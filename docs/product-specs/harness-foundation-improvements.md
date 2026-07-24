@@ -38,17 +38,17 @@ Target inspected for this proposal:
 ## Verified findings and structured-audit limitation
 
 The supplied HE findings were independently rechecked against the target
-revision and are accepted as the planning input for this SPEC. `HFI-001`
-instantiates the structured owners under
-`docs/documentation-audit/harness-foundation/`; dependent correction remains
-blocked until their Schema validation and mapping checks pass.
+revision and accepted as the planning input for this SPEC. `HFI-001`
+instantiated the structured owners under
+`docs/documentation-audit/harness-foundation/`; their Schema validation and
+mapping checks now gate every dependent correction.
 
 | Finding | Verified evidence at the target | Invariants | Requirements | Tasks |
 | --- | --- | --- | --- | --- |
 | `HE-001` | `docs/verification/harness-epochs.md` binds HGI-206 to target `a8a58882...`, skill digests and a 22 July epoch, and requires requalification after a skill change. Commits `57f13c1`, `623115e`, and `8695c01` changed repository skills on 24 July. `docs/exec-plans/active/README.md` still records no active plan, and no successor harness SPEC/task, epoch, or requalification exists. | `HC-EPOCH-001`, `HC-PROOF-001`, `HC-EVIDENCE-001` | `HFR-001`, `HFR-006` | `HFI-001`, `HFI-004`, `HFI-005` |
-| `HE-002` | `.agents/skills/docs-maintainer/references/harness/contract-map.md` requires `document-classes.md` and `change-impact.md`. Neither file exists in the repository-local skill, while the skill claims it is self-contained. | `HC-DOC-001`, `HC-TOOL-001`, `HC-REPO-001` | `HFR-003` | `HFI-002` |
-| `HE-003` | Harness JSON Schemas and a repository-profile template exist under `.agents/skills/docs-maintainer/assets/harness/`, but there is no TaxKit profile instance, structured audit scope/findings/acceptance template set, accepted HE register, repository audit/profile validator, or focused gate in root `verification`. | `HC-REPO-001`, `HC-TOOL-001`, `HC-FEEDBACK-001` | `HFR-001`, `HFR-004` | `HFI-001`, `HFI-003` |
-| `HE-004` | The current `repo-structure` baseline defines six complete canonical skill folders, repository overlays for the docs-maintainer and package-structure profiles, content-addressed tree receipts, and relative Claude links for all six. TaxKit has the six folder names, but several folders are partial, there is no canonical tree receipt, and the standard links for `effect-client-wrapper`, `package-structure`, and `prd-review` are absent. | `HC-REPO-001`, `HC-DEPENDENCY-001`, `HC-DOC-001` | `HFR-002`, `HFR-003`, `HFR-005` | `HFI-002`, `HFI-003` |
+| `HE-002` | `.agents/skills/docs-maintainer/references/harness/contract-map.md` requires `document-classes.md` and `change-impact.md`. Neither file exists in the repository-local skill, while the skill claims it is self-contained. | `HC-DOC-001`, `HC-TOOL-001`, `HC-REPO-001` | `HFR-003` | `HFI-002`, `HFI-005` |
+| `HE-003` | Harness JSON Schemas and a repository-profile template exist under `.agents/skills/docs-maintainer/assets/harness/`, but there is no TaxKit profile instance, structured audit scope/findings/acceptance template set, accepted HE register, repository audit/profile validator, or focused gate in root `verification`. | `HC-REPO-001`, `HC-TOOL-001`, `HC-FEEDBACK-001` | `HFR-001`, `HFR-004` | `HFI-001`, `HFI-003`, `HFI-005` |
+| `HE-004` | The current `repo-structure` baseline defines six complete canonical skill folders, repository overlays for the docs-maintainer and package-structure profiles, content-addressed tree receipts, and relative Claude links for all six. TaxKit has the six folder names, but several folders are partial, there is no canonical tree receipt, and the standard links for `effect-client-wrapper`, `package-structure`, and `prd-review` are absent. | `HC-REPO-001`, `HC-DEPENDENCY-001`, `HC-DOC-001` | `HFR-002`, `HFR-003`, `HFR-005` | `HFI-002`, `HFI-003`, `HFI-005` |
 
 The implementation audit records must retain the exact `HE-001` through
 `HE-004` IDs. The local audit Schemas must accept those stable IDs rather than
@@ -340,6 +340,11 @@ successor epoch claim. The first post-commit path check invalidated the initial
 candidate because two adversarial tests embedded private-looking absolute path
 literals; HFI-003 remains complete only after the equivalent fixtures are built
 from neutral fragments and the tracked path/full gates pass.
+Independent review of the next candidate then proved that full host permission
+bits were not portable through Git: non-executable `0600` source templates
+materialized as `0644` in a clean clone. The canonical content boundary remains
+unchanged, but TaxKit's enforceable receipt must normalize regular-file modes
+to Git's portable `0644`/`0755` distinction and pass both checkout contexts.
 
 The exact task contract and dependencies live in
 [`harness-foundation-improvements.tasks.json`](./harness-foundation-improvements.tasks.json).
@@ -453,16 +458,19 @@ epoch claim over changed skills.
 
 ## Limitations and non-claims
 
-- This SPEC and task list do not implement or validate the future profile,
-  audit register, skill migration, validator, CI inheritance, or epoch.
-- The HE mapping in this document is not a substitute for the missing
-  structured accepted-finding crosswalk.
+- `HFI-001` through `HFI-003` implement the profile, structured audit,
+  Git-portable skill migration, validator, and inherited CI edge. A successor
+  epoch remains unqualified until one immutable corrected candidate passes all
+  five journeys and fresh independent review.
+- The HE table is a readable route only; the schema-valid
+  `docs/documentation-audit/harness-foundation/accepted-findings.json` record
+  is the executable accepted-finding crosswalk.
 - The current global canonical skill collection was inspected as audit input,
   but no global path or mutable installation becomes repository runtime truth.
 - No package, API, SDK, app, website, public documentation, provider, registry,
   deployment, release, publication, recovery, or external consumer state is
   changed or proved.
-- A future green local verification or release graph will not prove hosted CI,
+- A green local verification or release graph does not prove hosted CI,
   Git publication, registry state, deployment, provider state, public-site
   availability, or general harness effectiveness.
 

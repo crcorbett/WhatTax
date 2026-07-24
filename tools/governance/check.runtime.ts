@@ -5,7 +5,7 @@ import * as FileSystem from "effect/FileSystem";
 import * as Path from "effect/Path";
 
 import { readGovernanceJson, repositoryRootFromUrl } from "./input.boundary.js";
-import { inspectGovernance } from "./policy.js";
+import { inspectGovernance, portableTreeMode } from "./policy.js";
 import type {
   GovernanceObservations,
   LinkObservation,
@@ -90,7 +90,7 @@ const inspectTree = (
             const hash = yield* sha256(bytes);
             return [
               relativePath,
-              `{"kind":"file","mode":${info.mode % 0o1_0000},"sha256":"${hash}"}`,
+              `{"kind":"file","mode":${portableTreeMode(info.mode)},"sha256":"${hash}"}`,
             ] as const;
           }
           if (info.type === "SymbolicLink") {

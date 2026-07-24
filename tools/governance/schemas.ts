@@ -273,9 +273,11 @@ export const CanonicalSkillBaseline = Schema.Struct({
     aggregateDigest: NonEmpty,
     identityLimitation: NonEmpty,
     kind: NonEmpty,
+    originalObservedAggregateDigest: NonEmpty,
     owner: NonEmpty,
     repositoryRevision: Schema.NullOr(NonEmpty),
   }),
+  treeDigestAlgorithm: NonEmpty,
 });
 export type CanonicalSkillBaseline = typeof CanonicalSkillBaseline.Type;
 

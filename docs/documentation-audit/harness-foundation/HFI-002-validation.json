@@ -30,10 +30,11 @@
   },
   "canonicalSource": {
     "kind": "content-addressed-installed-skill-collection",
-    "aggregateDigest": "f10de9106d54869d7d674e097ef3d492c165daaf1386de5d23d787dcfa0b2230",
+    "aggregateDigest": "55e15d59d8320fdaa06af6d6a55d8b6148b2c5ea327399bb77eec19cd7260577",
+    "originalObservedAggregateDigest": "f10de9106d54869d7d674e097ef3d492c165daaf1386de5d23d787dcfa0b2230",
     "receipt": "tools/skills/canonical-skill-baseline.json",
     "repositoryRevision": null,
-    "limitation": "No Git revision was available for the installed collection; per-tree and aggregate content digests are the frozen identity."
+    "limitation": "No Git revision was available for the installed collection. The enforceable receipt normalizes regular-file modes to Git-portable 0644/0755 semantics and retains the original host-mode aggregate as source-observation evidence."
   },
   "verification": [
     {
@@ -44,7 +45,7 @@
     {
       "check": "repository-local receipt recomputation",
       "status": "passed",
-      "postcondition": "Local-only SHA-256 recomputation matched all six tree receipts, both profile hashes, and the unchanged docs-writer and portless receipts."
+      "postcondition": "Local-only SHA-256 recomputation matched all six Git-portable tree receipts, both profile hashes, and the unchanged docs-writer and portless receipts in both the implementation checkout and a clean-clone materialization."
     },
     {
       "check": "Claude link resolution",
@@ -114,7 +115,8 @@
   "noChangeset": "HFI-002 changes repository skill/governance sources, compatibility links, tests, and formatter ownership only; package-facing behavior and public documentation are unchanged.",
   "limitations": [
     "The receipt qualifies only the source trees observed on 2026-07-24.",
-    "Future intentional canonical or profile changes require a new receipt and requalification."
+    "Future intentional canonical or profile changes require a new receipt and requalification.",
+    "The installed source used host-specific non-executable modes that Git cannot retain; the corrected receipt preserves content and executable-bit identity, not umask-specific permissions."
   ],
   "nonClaims": [
     "No global runtime installation, remote Git, hosted CI, registry, release, deployment, provider, public-site, or external-consumer state is established."

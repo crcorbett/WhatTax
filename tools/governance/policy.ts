@@ -86,6 +86,13 @@ export interface GovernanceInputs {
   readonly tasks: ProductSpecTaskPlan;
 }
 
+export const portableTreeMode = (mode: number) => {
+  const ownerExecutable = Math.floor(mode / 64) % 2 === 1;
+  const groupExecutable = Math.floor(mode / 8) % 2 === 1;
+  const otherExecutable = mode % 2 === 1;
+  return ownerExecutable || groupExecutable || otherExecutable ? 0o755 : 0o644;
+};
+
 const finding = (
   invariant: GovernanceInvariant,
   target: string,
@@ -191,6 +198,8 @@ const inspectTrees = (
   const receiptExtraIds = Record.keys(receipt.extras);
   const { "docs-writer": docsWriter, portless } = receipt.extras;
   const extraMismatch =
+    receipt.treeDigestAlgorithm !==
+      "sha256(canonical-json(sorted relative entries)); regular file mode normalized to Git-portable 0644 or 0755; allowed overlays excluded and hashed separately" ||
     !hasExactMembers(receiptExtraIds, expectedExtraIds) ||
     docsWriter?.classification !== "taxkit-public-copy-only-extra" ||
     docsWriter.owner !== "taxkit-documentation-owner" ||

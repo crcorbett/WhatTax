@@ -12,7 +12,7 @@ import {
 import { checkHarnessGovernance } from "./check.runtime.js";
 import acceptedFixture from "./fixtures/accepted.json";
 import adversarialFixture from "./fixtures/adversarial.json";
-import { inspectGovernance } from "./policy.js";
+import { inspectGovernance, portableTreeMode } from "./policy.js";
 import type {
   GovernanceInputs,
   GovernanceObservations,
@@ -64,6 +64,13 @@ const replaceCanonicalTree = (
 };
 
 describe("harness governance policy", () => {
+  it("normalizes host permissions to Git-portable tree modes", () => {
+    expect(portableTreeMode(0o600)).toBe(0o644);
+    expect(portableTreeMode(0o644)).toBe(0o644);
+    expect(portableTreeMode(0o700)).toBe(0o755);
+    expect(portableTreeMode(0o755)).toBe(0o755);
+  });
+
   it("accepts the repository and decodes the fixture corpus", async () => {
     const inputs = await loadAcceptedInputs();
     expect(inspectGovernance(inputs)).toEqual([]);

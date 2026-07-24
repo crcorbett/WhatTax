@@ -6,7 +6,7 @@
     "baseCommit": "aba9d42e7f665be334f0f929f0c63696f9a5b0d7",
     "branch": "main",
     "upstream": "origin/main",
-    "candidate": "HFI-003 semantic commit 9ace7d7db5bdc40c113ce16f3a71f944d50628d0 plus the passing-gated post-commit fixture correction"
+    "candidate": "HFI-003 semantic commit 9ace7d7db5bdc40c113ce16f3a71f944d50628d0 plus passing-gated fixture and Git-portable receipt corrections"
   },
   "acceptedFindingIds": ["HE-003", "HE-004"],
   "requirementIds": ["HFR-004", "HFR-005"],
@@ -86,8 +86,13 @@
     },
     {
       "check": "post-correction bun run verification",
+      "status": "superseded",
+      "postcondition": "The complete tracked root graph passed after the fixture correction in the originating worktree, but an independent clean clone exposed host-specific 0600 modes in the package-structure receipt."
+    },
+    {
+      "check": "Git-portable receipt correction, clean-clone focused gates, and originating-checkout full verification",
       "status": "passed",
-      "postcondition": "The complete tracked root graph passed after the fixture correction, including the new gate once, ten quality-workflow tests, both Knip graphs, and 23 of 23 workspace type/build tasks."
+      "postcondition": "The gate normalizes regular-file modes to Git's 0644/0755 semantics; a fresh clone after frozen install produced the same receipts and passed governance type/test/runtime plus repository paths, while the originating checkout passed full verification."
     },
     {
       "check": "git diff --check",
@@ -118,14 +123,16 @@
   },
   "noChangeset": "HFI-003 changes repository-local governance tooling, configuration, and maintainer routes only; package installation, exports, public API, runtime behavior, and public documentation are unchanged.",
   "limitations": [
-    "The gate validates the content-addressed baseline recorded in the repository; it does not fetch or qualify future canonical skill versions.",
+    "The gate validates the Git-portable content-addressed baseline recorded in the repository; it does not fetch or qualify future canonical skill versions.",
     "The gate proves local repository state only and cannot establish hosted or external outcomes.",
-    "A successor harness epoch remains unqualified until HFI-004 passes against an immutable migrated candidate."
+    "A successor harness epoch remains unqualified until HFI-004 passes against an immutable migrated candidate.",
+    "The clean-clone full verification attempt passed the harness/path/docs/runbook/lint/format/skill/workflow gates, then exposed a pre-existing Knip dependency on built docs-fumadocs output; this migration does not alter the preserved root release graph."
   ],
   "nonClaims": [
     "No push, remote branch, hosted CI run, registry publication, release, deployment, provider, production, public-site, or external-consumer state is established."
   ],
   "rollback": "Revert the HFI-003 local commit to remove the focused gate and owner routes while retaining HFI-001 and HFI-002 evidence; do not requalify the epoch until the gate passes again.",
   "observedAt": "2026-07-24T21:58:33Z",
-  "correctedAt": "2026-07-24T22:05:00Z"
+  "correctedAt": "2026-07-24T22:05:00Z",
+  "portableReceiptCorrectedAt": "2026-07-24T22:16:00Z"
 }

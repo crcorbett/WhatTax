@@ -4,9 +4,10 @@
   "source": {
     "kind": "content-addressed-installed-skill-collection",
     "owner": "repo-structure canonical repository-skill baseline",
-    "aggregateDigest": "f10de9106d54869d7d674e097ef3d492c165daaf1386de5d23d787dcfa0b2230",
+    "aggregateDigest": "55e15d59d8320fdaa06af6d6a55d8b6148b2c5ea327399bb77eec19cd7260577",
+    "originalObservedAggregateDigest": "f10de9106d54869d7d674e097ef3d492c165daaf1386de5d23d787dcfa0b2230",
     "repositoryRevision": null,
-    "identityLimitation": "The installed canonical collection has no available Git revision; the aggregate and per-tree SHA-256 digests are the frozen source identity."
+    "identityLimitation": "The installed canonical collection has no available Git revision. The original observed aggregate is retained; the enforceable aggregate and per-tree SHA-256 digests normalize regular-file permissions to Git-portable 0644/0755 semantics."
   },
   "skills": {
     "docs-maintainer": {
@@ -19,7 +20,7 @@
     },
     "package-structure": {
       "entryCount": 50,
-      "treeDigest": "523cf4666a02621c699d12bcb35e91c54aafd86147be89349526f324599c9b11"
+      "treeDigest": "3885b3fae6da0f98e6f8f1ea6e1e61e92763895eb78b3471f2f8a9afd30a8a46"
     },
     "prd-implementer": {
       "entryCount": 2,
@@ -34,6 +35,7 @@
       "treeDigest": "20ee18b840b67eee66ceeb2e4808bf9a9c2cbd021132a48be2f3ddbb53637f81"
     }
   },
+  "treeDigestAlgorithm": "sha256(canonical-json(sorted relative entries)); regular file mode normalized to Git-portable 0644 or 0755; allowed overlays excluded and hashed separately",
   "allowedOverlays": [
     {
       "path": ".agents/skills/docs-maintainer/references/repository-profile.md",
@@ -77,7 +79,8 @@
   "retirementCondition": "Retire this receipt only when a successor content-addressed baseline and migration receipt are accepted together.",
   "limitations": [
     "The receipt binds the canonical source observed on 2026-07-24 and does not claim compatibility with future source trees.",
-    "The two repository-profile overlays are excluded from baseline tree comparison and are independently hashed."
+    "The two repository-profile overlays are excluded from baseline tree comparison and are independently hashed.",
+    "The source collection contained host-specific non-executable permissions that Git cannot retain; receipt modes intentionally preserve only Git's executable-bit distinction."
   ],
   "nonClaims": [
     "No global skill installation is required or qualified at repository runtime.",
