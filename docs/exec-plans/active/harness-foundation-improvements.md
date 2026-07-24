@@ -31,8 +31,12 @@ changes.
   focused decode proof passed the task and root gates. The bounded acceptance
   record is
   [`HFI-001-validation.json`](../../documentation-audit/harness-foundation/HFI-001-validation.json).
-- **HFI-002 — pending on HFI-001:** migrate the six complete canonical skill
-  trees, two profiles, declared extras, receipt, references, and Claude links.
+- **HFI-002 — complete:** six canonical trees, two profiles, two unchanged
+  declared extras, the content-addressed receipt, all references, and eight
+  relative Claude links passed focused and root verification. The accepted
+  Oxfmt exclusion prevents repository formatting from invalidating the
+  canonical digest. Evidence:
+  [`HFI-002-validation.json`](../../documentation-audit/harness-foundation/HFI-002-validation.json).
 - **HFI-003 — pending on HFI-001 and HFI-002:** enforce the final repository
   state through one focused Effect-native gate in normal verification.
 - **HFI-004 — pending on HFI-003:** freeze the candidate, run the five retained

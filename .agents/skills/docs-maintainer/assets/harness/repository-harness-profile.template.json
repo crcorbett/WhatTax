@@ -34,12 +34,8 @@
     }
   ],
   "criticalJourneyOwner": "docs/critical-journeys/",
-  "boundaryFacts": [
-    "Name important runtime, provider, release, and trust boundaries."
-  ],
-  "exclusions": [
-    "Name generated, vendored, binary, inaccessible, or out-of-scope material."
-  ],
+  "boundaryFacts": ["Name important runtime, provider, release, and trust boundaries."],
+  "exclusions": ["Name generated, vendored, binary, inaccessible, or out-of-scope material."],
   "nonClaims": ["Name what repository-local proof does not establish."],
   "exceptions": []
 }

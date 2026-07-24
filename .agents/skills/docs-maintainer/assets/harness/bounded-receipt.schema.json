@@ -24,26 +24,14 @@
   ],
   "properties": {
     "schemaVersion": { "const": "1" },
-    "status": {
-      "enum": [
-        "passed",
-        "failed",
-        "blocked",
-        "skipped",
-        "inconclusive",
-        "no_op"
-      ]
-    },
+    "status": { "enum": ["passed", "failed", "blocked", "skipped", "inconclusive", "no_op"] },
     "claim": { "$ref": "#/$defs/nonEmptyString" },
     "target": { "$ref": "#/$defs/nonEmptyString" },
     "candidateIdentity": { "$ref": "#/$defs/nonEmptyString" },
     "actor": { "$ref": "#/$defs/nonEmptyString" },
     "authorityReceipt": { "$ref": "#/$defs/nonEmptyString" },
     "environment": { "$ref": "#/$defs/nonEmptyString" },
-    "journeyIds": {
-      "type": "array",
-      "items": { "$ref": "#/$defs/nonEmptyString" }
-    },
+    "journeyIds": { "type": "array", "items": { "$ref": "#/$defs/nonEmptyString" } },
     "observations": { "$ref": "#/$defs/nonEmptyStrings" },
     "postconditions": { "$ref": "#/$defs/nonEmptyStrings" },
     "detailArtifacts": {

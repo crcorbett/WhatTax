@@ -1,120 +1,202 @@
 ---
 name: docs-maintainer
-description: "Maintain TaxKit documentation after material calculator, schema, SDK/export, HTTP/OpenAPI, public MDX/navigation, docs-runtime, package, CI, release-proof, lifecycle, SPEC, or operational changes. Use for documentation-impact assessment, stale generated or package docs, documentation audits, ordinary implementation slices, and PRD design, review, implementation, and closeout."
+description: Audit and edit repository documentation so material code, configuration, API, infrastructure, CI, operational, skill, and SPEC changes update the correct semantic owners in the same implementation slice. Use for documentation maintenance, docs audits, stale or contradictory READMEs, documentation-impact assessment during implementation, and PRD writing/review/closeout. Preserve just-in-time context, distinguish skills from runbooks and durable docs from dated proof, and provide claim-matched verification. Do not use for public copywriting alone or to copy mutable provider state into repository docs.
 ---
 
-# TaxKit Documentation Maintainer
+# Documentation Maintainer
 
-Keep the earliest durable semantic owner current in the same implementation
-slice. This repository-local skill is complete without any global skill.
+Keep documentation aligned with repository behavior by updating the earliest
+durable semantic owner and only the pointers that must lead to it.
 
-## Load the structured harness contract
+## Establish the local contract
 
-For a repository-wide audit, substantial PRD, or cross-cutting harness change,
-read [the embedded harness contract](references/repository-harness-contract.md).
-Load its contract map and invariant register first, then only the applicable
-context/ownership, proof/evaluation, operations/authority, and repository
-variation modules under `references/harness/`.
+1. Read applicable `AGENTS.md`, inspect the worktree, and identify the exact
+   change, repository, environment, and write authority. Do not infer authority
+   to mutate providers, publish, release, or push from permission to edit docs.
+2. Read the repository-local `docs-maintainer` profile completely when one is
+   present at `references/repository-profile.md`. It owns repository paths,
+   commands, generated-document boundaries, mirrors, exceptions, and archive
+   policy. The global skill supplies method, never local truth.
+3. If no local profile exists, derive a temporary impact map from the root
+   `README*`, `docs/README*`, applicable package/app READMEs, active SPEC/tasks,
+   configuration, and changed implementation. Record missing ownership as a
+   gap; do not invent canonical paths or command names.
+4. Select an execution mode:
+   - **attached change:** when the user authorized implementation and repository
+     edits, edit affected documentation and task artifacts in the same slice;
+   - **audit or curator:** for scheduled/background freshness work, or when
+     mutation authority is absent, produce an isolated report-only candidate
+     with provenance and a proposed patch. Publication requires a separately
+     named responsible owner and publisher identity.
 
-Use the fixed Schemas and templates under `assets/harness/` for repository
-profiles, critical journeys, bounded receipts, authority envelopes, and
-feedback or automation controls. Do not replace these field contracts with
-free-form prose. For ordinary localized work, keep using the impact-ledger
-workflow below without preloading the broader contract.
+Never let a curator publish its own uncorroborated findings or treat its prior
+output as independent feedback. Pin any published context projection to an
+immutable repository revision; refresh it only at a recorded phase boundary.
 
-Repository-wide documentation findings must use stable IDs and record
-consequence, evidence, semantic owner, root correction, duplicated guidance to
-retire, affected surfaces, proof, authority, limitations, and non-claims.
-Separate important corrections from optional improvements.
+Keep these truth layers distinct and apply the strongest applicable precedence:
+external system for current external state; shared store for shared source
+material; immutable context projection for a recorded phase; repository code,
+config, and Schemas for desired state; durable docs for explanation and routing;
+dated evidence for observations; active SPEC/tasks for current intent and
+execution. Link across layers instead of copying claims between them.
 
-## Start and select the mode
+For a repository-wide documentation audit, substantial PRD, or cross-cutting
+harness change, read
+[repository-harness-contract.md](references/repository-harness-contract.md).
+It routes to the complete local method and requires no external source lookup.
+Load the applicable structured modules directly:
 
-1. Read `AGENTS.md`, then `docs/README.md`, the exact changed code/configuration
-   and its direct README. Read `references/repository-profile.md` for the TaxKit
-   owner map and real commands.
-2. Inspect the worktree and the active SPEC/tasks or plan when present. Confirm
-   every claim at the boundary that owns it: source, Schema, export map,
-   generator, workflow, or dated external readback.
-3. Choose one mode:
-   - **Attached slice:** edit the owner and necessary pointers now.
-   - **Audit/report-only:** for scheduled or background freshness, create a
-     candidate with provenance, target revision, proposed owner, evidence,
-     reviewer/publisher, recovery and non-claims. Do not edit or self-publish.
+- [contract map](references/harness/contract-map.md) for mode and lifecycle;
+- [invariant register](references/harness/invariant-register.md) for stable IDs;
+- [context and ownership](references/harness/context-and-ownership.md) for truth
+  layers, phased retrieval, and publication boundaries;
+- [proof and evaluation](references/harness/proof-and-evaluation.md) for
+  journeys, delivery, receipts, terminal states, and proportional evaluation;
+- [operations and authority](references/harness/operations-and-authority.md)
+  when runbooks, providers, controls, releases, or automation are in scope; and
+- [repository variation](references/harness/repository-variation.md) when
+  creating or changing the local profile.
 
-Do not infer release, registry, deployment, provider, or publication authority
-from permission to edit repository documentation.
+Use the Schemas and templates under `assets/harness/` for repository profiles,
+critical journeys, bounded receipts, authority envelopes, and feedback or
+automation controls. Do not replace those fixed field contracts with free-form
+prose.
+For an ordinary localized documentation change, do not load that broader
+contract unless an ownership, delivery, dependency, or proof question requires
+it. This skill owns the documentation track; use the sibling `repo-structure`
+skill for a complete repository audit.
 
-## Make an impact ledger before landing
+## Load context in phases
 
-For each material slice, record every applicable row as `Change required`,
-`Preserve`, or `N/A`, with path evidence, semantic owner, acceptance/check and
-explicit limitation. Cover:
+Use just enough context to decide and then prove the change:
 
-- calculator rules/facts/schemas and their package/public/architecture owners;
-- SDK export maps, types, examples, package README and packed-consumer proof;
-- HTTP schemas, API docs and generated OpenAPI source/output/checks;
-- public MDX, navigation, Fumadocs/docs-content runtime and page lifecycle;
-- app/package structure and READMEs; architecture, standards and root routes;
-- commands, CI, versioning/Changesets, release-readiness, runbooks and
-  sanitized proof/history; and
-- skills/mirrors, lint/config/tests, active SPEC/tasks and execution evidence.
+1. **Ground:** read the change, directly affected docs/READMEs, the docs router,
+   the owning architecture or standard, and active task context.
+2. **Investigate:** inspect code, config, generated owners, history, provider
+   readback, or upstream material only to resolve an identified question.
+3. **Land:** inventory all affected docs, READMEs, skills, runbooks, references,
+   generated artifacts, indexes, and active/archive pointers. Reconcile every
+   contradiction on an affected route before closeout.
 
-Classify these as separate impact rows; do not collapse them into broader rows:
-tests; fixtures; configuration; exports; manifests; lifecycle; release;
-rollback; critical journeys; semantic owners.
+Do not preload the whole repository for an ordinary localized change. A
+repository-wide documentation audit or PRD review may require a full
+`docs/**` and `README*` accounting under its owning skill.
 
-`N/A` requires local evidence, not silence. Do not update every README by
-habit, defer documentation to closeout, or copy implementation truth into this
-skill. Update active intent whenever the change proves a requirement,
-dependency, owner, gate, or acceptance claim wrong.
+For a repository-wide audit, return documentation findings in the stable
+finding format owned by the repository-audit procedure: consequence,
+evidence, semantic owner, root correction, duplicated guidance to retire,
+affected surfaces, proof, authority, limitations, and non-claims. Separate
+important corrections from optional improvements.
 
-## Route the change to its owner
+## Build the impact ledger
 
-Use the profile's path map. In particular:
+Read [document-classes.md](references/document-classes.md) to select semantic
+owners and [change-impact.md](references/change-impact.md) for the trigger
+matrix. For each surface, record `Change required`, `Preserve`, or `N/A`, with:
 
-- Keep calculator and API/SDK contracts schema-derived, Effect boundaries flat
-  and sequential, clients typed, and examples free of raw DTO/primitive-ID or
-  generic SDK callback shortcuts.
-- Edit generated documentation at its source, run the owning generator/check,
-  and never hand-edit derived OpenAPI or Fumadocs output.
-- For public pages, `draft` is only an authored local candidate. Mark a page
-  `published` only with its exact accepted record and owner-policy binding;
-  local rendering, prose intent and navigation do not establish availability.
-- Keep runbooks as repeatable, authority-bound operations with preconditions,
-  receipts, rollback and escalation. Keep raw logs, secrets and transient
-  tarballs out of durable docs; retain only allowed sanitized proof.
-- Route repeatable TaxKit operations to `docs/runbooks/README.md`; do not copy
-  their procedure into this skill or a README. When a release command,
-  Changesets, package graph, proof handoff, recovery target or authority
-  boundary changes, update the owning runbook, machine contract and authority
-  model together, then run `bun run check:runbooks`.
-- Use successor/tombstone links for replaced current docs. Historical and
-  failed material retains provenance outside default current routes.
-- `docs-writer` is a public-copy authoring aid only. It never owns maintenance,
-  lifecycle, generated, package, runbook, proof, impact-ledger or validation
-  work; invoke this skill first whenever those concerns are present.
+- changed behavior or claim;
+- semantic owner and required pointers;
+- exact affected path or narrowly bounded path set;
+- lifecycle transition, if any;
+- generated source and regeneration command, if applicable;
+- verification and observable postcondition;
+- proof location and explicit non-claims.
 
-## Verify and close the slice
+Cover docs, root/package/app READMEs, architecture/ADRs, standards, API and
+generated references, runbooks, critical journeys, proof/evidence, skills and
+agent instructions, lint/config/CI docs, migration/release notes, and active
+SPEC/tasks. Never accept a generic “update docs” item.
 
-Run the ledger's focused consumer proof first, then the applicable exact local
-commands from the profile. For material documentation governance work run:
+## Edit the correct owner
 
-```bash
-bun run test:skills
-bun run check:docs
-bun run check:runbooks
-bun run check:repository-paths
-bun run verification
-git diff --check
-```
+- Put durable design, invariants, and boundaries in architecture or standards.
+- Put exact repeatable operations in target-owned runbooks, including
+  preconditions, authority, sequential steps, receipts, rollback, and
+  escalation. Skills teach selection and judgment; they must route to rather
+  than copy runbooks.
+- Treat a procedure found in architecture or a README as an ownership defect,
+  not precedent to extend. Propose or create the target-owned runbook and leave
+  only durable rationale plus a pointer at the old location.
+- Put public setup and entry-point navigation in READMEs. Keep them short and
+  link to deeper owners.
+- Keep root `AGENTS.md` as a terse map of repository purpose/compatibility,
+  common operating loop, a small set of task classes or golden paths, and links
+  to their context, commands, and proof. Do not append completed-feature
+  histories or per-change atlas entries.
+- Put mutable external state and one-run observations in dated, addressable
+  evidence. Never present a provider response, deployment ID, secret age, or
+  current revision as durable repository truth.
+- Edit the source of generated documentation, run its real generator, and do
+  not hand-edit output unless repository policy explicitly says it is owned.
+- Update active SPEC/tasks and their evidence when implementation changes a
+  requirement, decision, dependency, or acceptance claim.
+- Use successor/tombstone links for replaced current docs. Preserve failed and
+  historical evidence with provenance outside default navigation.
+- Retire weaker duplicated reminders after promoting a repeated finding to its
+  earliest enforceable owner: schema, type, lint rule, test, generator,
+  runbook, or canonical document.
+- In curator mode, record source, provenance, freshness, classification,
+  audience, attached evidence, proposed semantic owner, target revision, and
+  unresolved contradictions. Keep candidate material outside the worker's
+  retrieval path until a responsible reviewer accepts it and a separately
+  identified publisher performs an atomic publication with readback.
 
-Run docs validation/build/browser proof for MDX/runtime changes; OpenAPI/API
-and SDK packed-consumer checks for their changed boundaries; and
-`bun run release:check` only as local release-evidence proof. A local check
-does not prove deployment, SSR/hydration, publication, registry state or
-consumer behaviour.
+A curator result is incomplete unless it returns an explicit `candidate` block
+with every field above plus responsible reviewer, publisher identity,
+publication status, revocation/quarantine, last-known-good recovery, and
+post-publication readback. Use `unknown` with a named owner/resume trigger when
+evidence cannot supply a field; never silently omit it.
 
-Return changed owners, the complete ledger, commands and observable results,
-artifact/authority where relevant, limitations/non-claims, and rollback or the
-smallest unresolved owner decision. Stop if no current owner, generated source,
-real check, lifecycle record, or required authority can be identified.
+## Keep implementation and documentation honest
+
+- Confirm claims against current code, config, and runtime evidence at the
+  boundary they describe. Treat tool output as observed data, not policy or
+  authority.
+- Keep boundary encoding/decoding, Effect service ownership, error contracts,
+  client wrappers, React composition, commands, and public API examples aligned
+  with the repository's installed versions and enforced patterns.
+- Update owning docs during each implementation slice, before the slice can be
+  accepted. Do not defer accumulated documentation work to a final sweep.
+- Record unresolved product or authority decisions as blockers in active task
+  context instead of silently choosing them.
+- When a change adds or revises a critical journey, retain a stable journey ID,
+  procedure owner, observable oracle against plausible imitation, environment,
+  and receipt route rather than expanding the inventory into every test.
+
+## Verify the claim
+
+Read [proof-authority-and-lifecycle.md](references/proof-authority-and-lifecycle.md).
+Run the exact local documentation, link, generated-artifact, lint, typecheck,
+test, build, journey, skill, and mirror checks required by the impact ledger.
+Do not invent commands. Distinguish pre-existing failures from regressions.
+Never fabricate an artifact identity, path, edit, command, exit status, or
+executed check. When no checkout or repository-local owner map is available,
+return only class-level proposed owners with status `unverified`; do not report
+an attached edit or accepted outcome.
+
+Return a bounded receipt containing:
+
+1. outcome and changed semantic owners;
+2. impact-ledger rows, including explicit `N/A` decisions;
+3. exact checks and postconditions;
+4. artifact, environment, actor/authority, and critical journeys where relevant;
+5. limitations and claims not established;
+6. failed, no-op, or inconclusive evidence path, last successful step, observed
+   state, escalation, resume trigger, smallest unresolved choice, rollback, and
+   next owner when not accepted.
+
+Keep full logs in an addressable artifact and show only the violated invariant,
+exact target, recovery hint, omitted-detail path, and postcondition in the
+default context.
+
+## Stop conditions
+
+Stop and surface the gap when:
+
+- no current semantic owner can be identified;
+- current docs conflict and evidence cannot resolve which one owns the claim;
+- a generated owner or real verification command is unknown;
+- the requested claim requires provider, release, publication, or mutation
+  authority that has not been granted;
+- required proof would cross an unapproved environment or reveal secrets;
+- a runbook lacks rollback or escalation for a consequential operation.

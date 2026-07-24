@@ -274,7 +274,7 @@
     },
     {
       "id": "HFI-002",
-      "status": "pending",
+      "status": "complete",
       "acceptedFindingIds": [
         "HE-002",
         "HE-004"
@@ -296,6 +296,7 @@
         "reapply only the TaxKit docs-maintainer and package-structure repository profiles",
         "repair missing document-classes, change-impact, proof/authority/lifecycle, and other canonical references",
         "record complete tree receipts, allowed overlays, local extras, limitations, and refresh triggers",
+        "exclude the content-addressed canonical skill projection from repository formatting so normal verification cannot rewrite accepted source identity",
         "add the missing standard relative Claude links",
         "preserve docs-writer as public-copy-only and portless as an unchanged non-baseline local extra"
       ],
@@ -308,6 +309,7 @@
         "complete .agents/skills/prd-writer/**",
         "TaxKit-only repository-profile overlays for docs-maintainer and package-structure",
         "tools/skills/canonical-skill-baseline.json",
+        "oxfmt.config.ts canonical-skill-tree exclusion",
         ".claude/skills/effect-client-wrapper",
         ".claude/skills/package-structure",
         ".claude/skills/prd-review",
@@ -321,6 +323,7 @@
         "focused link resolution proving all six standard Claude entries are relative symlinks to .agents/skills owners",
         "focused reference traversal proving every local skill Markdown link resolves",
         "structural skill validation for all six baseline skills and docs-writer",
+        "bun run format:check proving the canonical skill trees are not rewritten by repository formatting",
         "bun run test:skills",
         "bun run check:docs",
         "bun run check:repository-paths",

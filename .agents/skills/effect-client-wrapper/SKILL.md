@@ -1,245 +1,70 @@
 ---
 name: effect-client-wrapper
-description: "Wrap third-party SDKs and provider clients behind TaxKit Effect services. Use when integrating a Promise-based SDK or external provider so named operations, canonical schemas, immediate boundary decoding, schema-tagged errors, Config, live/mock Layers, focused tests, and stale-pattern enforcement replace raw client escape hatches."
+description: Design, implement, or review a typed Effect service around a third-party SDK, API client, callback library, or Promise-based provider. Use for provider adapters, service Layers, external-client configuration, request and response Schemas, typed provider errors, retries, and test Layers. Enforce named operations, branded identifiers, Schema-backed Config, immediate output decoding, flat Effects, and the explicit rejection of generic use callbacks, raw clients, primitive config, instanceof, and unchecked SDK outputs.
 ---
 
 # Effect Client Wrapper
 
-Wrap a third-party client inside one exact adapter and expose only owner-named
-Effect operations. The SDK is an implementation detail, not a service API.
+Create a semantic adapter owned by the application, not a generic Effect-shaped escape hatch around an SDK.
 
-## Read First
+## Establish the boundary
 
-Read:
+1. Read applicable repository instructions, architecture docs, lint rules, installed Effect and SDK versions, and representative services and Layers.
+2. Identify the owner of every request, response, identifier, configuration value, error, retry policy, and runtime boundary.
+3. Use DeepWiki through Executor MCP only for the upstream Effect or SDK repository. Reconcile it with installed types and local conventions.
+4. Prefer extending an existing semantic adapter over creating a parallel client abstraction.
 
-1. `AGENTS.md`
-2. `docs/architecture/effect-services.md`
-3. `docs/architecture/configuration.md`
-4. `docs/design-docs/abstraction-admission.md`
-5. the owning package schemas, service conventions, lint scopes, and tests
+## Define the public service
 
-Inspect the installed SDK and Effect versions locally. Use DeepWiki through
-Executor MCP only for the upstream SDK/library when local types and official
-source do not answer the question. Do not use DeepWiki to inspect TaxKit.
+- Expose named domain/provider operations such as `getCustomer`, `sendMessage`, or `renderImage`.
+- Accept owning Schema-derived inputs and branded identifiers. Never substitute raw `id: string`.
+- Return only decoded application-owned or explicitly provider-owned Schema types.
+- Keep the raw SDK instance private to the live Layer or adapter module.
+- Provide a live Layer and a mock/test Layer at the same service contract.
 
-## Non-Negotiable Rules
+Do not expose a generic `use`, `run`, `withClient`, callback, unconstrained generic result, or raw-client accessor. Those APIs erase operation ownership, output provenance, retry policy, and testability.
 
-- Expose named domain operations, never a generic SDK `use` callback.
-- Never expose the raw client on the public service or return it to consumers.
-- Reuse owner-named schemas and branded IDs; never publish raw `id: string`.
-- Load semantic configuration with owner-named `Config.schema` fragments and
-  app-owned `ConfigProvider` composition. Do not teach primitive semantic config.
-- Encode canonical input at the provider egress and decode every SDK output
-  immediately at provider ingress. An unchecked SDK result must never escape.
-- Model public expected failures with `Schema.TaggedErrorClass`. Translate
-  provider failures once without `instanceof`, raw `_tag` checks, or an
-  `unknown` public error channel.
-- Keep the primary operation flat, sequential, and composable. Use the locally
-  installed Effect v4 `Effect.fn` for a meaningful named operation; do not split
-  one path into encode/call/decode/map helpers used once.
-- Provide explicit live and deterministic mock Layers. Tests replace the public
-  service, not reach through it to the SDK.
-- Keep SDK construction and `Redacted.value` at the final live-adapter edge.
-- Add focused encode, provider-failure, malformed-output, live-adapter, and mock
-  tests plus stale-pattern scans.
+## Implement each operation linearly
 
-## Canonical Shape
+Use the locally installed Effect APIs. A named operation should read as one flat program:
 
-The example below is intentionally generic, but every real name must come from
-the provider/domain owner.
+1. validate or encode the typed request at the outbound boundary;
+2. call exactly one SDK operation through `Effect.tryPromise`, callback adaptation, or the repository's boundary primitive;
+3. map rejection immediately into an owner-named typed Schema error with safe diagnostics;
+4. decode the unknown SDK result immediately with the owning output Schema;
+5. apply operation-specific retry, timeout, tracing, metrics, and redaction policy;
+6. return the decoded value without another wrapper layer.
 
-```ts
-import { Config, Context, Effect, Layer, Redacted, Schema } from "effect";
+Use `Effect.gen`, meaningful `Effect.fn`, or local equivalents for readable sequential work. Keep one-use request mapping, rejection mapping, and decoding beside the operation. Extract only demonstrated reuse, stable domain policy, or a real I/O boundary.
 
-export const CustomerId = Schema.NonEmptyString.pipe(
-  Schema.brand("CustomerId")
-);
-export type CustomerId = typeof CustomerId.Type;
+## Configure safely
 
-export const InvoiceId = Schema.NonEmptyString.pipe(Schema.brand("InvoiceId"));
-export type InvoiceId = typeof InvoiceId.Type;
+- Model semantic configuration with Schema and `Config`/`ConfigProvider`, using the repository's supported API.
+- Give configuration an owner-named structure rather than passing independent primitive strings and numbers through the codebase.
+- Keep secrets redacted and unwrap them only for immediate SDK construction.
+- Construct the SDK once in the live Layer unless its documented lifecycle requires scoped acquisition and release.
+- Override configuration in tests through a test `ConfigProvider` or the repository's established Layer mechanism.
 
-export const CreateInvoiceInput = Schema.Struct({
-  customerId: CustomerId,
-  totalMinorUnits: Schema.Int.check(Schema.isGreaterThan(0)),
-});
-export type CreateInvoiceInput = typeof CreateInvoiceInput.Type;
+## Model failures explicitly
 
-const ProviderCreateInvoiceRequest = Schema.Struct({
-  customer_id: CustomerId,
-  total_minor_units: Schema.Int.check(Schema.isGreaterThan(0)),
-});
+- Use owner-named Schema-tagged errors for expected configuration, transport, rate-limit, authentication, provider, and decode failures when those distinctions affect callers.
+- Preserve safe provider codes, operation names, retryability, and diagnostic context; do not place unchecked `unknown` payloads in public tagged errors.
+- Use tagged catches or pattern matching. Never use `instanceof` for provider-error policy.
+- Treat truly unexpected failures as defects only when callers cannot reasonably recover.
 
-export const ProviderInvoice = Schema.Struct({
-  invoiceId: InvoiceId,
-  status: Schema.Literals(["pending", "paid"]),
-});
-export type ProviderInvoice = typeof ProviderInvoice.Type;
+## Test and enforce
 
-const ProviderApiKey = Schema.Redacted(Schema.NonEmptyString);
-const ProviderConfig = Config.all({
-  apiKey: Config.schema(ProviderApiKey).pipe(Config.nested("PROVIDER_API_KEY")),
-});
+Test service operations through mock/test Layers and test the live adapter boundary narrowly. Cover success, request encoding, provider rejection mapping, output decode failure, redaction, timeout/retry policy, and non-idempotent retry exclusion.
 
-export class ProviderRequestEncodingError extends Schema.TaggedErrorClass<ProviderRequestEncodingError>()(
-  "ProviderRequestEncodingError",
-  {
-    operation: Schema.Literal("createInvoice"),
-    message: Schema.NonEmptyString,
-  }
-) {}
+Update affected architecture docs, READMEs, lint/custom rules and fixtures, CI commands, SPEC/tasks, and repository-owned skills. Add the narrowest reliable static or stale-pattern check the repository supports.
 
-export class ProviderTransportError extends Schema.TaggedErrorClass<ProviderTransportError>()(
-  "ProviderTransportError",
-  {
-    operation: Schema.Literal("createInvoice"),
-    message: Schema.NonEmptyString,
-  }
-) {}
+Acceptance requires zero examples or public APIs containing:
 
-export class ProviderResponseDecodingError extends Schema.TaggedErrorClass<ProviderResponseDecodingError>()(
-  "ProviderResponseDecodingError",
-  {
-    operation: Schema.Literal("createInvoice"),
-    message: Schema.NonEmptyString,
-  }
-) {}
+- a generic SDK `use` callback or raw-client accessor;
+- a raw `id: string` where an owning branded ID exists;
+- primitive/manual semantic configuration in place of Schema-backed `Config`;
+- `instanceof` provider-error branching;
+- an SDK result escaping without immediate Schema decoding;
+- a one-use wrapper/helper that merely forwards, maps, reads one property, or hides the SDK call.
 
-export type ProviderClientError =
-  | ProviderRequestEncodingError
-  | ProviderTransportError
-  | ProviderResponseDecodingError;
-
-export interface ProviderClientShape {
-  readonly createInvoice: (
-    input: CreateInvoiceInput
-  ) => Effect.Effect<ProviderInvoice, ProviderClientError>;
-}
-
-export class ProviderClient extends Context.Service<
-  ProviderClient,
-  ProviderClientShape
->()("@taxkit/provider/ProviderClient") {}
-
-interface ProviderSdk {
-  readonly invoices: {
-    readonly create: (
-      input: typeof ProviderCreateInvoiceRequest.Encoded
-    ) => Promise<unknown>;
-  };
-}
-
-export const makeProviderClientLive = (
-  makeSdk: (apiKey: string) => ProviderSdk
-) =>
-  Layer.effect(
-    ProviderClient,
-    Effect.gen(function* makeProviderClient() {
-      const config = yield* ProviderConfig;
-      const sdk = makeSdk(Redacted.value(config.apiKey));
-
-      return ProviderClient.of({
-        createInvoice: Effect.fn("ProviderClient.createInvoice")(
-          function* createInvoice(input) {
-            const request = yield* Schema.encodeEffect(
-              ProviderCreateInvoiceRequest
-            )({
-              customer_id: input.customerId,
-              total_minor_units: input.totalMinorUnits,
-            }).pipe(
-              Effect.mapError(
-                () =>
-                  new ProviderRequestEncodingError({
-                    operation: "createInvoice",
-                    message: "Unable to encode the provider invoice request.",
-                  })
-              )
-            );
-
-            const rawResponse = yield* Effect.tryPromise({
-              try: () => sdk.invoices.create(request),
-              catch: () =>
-                new ProviderTransportError({
-                  operation: "createInvoice",
-                  message: "The provider invoice request failed.",
-                }),
-            });
-
-            return yield* Schema.decodeUnknownEffect(ProviderInvoice)(
-              rawResponse
-            ).pipe(
-              Effect.mapError(
-                () =>
-                  new ProviderResponseDecodingError({
-                    operation: "createInvoice",
-                    message: "The provider returned an invalid invoice.",
-                  })
-              )
-            );
-          }
-        ),
-      });
-    })
-  );
-
-export const ProviderClientMock = (
-  createInvoice: ProviderClientShape["createInvoice"]
-) => Layer.succeed(ProviderClient, ProviderClient.of({ createInvoice }));
-```
-
-The private `ProviderSdk` type and factory remain inside the live adapter module.
-If the SDK constructor can throw, wrap construction at that same edge with a
-schema-tagged configuration/initialization failure. Do not export an SDK factory
-from the package contract merely to make the example reusable.
-
-## Operation Design
-
-Keep each named operation readable in this order:
-
-```text
-canonical decoded input
-  -> Schema encoder at provider egress
-    -> one SDK/provider call
-      -> immediate Schema decoder at provider ingress
-        -> canonical decoded output
-```
-
-Map each expected failure where its context is known. Keep provider payloads,
-secrets, private paths, and SDK exception objects out of public errors and logs.
-Use `Match` or tagged handlers for decoded provider/domain variants.
-
-Do not automatically retry generic provider operations. A retry policy belongs
-to a named idempotent operation with explicit error classification and tests.
-
-## Layer And Test Contract
-
-Require focused tests for:
-
-1. canonical request encoding and exact provider call input
-2. success output decoded into the owner schema-derived type
-3. malformed provider output becoming `ProviderResponseDecodingError`
-4. rejected Promise becoming the safe schema-tagged transport error
-5. live Layer config/SDK construction at the final adapter edge
-6. deterministic mock Layer substitution without SDK access
-7. no secret or raw provider payload in diagnostics
-
-Run the owning package typecheck, tests, build, root verification, and the
-repository skill-policy stale scan.
-
-## Stale-Pattern Audit
-
-Scan fenced code examples and changed provider services. Reject:
-
-- generic `use` methods or callback APIs accepting the SDK
-- public `client` fields or raw SDK return values
-- raw identifier fields instead of owner brands
-- primitive semantic `Config` constructors where `Config.schema` owns the value
-- `instanceof` provider branching
-- Promise results returned without immediate Schema decoding
-- public `unknown` error channels or provider exception objects
-- live-only services with no deterministic mock Layer
-- tiny encode/call/decode/error helper chains around one operation
-
-Update the SPEC, task list, relevant READMEs, architecture docs, lint fixtures,
-skill metadata, and verification commands whenever the wrapper establishes or
-changes a durable repository pattern.
+Run the repository's actual format, lint, typecheck, test, build, boundary, skill-validation, and stale-pattern checks appropriate to the change. Do not invent commands or claim the wrapper is safe when any prohibited pattern remains.

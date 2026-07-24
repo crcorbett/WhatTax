@@ -1,4 +1,4 @@
 interface:
-  display_name: "TaxKit PRD Writer"
-  short_description: "Write and improve canonical TaxKit specs"
-  default_prompt: "Use $prd-writer to write or review the TaxKit SPEC and task list, editing both as findings arise."
+  display_name: "PRD Writer"
+  short_description: "Write evidence-backed implementation-ready specs"
+  default_prompt: "Use $prd-writer to write or revise an implementation-ready SPEC and task list against the current repository."

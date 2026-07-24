@@ -1,4 +1,4 @@
 interface:
   display_name: "Package Structure"
-  short_description: "Apply this repository package contract"
-  default_prompt: "Use $package-structure to create or audit a package with TaxKit's repository-owned Effect, export, and verification contract."
+  short_description: "Scaffold and audit strict Effect package boundaries"
+  default_prompt: "Use $package-structure to scaffold or audit an Effect package with explicit exports, deterministic Layers, and repository-local source conditions."

@@ -28,18 +28,9 @@
     "identitySource": { "$ref": "#/$defs/nonEmptyString" },
     "localWrite": { "type": "boolean" },
     "externalAccess": { "enum": ["none", "read_only", "mutation"] },
-    "operations": {
-      "type": "array",
-      "items": { "$ref": "#/$defs/nonEmptyString" }
-    },
-    "resources": {
-      "type": "array",
-      "items": { "$ref": "#/$defs/nonEmptyString" }
-    },
-    "environments": {
-      "type": "array",
-      "items": { "$ref": "#/$defs/nonEmptyString" }
-    },
+    "operations": { "type": "array", "items": { "$ref": "#/$defs/nonEmptyString" } },
+    "resources": { "type": "array", "items": { "$ref": "#/$defs/nonEmptyString" } },
+    "environments": { "type": "array", "items": { "$ref": "#/$defs/nonEmptyString" } },
     "duration": { "$ref": "#/$defs/nonEmptyString" },
     "revocation": { "$ref": "#/$defs/nonEmptyString" },
     "approvalRequired": { "type": "boolean" },
@@ -51,10 +42,7 @@
   },
   "allOf": [
     {
-      "if": {
-        "properties": { "externalAccess": { "const": "none" } },
-        "required": ["externalAccess"]
-      },
+      "if": { "properties": { "externalAccess": { "const": "none" } }, "required": ["externalAccess"] },
       "then": {
         "properties": {
           "operations": { "maxItems": 0 },
@@ -64,10 +52,7 @@
       }
     },
     {
-      "if": {
-        "properties": { "externalAccess": { "const": "mutation" } },
-        "required": ["externalAccess"]
-      },
+      "if": { "properties": { "externalAccess": { "const": "mutation" } }, "required": ["externalAccess"] },
       "then": {
         "properties": {
           "approvalRequired": { "const": true },

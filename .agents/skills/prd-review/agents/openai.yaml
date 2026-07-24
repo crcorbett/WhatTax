@@ -1,4 +1,4 @@
 interface:
   display_name: "PRD Review"
-  short_description: "Edit and strengthen repository specifications"
-  default_prompt: "Use $prd-review to re-review and edit the SPEC and tasks against repository code, docs, lint rules, skills, and upstream library evidence."
+  short_description: "Edit specs and downstream implementation tasks"
+  default_prompt: "Use $prd-review to directly improve this SPEC and its tasks, including required docs, README, lint-rule, client-wrapper, skill, configuration, testing, and operational changes."

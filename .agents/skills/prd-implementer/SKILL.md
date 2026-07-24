@@ -1,248 +1,138 @@
 ---
 name: prd-implementer
-description: "Implement TaxKit SPECs and task lists in verified sequential slices. Use when executing a SPEC or plan so code, canonical planning artifacts, documentation, lint, skills, Effect boundaries, React composition, and release evidence stay synchronized as findings arise."
+description: Implement an approved product or technical SPEC and its task list in small, verified, sequential slices. Use when executing repository plans that require Effect/TypeScript architecture, React composition, external SDK boundaries, documentation and README synchronization, lint and CI enforcement, repository-skill updates, or evidence-backed reconciliation of the SPEC and tasks as implementation discoveries arise.
 ---
 
 # PRD Implementer
 
-Implement one end-to-end task at a time and keep the SPEC, task list, active
-plan, code, docs, and enforcement surfaces truthful throughout the rollout.
+Implement the canonical SPEC as a sequence of accepted end-to-end slices. Keep code, documentation, enforcement, and planning artifacts synchronized.
 
-## Enforce the structured handoff
+## Start from current truth
+
+1. Read applicable `AGENTS.md`, the exact SPEC, its sibling task list, active execution plan, relevant docs and READMEs, current worktree, installed dependency versions, package scripts, lint/test/CI configuration, and representative code.
+2. Preserve unrelated changes. Confirm task dependencies and current completion evidence before editing.
+3. Use DeepWiki through Executor MCP only for upstream libraries. Verify any guidance against the installed version and local types; never use DeepWiki as a substitute for reading the checkout.
+
+Load context in layers: external systems own live external state, repository
+docs own durable repository truth, and the active SPEC/tasks own the current
+change. Pull current and affected owners just in time; link to history, raw
+proof, and provider truth instead of copying them into the active context.
 
 For substantial repository, operational, automation, migration, or harness
-work, load the embedded harness contract, contract map, and invariant register
-under `../docs-maintainer/references/` once during grounding.
+work, read the sibling
+[`repository-harness-contract`](../docs-maintainer/references/repository-harness-contract.md)
+once during grounding, including its contract map and invariant register. Apply
+the stable invariant IDs through the owning task surfaces rather than copying
+the references into the SPEC, code, or final report.
 
-When work derives from an audit, confirm each task's accepted finding IDs and
-validate the structured crosswalk when a local validator exists. Implement only
-accepted findings and carry their full impact-surface decisions, verification,
-journeys, and proof through task closure. Do not silently implement rejected,
-deferred, or optional findings.
+## Delegated Slice Prompt Contract
 
-For ordinary repository work, stop after accepted corrections, normal checks,
-applicable journeys, and one fresh independent review. Do not extend delivery
-into a comparative harness campaign without an explicit approved claim.
+Keep one primary trajectory accountable for integration, proof, delivery, and
+closeout. Delegate a bounded task only when it has an independently provable
+boundary, benefits from fresh/adversarial evidence, or the task artifact proves
+disjoint writes. Review delegated work and return an incomplete slice to the
+same agent before acceptance. Do not use one-subagent-per-task or a fixed number
+of audit passes as acceptance proof. Parallelize only when dependencies and
+write scopes are explicitly disjoint.
 
-## Start Here
+Every delegated slice states the accepted outcome, exact target revision and
+paths, applicable repository instructions, authority and stop conditions,
+document/runbook/proof impact, commands or procedure owners, required receipt,
+limitations, non-claims, and return-to-owner condition. The primary trajectory
+reviews the evidence and owns merge, cross-surface reconciliation, rollback,
+and task closure.
 
-Read in this order:
-
-1. `AGENTS.md`
-2. the target SPEC and sibling task list
-3. the matching active execution plan, when present
-4. `docs/exec-plans/implementing-specs.md`
-5. the relevant architecture, design, standards, README, source, manifest,
-   config, lint, fixture, test, skill, CI, and operator files
-
-Use local source and installed package versions for TaxKit. Use DeepWiki through
-Executor MCP only to research upstream libraries such as Effect, TanStack,
-Fumadocs, Knip, or Oxlint; never use it to inspect the local codebase.
-
-## Edit Canonical Artifacts During Implementation
-
-- Edit the SPEC, sibling task list, and active plan whenever implementation
-  proves a missing requirement, changed call graph, incorrect path, new
-  dependency, stronger acceptance criterion, or required downstream artifact.
-- Do not defer those edits to a review memo or final cleanup task.
-- Keep task status, dependencies, outputs, verification, ledger decisions, and
-  evidence synchronized with the implementation.
-- Preserve unrelated user changes and stop before overwriting overlapping work.
-
-Invoke `$docs-maintainer` in every material implementation slice and at
-closeout. It selects the canonical owner and records the complete `Change
-required`/`Preserve`/`N/A` ledger before the slice is accepted; `$docs-writer`
-is only a later public-copy aid and never a maintenance substitute.
-
-## Required Impact Ledger
-
-Before accepting each task, update the SPEC/task path-evidenced ledger. Mark each
-surface `Change required` or `N/A` with evidence:
-
-1. SPEC, tasks, index, and active plan
-2. canonical docs, standards, references, and documentation audit
-3. root and relevant app/package/skill READMEs
-4. lint config, custom rules, accepted/rejected fixtures, focused tests, root
-   scripts, and CI inheritance
-5. repo skills, `AGENTS.md`, instruction symlinks, bundled resources, and
-   `agents/openai.yaml`
-6. config, manifests, exports, schemas, branded IDs, generators, generated
-   output, fixtures, tests, examples, migrations, and Changesets
-7. provider/API/SDK/HTTP/storage/file/command boundaries, observability,
-   deployment, rollback, and operator runbooks
-8. React route/container/leaf composition, accessibility, and browser proof
-
-Classify these as separate impact rows; do not collapse them into broader rows:
-tests; fixtures; configuration; exports; manifests; lifecycle; release;
-rollback; critical journeys; semantic owners.
-
-Implement every required row in the same task or add a concrete dependent task
-before acceptance. An unimplemented `Change required` row blocks completion.
-
-## Effect Implementation Rules
-
-- Keep the primary success path flat, sequential, and composable. Prefer a
-  readable pipe; use `Effect.gen` for real sequencing and the installed Effect
-  v4 `Effect.fn` for meaningful named operation or tracing boundaries, not to
-  wrap one line.
-- Handle expected errors at the owning boundary, usually in the outer
-  `.pipe(...)` with `catchTag`, `catchTags`, or `mapError`.
-- Reuse canonical Schema-derived `Type` and `Encoded` forms, branded IDs,
-  services, errors, and constructors. Do not mirror DTOs or redeclare
-  `id: string`, status, metadata, or provider fields.
-- Decode `unknown` and provider SDK results immediately inside the exact ingress
-  adapter. Pass decoded values inward and encode only at an explicit egress.
-- Use owner-named `Config.schema` fragments and app-owned `ConfigProvider`
-  composition. Do not introduce primitive semantic config or manual env parsing.
-- Use `Schema.TaggedErrorClass` for public expected failures. Translate provider
-  failures once without `instanceof`, raw `_tag` checks, or unknown public error
-  channels.
-- Expose named provider operations behind a `Context.Service`; never expose the
-  raw client or a generic SDK `use` callback. Provide explicit live and
-  deterministic mock Layers.
-- Use Effect-native collections, `Option`, `Match`, `Result`, `Exit`, Platform,
-  Command, and managed runtimes when they own the problem.
-- Keep one-use decoding, encoding, mapping, property access, layer creation, and
-  Effect fragments inline. Admit an abstraction only when it satisfies
-  `docs/design-docs/abstraction-admission.md`.
-
-## React Implementation Rules
-
-Follow `docs/architecture/frontend.md`:
-
-```text
-route loader/action or server function
-  -> direct route-root restore and Result match
-    -> page shell and semantic landmarks
-      -> policy-owning section container and smallest owning fallback
-        -> leaf with readonly values and focused commands
-```
-
-- Routes restore encoded transport once and own top-level outcome matching.
-- Route/feature boundaries or policy-owning containers own data loading,
-  fetch/query execution, Effect/service/RPC execution, remote/domain mutations
-  and commands, shared workflow/orchestration, and loading/error policy.
-- Presentation leaves receive narrow readonly values and callbacks. They own
-  rendering, accessibility, focus, and local UI interaction state only.
-- Leaves must not decode transport data, acquire Effect services, run runtimes,
-  read environment/storage, fetch or query boundary data, execute remote/domain
-  mutations or commands, own shared workflows, or construct provider clients.
-- Keep loading, empty, unavailable, and recoverable errors at the smallest
-  owning boundary with stable dimensions.
-- Reject hooks, providers, wrappers, and feature components whose only purpose
-  is to move a boundary, hide route JSX, pass through state, or silence lint.
-
-## Sequential Task Loop
-
-Use a goal only when the user explicitly requests one. Goal state and worker
-counts are coordination state, never acceptance proof.
+## Execute sequentially
 
 For each task:
 
-1. Keep the primary trajectory accountable. Delegate a bounded slice only when
-   it has independent proof value, adversarial-review value, or explicitly
-   disjoint writes; include its SPEC, task object, paths, ledger, and gates.
-2. Require direct edits, including SPEC/tasks/plan improvements discovered while
-   implementing.
-3. Review the complete diff and local evidence against the task, architecture,
-   impact ledger, call graphs, and release contract.
-4. Run focused verification and the required quality audits.
-5. Correct incomplete work directly or return a delegated slice to the same
-   owner with exact failed evidence.
-6. If the same blocker persists and safe alternatives are exhausted, record it
-   precisely and replan or ask for a decision.
-7. Accept and commit the slice only when all required ledger rows and gates are
-   complete.
-8. Begin the next task only after acceptance.
+1. Re-state its owning paths, dependencies, acceptance criteria, and verification.
+2. When work derives from an audit, confirm the task's accepted finding IDs.
+   Validate the structured crosswalk when the repository provides its audit
+   validator. Do not implement rejected, deferred, or optional findings without
+   explicit acceptance.
+3. For a material slice, load the sibling
+   [`docs-maintainer`](../docs-maintainer/SKILL.md) and its local profile when
+   present; establish the slice's documentation-impact rows.
+4. Implement the smallest complete vertical slice.
+5. Update the SPEC, tasks, diagrams, owning docs, necessary pointers, READMEs,
+   lint/configuration, skills, and operational artifacts immediately when
+   implementation evidence changes them.
+6. Audit the diff for architecture, helper sprawl, boundary provenance, React composition, and enforcement.
+7. Run the narrow proof first and broaden according to blast radius.
+8. Record evidence and mark completion only when every required surface and
+   documentation-impact row passes.
 
-Default to strict serial execution. Parallelize only tasks whose task list proves
-independent dependencies and disjoint write scopes.
+Do not preserve a fixed number of passes, subagents, files, or commands as a
+process goal. Risk, dependencies, accepted outcomes, and evidence determine the
+slice and verification depth.
 
-## Delegated Slice Prompt
+## Effect implementation bar
 
-When delegation meets the rule above, include this block tightened with
-task-specific paths and gates:
+- Use the repository's installed Effect APIs and established Service/Context and Layer style.
+- Keep primary operations lazy, flat, readable, and sequential with `Effect.gen`, meaningful `Effect.fn`, or the local equivalent. Use combinators where they improve local composition.
+- Keep one-use transformations and typed error handling inline. Extract only reused domain policy, independently testable behavior, or a real I/O boundary.
+- Reuse canonical Schemas, schema-derived types, branded IDs, services, Layers, tagged errors, and constructors. Do not mirror DTOs or redeclare identifiers as raw strings.
+- Decode unknown values once at the real boundary and encode values at outward transport boundaries.
+- Use Schema-backed `Config`/`ConfigProvider` configuration and preserve redaction until immediate SDK construction.
+- Keep expected failures typed; do not use `instanceof` for policy or provider-error classification.
+- Keep Effects lazy until the repository's application/runtime boundary. Do not scatter `runPromise`, nested runtimes, ad hoc `try/catch`, or Promise islands.
 
-```text
-Implement exactly one TaxKit task. Edit the canonical SPEC, sibling task list,
-and active plan as findings arise; do not leave proven requirements only in the
-handoff.
+For an external SDK, invoke the `effect-client-wrapper` contract. Reject generic `use` callbacks, exposed raw clients, raw `id: string`, primitive config, `instanceof`, and unchecked provider output. Require named operations, encoded requests, immediate output decoding, typed Schema errors, operation-specific retry policy, and live plus mock/test Layers.
 
-Complete the path-evidenced Change required/N/A impact ledger for docs, every
-relevant README, lint/custom rules/fixtures/CI, repo skills/AGENTS/metadata,
-config/manifests/schemas/generators/tests/ops, and React/runtime surfaces.
-Implement every required row or add a concrete dependent task.
+## React implementation bar
 
-Keep primary Effect operations flat, sequential, and composable. Use pipe-first
-flow, Effect.gen for genuine sequencing, and installed Effect.fn only for
-meaningful named operations. Reuse canonical Schema Type/Encoded contracts,
-branded IDs, services, Schema tagged errors, Config.schema fragments, and
-ConfigProvider composition. Decode provider output immediately at ingress and
-encode only at egress. Never expose a raw provider client or generic SDK use
-callback, accept raw id: string, use primitive semantic config, branch with
-instanceof, or allow unchecked SDK output to escape.
+- Compose data loading, shared state, and Effect execution at the route or feature boundary.
+- Keep leaf components focused on rendering and local interaction through narrow readonly props and callbacks.
+- Colocate one-use components; extract shared components or hooks only for demonstrated reuse or a stable semantic boundary.
+- Cover semantic HTML, keyboard and focus behavior, loading, empty, error, disabled, and responsive states.
+- Reject synchronization Effects, duplicated state, service-aware leaves, giant route components, boolean-prop matrices, and hooks that merely rename one call.
 
-For React, keep transport restore/outcome matching at the route, remote/domain
-commands and coordination in the owning container, and readonly rendering/local
-interaction state in leaves. Do not move boundaries into hooks, providers,
-wrappers, or leaves.
+## Reconcile every surface
 
-Keep one-use logic inline. Reject helper, mapper, wrapper, hook, provider,
-service, layer, schema, config, and module sprawl unless the abstraction has an
-owner, semantic weight, a real second use/substitution point, a simpler call
-graph, and focused tests.
+Before accepting a task, resolve every SPEC impact-ledger row for docs, READMEs, lint/custom rules and fixtures, CI, skills and agent instructions, configuration/manifests, Schemas/migrations/generators, tests/fixtures, observability, release, rollout, and rollback. A required surface cannot be deferred with a vague follow-up.
 
-Run all task gates, focused lint fixtures and stale-pattern scans, skill
-validation, bun run verification unless explicitly narrowed, and package/API/
-SDK/browser/downstream proof required by the blast radius. Report changed files,
-evidence, call-graph alignment, ledger completion, Changeset impact, and risks.
-Do not start another task.
-```
+Use only commands that exist in the repository. Validate changed skills with the available skill validator. Distinguish pre-existing failures from regressions, and finish with changed paths, commands and outcomes, updated task status, and residual risks.
 
-## Parent Review Bar
+For material tasks, also reconcile the complete harness contract:
 
-Reject a task when any relevant condition fails:
+- respect truth layers and semantic owners; update the earliest durable owner
+  and remove weaker duplicated reminders;
+- keep skills as judgment/routing and runbooks as procedures with preconditions,
+  authority, exact steps, bounded evidence, rollback, and escalation;
+- emit bounded receipts with invariant, target, recovery, omitted-detail path,
+  postcondition, artifact identity, limitations, and non-claims;
+- match proof to the actual artifact, environment, boundary, and small
+  consumer-visible critical journeys with an oracle against imitation;
+- distinguish capability, authenticated identity, authority, and approval, and
+  record revocation, duration, audit receipt, rollback, and escalation for
+  consequential operations;
+- admit automation only when signal, durable state, authority,
+  idempotence/convergence, per-run proof, bounded failure, stopping, and
+  escalation are settled;
+- preserve the worker/host/tool/runtime/skill epoch and the four distinct
+  clocks when evaluation claims depend on them; and
+- retain failed, blocked, deferred, superseded, inconclusive, and no-op evidence
+  with provenance, successor/tombstone, recovery, and explicit non-claims
+  outside the default context route.
 
-- required ledger row is missing, still pending, or lacks path evidence
-- SPEC/task/plan no longer matches the implementation
-- primary Effect flow is fragmented, nested, wrapper-heavy, or hides sequencing
-- meaningful operations lack useful naming where local `Effect.fn` fits
-- raw public primitives, DTO mirrors, unchecked provider output, repeated
-  decoding, primitive config, unsafe casts, `instanceof`, or raw clients remain
-- public expected failures are not schema-tagged and closed
-- live/mock provider substitution or provider-result decoding is untested
-- helper, mapper, wrapper, hook, provider, service, layer, or module sprawl lacks
-  admission evidence
-- route/container/leaf responsibilities or browser/server imports are inverted
-- docs, relevant READMEs, lint rules/fixtures, skills/metadata, manifests,
-  generators, tests, or operator artifacts are stale
-- focused verification, stale scans, skill validation, browser/API/SDK proof,
-  Changeset evidence, or root verification is missing
+The docs-maintainer method and local profile own the local document map, exact
+checks, archive and mirror rules, runbooks, and exceptions; this skill must not
+invent them. Update owning docs and necessary pointers inside the
+implementation slice. Mark every impact-ledger surface `Change required`,
+`Preserve`, or `N/A` with evidence and attach its bounded receipt before task
+acceptance.
 
-## Verification Baseline
+## Close out the SPEC
 
-Choose the smallest proving checks during iteration, then broaden before task
-acceptance:
+Invoke docs-maintainer again before final task or SPEC closeout. Reconcile the
+active SPEC, tasks, execution plan, lifecycle state, successor/tombstone and
+archive pointers, proof packets, limitations, and non-claims against the
+implemented repository. Run the exact local documentation and lifecycle checks
+and mark completion only after current owners and planning artifacts agree.
 
-1. skill validation and skill-policy stale scans when skills change
-2. focused custom-lint visitor and installed-binary fixture tests when rules move
-3. owning package typecheck, tests, and build
-4. API, SDK packed/downstream, browser, runtime, or operator proof for the real
-   changed boundary
-5. `bun run verification`
-6. `bun run changeset` for package-facing changes or explicit no-Changeset
-   rationale
-
-Do not defer all proof or documentation reconciliation to the final rollout
-task.
-
-## Common References
-
-- `docs/exec-plans/implementing-specs.md`
-- `docs/product-specs/writing-specs.md`
-- `docs/product-specs/writing-task-lists.md`
-- `docs/architecture/effect-services.md`
-- `docs/architecture/configuration.md`
-- `docs/architecture/frontend.md`
-- `docs/architecture/testing-and-quality.md`
-- `docs/design-docs/abstraction-admission.md`
+For ordinary repository improvements, finish after the accepted important
+corrections, normal repository checks, applicable real journeys, and one fresh
+independent review. Preserve optional work as optional. Do not extend execution
+into a comparative harness campaign unless that distinct claim and authority
+were approved.
