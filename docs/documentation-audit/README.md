@@ -111,10 +111,11 @@ was invalidated by volatile profile lifecycle paths, and stable-profile
 candidate `f12c324` was rejected because the gate accepted that same volatile
 shape. Five terminal attempts are retained. The corrected HFI-003 gate rejects
 that shape; HFI-004 successor `7c8a96e` passed five fresh journeys, focused
-epoch validation, and fresh independent acceptance. HFI-005 current-owner and
-lifecycle closeout remains pending. No local evidence establishes remote Git,
-hosted CI, registry, release, deployment, provider, public-site, or
-external-consumer state.
+epoch validation, and fresh independent acceptance. HFI-005 closes the
+implemented SPEC/tasks and completed plan route in
+[`harness-foundation/closeout-validation.json`](harness-foundation/closeout-validation.json).
+No local evidence establishes remote Git, hosted CI, registry, release,
+deployment, provider, public-site, or external-consumer state.
 
 ## Current docs inventory
 

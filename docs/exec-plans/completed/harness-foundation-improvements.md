@@ -1,28 +1,28 @@
 ---
 document_type: execution-plan
-lifecycle: current
-authority: canonical
-owner: taxkit-harness-owner
+lifecycle: historical
+authority: supporting
+owner: taxkit-execution-history-owner
 last_reviewed: 2026-07-24
 review_trigger: HFI task state, HE mapping, implementation finding, verification result, candidate identity, authority, or lifecycle change
-successor: null
+successor: ../../product-specs/harness-foundation-improvements.md
 tombstone: false
 ---
 
 # Harness foundation improvements execution plan
 
-This plan implements
+This completed plan implemented
 [`harness-foundation-improvements.md`](../../product-specs/harness-foundation-improvements.md)
 and its
 [`sibling task list`](../../product-specs/harness-foundation-improvements.tasks.json)
 in strict dependency order. The structured accepted finding owner is
 [`accepted-findings.json`](../../documentation-audit/harness-foundation/accepted-findings.json).
 
-Authority permits repository-local reads, writes, verification, and task-scoped
-local commits only after the named task gates pass. It stops before push, tag,
-versioning, release, publication, deployment, provider access, recovery,
-destructive operations, website design, public MDX, navigation, or public-copy
-changes.
+Authority permitted repository-local reads, writes, verification, and
+task-scoped local commits only after the named task gates passed. Work stopped
+before push, tag, versioning, release, publication, deployment, provider
+access, recovery, destructive operations, website design, public MDX,
+navigation, or public-copy changes.
 
 ## Progress
 
@@ -70,9 +70,10 @@ changes.
   validation, and fresh independent acceptance with no unresolved findings.
   Evidence:
   [`epoch-validation.json`](../../documentation-audit/harness-foundation/epoch-validation.json).
-- **HFI-005 — pending:** reconcile the
-  accepted epoch/effectiveness and maintainer routes, then validate and move
-  this plan to completed history.
+- **HFI-005 — complete:** the accepted epoch/effectiveness and maintainer
+  routes, HE crosswalk, implemented SPEC/tasks, product-spec inventory, and
+  historical plan indexes agree. Final bounded evidence is
+  [`closeout-validation.json`](../../documentation-audit/harness-foundation/closeout-validation.json).
 
 ## HFI-001 acceptance record
 

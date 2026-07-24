@@ -14,12 +14,9 @@ tombstone: false
 Live implementation plans belong here while work is in progress. Maintainer
 lifecycle is owned by [`../../README.md`](../../README.md).
 
-Active plan:
+There are no active execution plans.
 
-- [Harness foundation improvements](./harness-foundation-improvements.md) —
-  successor requalification after the corrected gate rejected the stable
-  profile's old volatile lifecycle shape. External operations and public-copy
-  work remain out of scope.
-
-The completed harness-governance rollout is retained under
+Completed harness work is retained under
+[`../completed/harness-foundation-improvements.md`](../completed/harness-foundation-improvements.md)
+and
 [`../completed/harness-governance-documentation.md`](../completed/harness-governance-documentation.md).

@@ -9,33 +9,27 @@ review_trigger: worker, host, tool, runtime, skill, public-boundary, or release-
 
 # Harness evaluation epochs
 
-There is no current worker-visible TaxKit epoch while successor
-requalification is in progress. `HFI-004-2026-07-24` was accepted against
-candidate `03716bfce8e6014e4fa72ec43cb33c487a9c869f`, then invalidated when
-HFI-005 proved that its repository profile still contained volatile
-active-SPEC/plan lifecycle paths. Its
-scenario contract is
+The current worker-visible TaxKit epoch is `HFI-004-2026-07-24`, qualified
+against candidate `7c8a96e35ed59e4f78490d229cbfdcf21ea18ec0`, tree
+`637bc0e2145ea24be7b2a72d507f9f99a43e5a72`, from migration base
+`8695c018accf4c4abb7e803c631c5120f90e52b2`. Git reproduces 135 changed
+paths and the NUL-delimited path digest
+`18a0f7f2f43cae8428e50376b0ca9ddce400b8f4fba280ca1a1e209e096fa5c6`.
+Its scenario contract is
 [`../../tools/evals/harness-foundation-scenarios.json`](../../tools/evals/harness-foundation-scenarios.json);
 the independent reviewer record remains outside that default worker context.
-The invalidated target is commit `03716bfce8e6014e4fa72ec43cb33c487a9c869f`,
-tree `bb0300c3d02a11c9f30e6dc7cd6c8659bc3f51fa`, after the canonical skill,
-profile, governance, path-fixture and Git owner-execute corrections.
 
-The invalidated source manifest, candidate and validation remain reachable,
-while five terminal attempt records—including the rejected stable-profile
-candidate—and its five local journey receipts remain transitional evidence
-under
+The source manifest, five fresh local journey receipts, five terminal
+predecessor attempts, fresh independent acceptance, four clocks, limitations,
+non-claims, and focused validation are hash-bound under
 [`epoch-candidate.json`](../documentation-audit/harness-foundation/epoch-candidate.json)
 and
 [`epoch-validation.json`](../documentation-audit/harness-foundation/epoch-validation.json).
-The focused epoch graph is expected to reject that mixed transitional state;
-it must be replaced only after a new immutable successor passes. Candidate
-`f12c324` correctly embeds the stable profile but cannot qualify because its
-gate accepts the old volatile lifecycle/owner shape. Successor `7c8a96e`
-contains the fail-closed correction and passed five fresh journeys, exact
-focused epoch validation, and fresh independent acceptance. It remains pending
-HFI-005 current-owner and lifecycle reconciliation before this owner promotes
-it as the current worker-visible epoch.
+The candidate contains the complete stable TaxKit profile and a governance
+policy that rejects the previous volatile lifecycle/owner shape. The focused
+epoch verifier also distinguishes required epoch/effectiveness owner changes
+from preserved HGI evidence. Any source, receipt, review, or target mismatch
+fails closed.
 
 The five current journeys are calculator, packed SDK consumer, HTTP API,
 documentation runtime, and report-only release readiness. Their command,
@@ -59,6 +53,6 @@ truth.
 Failed, rejected, deferred and inconclusive material remains under
 `docs/documentation-audit/` and is not acceptance proof. Reversal of the
 current epoch is limited to reverting its task-scoped evidence/owner commits,
-restoring HGI-206 as the previous retained route, and preserving every terminal
-receipt. Any worker, host, tool, runtime, skill receipt, repository profile,
-validator, journey, target or authority change requires requalification.
+retaining HGI-206 as the previous route, and preserving every terminal receipt.
+Any worker, host, tool, runtime, skill receipt, repository profile, validator,
+journey, target or authority change requires requalification.

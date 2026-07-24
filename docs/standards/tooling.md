@@ -35,9 +35,9 @@ library with stable package boundaries and predictable bundle behavior.
   `check:runbooks` validator and its strict prose/sidecar adversarial fixtures.
 - `tools/governance` owns the Effect-native repository harness gate. It
   Schema-decodes repository-local owners at filesystem ingress and checks the
-  accepted HE crosswalk, TaxKit profile, canonical skill receipt and overlays,
-  Claude links, portable references, critical journeys, and external
-  non-claims.
+  accepted HE crosswalk, stable TaxKit profile lifecycle/index owners,
+  canonical skill receipt and overlays, Claude links, portable references,
+  critical journeys, and external non-claims.
 - `tools/evals/harness-foundation` owns the target-specific epoch verifier. It
   hashes both complete validator closures and reconciles the immutable Git
   target, canonical skill/journey projections, receipts, retained failures,
@@ -94,11 +94,12 @@ its only output artifact is the ignored bounded
 Use `bun run check:harness-governance` after a repository harness profile,
 structured HE audit, canonical skill, repository-profile overlay, local extra,
 Claude link, critical-journey, or governance-policy change. The focused tests
-include adversarial cases for missing mappings, invalid profiles,
-partial/stale trees, unexpected overlays, copied/absolute links, broken
-references, and false external claims. The gate is repository-local and
-deterministic; success proves none of remote Git, hosted CI, registry, release,
-deployment, provider, production, public-site, or external-consumer state.
+include adversarial cases for missing mappings, volatile lifecycle/owner
+profiles, unqualified exceptions, partial/stale trees, unexpected overlays,
+copied/absolute links, broken references, and false external claims. The gate
+is repository-local and deterministic; success proves none of remote Git,
+hosted CI, registry, release, deployment, provider, production, public-site,
+or external-consumer state.
 
 Use `bun run check:harness-foundation-epoch` only for the recorded
 target-specific closeout or after a review trigger requires a successor epoch.

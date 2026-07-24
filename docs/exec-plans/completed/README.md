@@ -36,8 +36,9 @@ Completed plans:
 - [Docs MDX Fumadocs runtime](./docs-mdx-fumadocs-runtime.md)
 - [Docs Fumadocs package separation](./docs-fumadocs-package-separation.md)
 - [Harness-governance documentation rollout](./harness-governance-documentation.md)
+- [Harness foundation improvements](./harness-foundation-improvements.md)
 
 Completed plans retain provenance and limitations, not active follow-up work.
-The harness-governance plan records the accepted HGI-200 through HGI-208
-dependency order and routes its final HGI-206 proof; it creates no current
-release, publication, registry, deployment, provider, or recovery work.
+The harness-governance and harness-foundation plans record accepted dependency
+order and bounded target-specific proof; neither creates current release,
+publication, registry, deployment, provider, or recovery work.

@@ -55,8 +55,9 @@ stale provider-wrapper examples. The root graph also runs
 TaxKit profile, structured HE findings/crosswalk, canonical skill receipt, and
 critical-journey inventory at filesystem ingress, then checks local skill-tree
 digests, the two permitted profile overlays, the two declared extras, eight
-relative Claude links, self-contained references, portable runtime paths, and
-external non-claims. Its positive and adversarial corpus is owned by
+relative Claude links, the maintained lifecycle with stable spec/plan index
+owners, self-contained references, portable runtime paths, and external
+non-claims. Its positive and adversarial corpus is owned by
 `tools/governance/`; focused type and test commands are
 `check:harness-governance:types` and `test:harness-governance`.
 Target-specific requalification is separately owned by

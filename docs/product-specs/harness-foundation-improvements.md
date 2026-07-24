@@ -1,7 +1,7 @@
 ---
 document_type: product-spec
-lifecycle: current
-authority: canonical
+lifecycle: implemented
+authority: supporting
 owner: taxkit-harness-owner
 last_reviewed: 2026-07-24
 review_trigger: accepted HE finding, canonical skill baseline, harness profile, governance validator, verification graph, or harness epoch change
@@ -13,16 +13,15 @@ tombstone: false
 
 ## Overview
 
-TaxKit needs one small harness-foundation migration before its current
-repository-governance claims can be requalified. The migration completes the
-portable canonical skill baseline, makes the embedded harness contract
-self-contained, instantiates the TaxKit repository profile and structured audit
-records, enforces them through one deterministic repository gate, and then
+TaxKit completed the smallest coherent harness-foundation migration needed to
+requalify its repository-governance claims. The implemented migration completes
+the portable canonical skill baseline, makes the embedded harness contract
+self-contained, instantiates the TaxKit repository profile and structured
+audit records, enforces them through one deterministic repository gate, and
 qualifies a new target-specific epoch.
 
-Implementation began with `HFI-001` on 24 July 2026. The synchronized active
-plan is
-[`harness-foundation-improvements.md`](../exec-plans/active/harness-foundation-improvements.md).
+Implementation completed on 24 July 2026. The historical execution plan is
+[`harness-foundation-improvements.md`](../exec-plans/completed/harness-foundation-improvements.md).
 
 Target inspected for this proposal:
 
@@ -376,13 +375,13 @@ owner that remains unchanged; silence is not an impact decision.
 
 | Surface | Decision | Evidence and required paths | Acceptance and verification |
 | --- | --- | --- | --- |
-| SPEC | Change required | This current owner: `docs/product-specs/harness-foundation-improvements.md`. | Requirements, HE mapping, boundaries, non-claims, ledger, and final lifecycle agree. |
+| SPEC | Change required | This implemented owner: `docs/product-specs/harness-foundation-improvements.md`. | Requirements, HE mapping, boundaries, non-claims, ledger, and final lifecycle agree. |
 | Sibling tasks | Change required | `docs/product-specs/harness-foundation-improvements.tasks.json`. | Exact dependencies, outputs, task-local ledger coverage, verification, independent review, rollback, and commit policy validate as JSON. |
-| Product-spec index | Change required | `docs/product-specs/index.md`. | Lists this SPEC as Active until successor requalification and HFI-005 acceptance. |
-| Execution plan | Change required | `docs/exec-plans/active/harness-foundation-improvements.md` and the active/completed indexes. | Current task evidence remains active until no stale profile or lifecycle pointer remains. |
+| Product-spec index | Change required | `docs/product-specs/index.md`. | Lists this SPEC as Implemented with the accepted epoch and no active-work claim. |
+| Execution plan | Change required | `docs/exec-plans/completed/harness-foundation-improvements.md` and the active/completed indexes. | Completed evidence is historical, and the active index contains no plan residue. |
 | Semantic owners | Change required during implementation | `docs/README.md`, `docs/verification/harness-epochs.md`, `docs/verification/effectiveness.md`, `docs/architecture/testing-and-quality.md`, `docs/standards/tooling.md`, and `docs/documentation-audit/README.md`. | Owners route the profile, structured audit, focused gate, previous epoch, current epoch, limitations, and non-claims without copying procedures. |
 | Documentation audit records | Change required | `docs/documentation-audit/templates/**` and `docs/documentation-audit/harness-foundation/**`. | Scope, HE findings, decisions, crosswalk, receipts, failures, independent review, and closeout decode and remain addressable. |
-| Root README | Change required when the command lands | `README.md` currently documents root verification and skill tests but no harness-governance command. | Add only the focused command/purpose/non-claim route; no public-site copy. |
+| Root README | Change required | `README.md` routes the focused harness-governance command and root verification edge. | The command/purpose/non-claim route is present; no public-site copy changed. |
 | App/package READMEs | N/A | `apps/**/README.md` and `packages/**/README.md` own unchanged runtime/package contracts; journey commands are consumed, not changed. | Focused diff confirms no app/package README or package contract changed. |
 | Public MDX/navigation | N/A | `apps/docs/content/**`, `apps/docs/navigation.json`, and `tools/documentation/owner-policy.json` are public-content owners outside scope. | No public content/status/navigation path changes; no `docs-writer` copy pass. |
 | Canonical skill folders | Change required | Complete `.agents/skills/{docs-maintainer,effect-client-wrapper,package-structure,prd-implementer,prd-review,prd-writer}/**`. | Exact tree receipt passes with only the two declared profile overlays. |
@@ -485,8 +484,8 @@ epoch claim over changed skills.
   also rejected and its local journey receipts remain terminal evidence only.
   Successor `7c8a96e` binds the stable final profile and corrected gate from one
   immutable commit and passed the five fresh journeys, focused epoch
-  validation, and fresh independent review. Its current-owner/effectiveness
-  promotion and lifecycle closeout remain pending HFI-005.
+  validation, and fresh independent review. HFI-005 reconciles the current
+  epoch/effectiveness owners and closes this SPEC, task list, and plan.
 - The HE table is a readable route only; the schema-valid
   `docs/documentation-audit/harness-foundation/accepted-findings.json` record
   is the executable accepted-finding crosswalk.

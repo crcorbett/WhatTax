@@ -2,7 +2,7 @@
   "$schema": "https://taxkit.local/schemas/product-spec-task-plan.v1.json",
   "spec": "docs/product-specs/harness-foundation-improvements.md",
   "title": "Harness Foundation Improvements Implementation Tasks",
-  "status": "active",
+  "status": "implemented",
   "last_reviewed": "2026-07-24",
   "principles": [
     "Preserve HE-001 through HE-004 and convert the accepted planning input into schema-valid audit and crosswalk records before dependent corrections begin.",
@@ -47,11 +47,11 @@
         "docs/product-specs/harness-foundation-improvements.md",
         "docs/product-specs/harness-foundation-improvements.tasks.json",
         "docs/product-specs/index.md",
-        "docs/exec-plans/active/harness-foundation-improvements.md",
+        "docs/exec-plans/completed/harness-foundation-improvements.md",
         "docs/exec-plans/active/README.md",
         "docs/exec-plans/completed/README.md"
       ],
-      "acceptance": "Proposed planning remains separate from active execution; implementation and closeout update all current-intent owners together."
+      "acceptance": "The implemented SPEC/tasks and product index route the completed plan, while the active index contains no completed-plan residue."
     },
     {
       "surface": "structured-audit-profile",
@@ -510,7 +510,7 @@
     },
     {
       "id": "HFI-005",
-      "status": "pending",
+      "status": "complete",
       "acceptedFindingIds": [
         "HE-001",
         "HE-002",
