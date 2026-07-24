@@ -1,0 +1,130 @@
+{
+  "schemaVersion": "1",
+  "repository": "taxkit",
+  "purpose": "Public monorepo for the TaxKit tax engine, calculators, HTTP API, TypeScript SDK, and documentation runtime.",
+  "lifecyclePhase": "active-harness-foundation-migration",
+  "identitySource": "git rev-parse HEAD, git status --short --branch, and the content-addressed candidate manifest",
+  "owners": {
+    "docsRouter": "docs/README.md",
+    "architecture": ["docs/architecture/README.md", "docs/architecture/"],
+    "standards": ["docs/standards/README.md", "docs/standards/"],
+    "readmes": ["README.md", "apps/**/README.md", "packages/**/README.md"],
+    "generatedReference": [
+      "packages/api/http/src/openapi.ts",
+      "packages/api/http/__snapshots__/openapi.json",
+      "packages/docs-content/source.config.ts",
+      "packages/docs-content/.source/"
+    ],
+    "runbooks": ["docs/runbooks/README.md", "docs/runbooks/"],
+    "proof": [
+      "docs/verification/critical-journeys.json",
+      "docs/evidence/releases/"
+    ],
+    "evidence": [
+      "docs/documentation-audit/",
+      "docs/evidence/",
+      "tools/evals/"
+    ],
+    "activeSpecs": [
+      "docs/product-specs/index.md",
+      "docs/product-specs/harness-foundation-improvements.md",
+      "docs/product-specs/harness-foundation-improvements.tasks.json"
+    ],
+    "activePlans": [
+      "docs/exec-plans/active/README.md",
+      "docs/exec-plans/active/harness-foundation-improvements.md"
+    ],
+    "archives": [
+      "docs/exec-plans/completed/",
+      "docs/documentation-audit/",
+      "docs/evidence/"
+    ],
+    "skills": [".agents/skills/", ".claude/skills/"],
+    "agentGuidance": ["AGENTS.md", "CLAUDE.md"]
+  },
+  "commands": {
+    "documentation": [
+      "bun run check:docs",
+      "bun run check:runbooks",
+      "bun run check:repository-paths"
+    ],
+    "skills": ["bun run test:skills"],
+    "focused": [
+      "bun run check:harness-governance:types",
+      "bun run test:harness-governance",
+      "bun run check:harness-governance"
+    ],
+    "closeout": ["bun run verification", "git diff --check"]
+  },
+  "representativeJobs": [
+    {
+      "id": "TAXKIT-CALCULATOR",
+      "consumer": "Direct calculator package consumer",
+      "acceptedOutcome": "Schema-backed calculator operations return rule-owned results for canonical fixtures.",
+      "owningPaths": [
+        "packages/calculators/",
+        "packages/rules/au/",
+        "docs/verification/critical-journeys.json#taxkit-calculator-direct"
+      ]
+    },
+    {
+      "id": "TAXKIT-PACKED-SDK",
+      "consumer": "Clean packed TypeScript SDK consumer",
+      "acceptedOutcome": "The dist-only tarball installs and supported public entrypoints import without workspace source.",
+      "owningPaths": [
+        "packages/sdk/typescript/",
+        "docs/verification/critical-journeys.json#taxkit-sdk-packed"
+      ]
+    },
+    {
+      "id": "TAXKIT-HTTP-API",
+      "consumer": "Local HTTP API consumer",
+      "acceptedOutcome": "Local health, metadata, calculation, schema-error, and OpenAPI responses match owning Schemas.",
+      "owningPaths": [
+        "apps/api/",
+        "packages/api/http/",
+        "docs/verification/critical-journeys.json#taxkit-http-api"
+      ]
+    },
+    {
+      "id": "TAXKIT-DOCS-RUNTIME",
+      "consumer": "Local documentation-site reader",
+      "acceptedOutcome": "Validated content renders and the browser harness observes navigation, server functions, recoverable errors, and clean console behavior.",
+      "owningPaths": [
+        "apps/docs/",
+        "packages/docs-content/",
+        "packages/docs-fumadocs/",
+        "docs/verification/critical-journeys.json#taxkit-docs-runtime"
+      ]
+    },
+    {
+      "id": "TAXKIT-RELEASE-CLOSURE",
+      "consumer": "TaxKit release maintainer",
+      "acceptedOutcome": "The local report-only release-readiness graph completes nine checks with bounded evidence and no external mutation.",
+      "owningPaths": [
+        "packages/scripts/src/release-readiness/",
+        "docs/verification/critical-journeys.json#taxkit-release-closure"
+      ]
+    }
+  ],
+  "criticalJourneyOwner": "docs/verification/critical-journeys.json",
+  "boundaryFacts": [
+    "Package, API, SDK, app, and public documentation behavior remains owned by code, Schemas, manifests, exports, and direct READMEs.",
+    "The local release-readiness graph grants no versioning, Git, registry, release, deployment, provider, public-site, or recovery authority.",
+    "The existing Quality workflow invokes bun run release:check -- --ci; that graph begins with root verification and remains the sole hosted CI route.",
+    "Exactly four operational runbooks and docs/operations/authority-model.md remain the repeatable operation and authority owners.",
+    "Repository-local skills and validators must work from a clean clone without reading a user home or global skill installation."
+  ],
+  "exclusions": [
+    "Dependency, build, cache, generated route, temporary, binary, and vendored trees are excluded from readable corpus accounting.",
+    "Website design, public MDX copy, navigation, package/API/SDK/runtime behavior, provider access, and external mutation are outside this migration.",
+    "HGI-203 through HGI-206 evidence is preserved and not rewritten."
+  ],
+  "nonClaims": [
+    "Repository-local validation does not establish hosted CI success.",
+    "Local Git commits do not establish push, remote branch, tag, or release state.",
+    "No registry publication, package versioning, external consumer behavior, provider state, deployment, production behavior, or public-site availability is established.",
+    "A target-specific harness epoch does not establish general causal effectiveness for other workers, repositories, or future skill states."
+  ],
+  "exceptions": []
+}

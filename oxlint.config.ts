@@ -42,6 +42,7 @@ const decodingBoundaryFiles = [
   "tools/quality-workflow/policy.ts",
   "tools/quality-workflow/release-boundary.test.ts",
   "tools/evals/hgi-206/input.boundary.ts",
+  "tools/governance/foundation.test.ts",
 
   // Dynamic dispatch and its transitional repeated scenario decodes.
   "packages/calculators/src/catalog.ts",
