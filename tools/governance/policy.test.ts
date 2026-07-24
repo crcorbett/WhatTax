@@ -107,19 +107,37 @@ describe("harness governance policy", () => {
     );
   });
 
-  it("rejects an invalid profile", async () => {
+  it("rejects volatile lifecycle owners and unqualified profile exceptions", async () => {
     const inputs = await loadAcceptedInputs();
-    const invalidProfile = {
+    const volatileProfile = {
+      ...inputs.profile,
+      lifecyclePhase: "active-harness-foundation-migration" as const,
+      owners: {
+        ...inputs.profile.owners,
+        activePlans: [
+          "docs/exec-plans/active/harness-foundation-improvements.md",
+        ] as const,
+        activeSpecs: [
+          "docs/product-specs/harness-foundation-improvements.md",
+          "docs/product-specs/harness-foundation-improvements.tasks.json",
+        ] as const,
+      },
+    };
+    const exceptionProfile = {
       ...inputs.profile,
       exceptions: ["unqualified"],
     };
     expect(
       Result.isSuccess(
-        Schema.decodeUnknownResult(RepositoryHarnessProfile)(invalidProfile)
+        Schema.decodeUnknownResult(RepositoryHarnessProfile)(volatileProfile)
       )
     ).toBe(true);
     expectInvariant(
-      { ...inputs, profile: invalidProfile },
+      { ...inputs, profile: volatileProfile },
+      "repository-profile"
+    );
+    expectInvariant(
+      { ...inputs, profile: exceptionProfile },
       "repository-profile"
     );
   });

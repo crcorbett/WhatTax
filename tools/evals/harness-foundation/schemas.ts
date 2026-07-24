@@ -2,8 +2,8 @@ import { Schema } from "effect";
 
 export const epochId = "HFI-004-2026-07-24";
 export const migrationBaseCommit = "8695c018accf4c4abb7e803c631c5120f90e52b2";
-export const candidateCommit = "03716bfce8e6014e4fa72ec43cb33c487a9c869f";
-export const candidateTree = "bb0300c3d02a11c9f30e6dc7cd6c8659bc3f51fa";
+export const candidateCommit = "f12c3243cb3c2de5a877fa9f0c61e7c9b5fb704f";
+export const candidateTree = "5c5a15c89b2257d7b813f1650c783bdc20d9ee74";
 
 export const epochPaths = {
   candidate: "docs/documentation-audit/harness-foundation/epoch-candidate.json",
@@ -20,6 +20,7 @@ export const failedAttemptPaths = [
   "docs/documentation-audit/harness-foundation/failed-or-inconclusive/HFI-004-candidate-2.json",
   "docs/documentation-audit/harness-foundation/failed-or-inconclusive/HFI-004-candidate-3.json",
   "docs/documentation-audit/harness-foundation/failed-or-inconclusive/HFI-004-candidate-4.json",
+  "docs/documentation-audit/harness-foundation/failed-or-inconclusive/HFI-004-candidate-5.json",
 ] as const;
 
 export const receiptPaths = [

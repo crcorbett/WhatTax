@@ -21,15 +21,18 @@ The invalidated target is commit `03716bfce8e6014e4fa72ec43cb33c487a9c869f`,
 tree `bb0300c3d02a11c9f30e6dc7cd6c8659bc3f51fa`, after the canonical skill,
 profile, governance, path-fixture and Git owner-execute corrections.
 
-The source manifest, five receipts, three rejected attempts, fresh independent
-acceptance and focused validation are bound by
+The invalidated source manifest, candidate and validation remain reachable,
+while five terminal attempt records—including the rejected stable-profile
+candidate—and its five local journey receipts remain transitional evidence
+under
 [`epoch-candidate.json`](../documentation-audit/harness-foundation/epoch-candidate.json)
 and
 [`epoch-validation.json`](../documentation-audit/harness-foundation/epoch-validation.json).
-They remain terminal evidence for only the recorded candidate, worker/model
-description, host, tools, runtime, skill/profile/evaluator identities,
-journeys, clocks, authority, limitations and non-claims. They do not qualify
-the corrected stable profile.
+The focused epoch graph is expected to reject that mixed transitional state;
+it must be replaced only after the reopened governance task is committed and a
+new immutable successor passes. Candidate `f12c324` correctly embeds the stable
+profile but cannot qualify because its gate accepts the old volatile
+lifecycle/owner shape.
 
 The five current journeys are calculator, packed SDK consumer, HTTP API,
 documentation runtime, and report-only release readiness. Their command,

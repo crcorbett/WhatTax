@@ -2,7 +2,7 @@
   "schemaVersion": "1",
   "epochId": "HFI-004-2026-07-24",
   "lifecycle": "current-worker-visible",
-  "targetCommit": "03716bfce8e6014e4fa72ec43cb33c487a9c869f",
+  "targetCommit": "f12c3243cb3c2de5a877fa9f0c61e7c9b5fb704f",
   "owner": "taxkit-harness-owner",
   "reviewTrigger": "worker, host, tool, runtime, skill receipt, repository profile, governance validator, journey, or target change",
   "authority": {

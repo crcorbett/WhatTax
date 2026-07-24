@@ -1,12 +1,12 @@
 {
   "schemaVersion": "1",
   "taskId": "HFI-003",
-  "status": "accepted-after-post-commit-correction",
+  "status": "accepted-after-independent-review-correction",
   "target": {
     "baseCommit": "aba9d42e7f665be334f0f929f0c63696f9a5b0d7",
     "branch": "main",
     "upstream": "origin/main",
-    "candidate": "HFI-003 semantic commit 9ace7d7db5bdc40c113ce16f3a71f944d50628d0 plus passing-gated fixture and Git-portable receipt corrections"
+    "candidate": "HFI-003 semantic commit 9ace7d7db5bdc40c113ce16f3a71f944d50628d0 plus passing-gated fixture, Git-portable receipt, owner-execute, and stable-profile policy corrections"
   },
   "acceptedFindingIds": ["HE-003", "HE-004"],
   "requirementIds": ["HFR-004", "HFR-005"],
@@ -100,6 +100,11 @@
       "postcondition": "A temporary Git index proved 0654 stages as 100644 and 0744 as 100755; portableTreeMode matches both cases, and focused governance, skill, documentation, runbook, path, diff, and full repository verification pass before a successor HFI-004 candidate is frozen."
     },
     {
+      "check": "stable profile lifecycle and owner enforcement",
+      "status": "passed",
+      "postcondition": "The gate accepts maintained-harness-governance with only the stable product-spec and active-plan indexes, and rejects the exact active-migration lifecycle plus specific SPEC/task/plan shape that invalidated candidates 03716bf and f12c324."
+    },
+    {
       "check": "git diff --check",
       "status": "passed",
       "postcondition": "No whitespace error is present."
@@ -141,5 +146,7 @@
   "correctedAt": "2026-07-24T22:05:00Z",
   "portableReceiptCorrectedAt": "2026-07-24T22:16:00Z",
   "ownerExecuteCorrectionObservedAt": "2026-07-24T22:36:17Z",
-  "ownerExecuteCorrectionAcceptedAt": "2026-07-24T22:40:00Z"
+  "ownerExecuteCorrectionAcceptedAt": "2026-07-24T22:40:00Z",
+  "stableProfilePolicyCorrectionObservedAt": "2026-07-24T23:19:25Z",
+  "stableProfilePolicyCorrectionAcceptedAt": "2026-07-24T23:24:05Z"
 }

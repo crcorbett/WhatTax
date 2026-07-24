@@ -67,8 +67,6 @@ const forbiddenMigrationPrefixes = [
   "docs/documentation-audit/hgi-206/",
   "docs/evidence/releases/HGI-203",
   "docs/verification/critical-journeys.json",
-  "docs/verification/effectiveness.md",
-  "docs/verification/harness-epochs.md",
   "packages/",
   "tools/documentation/owner-policy.json",
   "tools/documentation/runbook-",

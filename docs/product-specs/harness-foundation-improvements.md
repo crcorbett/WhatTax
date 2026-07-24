@@ -331,8 +331,10 @@ accepted and adversarial governance fixtures
 5. `HFI-005` reconciles lifecycle owners and closes the SPEC/tasks/plan only
    after the new epoch is accepted.
 
-`HFI-001` through `HFI-003` are complete. The accepted repository-local gate
-now validates the exact HE crosswalk, TaxKit profile, content-addressed skill
+`HFI-001` through `HFI-003` are complete. Independent review supplied a narrow
+fail-closed profile-policy correction before HFI-003 acceptance was restored.
+The repository-local gate validates the exact HE crosswalk, TaxKit profile,
+content-addressed skill
 baseline, two profile overlays, two declared extras, eight relative Claude
 links, self-contained references, five journey owners, and external
 non-claims. `HFI-004` must freeze the resulting committed candidate before any
@@ -355,7 +357,14 @@ HFI-005 then proved its canonical profile still named the specific active
 SPEC/plan and an active-migration lifecycle. Moving the plan would stale that
 profile; correcting the profile triggers requalification. That acceptance is
 therefore retained but invalidated, and the stable-index profile must be part of
-the successor target.
+the successor target. Fresh review of that successor then found that the epoch
+verifier still classified the required `harness-epochs.md` and
+`effectiveness.md` lifecycle-owner corrections as preserved surfaces. After
+that post-candidate evaluator correction, the same review proved normal
+governance still accepted the exact volatile profile lifecycle/owner shape.
+Candidate `f12c324` is retained as rejected; the corrected HFI-003 gate enforces
+the stable lifecycle and index owners before another successor target is
+frozen.
 
 The exact task contract and dependencies live in
 [`harness-foundation-improvements.tasks.json`](./harness-foundation-improvements.tasks.json).
@@ -469,12 +478,13 @@ epoch claim over changed skills.
 
 ## Limitations and non-claims
 
-- `HFI-001` through `HFI-003` implement the profile, structured audit,
-  Git-portable skill migration, validator, and inherited CI edge. Candidate
+- `HFI-001` through `HFI-003` implement the profile foundation, Git-portable
+  skill migration, and corrected fail-closed gate. Candidate
   `03716bf` passed all five journeys and fresh independent review but is
-  invalidated by its volatile profile lifecycle paths. A successor
-  requalification must bind the stable final profile before
-  `HFI-005` can reconcile lifecycle owners and implement this SPEC/tasks.
+  invalidated by its volatile profile lifecycle paths. Candidate `f12c324` is
+  also rejected and its local journey receipts remain terminal evidence only.
+  A successor requalification must bind the stable final profile and corrected
+  gate from one immutable commit; `HFI-005` remains pending.
 - The HE table is a readable route only; the schema-valid
   `docs/documentation-audit/harness-foundation/accepted-findings.json` record
   is the executable accepted-finding crosswalk.

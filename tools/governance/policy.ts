@@ -43,6 +43,8 @@ const allowedOverlayPaths = [
   ".agents/skills/docs-maintainer/references/repository-profile.md",
   ".agents/skills/package-structure/references/repository-profile.md",
 ];
+const expectedActiveSpecOwners = ["docs/product-specs/index.md"];
+const expectedActivePlanOwners = ["docs/exec-plans/active/README.md"];
 
 export interface TreeObservation {
   readonly entryCount: number;
@@ -152,7 +154,10 @@ const inspectProfile = (
     ...profile.commands.focused,
     ...profile.commands.skills,
   ];
-  return profile.exceptions.length === 0 &&
+  return profile.lifecyclePhase === "maintained-harness-governance" &&
+    hasExactMembers(profile.owners.activeSpecs, expectedActiveSpecOwners) &&
+    hasExactMembers(profile.owners.activePlans, expectedActivePlanOwners) &&
+    profile.exceptions.length === 0 &&
     profile.criticalJourneyOwner ===
       "docs/verification/critical-journeys.json" &&
     profile.representativeJobs.length === expectedJourneyIds.length &&
@@ -171,7 +176,7 @@ const inspectProfile = (
         finding(
           "repository-profile",
           "docs/verification/repository-harness-profile.json",
-          "Restore the exception-free TaxKit owner, command, journey, and public-copy boundary profile."
+          "Restore the maintained TaxKit lifecycle, stable spec/plan index owners, exception-free commands, journeys, and public-copy boundary."
         ),
       ];
 };

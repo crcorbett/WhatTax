@@ -37,7 +37,7 @@ changes.
   Oxfmt exclusion prevents repository formatting from invalidating the
   canonical digest. Evidence:
   [`HFI-002-validation.json`](../../documentation-audit/harness-foundation/HFI-002-validation.json).
-- **HFI-003 — complete:** the Effect-native gate decodes repository-local
+- **HFI-003 — complete after independent-review correction:** the Effect-native gate decodes repository-local
   owners once at ingress, accepts the migrated profile/audit/skill state, and
   rejects all nine named adversarial defects. Root verification invokes it
   exactly once; the unchanged Quality workflow inherits it through the
@@ -50,13 +50,23 @@ changes.
   that Git uses the owner-execute bit specifically: `0654` must remain
   non-executable while `0744` is executable. That candidate is retained as
   rejected, and the corrected normalizer plus focused proof must pass before
-  another candidate can be frozen. Evidence:
+  another candidate can be frozen. Fresh HFI-004 review then proved the gate
+  did not reject the exact volatile profile lifecycle/owner shape that
+  invalidated the previous candidate. The corrected gate now enforces the
+  maintained lifecycle and stable index owners and rejects the exact volatile
+  shape. Evidence:
   [`HFI-003-validation.json`](../../documentation-audit/harness-foundation/HFI-003-validation.json).
-- **HFI-004 — reopened:** candidate `03716bf` passed the five retained journeys
+- **HFI-004 — in progress:** candidate `03716bf` passed the five retained journeys
   and fresh independent review, then HFI-005 proved its profile still named
   volatile active SPEC/plan lifecycle paths. That accepted evidence is retained
   but invalidated; the stable-profile successor must rerun every candidate-bound
-  gate, journey and review. Prior evidence:
+  gate, journey and review. Fresh successor review found and corrected a
+  post-candidate evaluator boundary that still prohibited the two required
+  epoch/effectiveness semantic-owner changes. The same review then rejected
+  successor `f12c324` because normal governance accepted the old volatile
+  lifecycle shape. Both candidate identities are retained; neither can be
+  promoted. A new candidate must be frozen from the committed fail-closed gate
+  and rerun every candidate-bound gate, journey, and review. Prior evidence:
   [`epoch-validation.json`](../../documentation-audit/harness-foundation/epoch-validation.json).
 - **HFI-005 — pending on successor HFI-004 requalification:** reconcile the
   accepted epoch/effectiveness and maintainer routes, then validate and move

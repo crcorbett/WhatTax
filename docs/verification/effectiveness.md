@@ -25,8 +25,9 @@ activity counts are not efficacy.
 | Any causal comparison or ablation claim | Inconclusive | independent grader result | condition-blind comparison is available |
 
 The router and skill/profile/gate rows become current `Retain` decisions only
-after the stable-profile successor passes. The invalidated candidate remains
-useful terminal evidence but cannot qualify the corrected profile.
+after a stable-profile successor with fail-closed lifecycle enforcement
+passes. The invalidated and rejected candidates remain useful terminal
+evidence but cannot qualify the corrected profile or gate.
 `Inconclusive` remains: there is no
 condition-blind comparison or ablation, so no speed, quality, cost, or
 general-effectiveness claim is made. The candidate and validation receipts

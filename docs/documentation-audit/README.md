@@ -106,11 +106,12 @@ Accepted harness-foundation migration evidence:
 The active profile and focused repository gate preserve exact `HE-001` through
 `HE-004` mappings and validate the six canonical skill trees, two profile
 overlays, two declared local extras, eight relative Claude links, and five
-retained journeys. HFI-004 qualifies target-specific local epoch
-`HFI-004-2026-07-24` against candidate `03716bf` with three rejected attempts
-retained. HFI-005 found that the accepted candidate still projected volatile
-active-plan/profile lifecycle paths; a stable-profile successor must requalify
-before closeout. No local evidence establishes remote Git, hosted CI, registry,
+retained journeys. HFI-004 has no accepted current epoch: candidate `03716bf`
+was invalidated by volatile profile lifecycle paths, and stable-profile
+candidate `f12c324` was rejected because the gate accepted that same volatile
+shape. Five terminal attempts are retained. The corrected HFI-003 gate now
+rejects that shape; HFI-004 must freeze and requalify a new immutable
+successor. No local evidence establishes remote Git, hosted CI, registry,
 release, deployment, provider, public-site, or external-consumer state.
 
 ## Current docs inventory

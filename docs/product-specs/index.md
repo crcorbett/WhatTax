@@ -21,7 +21,7 @@ Specs:
 
 | Spec | Status | Notes |
 | --- | --- | --- |
-| [Harness foundation improvements](./harness-foundation-improvements.md) | Active | HFI-005 found a volatile active-plan/profile pointer after the first HFI-004 acceptance; the stable profile must be committed and requalified before lifecycle closeout. |
+| [Harness foundation improvements](./harness-foundation-improvements.md) | Active | HFI-003 now rejects the volatile profile lifecycle/owner shape; HFI-004 must freeze and requalify a new immutable candidate before closeout. |
 | [Harness-governance documentation](./harness-governance-documentation.md) | Implemented | HGI-200 through HGI-208 are accepted locally; HGI-206 records the bounded repository epoch and closeout without claiming release, provider, or public actuality. |
 | [API compatibility harness](./api-compatibility-harness.md) | Implemented | OpenAPI snapshot, route fixtures and live API app smoke coverage are in place. |
 | [API HTTP package topology](./api-http-package-topology.md) | Implemented | The implemented HTTP API package now lives at `packages/api/http` as `@taxkit/api-http`. |

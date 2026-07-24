@@ -17,8 +17,9 @@ lifecycle is owned by [`../../README.md`](../../README.md).
 Active plan:
 
 - [Harness foundation improvements](./harness-foundation-improvements.md) —
-  successor requalification after HFI-005 exposed a volatile profile lifecycle
-  pointer. External operations and public-copy work remain out of scope.
+  successor requalification after the corrected gate rejected the stable
+  profile's old volatile lifecycle shape. External operations and public-copy
+  work remain out of scope.
 
 The completed harness-governance rollout is retained under
 [`../completed/harness-governance-documentation.md`](../completed/harness-governance-documentation.md).
