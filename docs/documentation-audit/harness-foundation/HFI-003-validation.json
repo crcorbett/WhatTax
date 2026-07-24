@@ -37,7 +37,7 @@
     {
       "check": "bun run test:harness-governance",
       "status": "passed",
-      "postcondition": "Eleven focused tests passed, including rejection of every declared adversarial defect."
+      "postcondition": "Twelve focused tests passed, including rejection of every declared adversarial defect and Git-portable mode normalization."
     },
     {
       "check": "bun run check:harness-governance",
@@ -91,8 +91,13 @@
     },
     {
       "check": "Git-portable receipt correction, clean-clone focused gates, and originating-checkout full verification",
+      "status": "superseded",
+      "postcondition": "The gate normalized regular-file modes to 0644/0755 and passed a fresh clone, but adversarial review later proved it incorrectly treated group/other execute bits as Git-executable."
+    },
+    {
+      "check": "owner-execute Git mode correction and adversarial proof",
       "status": "passed",
-      "postcondition": "The gate normalizes regular-file modes to Git's 0644/0755 semantics; a fresh clone after frozen install produced the same receipts and passed governance type/test/runtime plus repository paths, while the originating checkout passed full verification."
+      "postcondition": "A temporary Git index proved 0654 stages as 100644 and 0744 as 100755; portableTreeMode matches both cases, and focused governance, skill, documentation, runbook, path, diff, and full repository verification pass before a successor HFI-004 candidate is frozen."
     },
     {
       "check": "git diff --check",
@@ -134,5 +139,7 @@
   "rollback": "Revert the HFI-003 local commit to remove the focused gate and owner routes while retaining HFI-001 and HFI-002 evidence; do not requalify the epoch until the gate passes again.",
   "observedAt": "2026-07-24T21:58:33Z",
   "correctedAt": "2026-07-24T22:05:00Z",
-  "portableReceiptCorrectedAt": "2026-07-24T22:16:00Z"
+  "portableReceiptCorrectedAt": "2026-07-24T22:16:00Z",
+  "ownerExecuteCorrectionObservedAt": "2026-07-24T22:36:17Z",
+  "ownerExecuteCorrectionAcceptedAt": "2026-07-24T22:40:00Z"
 }

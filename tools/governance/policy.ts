@@ -88,9 +88,7 @@ export interface GovernanceInputs {
 
 export const portableTreeMode = (mode: number) => {
   const ownerExecutable = Math.floor(mode / 64) % 2 === 1;
-  const groupExecutable = Math.floor(mode / 8) % 2 === 1;
-  const otherExecutable = mode % 2 === 1;
-  return ownerExecutable || groupExecutable || otherExecutable ? 0o755 : 0o644;
+  return ownerExecutable ? 0o755 : 0o644;
 };
 
 const finding = (

@@ -67,7 +67,9 @@ describe("harness governance policy", () => {
   it("normalizes host permissions to Git-portable tree modes", () => {
     expect(portableTreeMode(0o600)).toBe(0o644);
     expect(portableTreeMode(0o644)).toBe(0o644);
+    expect(portableTreeMode(0o654)).toBe(0o644);
     expect(portableTreeMode(0o700)).toBe(0o755);
+    expect(portableTreeMode(0o744)).toBe(0o755);
     expect(portableTreeMode(0o755)).toBe(0o755);
   });
 

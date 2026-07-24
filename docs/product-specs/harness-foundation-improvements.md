@@ -345,6 +345,11 @@ bits were not portable through Git: non-executable `0600` source templates
 materialized as `0644` in a clean clone. The canonical content boundary remains
 unchanged, but TaxKit's enforceable receipt must normalize regular-file modes
 to Git's portable `0644`/`0755` distinction and pass both checkout contexts.
+Adversarial review of the corrected candidate then proved that this distinction
+is specifically Git's owner-execute bit: mode `0654` stages as non-executable,
+while `0744` stages as executable. That candidate is also rejected; the
+normalizer and focused proof must encode those two cases before a successor is
+frozen.
 
 The exact task contract and dependencies live in
 [`harness-foundation-improvements.tasks.json`](./harness-foundation-improvements.tasks.json).
@@ -460,8 +465,9 @@ epoch claim over changed skills.
 
 - `HFI-001` through `HFI-003` implement the profile, structured audit,
   Git-portable skill migration, validator, and inherited CI edge. A successor
-  epoch remains unqualified until one immutable corrected candidate passes all
-  five journeys and fresh independent review.
+  epoch remains unqualified until the owner-execute correction is committed
+  and one immutable successor candidate passes all five journeys and fresh
+  independent review.
 - The HE table is a readable route only; the schema-valid
   `docs/documentation-audit/harness-foundation/accepted-findings.json` record
   is the executable accepted-finding crosswalk.

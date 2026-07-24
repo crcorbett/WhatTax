@@ -46,10 +46,15 @@ changes.
   new HFI-004 candidate was frozen. Independent clean-clone review then exposed
   host-specific non-executable modes in the initial tree receipt; the
   enforceable receipt now normalizes regular files to Git-portable `0644` or
-  `0755` semantics before another candidate can be frozen. Evidence:
+  `0755` semantics. Adversarial review of the corrected candidate then exposed
+  that Git uses the owner-execute bit specifically: `0654` must remain
+  non-executable while `0744` is executable. That candidate is retained as
+  rejected, and the corrected normalizer plus focused proof must pass before
+  another candidate can be frozen. Evidence:
   [`HFI-003-validation.json`](../../documentation-audit/harness-foundation/HFI-003-validation.json).
-- **HFI-004 — pending on HFI-003:** freeze the candidate, run the five retained
-  journeys, obtain fresh independent review, and qualify one new epoch.
+- **HFI-004 — pending on the owner-execute correction:** freeze a successor
+  candidate, rerun the five retained journeys, obtain fresh independent
+  review, and qualify one new epoch.
 - **HFI-005 — pending on HFI-004:** reconcile semantic owners and move this plan
   to completed history.
 
