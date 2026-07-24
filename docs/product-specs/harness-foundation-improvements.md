@@ -483,8 +483,10 @@ epoch claim over changed skills.
   `03716bf` passed all five journeys and fresh independent review but is
   invalidated by its volatile profile lifecycle paths. Candidate `f12c324` is
   also rejected and its local journey receipts remain terminal evidence only.
-  A successor requalification must bind the stable final profile and corrected
-  gate from one immutable commit; `HFI-005` remains pending.
+  Successor `7c8a96e` binds the stable final profile and corrected gate from one
+  immutable commit and passed the five fresh journeys, focused epoch
+  validation, and fresh independent review. Its current-owner/effectiveness
+  promotion and lifecycle closeout remain pending HFI-005.
 - The HE table is a readable route only; the schema-valid
   `docs/documentation-audit/harness-foundation/accepted-findings.json` record
   is the executable accepted-finding crosswalk.

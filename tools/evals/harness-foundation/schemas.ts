@@ -2,8 +2,8 @@ import { Schema } from "effect";
 
 export const epochId = "HFI-004-2026-07-24";
 export const migrationBaseCommit = "8695c018accf4c4abb7e803c631c5120f90e52b2";
-export const candidateCommit = "f12c3243cb3c2de5a877fa9f0c61e7c9b5fb704f";
-export const candidateTree = "5c5a15c89b2257d7b813f1650c783bdc20d9ee74";
+export const candidateCommit = "7c8a96e35ed59e4f78490d229cbfdcf21ea18ec0";
+export const candidateTree = "637bc0e2145ea24be7b2a72d507f9f99a43e5a72";
 
 export const epochPaths = {
   candidate: "docs/documentation-audit/harness-foundation/epoch-candidate.json",

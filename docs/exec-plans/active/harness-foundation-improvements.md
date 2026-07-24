@@ -56,7 +56,7 @@ changes.
   maintained lifecycle and stable index owners and rejects the exact volatile
   shape. Evidence:
   [`HFI-003-validation.json`](../../documentation-audit/harness-foundation/HFI-003-validation.json).
-- **HFI-004 — in progress:** candidate `03716bf` passed the five retained journeys
+- **HFI-004 — complete:** candidate `03716bf` passed the five retained journeys
   and fresh independent review, then HFI-005 proved its profile still named
   volatile active SPEC/plan lifecycle paths. That accepted evidence is retained
   but invalidated; the stable-profile successor must rerun every candidate-bound
@@ -65,10 +65,12 @@ changes.
   epoch/effectiveness semantic-owner changes. The same review then rejected
   successor `f12c324` because normal governance accepted the old volatile
   lifecycle shape. Both candidate identities are retained; neither can be
-  promoted. A new candidate must be frozen from the committed fail-closed gate
-  and rerun every candidate-bound gate, journey, and review. Prior evidence:
+  promoted. Candidate `7c8a96e` contains the committed fail-closed correction
+  and passed every focused/full gate, all five fresh journeys, exact epoch
+  validation, and fresh independent acceptance with no unresolved findings.
+  Evidence:
   [`epoch-validation.json`](../../documentation-audit/harness-foundation/epoch-validation.json).
-- **HFI-005 — pending on successor HFI-004 requalification:** reconcile the
+- **HFI-005 — pending:** reconcile the
   accepted epoch/effectiveness and maintainer routes, then validate and move
   this plan to completed history.
 

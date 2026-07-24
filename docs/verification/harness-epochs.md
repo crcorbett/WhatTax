@@ -29,10 +29,13 @@ under
 and
 [`epoch-validation.json`](../documentation-audit/harness-foundation/epoch-validation.json).
 The focused epoch graph is expected to reject that mixed transitional state;
-it must be replaced only after the reopened governance task is committed and a
-new immutable successor passes. Candidate `f12c324` correctly embeds the stable
-profile but cannot qualify because its gate accepts the old volatile
-lifecycle/owner shape.
+it must be replaced only after a new immutable successor passes. Candidate
+`f12c324` correctly embeds the stable profile but cannot qualify because its
+gate accepts the old volatile lifecycle/owner shape. Successor `7c8a96e`
+contains the fail-closed correction and passed five fresh journeys, exact
+focused epoch validation, and fresh independent acceptance. It remains pending
+HFI-005 current-owner and lifecycle reconciliation before this owner promotes
+it as the current worker-visible epoch.
 
 The five current journeys are calculator, packed SDK consumer, HTTP API,
 documentation runtime, and report-only release readiness. Their command,

@@ -109,10 +109,12 @@ overlays, two declared local extras, eight relative Claude links, and five
 retained journeys. HFI-004 has no accepted current epoch: candidate `03716bf`
 was invalidated by volatile profile lifecycle paths, and stable-profile
 candidate `f12c324` was rejected because the gate accepted that same volatile
-shape. Five terminal attempts are retained. The corrected HFI-003 gate now
-rejects that shape; HFI-004 must freeze and requalify a new immutable
-successor. No local evidence establishes remote Git, hosted CI, registry,
-release, deployment, provider, public-site, or external-consumer state.
+shape. Five terminal attempts are retained. The corrected HFI-003 gate rejects
+that shape; HFI-004 successor `7c8a96e` passed five fresh journeys, focused
+epoch validation, and fresh independent acceptance. HFI-005 current-owner and
+lifecycle closeout remains pending. No local evidence establishes remote Git,
+hosted CI, registry, release, deployment, provider, public-site, or
+external-consumer state.
 
 ## Current docs inventory
 

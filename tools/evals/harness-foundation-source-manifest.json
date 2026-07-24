@@ -3,10 +3,10 @@
   "epochId": "HFI-004-2026-07-24",
   "migrationBaseCommit": "8695c018accf4c4abb7e803c631c5120f90e52b2",
   "candidate": {
-    "commit": "f12c3243cb3c2de5a877fa9f0c61e7c9b5fb704f",
-    "tree": "5c5a15c89b2257d7b813f1650c783bdc20d9ee74",
-    "changedPathCount": 134,
-    "changedPathDigest": "cf7eb5b2f667b31324d9da3ec9cbab94bedf512e1894ecea01668fdfc7c30e22"
+    "commit": "7c8a96e35ed59e4f78490d229cbfdcf21ea18ec0",
+    "tree": "637bc0e2145ea24be7b2a72d507f9f99a43e5a72",
+    "changedPathCount": 135,
+    "changedPathDigest": "18a0f7f2f43cae8428e50376b0ca9ddce400b8f4fba280ca1a1e209e096fa5c6"
   },
   "epoch": {
     "worker": "primary delegated TaxKit prd-implementer worker",
@@ -16,23 +16,23 @@
       {
         "name": "git",
         "version": "git version 2.50.1 (Apple Git-155)",
-        "observedAt": "2026-07-24T23:07:00Z"
+        "observedAt": "2026-07-24T23:24:35Z"
       },
       {
         "name": "bun",
         "version": "1.3.14",
-        "observedAt": "2026-07-24T23:07:00Z"
+        "observedAt": "2026-07-24T23:24:35Z"
       },
       {
         "name": "ripgrep",
         "version": "15.2.0 (rev e89fff89ac)",
-        "observedAt": "2026-07-24T23:07:00Z"
+        "observedAt": "2026-07-24T23:24:35Z"
       }
     ],
     "runtime": [
       {
         "name": "TaxKit workspace",
-        "version": "candidate commit f12c3243cb3c2de5a877fa9f0c61e7c9b5fb704f"
+        "version": "candidate commit 7c8a96e35ed59e4f78490d229cbfdcf21ea18ec0"
       },
       {
         "name": "Effect",
@@ -63,7 +63,7 @@
     },
     {
       "path": "tools/governance/policy.ts",
-      "sha256": "34e1839bd2bc71e43335110ec75f5ea9517a87b1e894f2e022b5f605e632e2e0"
+      "sha256": "f802e1eac82fec3ba8b3e6f00e31d671fed60948e1191248488e8f6bf16a3995"
     },
     {
       "path": "tools/governance/schemas.ts",
@@ -75,7 +75,7 @@
     },
     {
       "path": "tools/evals/harness-foundation-scenarios.json",
-      "sha256": "3d3fa1d5433a418e1e11aad0f12b2f683af9002fb9cfdf499b546262830c5d40"
+      "sha256": "f768ca832068a4dfe15de15511271f130ae7d71350ae94625ce9db8619334ab0"
     },
     {
       "path": "tools/evals/harness-foundation/check.runtime.ts",
@@ -87,7 +87,7 @@
     },
     {
       "path": "tools/evals/harness-foundation/schemas.ts",
-      "sha256": "df878d97d62865ab930b51410dd5ecfbe9c7b2662e91fd717cd04786a41db7e5"
+      "sha256": "a5522248cd43eb21d617b3d016430a74d9275bc156ca4295131ae4b903fe96fb"
     }
   ],
   "skills": [

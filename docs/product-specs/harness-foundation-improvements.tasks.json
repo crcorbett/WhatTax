@@ -433,7 +433,7 @@
     },
     {
       "id": "HFI-004",
-      "status": "in_progress",
+      "status": "complete",
       "acceptedFindingIds": [
         "HE-001"
       ],
