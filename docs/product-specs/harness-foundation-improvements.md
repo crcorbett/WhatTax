@@ -350,6 +350,12 @@ is specifically Git's owner-execute bit: mode `0654` stages as non-executable,
 while `0744` stages as executable. That candidate is also rejected; the
 normalizer and focused proof must encode those two cases before a successor is
 frozen.
+The next candidate passed every gate, journey and fresh independent review, but
+HFI-005 then proved its canonical profile still named the specific active
+SPEC/plan and an active-migration lifecycle. Moving the plan would stale that
+profile; correcting the profile triggers requalification. That acceptance is
+therefore retained but invalidated, and the stable-index profile must be part of
+the successor target.
 
 The exact task contract and dependencies live in
 [`harness-foundation-improvements.tasks.json`](./harness-foundation-improvements.tasks.json).
@@ -361,10 +367,10 @@ owner that remains unchanged; silence is not an impact decision.
 
 | Surface | Decision | Evidence and required paths | Acceptance and verification |
 | --- | --- | --- | --- |
-| SPEC | Change required | This proposed owner: `docs/product-specs/harness-foundation-improvements.md`. | Requirements, HE mapping, boundaries, non-claims, ledger, and final lifecycle agree. |
+| SPEC | Change required | This current owner: `docs/product-specs/harness-foundation-improvements.md`. | Requirements, HE mapping, boundaries, non-claims, ledger, and final lifecycle agree. |
 | Sibling tasks | Change required | `docs/product-specs/harness-foundation-improvements.tasks.json`. | Exact dependencies, outputs, task-local ledger coverage, verification, independent review, rollback, and commit policy validate as JSON. |
-| Product-spec index | Change required | `docs/product-specs/index.md`. | Lists this SPEC as Active while HFI-001 through HFI-005 execute. |
-| Active execution plan | Change required | `docs/exec-plans/active/harness-foundation-improvements.md` and its index own current task evidence now implementation has begun. | HFI task state, dependencies, evidence, recovery, authority, and no-Changeset decisions remain synchronized. |
+| Product-spec index | Change required | `docs/product-specs/index.md`. | Lists this SPEC as Active until successor requalification and HFI-005 acceptance. |
+| Execution plan | Change required | `docs/exec-plans/active/harness-foundation-improvements.md` and the active/completed indexes. | Current task evidence remains active until no stale profile or lifecycle pointer remains. |
 | Semantic owners | Change required during implementation | `docs/README.md`, `docs/verification/harness-epochs.md`, `docs/verification/effectiveness.md`, `docs/architecture/testing-and-quality.md`, `docs/standards/tooling.md`, and `docs/documentation-audit/README.md`. | Owners route the profile, structured audit, focused gate, previous epoch, current epoch, limitations, and non-claims without copying procedures. |
 | Documentation audit records | Change required | `docs/documentation-audit/templates/**` and `docs/documentation-audit/harness-foundation/**`. | Scope, HE findings, decisions, crosswalk, receipts, failures, independent review, and closeout decode and remain addressable. |
 | Root README | Change required when the command lands | `README.md` currently documents root verification and skill tests but no harness-governance command. | Add only the focused command/purpose/non-claim route; no public-site copy. |
@@ -395,10 +401,10 @@ owner that remains unchanged; silence is not an impact decision.
 | HGI-205 CI/authority controls | N/A — preserve | `.github/workflows/quality.yml`, `tools/quality-workflow/**`, `docs/standards/controls.md`, and `docs/operations/automation-register.md`. | Existing report-only CI, action pins, denied operations, rollback, and recovery remain intact. |
 | Critical journeys | Change required only for the new epoch binding | `docs/verification/critical-journeys.json` remains the journey owner; new scenario/receipt paths live under `tools/evals/` and `docs/documentation-audit/harness-foundation/`. | All five existing commands/oracles pass against the immutable migrated candidate; no journey contract is weakened. |
 | Proof/evidence | Change required | New bounded candidate, source manifest, journey receipts, failures, independent review, and validation under `docs/documentation-audit/harness-foundation/**` and `tools/evals/**`. | Digests bind the exact candidate; failed/inconclusive attempts remain outside current routes. |
-| Lifecycle | Change required | This SPEC/tasks/index, future active/completed plan, `docs/README.md`, `docs/verification/harness-epochs.md`, and `docs/verification/effectiveness.md`. | Proposed remains proposed until implementation; closeout occurs only after accepted requalification. |
+| Lifecycle | Change required | This SPEC/tasks/index, active/completed plan, `docs/README.md`, `docs/verification/harness-epochs.md`, and `docs/verification/effectiveness.md`. | Closeout occurs only after accepted requalification of the stable final profile. |
 | Release | N/A | No version, Changeset consumption, tag, hosted release, publication, or registry operation. | Local release graph may be used as journey proof only and retains explicit non-claims. |
 | Rollback | Change required as planning/proof | Task receipts and the new epoch owner must identify task-scoped revert order, retained evidence, and resume trigger. | Reversal never deletes failed/accepted evidence or rewrites HGI-203 through HGI-206 history. |
-| Changeset | N/A by default | The proposal changes repository governance/docs/tooling only, not package installation, exports, public API, package behavior, or public docs. | Each implementation task records the no-Changeset rationale; add a Changeset only if later accepted work becomes package-facing. |
+| Changeset | N/A | The implementation changes repository governance/docs/tooling only, not package installation, exports, public API, package behaviour, versions, or public docs. | Each task and final closeout record the no-Changeset rationale. |
 | HTTP/API/SDK/provider/storage | N/A | Current package/app owners and Schemas remain unchanged; no external access is authorized. | No runtime/provider call graph change and no external actuality claim. |
 | React/accessibility/browser UI | N/A | No route, container, leaf, UI state, accessibility, or browser import boundary changes. | Docs browser runs only as an unchanged requalification journey. |
 | Deployment/observability | N/A | No deployment, hosted telemetry, provider state, secrets, dashboards, or production logs are read or changed. | Receipts distinguish local observations from hosted/external state. |
@@ -464,12 +470,11 @@ epoch claim over changed skills.
 ## Limitations and non-claims
 
 - `HFI-001` through `HFI-003` implement the profile, structured audit,
-  Git-portable skill migration, validator, and inherited CI edge. A successor
-  epoch is now qualified against owner-execute-corrected candidate `03716bf`.
-  All five retained journeys, the exact evaluator, retained failed attempts,
-  fresh independent acceptance, and the hash-bound epoch validation pass.
-  `HFI-005` must still reconcile the current epoch/effectiveness and lifecycle
-  owners before this SPEC is implemented.
+  Git-portable skill migration, validator, and inherited CI edge. Candidate
+  `03716bf` passed all five journeys and fresh independent review but is
+  invalidated by its volatile profile lifecycle paths. A successor
+  requalification must bind the stable final profile before
+  `HFI-005` can reconcile lifecycle owners and implement this SPEC/tasks.
 - The HE table is a readable route only; the schema-valid
   `docs/documentation-audit/harness-foundation/accepted-findings.json` record
   is the executable accepted-finding crosswalk.

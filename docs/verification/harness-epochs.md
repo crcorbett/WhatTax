@@ -9,11 +9,15 @@ review_trigger: worker, host, tool, runtime, skill, public-boundary, or release-
 
 # Harness evaluation epochs
 
-`HFI-004-2026-07-24` is the current worker-visible local TaxKit epoch. Its
+There is no current worker-visible TaxKit epoch while successor
+requalification is in progress. `HFI-004-2026-07-24` was accepted against
+candidate `03716bfce8e6014e4fa72ec43cb33c487a9c869f`, then invalidated when
+HFI-005 proved that its repository profile still contained volatile
+active-SPEC/plan lifecycle paths. Its
 scenario contract is
 [`../../tools/evals/harness-foundation-scenarios.json`](../../tools/evals/harness-foundation-scenarios.json);
 the independent reviewer record remains outside that default worker context.
-The target is commit `03716bfce8e6014e4fa72ec43cb33c487a9c869f`,
+The invalidated target is commit `03716bfce8e6014e4fa72ec43cb33c487a9c869f`,
 tree `bb0300c3d02a11c9f30e6dc7cd6c8659bc3f51fa`, after the canonical skill,
 profile, governance, path-fixture and Git owner-execute corrections.
 
@@ -22,9 +26,10 @@ acceptance and focused validation are bound by
 [`epoch-candidate.json`](../documentation-audit/harness-foundation/epoch-candidate.json)
 and
 [`epoch-validation.json`](../documentation-audit/harness-foundation/epoch-validation.json).
-They qualify only the recorded candidate, worker/model description, host,
-tools, runtime, skill/profile/evaluator identities, journeys, clocks,
-authority, limitations and non-claims.
+They remain terminal evidence for only the recorded candidate, worker/model
+description, host, tools, runtime, skill/profile/evaluator identities,
+journeys, clocks, authority, limitations and non-claims. They do not qualify
+the corrected stable profile.
 
 The five current journeys are calculator, packed SDK consumer, HTTP API,
 documentation runtime, and report-only release readiness. Their command,
@@ -42,7 +47,8 @@ HGI-206 remains the previous retained epoch for target
 `a8a58882cd6c5f8003d31dc0c0567d78093597b9`; its scenario, candidate,
 validation and lifecycle-correction evidence remain reachable under
 `tools/evals/hgi-206*` and `docs/documentation-audit/HGI-206*`. It cannot
-qualify the later skill or governance state.
+qualify the later skill or governance state and is not restored as current
+truth.
 
 Failed, rejected, deferred and inconclusive material remains under
 `docs/documentation-audit/` and is not acceptance proof. Reversal of the

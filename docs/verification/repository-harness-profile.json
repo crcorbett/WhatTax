@@ -2,7 +2,7 @@
   "schemaVersion": "1",
   "repository": "taxkit",
   "purpose": "Public monorepo for the TaxKit tax engine, calculators, HTTP API, TypeScript SDK, and documentation runtime.",
-  "lifecyclePhase": "active-harness-foundation-migration",
+  "lifecyclePhase": "maintained-harness-governance",
   "identitySource": "git rev-parse HEAD, git status --short --branch, and the content-addressed candidate manifest",
   "owners": {
     "docsRouter": "docs/README.md",
@@ -25,15 +25,8 @@
       "docs/evidence/",
       "tools/evals/"
     ],
-    "activeSpecs": [
-      "docs/product-specs/index.md",
-      "docs/product-specs/harness-foundation-improvements.md",
-      "docs/product-specs/harness-foundation-improvements.tasks.json"
-    ],
-    "activePlans": [
-      "docs/exec-plans/active/README.md",
-      "docs/exec-plans/active/harness-foundation-improvements.md"
-    ],
+    "activeSpecs": ["docs/product-specs/index.md"],
+    "activePlans": ["docs/exec-plans/active/README.md"],
     "archives": [
       "docs/exec-plans/completed/",
       "docs/documentation-audit/",
@@ -52,7 +45,9 @@
     "focused": [
       "bun run check:harness-governance:types",
       "bun run test:harness-governance",
-      "bun run check:harness-governance"
+      "bun run check:harness-governance",
+      "bun run check:harness-foundation-epoch:types",
+      "bun run check:harness-foundation-epoch"
     ],
     "closeout": ["bun run verification", "git diff --check"]
   },

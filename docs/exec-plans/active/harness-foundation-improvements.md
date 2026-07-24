@@ -52,15 +52,15 @@ changes.
   rejected, and the corrected normalizer plus focused proof must pass before
   another candidate can be frozen. Evidence:
   [`HFI-003-validation.json`](../../documentation-audit/harness-foundation/HFI-003-validation.json).
-- **HFI-004 — complete:** successor candidate `03716bf` contains the accepted
-  owner-execute correction, passes the five retained journeys, and has fresh
-  independent acceptance. The strengthened evaluator binds both complete
-  validator closures, canonical skill/journey projections, three rejected
-  attempts, exact duplicate-free review/validation check sets, clocks,
-  limitations, non-claims, and the no-Changeset rationale. Evidence:
+- **HFI-004 — reopened:** candidate `03716bf` passed the five retained journeys
+  and fresh independent review, then HFI-005 proved its profile still named
+  volatile active SPEC/plan lifecycle paths. That accepted evidence is retained
+  but invalidated; the stable-profile successor must rerun every candidate-bound
+  gate, journey and review. Prior evidence:
   [`epoch-validation.json`](../../documentation-audit/harness-foundation/epoch-validation.json).
-- **HFI-005 — in progress:** reconcile the accepted epoch/effectiveness and
-  maintainer routes, then validate and move this plan to completed history.
+- **HFI-005 — pending on successor HFI-004 requalification:** reconcile the
+  accepted epoch/effectiveness and maintainer routes, then validate and move
+  this plan to completed history.
 
 ## HFI-001 acceptance record
 

@@ -9,7 +9,8 @@ review_trigger: repeated contradiction or worker, host, tool, runtime, skill, ta
 
 # Harness effectiveness
 
-The current HFI-004 epoch retains the smallest coherent intervention set:
+The invalidated HFI-004 epoch supplied target-specific evidence for the
+smallest coherent intervention set:
 maintainer routing, five-journey inventory, four runbooks, authority model,
 release graph, portable repository-local skills, the TaxKit harness profile,
 and deterministic governance/epoch checks. Decisions remain evidence-bounded;
@@ -23,10 +24,10 @@ activity counts are not efficacy.
 | Portable repo-local skills, profile, and deterministic gates | Retain | `.agents/skills/**`, `tools/skills/canonical-skill-baseline.json`, `docs/verification/repository-harness-profile.json`, `tools/governance/**`, and HFI-004 epoch validation | skill, profile, receipt, link, or enforcement change |
 | Any causal comparison or ablation claim | Inconclusive | independent grader result | condition-blind comparison is available |
 
-The router returns to `Retain` only after HFI-005 reconciles the accepted epoch
-and lifecycle owners. The skill/profile/gate intervention is retained because
-the exact migrated state and five target journeys pass, not because it proves a
-causal improvement over HGI-206. `Inconclusive` remains: there is no
+The router and skill/profile/gate rows become current `Retain` decisions only
+after the stable-profile successor passes. The invalidated candidate remains
+useful terminal evidence but cannot qualify the corrected profile.
+`Inconclusive` remains: there is no
 condition-blind comparison or ablation, so no speed, quality, cost, or
 general-effectiveness claim is made. The candidate and validation receipts
 name the exact observations, limitations and recovery.

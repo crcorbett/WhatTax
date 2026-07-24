@@ -19,6 +19,7 @@ export const failedAttemptPaths = [
   "docs/documentation-audit/harness-foundation/failed-or-inconclusive/HFI-004-candidate-1.json",
   "docs/documentation-audit/harness-foundation/failed-or-inconclusive/HFI-004-candidate-2.json",
   "docs/documentation-audit/harness-foundation/failed-or-inconclusive/HFI-004-candidate-3.json",
+  "docs/documentation-audit/harness-foundation/failed-or-inconclusive/HFI-004-candidate-4.json",
 ] as const;
 
 export const receiptPaths = [

@@ -17,10 +17,8 @@ lifecycle is owned by [`../../README.md`](../../README.md).
 Active plan:
 
 - [Harness foundation improvements](./harness-foundation-improvements.md) —
-  strict `HFI-001` through `HFI-005` implementation of the accepted `HE-001`
-  through `HE-004` migration. It permits repository-local changes and
-  passing-gated local commits only; external operations and public-copy work
-  remain out of scope.
+  successor requalification after HFI-005 exposed a volatile profile lifecycle
+  pointer. External operations and public-copy work remain out of scope.
 
 The completed harness-governance rollout is retained under
 [`../completed/harness-governance-documentation.md`](../completed/harness-governance-documentation.md).

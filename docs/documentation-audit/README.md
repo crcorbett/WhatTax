@@ -108,10 +108,10 @@ The active profile and focused repository gate preserve exact `HE-001` through
 overlays, two declared local extras, eight relative Claude links, and five
 retained journeys. HFI-004 qualifies target-specific local epoch
 `HFI-004-2026-07-24` against candidate `03716bf` with three rejected attempts
-retained. HFI-005 reconciles the current epoch/effectiveness and lifecycle
-owners without rewriting the candidate or rejected-attempt evidence. No local
-evidence establishes remote Git, hosted CI, registry, release, deployment,
-provider, public-site, or external-consumer state.
+retained. HFI-005 found that the accepted candidate still projected volatile
+active-plan/profile lifecycle paths; a stable-profile successor must requalify
+before closeout. No local evidence establishes remote Git, hosted CI, registry,
+release, deployment, provider, public-site, or external-consumer state.
 
 ## Current docs inventory
 
