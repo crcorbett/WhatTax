@@ -52,9 +52,13 @@ changes.
   rejected, and the corrected normalizer plus focused proof must pass before
   another candidate can be frozen. Evidence:
   [`HFI-003-validation.json`](../../documentation-audit/harness-foundation/HFI-003-validation.json).
-- **HFI-004 — pending on the owner-execute correction:** freeze a successor
-  candidate, rerun the five retained journeys, obtain fresh independent
-  review, and qualify one new epoch.
+- **HFI-004 — complete:** successor candidate `03716bf` contains the accepted
+  owner-execute correction, passes the five retained journeys, and has fresh
+  independent acceptance. The strengthened evaluator binds both complete
+  validator closures, canonical skill/journey projections, three rejected
+  attempts, exact duplicate-free review/validation check sets, clocks,
+  limitations, non-claims, and the no-Changeset rationale. Evidence:
+  [`epoch-validation.json`](../../documentation-audit/harness-foundation/epoch-validation.json).
 - **HFI-005 — pending on HFI-004:** reconcile semantic owners and move this plan
   to completed history.
 

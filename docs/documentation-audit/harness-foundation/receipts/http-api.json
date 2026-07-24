@@ -1,0 +1,14 @@
+{
+  "schemaVersion": "1",
+  "epochId": "HFI-004-2026-07-24",
+  "journeyId": "taxkit-http-api",
+  "candidateCommit": "03716bfce8e6014e4fa72ec43cb33c487a9c869f",
+  "command": "bun run --filter=api smoke",
+  "observedAt": "2026-07-24T22:41:55Z",
+  "durationMs": 430,
+  "exitCode": 0,
+  "oracleObserved": "The ephemeral API and external temporary consumer passed health, calculator metadata, two calculation routes, schema failure, and OpenAPI checks against real local HTTP responses.",
+  "sideEffects": "The local API process stopped and its temporary external consumer workspace was removed.",
+  "recovery": "apps/api/README.md and packages/api/http/README.md",
+  "nonClaim": "The ephemeral local API establishes no deployed API, provider, production, or public availability state."
+}

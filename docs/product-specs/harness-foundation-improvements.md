@@ -465,9 +465,11 @@ epoch claim over changed skills.
 
 - `HFI-001` through `HFI-003` implement the profile, structured audit,
   Git-portable skill migration, validator, and inherited CI edge. A successor
-  epoch remains unqualified until the owner-execute correction is committed
-  and one immutable successor candidate passes all five journeys and fresh
-  independent review.
+  epoch is now qualified against owner-execute-corrected candidate `03716bf`.
+  All five retained journeys, the exact evaluator, retained failed attempts,
+  fresh independent acceptance, and the hash-bound epoch validation pass.
+  `HFI-005` must still reconcile the current epoch/effectiveness and lifecycle
+  owners before this SPEC is implemented.
 - The HE table is a readable route only; the schema-valid
   `docs/documentation-audit/harness-foundation/accepted-findings.json` record
   is the executable accepted-finding crosswalk.

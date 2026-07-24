@@ -1,0 +1,111 @@
+{
+  "schemaVersion": "1",
+  "epochId": "HFI-004-2026-07-24",
+  "lifecycle": "qualified",
+  "target": {
+    "migrationBaseCommit": "8695c018accf4c4abb7e803c631c5120f90e52b2",
+    "commit": "03716bfce8e6014e4fa72ec43cb33c487a9c869f",
+    "tree": "bb0300c3d02a11c9f30e6dc7cd6c8659bc3f51fa",
+    "changedPathCount": 114,
+    "changedPathDigest": "8ded08031b2c839d66e2422fc993ec361aa11256a63165ada87b720883728ff6"
+  },
+  "sourceManifest": {
+    "path": "tools/evals/harness-foundation-source-manifest.json",
+    "sha256": "629c75f0baec242c4d60e1fb7425bc2e0c6af8edadbd67d352c13642175c9346"
+  },
+  "scenario": {
+    "path": "tools/evals/harness-foundation-scenarios.json",
+    "sha256": "205822e49b3cd4bfb9caaf4e4a03804625528c9d2ccb000c7fcae84b43d4e9cb"
+  },
+  "failedAttempts": [
+    {
+      "path": "docs/documentation-audit/harness-foundation/failed-or-inconclusive/HFI-004-candidate-1.json",
+      "sha256": "6156b1d5ebececc3b15a36bf71a0213d622e1adb357acb2bd8226251d81c84b1"
+    },
+    {
+      "path": "docs/documentation-audit/harness-foundation/failed-or-inconclusive/HFI-004-candidate-2.json",
+      "sha256": "05fbfa77e919bc9d53a9421c469a87bb5e097d3c69aff6300afe52d56a775c1c"
+    },
+    {
+      "path": "docs/documentation-audit/harness-foundation/failed-or-inconclusive/HFI-004-candidate-3.json",
+      "sha256": "7161130e63aab84efefe55dbecc2f976c75ef52941b9a22c0719e1bb6885c0ae"
+    }
+  ],
+  "receipts": [
+    {
+      "journeyId": "taxkit-calculator-direct",
+      "path": "docs/documentation-audit/harness-foundation/receipts/calculator.json",
+      "sha256": "d8e2bfd6d0d36687af3c1caf471b890886be20c832c21c5f0b9f90b88bb5c6be"
+    },
+    {
+      "journeyId": "taxkit-sdk-packed",
+      "path": "docs/documentation-audit/harness-foundation/receipts/packed-sdk.json",
+      "sha256": "8a5ac0021a8d667f6c22e240a08f711ab4f91ecb62655fa7cc367dbb3b63bbb9"
+    },
+    {
+      "journeyId": "taxkit-http-api",
+      "path": "docs/documentation-audit/harness-foundation/receipts/http-api.json",
+      "sha256": "c23f460ff4618f38620205b68c329231c24a59f858705caea9d07c9d78778cd7"
+    },
+    {
+      "journeyId": "taxkit-docs-runtime",
+      "path": "docs/documentation-audit/harness-foundation/receipts/docs-runtime.json",
+      "sha256": "6744b53802f2ccb1515da2559bf5a1e57b446bcf57d1158f814ca9d18b4280da"
+    },
+    {
+      "journeyId": "taxkit-release-closure",
+      "path": "docs/documentation-audit/harness-foundation/receipts/release-readiness.json",
+      "sha256": "d6f04793c1b8c85e2752186c24a9f4df19f77d95baa81c4d2cc9cbef12abd451"
+    }
+  ],
+  "independentReview": {
+    "path": "docs/documentation-audit/harness-foundation/independent-review.json",
+    "sha256": "ac7e7d6f6a5c0d44682af8cf20cea359e3157508d2d0625afc8e9f3e571faed3"
+  },
+  "clocks": {
+    "workerFeedback": {
+      "valueMs": null,
+      "measurement": "No independent worker-feedback latency clock was instrumented.",
+      "reason": "Review messages supplied findings and acceptance, but their delivery latency was not directly measured."
+    },
+    "workerWallClock": {
+      "valueMs": 615000,
+      "measurement": "UTC wall time from successor candidate observation at 2026-07-24T22:40:51Z to independent acceptance at 2026-07-24T22:51:06Z.",
+      "reason": null
+    },
+    "humanAttention": {
+      "valueMs": null,
+      "measurement": "No synchronous human-attention clock was instrumented.",
+      "reason": "The delegated implementation proceeded without a measured synchronous human-review interval."
+    },
+    "acceptedOutcome": {
+      "valueMs": 615000,
+      "measurement": "UTC elapsed time from the immutable successor candidate observation to fresh independent acceptance.",
+      "reason": null
+    }
+  },
+  "authority": {
+    "mode": "local-read-and-verification",
+    "stopsBefore": [
+      "push",
+      "tag",
+      "versioning",
+      "publication",
+      "release",
+      "deployment",
+      "provider-access",
+      "public-site-mutation",
+      "recovery-mutation"
+    ]
+  },
+  "limitations": [
+    "The qualified epoch is target-specific to candidate 03716bf, the recorded local environment, exact skill/profile/evaluator identities, and the five retained journey receipts.",
+    "The independent reviewer did not rerun the five expensive journeys and instead independently verified their bound receipts plus clean-clone focused/full repository gates.",
+    "Clean-clone full verification required normal build preparation because of the pre-existing Knip dependency on generated docs-fumadocs output.",
+    "Any worker, host, tool, runtime, skill receipt, profile, validator, journey, target, or authority change requires requalification."
+  ],
+  "nonClaims": [
+    "This local epoch does not establish push or remote Git state, hosted CI, registry publication, release, deployment, provider or production state, public-site availability, or an external-consumer outcome."
+  ],
+  "rollback": "Revert the HFI-004 evidence commit without rewriting the three rejected attempts, restore HGI-206 as the previous retained epoch route, and requalify only from a new immutable candidate after every focused gate and journey passes."
+}

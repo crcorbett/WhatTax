@@ -95,15 +95,22 @@ Active harness-foundation migration evidence:
 - [`harness-foundation/HFI-001-validation.json`](harness-foundation/HFI-001-validation.json)
 - [`harness-foundation/HFI-002-validation.json`](harness-foundation/HFI-002-validation.json)
 - [`harness-foundation/HFI-003-validation.json`](harness-foundation/HFI-003-validation.json)
+- [`harness-foundation/epoch-candidate.json`](harness-foundation/epoch-candidate.json)
+- [`harness-foundation/epoch-validation.json`](harness-foundation/epoch-validation.json)
+- [`harness-foundation/independent-review.json`](harness-foundation/independent-review.json)
+- [`harness-foundation/failed-or-inconclusive/`](harness-foundation/failed-or-inconclusive/)
+- [`harness-foundation/receipts/`](harness-foundation/receipts/)
 - [`../verification/repository-harness-profile.json`](../verification/repository-harness-profile.json)
 - [`../../tools/skills/canonical-skill-baseline.json`](../../tools/skills/canonical-skill-baseline.json)
 
 The active profile and focused repository gate preserve exact `HE-001` through
 `HE-004` mappings and validate the six canonical skill trees, two profile
 overlays, two declared local extras, eight relative Claude links, and five
-retained journeys. Passing local checks does not yet create a successor epoch
-or establish remote Git, hosted CI, registry, release, deployment, provider,
-public-site, or external-consumer state.
+retained journeys. HFI-004 qualifies target-specific local epoch
+`HFI-004-2026-07-24` against candidate `03716bf` with three rejected attempts
+retained. HFI-005 still owns current epoch/effectiveness and lifecycle
+reconciliation. No local evidence establishes remote Git, hosted CI, registry,
+release, deployment, provider, public-site, or external-consumer state.
 
 ## Current docs inventory
 

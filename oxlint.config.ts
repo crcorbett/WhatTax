@@ -42,6 +42,8 @@ const decodingBoundaryFiles = [
   "tools/quality-workflow/policy.ts",
   "tools/quality-workflow/release-boundary.test.ts",
   "tools/evals/hgi-206/input.boundary.ts",
+  "tools/evals/harness-foundation/input.boundary.ts",
+  "tools/evals/harness-foundation/check.runtime.ts",
   "tools/governance/foundation.test.ts",
   "tools/governance/input.boundary.ts",
   "tools/governance/policy.test.ts",
@@ -121,6 +123,7 @@ const portableEffectSourceFiles = [
   "tools/repository-paths/**/*.{ts,tsx,js,jsx}",
   "tools/skills/**/*.{ts,tsx,js,jsx}",
   "tools/governance/**/*.{ts,tsx,js,jsx}",
+  "tools/evals/harness-foundation/**/*.{ts,tsx,js,jsx}",
 ];
 
 const schemaEncoderEgressFiles = [
@@ -168,6 +171,7 @@ const runtimeBoundaryFiles = [
   "tools/documentation/runbook-check.runtime.ts",
   "tools/documentation/runbook-policy.test.ts",
   "tools/evals/hgi-206/check.runtime.ts",
+  "tools/evals/harness-foundation/check.runtime.ts",
   "tools/governance/check.runtime.ts",
   "tools/governance/policy.test.ts",
 ];
@@ -180,6 +184,7 @@ const processBoundaryFiles = [
   "tools/documentation/check.runtime.ts",
   "tools/documentation/runbook-check.runtime.ts",
   "tools/evals/hgi-206/check.runtime.ts",
+  "tools/evals/harness-foundation/check.runtime.ts",
   "tools/governance/check.runtime.ts",
 ];
 
@@ -193,6 +198,7 @@ const consoleBoundaryFiles = [
   "tools/documentation/check.runtime.ts",
   "tools/documentation/runbook-check.runtime.ts",
   "tools/evals/hgi-206/check.runtime.ts",
+  "tools/evals/harness-foundation/check.runtime.ts",
   "tools/governance/check.runtime.ts",
 ];
 
@@ -209,6 +215,7 @@ const bunAdapterFiles = [
   "tools/documentation/runbook-check.runtime.ts",
   "tools/documentation/runbook-check.runtime.test.ts",
   "tools/evals/hgi-206/check.runtime.ts",
+  "tools/evals/harness-foundation/check.runtime.ts",
   "tools/governance/check.runtime.ts",
 ];
 
@@ -227,6 +234,7 @@ const bunRuntimeEntrypointFiles = [
   "tools/quality-workflow/check.runtime.ts",
   "tools/quality-workflow/release-boundary.test.ts",
   "tools/evals/hgi-206/check.runtime.ts",
+  "tools/evals/harness-foundation/check.runtime.ts",
   "tools/governance/check.runtime.ts",
 ];
 

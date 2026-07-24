@@ -1,0 +1,14 @@
+{
+  "schemaVersion": "1",
+  "epochId": "HFI-004-2026-07-24",
+  "journeyId": "taxkit-calculator-direct",
+  "candidateCommit": "03716bfce8e6014e4fa72ec43cb33c487a9c869f",
+  "command": "bun run test",
+  "observedAt": "2026-07-24T22:41:25Z",
+  "durationMs": 4749,
+  "exitCode": 0,
+  "oracleObserved": "The 19-task workspace test graph included @taxkit/calculators and its five public-calculator-service tests; all tasks passed.",
+  "sideEffects": "Test-owned local build/cache artifacts only.",
+  "recovery": "packages/calculators/README.md and the calculator package owner",
+  "nonClaim": "Local calculator proof does not establish a published package or external consumer."
+}

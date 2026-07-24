@@ -40,6 +40,8 @@
     "check:effect-language-service": "effect-language-service check && tsc --noEmit -p tools/effect-language-service/tsconfig.json",
     "check:harness-governance": "bun --conditions=source run tools/governance/check.runtime.ts",
     "check:harness-governance:types": "tsc --noEmit -p tools/governance/tsconfig.json",
+    "check:harness-foundation-epoch": "bun --conditions=source run tools/evals/harness-foundation/check.runtime.ts",
+    "check:harness-foundation-epoch:types": "tsc --noEmit -p tools/evals/tsconfig.json",
     "check:hgi-206": "bun --conditions=source run tools/evals/hgi-206/check.runtime.ts",
     "check:runbooks": "bun --conditions=source run tools/documentation/runbook-check.runtime.ts",
     "check-types": "turbo run check-types",

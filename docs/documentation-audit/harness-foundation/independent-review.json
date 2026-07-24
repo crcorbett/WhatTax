@@ -1,0 +1,53 @@
+{
+  "schemaVersion": "1",
+  "epochId": "HFI-004-2026-07-24",
+  "candidateCommit": "03716bfce8e6014e4fa72ec43cb33c487a9c869f",
+  "status": "accepted",
+  "reviewer": {
+    "identity": "/root/hfi004_independent_review",
+    "context": "Fresh delegated successor-candidate review with isolated-clone and adversarial evidence inspection.",
+    "workerIndependentOf": "primary delegated TaxKit prd-implementer worker"
+  },
+  "checks": [
+    {
+      "name": "exact-candidate-and-path-identity",
+      "outcome": "passed",
+      "postcondition": "The candidate commit, tree, 114-path NUL-delimited digest, and exact HE-001 through HE-004 requirement/task crosswalk reproduce."
+    },
+    {
+      "name": "clean-clone-portability-and-governance",
+      "outcome": "passed",
+      "postcondition": "An isolated clone passed focused governance, type, skill, path, and full repository verification after the repository's normal build preparation; 0654 and 0744 owner-execute semantics are corrected."
+    },
+    {
+      "name": "he-mapping-and-skill-projection",
+      "outcome": "passed",
+      "postcondition": "Six canonical skills, two overlays, two declared extras, eight relative Claude links, complete local references, and their content-addressed projections agree."
+    },
+    {
+      "name": "journeys-and-retained-failures",
+      "outcome": "passed",
+      "postcondition": "Five zero-exit candidate-bound journey receipts and all three rejected predecessor records are complete, distinct, hash-bound, and retained."
+    },
+    {
+      "name": "preserved-surfaces-and-no-changeset",
+      "outcome": "passed",
+      "postcondition": "HGI-203 through HGI-206 evidence, packages/apps, workflows, runbooks, authority controls, critical-journey owner, public content, lockfile, and Changesets are unchanged; package-facing behaviour does not require a Changeset."
+    },
+    {
+      "name": "evaluator-adversarial-and-external-nonclaims",
+      "outcome": "passed",
+      "postcondition": "Omission, duplicate, stale projection, forged identity, temporal ordering, circularity, and external-claim routes fail closed; evaluator typecheck, lint, format, diff, and source-hash readback pass."
+    }
+  ],
+  "findings": [],
+  "limitations": [
+    "The reviewer inspected the five candidate-bound journey receipts but did not independently rerun those five expensive commands.",
+    "Clean-clone full verification required normal build preparation because of the documented pre-existing Knip dependency on generated docs-fumadocs output.",
+    "Acceptance qualifies only the named local candidate, environment, receipts, and epoch evidence."
+  ],
+  "nonClaims": [
+    "No push, remote Git, hosted CI, registry, release, deployment, provider, public-site, or external-consumer state was accessed or established."
+  ],
+  "observedAt": "2026-07-24T22:51:06Z"
+}
