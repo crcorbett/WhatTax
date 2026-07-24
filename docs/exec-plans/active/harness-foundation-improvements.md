@@ -41,7 +41,9 @@ changes.
   owners once at ingress, accepts the migrated profile/audit/skill state, and
   rejects all nine named adversarial defects. Root verification invokes it
   exactly once; the unchanged Quality workflow inherits it through the
-  existing release graph. Evidence:
+  existing release graph. The first post-commit path check exposed and then
+  corrected two literal private-looking adversarial fixture values before a
+  new HFI-004 candidate was frozen. Evidence:
   [`HFI-003-validation.json`](../../documentation-audit/harness-foundation/HFI-003-validation.json).
 - **HFI-004 — pending on HFI-003:** freeze the candidate, run the five retained
   journeys, obtain fresh independent review, and qualify one new epoch.

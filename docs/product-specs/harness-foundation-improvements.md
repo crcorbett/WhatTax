@@ -336,7 +336,10 @@ now validates the exact HE crosswalk, TaxKit profile, content-addressed skill
 baseline, two profile overlays, two declared extras, eight relative Claude
 links, self-contained references, five journey owners, and external
 non-claims. `HFI-004` must freeze the resulting committed candidate before any
-successor epoch claim.
+successor epoch claim. The first post-commit path check invalidated the initial
+candidate because two adversarial tests embedded private-looking absolute path
+literals; HFI-003 remains complete only after the equivalent fixtures are built
+from neutral fragments and the tracked path/full gates pass.
 
 The exact task contract and dependencies live in
 [`harness-foundation-improvements.tasks.json`](./harness-foundation-improvements.tasks.json).

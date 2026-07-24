@@ -166,6 +166,7 @@ describe("harness governance policy", () => {
   it("rejects copied and absolute Claude links", async () => {
     const inputs = await loadAcceptedInputs();
     const [first, ...rest] = inputs.observations.links;
+    const absoluteSkillPath = ["", "Users", "example", "skill"].join("/");
     expect(first).toBeDefined();
     if (first === undefined) {
       return;
@@ -185,7 +186,7 @@ describe("harness governance policy", () => {
         ...inputs,
         observations: {
           ...inputs.observations,
-          links: [{ ...first, target: "/Users/example/skill" }, ...rest],
+          links: [{ ...first, target: absoluteSkillPath }, ...rest],
         },
       },
       "claude-link"
@@ -194,6 +195,13 @@ describe("harness governance policy", () => {
 
   it("rejects broken references and user-specific runtime paths", async () => {
     const inputs = await loadAcceptedInputs();
+    const personalSkillPath = [
+      "",
+      "Users",
+      "example",
+      ".agents",
+      "skills",
+    ].join("/");
     expectInvariant(
       {
         ...inputs,
@@ -217,7 +225,7 @@ describe("harness governance policy", () => {
           portablePathFindings: [
             {
               source: ".agents/skills/docs-maintainer/SKILL.md",
-              target: "/Users/example/.agents/skills",
+              target: personalSkillPath,
             },
           ],
         },

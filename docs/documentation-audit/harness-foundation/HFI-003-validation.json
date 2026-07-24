@@ -1,12 +1,12 @@
 {
   "schemaVersion": "1",
   "taskId": "HFI-003",
-  "status": "accepted",
+  "status": "accepted-after-post-commit-correction",
   "target": {
     "baseCommit": "aba9d42e7f665be334f0f929f0c63696f9a5b0d7",
     "branch": "main",
     "upstream": "origin/main",
-    "candidate": "HFI-003 working tree before the passing-gated local task commit"
+    "candidate": "HFI-003 semantic commit 9ace7d7db5bdc40c113ce16f3a71f944d50628d0 plus the passing-gated post-commit fixture correction"
   },
   "acceptedFindingIds": ["HE-003", "HE-004"],
   "requirementIds": ["HFR-004", "HFR-005"],
@@ -71,13 +71,23 @@
     },
     {
       "check": "bun run check:repository-paths",
-      "status": "passed",
-      "postcondition": "Tracked readable repository paths contain no machine-local dependency."
+      "status": "superseded",
+      "postcondition": "The initial working-tree pass did not include the then-untracked adversarial tests. The first HFI-004 post-commit run correctly rejected two literal private-looking fixture values and invalidated candidate 9ace7d7db5bdc40c113ce16f3a71f944d50628d0."
     },
     {
-      "check": "bun run verification",
+      "check": "post-commit fixture correction and bun run check:repository-paths",
       "status": "passed",
-      "postcondition": "The complete root graph passed, including the new gate once, ten quality-workflow tests, both Knip graphs, and 23 of 23 workspace type/build tasks."
+      "postcondition": "Adversarial absolute paths are assembled from neutral fragments, remain semantically equivalent, and the tracked repository path inventory passes."
+    },
+    {
+      "check": "initial working-tree bun run verification",
+      "status": "superseded",
+      "postcondition": "The graph passed before the new fixture files were tracked, so its repository-path result cannot qualify the post-commit tree."
+    },
+    {
+      "check": "post-correction bun run verification",
+      "status": "passed",
+      "postcondition": "The complete tracked root graph passed after the fixture correction, including the new gate once, ten quality-workflow tests, both Knip graphs, and 23 of 23 workspace type/build tasks."
     },
     {
       "check": "git diff --check",
@@ -116,5 +126,6 @@
     "No push, remote branch, hosted CI run, registry publication, release, deployment, provider, production, public-site, or external-consumer state is established."
   ],
   "rollback": "Revert the HFI-003 local commit to remove the focused gate and owner routes while retaining HFI-001 and HFI-002 evidence; do not requalify the epoch until the gate passes again.",
-  "observedAt": "2026-07-24T21:58:33Z"
+  "observedAt": "2026-07-24T21:58:33Z",
+  "correctedAt": "2026-07-24T22:05:00Z"
 }
