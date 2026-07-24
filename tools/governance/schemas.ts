@@ -200,3 +200,149 @@ export const RepositoryHarnessProfile = Schema.Struct({
   schemaVersion: Schema.Literal("1"),
 });
 export type RepositoryHarnessProfile = typeof RepositoryHarnessProfile.Type;
+
+export const GovernanceInvariant = Schema.Literals([
+  "audit-crosswalk",
+  "repository-profile",
+  "canonical-skill-tree",
+  "skill-overlay",
+  "claude-link",
+  "skill-reference",
+  "portable-runtime",
+  "external-claim",
+  "critical-journey",
+]);
+export type GovernanceInvariant = typeof GovernanceInvariant.Type;
+
+export class GovernanceFinding extends Schema.TaggedClass<GovernanceFinding>()(
+  "GovernanceFinding",
+  {
+    invariant: GovernanceInvariant,
+    recovery: NonEmpty,
+    target: NonEmpty,
+  }
+) {}
+
+export class GovernanceInputError extends Schema.TaggedErrorClass<GovernanceInputError>()(
+  "GovernanceInputError",
+  {
+    target: NonEmpty,
+  }
+) {}
+
+export class GovernancePolicyError extends Schema.TaggedErrorClass<GovernancePolicyError>()(
+  "GovernancePolicyError",
+  {
+    findings: Schema.NonEmptyArray(GovernanceFinding),
+  }
+) {}
+
+const TreeReceipt = Schema.Struct({
+  entryCount: Schema.Number,
+  treeDigest: NonEmpty,
+});
+
+export const CanonicalSkillBaseline = Schema.Struct({
+  allowedOverlays: Schema.NonEmptyArray(
+    Schema.Struct({
+      owner: NonEmpty,
+      path: NonEmpty,
+      sha256: NonEmpty,
+    })
+  ),
+  claudeLinks: Schema.Record(NonEmpty, NonEmpty),
+  cleanCloneRule: NonEmpty,
+  extras: Schema.Record(
+    NonEmpty,
+    Schema.Struct({
+      classification: NonEmpty,
+      entryCount: Schema.Number,
+      owner: NonEmpty,
+      scope: NonEmpty,
+      treeDigest: NonEmpty,
+    })
+  ),
+  limitations: Schema.NonEmptyArray(NonEmpty),
+  nonClaims: Schema.NonEmptyArray(NonEmpty),
+  observedAt: NonEmpty,
+  retirementCondition: NonEmpty,
+  reviewTrigger: NonEmpty,
+  schemaVersion: Schema.Literal("1"),
+  skills: Schema.Record(NonEmpty, TreeReceipt),
+  source: Schema.Struct({
+    aggregateDigest: NonEmpty,
+    identityLimitation: NonEmpty,
+    kind: NonEmpty,
+    owner: NonEmpty,
+    repositoryRevision: Schema.NullOr(NonEmpty),
+  }),
+});
+export type CanonicalSkillBaseline = typeof CanonicalSkillBaseline.Type;
+
+export const ProductSpecTaskPlan = Schema.StructWithRest(
+  Schema.Struct({
+    $schema: NonEmpty,
+    spec: NonEmpty,
+    status: Schema.Literals(["proposed", "active", "implemented", "blocked"]),
+    tasks: Schema.NonEmptyArray(
+      Schema.StructWithRest(
+        Schema.Struct({
+          acceptedFindingIds: Schema.Array(FindingId),
+          dependsOn: Schema.Array(NonEmpty),
+          id: NonEmpty,
+          requirementIds: Schema.NonEmptyArray(NonEmpty),
+          status: Schema.Literals([
+            "pending",
+            "in_progress",
+            "complete",
+            "blocked",
+          ]),
+          title: NonEmpty,
+        }),
+        [Schema.Record(Schema.String, Schema.Unknown)]
+      )
+    ),
+    title: NonEmpty,
+  }),
+  [Schema.Record(Schema.String, Schema.Unknown)]
+);
+export type ProductSpecTaskPlan = typeof ProductSpecTaskPlan.Type;
+
+export const CriticalJourneyInventory = Schema.Struct({
+  journeys: Schema.NonEmptyArray(
+    Schema.StructWithRest(
+      Schema.Struct({
+        authority: Schema.Literal("none"),
+        id: NonEmpty,
+        nonClaims: Schema.NonEmptyArray(NonEmpty),
+        oracle: NonEmpty,
+        stepsOrProcedureOwner: NonEmpty,
+      }),
+      [Schema.Record(Schema.String, Schema.Unknown)]
+    )
+  ),
+  owner: NonEmpty,
+  reviewTrigger: NonEmpty,
+  schemaVersion: Schema.Literal(1),
+});
+export type CriticalJourneyInventory = typeof CriticalJourneyInventory.Type;
+
+export const RootPackageManifest = Schema.StructWithRest(
+  Schema.Struct({
+    scripts: Schema.Record(NonEmpty, NonEmpty),
+  }),
+  [Schema.Record(Schema.String, Schema.Unknown)]
+);
+export type RootPackageManifest = typeof RootPackageManifest.Type;
+
+export const GovernanceFixtureCorpus = Schema.Struct({
+  cases: Schema.NonEmptyArray(
+    Schema.Struct({
+      expectedInvariant: GovernanceInvariant,
+      id: NonEmpty,
+      mutation: NonEmpty,
+    })
+  ),
+  schemaVersion: Schema.Literal("1"),
+});
+export type GovernanceFixtureCorpus = typeof GovernanceFixtureCorpus.Type;

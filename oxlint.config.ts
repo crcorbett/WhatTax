@@ -43,6 +43,8 @@ const decodingBoundaryFiles = [
   "tools/quality-workflow/release-boundary.test.ts",
   "tools/evals/hgi-206/input.boundary.ts",
   "tools/governance/foundation.test.ts",
+  "tools/governance/input.boundary.ts",
+  "tools/governance/policy.test.ts",
 
   // Dynamic dispatch and its transitional repeated scenario decodes.
   "packages/calculators/src/catalog.ts",
@@ -118,6 +120,7 @@ const portableEffectSourceFiles = [
   "tools/oxlint/**/*.{ts,tsx,js,jsx}",
   "tools/repository-paths/**/*.{ts,tsx,js,jsx}",
   "tools/skills/**/*.{ts,tsx,js,jsx}",
+  "tools/governance/**/*.{ts,tsx,js,jsx}",
 ];
 
 const schemaEncoderEgressFiles = [
@@ -165,6 +168,8 @@ const runtimeBoundaryFiles = [
   "tools/documentation/runbook-check.runtime.ts",
   "tools/documentation/runbook-policy.test.ts",
   "tools/evals/hgi-206/check.runtime.ts",
+  "tools/governance/check.runtime.ts",
+  "tools/governance/policy.test.ts",
 ];
 
 const processBoundaryFiles = [
@@ -175,6 +180,7 @@ const processBoundaryFiles = [
   "tools/documentation/check.runtime.ts",
   "tools/documentation/runbook-check.runtime.ts",
   "tools/evals/hgi-206/check.runtime.ts",
+  "tools/governance/check.runtime.ts",
 ];
 
 const consoleBoundaryFiles = [
@@ -187,6 +193,7 @@ const consoleBoundaryFiles = [
   "tools/documentation/check.runtime.ts",
   "tools/documentation/runbook-check.runtime.ts",
   "tools/evals/hgi-206/check.runtime.ts",
+  "tools/governance/check.runtime.ts",
 ];
 
 const bunAdapterFiles = [
@@ -202,6 +209,7 @@ const bunAdapterFiles = [
   "tools/documentation/runbook-check.runtime.ts",
   "tools/documentation/runbook-check.runtime.test.ts",
   "tools/evals/hgi-206/check.runtime.ts",
+  "tools/governance/check.runtime.ts",
 ];
 
 const bunRuntimeEntrypointFiles = [
@@ -219,6 +227,7 @@ const bunRuntimeEntrypointFiles = [
   "tools/quality-workflow/check.runtime.ts",
   "tools/quality-workflow/release-boundary.test.ts",
   "tools/evals/hgi-206/check.runtime.ts",
+  "tools/governance/check.runtime.ts",
 ];
 
 export default defineConfig({

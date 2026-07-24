@@ -3,8 +3,8 @@ document_type: standard
 lifecycle: current
 authority: canonical
 owner: taxkit-tooling-owner
-last_reviewed: 2026-07-21
-review_trigger: formatter, lint, dependency, typecheck, Changeset, or root command change
+last_reviewed: 2026-07-24
+review_trigger: formatter, lint, dependency, typecheck, governance gate, Changeset, or root command change
 ---
 
 # Formatting, Linting, And Dependency Hygiene
@@ -33,6 +33,11 @@ library with stable package boundaries and predictable bundle behavior.
   receipts, negative fixtures, and machine-readable owner contract.
 - `tools/documentation` also owns the flat sequential, non-executing
   `check:runbooks` validator and its strict prose/sidecar adversarial fixtures.
+- `tools/governance` owns the Effect-native repository harness gate. It
+  Schema-decodes repository-local owners at filesystem ingress and checks the
+  accepted HE crosswalk, TaxKit profile, canonical skill receipt and overlays,
+  Claude links, portable references, critical journeys, and external
+  non-claims.
 - TypeScript is cataloged at the root and uses `ES2025` lib support.
 - Changesets record package-facing changes before release automation exists.
   See [Versioning and Changesets](./versioning.md).
@@ -44,6 +49,9 @@ bun run check
 bun run fix
 bun run check:docs
 bun run check:runbooks
+bun run check:harness-governance:types
+bun run test:harness-governance
+bun run check:harness-governance
 bun run knip
 bun run knip:production
 bun run changeset
@@ -76,6 +84,15 @@ prose/sidecar agreement, unique owners, substantive required sections, accepted
 proof binding and unknown-principal stops. It executes no documented command;
 its only output artifact is the ignored bounded
 `tmp/runbook-validation-report.json` receipt.
+
+Use `bun run check:harness-governance` after a repository harness profile,
+structured HE audit, canonical skill, repository-profile overlay, local extra,
+Claude link, critical-journey, or governance-policy change. The focused tests
+include adversarial cases for missing mappings, invalid profiles,
+partial/stale trees, unexpected overlays, copied/absolute links, broken
+references, and false external claims. The gate is repository-local and
+deterministic; success proves none of remote Git, hosted CI, registry, release,
+deployment, provider, production, public-site, or external-consumer state.
 
 Use `bun run verification` after changes that affect docs routing, package
 exports, Effect config composition, HTTP API contracts, runtime layers or

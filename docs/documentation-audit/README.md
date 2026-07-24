@@ -3,7 +3,7 @@ document_type: evidence-index
 lifecycle: evidence
 authority: supporting
 owner: taxkit-documentation-owner
-last_reviewed: 2026-07-22
+last_reviewed: 2026-07-24
 review_trigger: documentation-audit receipt, evidence class, corpus inventory, or decision-record change
 ---
 
@@ -86,6 +86,24 @@ Accepted HGI-206 repository-local requalification and closeout:
 - [`HGI-206-lifecycle-correction-validation.json`](HGI-206-lifecycle-correction-validation.json)
 - [`../verification/harness-epochs.md`](../verification/harness-epochs.md)
 - [`../verification/effectiveness.md`](../verification/effectiveness.md)
+
+Active harness-foundation migration evidence:
+
+- [`harness-foundation/audit-scope.json`](harness-foundation/audit-scope.json)
+- [`harness-foundation/audit-findings.json`](harness-foundation/audit-findings.json)
+- [`harness-foundation/accepted-findings.json`](harness-foundation/accepted-findings.json)
+- [`harness-foundation/HFI-001-validation.json`](harness-foundation/HFI-001-validation.json)
+- [`harness-foundation/HFI-002-validation.json`](harness-foundation/HFI-002-validation.json)
+- [`harness-foundation/HFI-003-validation.json`](harness-foundation/HFI-003-validation.json)
+- [`../verification/repository-harness-profile.json`](../verification/repository-harness-profile.json)
+- [`../../tools/skills/canonical-skill-baseline.json`](../../tools/skills/canonical-skill-baseline.json)
+
+The active profile and focused repository gate preserve exact `HE-001` through
+`HE-004` mappings and validate the six canonical skill trees, two profile
+overlays, two declared local extras, eight relative Claude links, and five
+retained journeys. Passing local checks does not yet create a successor epoch
+or establish remote Git, hosted CI, registry, release, deployment, provider,
+public-site, or external-consumer state.
 
 ## Current docs inventory
 

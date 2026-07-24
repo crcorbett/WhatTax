@@ -37,8 +37,12 @@ changes.
   Oxfmt exclusion prevents repository formatting from invalidating the
   canonical digest. Evidence:
   [`HFI-002-validation.json`](../../documentation-audit/harness-foundation/HFI-002-validation.json).
-- **HFI-003 — pending on HFI-001 and HFI-002:** enforce the final repository
-  state through one focused Effect-native gate in normal verification.
+- **HFI-003 — complete:** the Effect-native gate decodes repository-local
+  owners once at ingress, accepts the migrated profile/audit/skill state, and
+  rejects all nine named adversarial defects. Root verification invokes it
+  exactly once; the unchanged Quality workflow inherits it through the
+  existing release graph. Evidence:
+  [`HFI-003-validation.json`](../../documentation-audit/harness-foundation/HFI-003-validation.json).
 - **HFI-004 — pending on HFI-003:** freeze the candidate, run the five retained
   journeys, obtain fresh independent review, and qualify one new epoch.
 - **HFI-005 — pending on HFI-004:** reconcile semantic owners and move this plan

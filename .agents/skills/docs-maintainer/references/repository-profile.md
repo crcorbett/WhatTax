@@ -29,6 +29,10 @@ not provider, registry, deployment, public-site or consumer proof.
 
 - Baseline documentation/path/skill checks: `bun run test:skills`, `bun run
 check:docs`, `bun run check:runbooks`, `bun run check:repository-paths`.
+- Harness foundation checks: `bun run check:harness-governance:types`, `bun run
+  test:harness-governance`, and `bun run check:harness-governance`. The runtime
+  gate reads only repository-local profile, audit, receipt, skill, link, and
+  critical-journey owners.
 - Full local closeout: `bun run verification` and `git diff --check`.
 - Public content/runtime: `bun run docs:validate`, `bun run docs:build`,
   `bun run --filter=docs test:browser` when applicable.

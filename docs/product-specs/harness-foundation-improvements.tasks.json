@@ -354,7 +354,7 @@
     },
     {
       "id": "HFI-003",
-      "status": "pending",
+      "status": "complete",
       "acceptedFindingIds": [
         "HE-003",
         "HE-004"

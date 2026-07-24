@@ -50,7 +50,16 @@ Git-tracked readable text and safely reports only repository-relative file,
 positive line and closed finding category. Binary files are identified by a
 NUL byte or failed strict UTF-8 decode and skipped. For skill governance it
 also runs `test:skills`, which validates required policy language and rejects
-stale provider-wrapper examples. For docs, `apps/docs` type checking also
+stale provider-wrapper examples. The root graph also runs
+`check:harness-governance` exactly once. That Effect-native gate decodes the
+TaxKit profile, structured HE findings/crosswalk, canonical skill receipt, and
+critical-journey inventory at filesystem ingress, then checks local skill-tree
+digests, the two permitted profile overlays, the two declared extras, eight
+relative Claude links, self-contained references, portable runtime paths, and
+external non-claims. Its positive and adversarial corpus is owned by
+`tools/governance/`; focused type and test commands are
+`check:harness-governance:types` and `test:harness-governance`.
+For docs, `apps/docs` type checking also
 typechecks checked examples,
 and dependent package builds run before type checks through Turbo. Heavier
 docs runtime gates remain explicit package commands so normal local
@@ -144,6 +153,10 @@ packed SDK, API, docs, manifests, workflows, and release scripts as
 release-relevant boundaries. This is local workflow-configuration proof only;
 it does not prove a hosted run, publication, deployment, registry state, or
 external consumer behaviour.
+
+The harness gate is not a separate Quality workflow step. The existing
+`release:check -- --ci` graph begins with root verification and therefore
+inherits it without duplicating execution or widening workflow authority.
 
 The five consumer-visible release journeys are maintained in
 [`../verification/critical-journeys.json`](../verification/critical-journeys.json):
@@ -319,7 +332,10 @@ supporting gate and cannot replace semantic ownership or call-graph review.
   policy they prove. Reports must never include matched text, usernames,
   process stderr or surrounding content.
 - Repo-owned skill changes must pass the skill validator and `bun run
-  test:skills`. The stale-pattern test checks fenced provider examples for raw
+  test:skills`. Canonical baseline or repository-profile changes must also pass
+  `bun run check:harness-governance`, which compares only repository-local
+  paths with the content-addressed receipt and never reads a user home or
+  installed global skill collection. The stale-pattern test checks fenced provider examples for raw
   clients, generic SDK callbacks, raw IDs, primitive config, `instanceof`, and
   unchecked SDK result escape. Positive and adversarial fixtures also protect
   the PRD route/container/leaf ownership boundary and require separate

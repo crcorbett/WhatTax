@@ -1,0 +1,120 @@
+{
+  "schemaVersion": "1",
+  "taskId": "HFI-003",
+  "status": "accepted",
+  "target": {
+    "baseCommit": "aba9d42e7f665be334f0f929f0c63696f9a5b0d7",
+    "branch": "main",
+    "upstream": "origin/main",
+    "candidate": "HFI-003 working tree before the passing-gated local task commit"
+  },
+  "acceptedFindingIds": ["HE-003", "HE-004"],
+  "requirementIds": ["HFR-004", "HFR-005"],
+  "authority": {
+    "principal": "Delegated Codex implementation worker",
+    "identitySource": "source thread 019f663b-6195-7130-8d2a-6bf5aaf24a8b",
+    "localWrite": true,
+    "localCommit": true,
+    "approvalReceipt": "The delegated request authorized full SPEC implementation and passing-gated local task commits.",
+    "denied": [
+      "push",
+      "tag",
+      "versioning",
+      "publication",
+      "release",
+      "deployment",
+      "provider access",
+      "recovery",
+      "destructive operations"
+    ]
+  },
+  "verification": [
+    {
+      "check": "bun run check:harness-governance:types",
+      "status": "passed",
+      "postcondition": "The Effect Schema, boundary, policy, runtime, and fixture sources typecheck."
+    },
+    {
+      "check": "bun run test:harness-governance",
+      "status": "passed",
+      "postcondition": "Eleven focused tests passed, including rejection of every declared adversarial defect."
+    },
+    {
+      "check": "bun run check:harness-governance",
+      "status": "passed",
+      "postcondition": "The repository-local gate accepted four findings, six canonical skills, two overlays, eight links, two declared extras, and five journeys."
+    },
+    {
+      "check": "verification and Quality workflow call-graph audit",
+      "status": "passed",
+      "postcondition": "Root verification invokes check:harness-governance exactly once; the unchanged workflow still invokes only check:quality-workflow and release:check -- --ci after installation."
+    },
+    {
+      "check": "bun run test:skills",
+      "status": "passed",
+      "postcondition": "Twenty-one repository skill-policy tests passed."
+    },
+    {
+      "check": "bun run check:quality-workflow",
+      "status": "passed",
+      "postcondition": "The immutable bounded read-only canonical release graph remains accepted."
+    },
+    {
+      "check": "bun run check:docs",
+      "status": "passed",
+      "postcondition": "Documentation policy reported zero violations."
+    },
+    {
+      "check": "bun run check:runbooks",
+      "status": "passed",
+      "postcondition": "All four runbooks and ten documented commands passed without executing a procedure."
+    },
+    {
+      "check": "bun run check:repository-paths",
+      "status": "passed",
+      "postcondition": "Tracked readable repository paths contain no machine-local dependency."
+    },
+    {
+      "check": "bun run verification",
+      "status": "passed",
+      "postcondition": "The complete root graph passed, including the new gate once, ten quality-workflow tests, both Knip graphs, and 23 of 23 workspace type/build tasks."
+    },
+    {
+      "check": "git diff --check",
+      "status": "passed",
+      "postcondition": "No whitespace error is present."
+    }
+  ],
+  "documentationImpact": {
+    "changeRequired": [
+      "tools/governance Schema, ingress, policy, runtime, tests, and accepted/adversarial fixtures",
+      "package.json focused commands and one root verification edge",
+      "exact Oxlint boundary ownership",
+      "root command route, docs router, testing architecture, tooling standard, and audit index",
+      "docs-maintainer TaxKit profile command route and its independently hashed allowed overlay",
+      "SPEC, task list, active plan, and HFI-003 validation record"
+    ],
+    "preserve": [
+      "the Quality workflow's existing check:quality-workflow and release:check -- --ci steps",
+      "the six canonical baseline tree digests and package-structure profile overlay",
+      "docs-writer public-copy-only and portless local-development ownership",
+      "HGI-203 through HGI-205 release proof, four runbooks, authority model, controls, automation register, and release-readiness graph"
+    ],
+    "notApplicable": [
+      "package/app source, manifests, exports, versions, API/SDK/runtime behavior, and Changesets",
+      "public MDX, navigation, docs-site design, public-copy templates, and generated public content",
+      "remote Git, hosted CI, registry, release, deployment, provider, public-site, and external-consumer state"
+    ]
+  },
+  "noChangeset": "HFI-003 changes repository-local governance tooling, configuration, and maintainer routes only; package installation, exports, public API, runtime behavior, and public documentation are unchanged.",
+  "limitations": [
+    "The gate validates the content-addressed baseline recorded in the repository; it does not fetch or qualify future canonical skill versions.",
+    "The gate proves local repository state only and cannot establish hosted or external outcomes.",
+    "A successor harness epoch remains unqualified until HFI-004 passes against an immutable migrated candidate."
+  ],
+  "nonClaims": [
+    "No push, remote branch, hosted CI run, registry publication, release, deployment, provider, production, public-site, or external-consumer state is established."
+  ],
+  "rollback": "Revert the HFI-003 local commit to remove the focused gate and owner routes while retaining HFI-001 and HFI-002 evidence; do not requalify the epoch until the gate passes again.",
+  "observedAt": "2026-07-24T21:58:33Z"
+}

@@ -331,6 +331,13 @@ accepted and adversarial governance fixtures
 5. `HFI-005` reconciles lifecycle owners and closes the SPEC/tasks/plan only
    after the new epoch is accepted.
 
+`HFI-001` through `HFI-003` are complete. The accepted repository-local gate
+now validates the exact HE crosswalk, TaxKit profile, content-addressed skill
+baseline, two profile overlays, two declared extras, eight relative Claude
+links, self-contained references, five journey owners, and external
+non-claims. `HFI-004` must freeze the resulting committed candidate before any
+successor epoch claim.
+
 The exact task contract and dependencies live in
 [`harness-foundation-improvements.tasks.json`](./harness-foundation-improvements.tasks.json).
 

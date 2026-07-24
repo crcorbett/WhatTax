@@ -3,7 +3,7 @@ document_type: documentation-router
 lifecycle: current
 authority: canonical
 owner: taxkit-documentation-owner
-last_reviewed: 2026-07-22
+last_reviewed: 2026-07-24
 review_trigger: any maintainer/public docs class, root route, SPEC, plan, runbook, proof, evidence, or lifecycle change
 ---
 
@@ -55,7 +55,7 @@ lifecycle; migrate it only when its owner is materially revised.
 | Repeatable release/recovery operations | [`runbooks/README.md`](runbooks/README.md) and [`operations/authority-model.md`](operations/authority-model.md) | Exactly four target-owned procedures; stop consequential operations when principal or receipt is unknown. |
 | CI controls and recurring automation | [`standards/controls.md`](standards/controls.md) and [`operations/automation-register.md`](operations/automation-register.md) | Quality workflow admission, release-graph controls, and report-only candidate boundaries; neither route grants external authority. |
 | Verification/critical journeys/proof | [`architecture/testing-and-quality.md`](architecture/testing-and-quality.md), [`verification/critical-journeys.json`](verification/critical-journeys.json), [`evidence/releases/HGI-203-local.json`](evidence/releases/HGI-203-local.json), and [`documentation-audit/HGI-203-validation.json`](documentation-audit/HGI-203-validation.json) | Accepted HGI-203 owns the five journeys and bounded local proof; HGI-204 runbooks consume it. Raw logs and secrets are never durable proof. |
-| Harness requalification | [`verification/harness-epochs.md`](verification/harness-epochs.md), [`verification/effectiveness.md`](verification/effectiveness.md), and [`documentation-audit/HGI-206-validation.json`](documentation-audit/HGI-206-validation.json) | Completed HGI-206 records one target-specific local epoch, accepted portable-path re-audit, exact Git identity, limitations, and non-claims. It does not qualify future epochs or external state. |
+| Harness foundation and requalification | [`verification/repository-harness-profile.json`](verification/repository-harness-profile.json), [`documentation-audit/harness-foundation/accepted-findings.json`](documentation-audit/harness-foundation/accepted-findings.json), [`verification/harness-epochs.md`](verification/harness-epochs.md), and [`verification/effectiveness.md`](verification/effectiveness.md) | The TaxKit profile, accepted HE crosswalk, skill receipt, and focused gate own the active migration. HGI-206 remains the previous target-specific epoch until a successor candidate passes the five retained journeys and fresh independent review. Neither epoch establishes external state. |
 | References | [`references/README.md`](references/README.md) | Revalidate mutable external guidance. |
 | Audit/accounting | [`documentation-audit/README.md`](documentation-audit/README.md) | Dated evidence, not policy. |
 
