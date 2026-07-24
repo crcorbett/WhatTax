@@ -59,8 +59,8 @@ changes.
   attempts, exact duplicate-free review/validation check sets, clocks,
   limitations, non-claims, and the no-Changeset rationale. Evidence:
   [`epoch-validation.json`](../../documentation-audit/harness-foundation/epoch-validation.json).
-- **HFI-005 — pending on HFI-004:** reconcile semantic owners and move this plan
-  to completed history.
+- **HFI-005 — in progress:** reconcile the accepted epoch/effectiveness and
+  maintainer routes, then validate and move this plan to completed history.
 
 ## HFI-001 acceptance record
 

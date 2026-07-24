@@ -59,6 +59,12 @@ relative Claude links, self-contained references, portable runtime paths, and
 external non-claims. Its positive and adversarial corpus is owned by
 `tools/governance/`; focused type and test commands are
 `check:harness-governance:types` and `test:harness-governance`.
+Target-specific requalification is separately owned by
+`check:harness-foundation-epoch` and its focused TypeScript check. That command
+binds one immutable candidate to complete validator sources, the canonical
+skill and journey projections, retained failures, five receipts, fresh
+independent review, clocks, limitations and non-claims. It is a closeout check,
+not another root-verification or Quality-workflow edge.
 For docs, `apps/docs` type checking also
 typechecks checked examples,
 and dependent package builds run before type checks through Turbo. Heavier
@@ -335,7 +341,9 @@ supporting gate and cannot replace semantic ownership or call-graph review.
   test:skills`. Canonical baseline or repository-profile changes must also pass
   `bun run check:harness-governance`, which compares only repository-local
   paths with the content-addressed receipt and never reads a user home or
-  installed global skill collection. The stale-pattern test checks fenced provider examples for raw
+  installed global skill collection. Epoch requalification must additionally
+  pass `bun run check:harness-foundation-epoch` against its exact candidate
+  evidence. The stale-pattern test checks fenced provider examples for raw
   clients, generic SDK callbacks, raw IDs, primitive config, `instanceof`, and
   unchecked SDK result escape. Positive and adversarial fixtures also protect
   the PRD route/container/leaf ownership boundary and require separate

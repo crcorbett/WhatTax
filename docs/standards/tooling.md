@@ -38,6 +38,10 @@ library with stable package boundaries and predictable bundle behavior.
   accepted HE crosswalk, TaxKit profile, canonical skill receipt and overlays,
   Claude links, portable references, critical journeys, and external
   non-claims.
+- `tools/evals/harness-foundation` owns the target-specific epoch verifier. It
+  hashes both complete validator closures and reconciles the immutable Git
+  target, canonical skill/journey projections, receipts, retained failures,
+  independent review, clocks, authority, limitations and non-claims.
 - TypeScript is cataloged at the root and uses `ES2025` lib support.
 - Changesets record package-facing changes before release automation exists.
   See [Versioning and Changesets](./versioning.md).
@@ -52,6 +56,8 @@ bun run check:runbooks
 bun run check:harness-governance:types
 bun run test:harness-governance
 bun run check:harness-governance
+bun run check:harness-foundation-epoch:types
+bun run check:harness-foundation-epoch
 bun run knip
 bun run knip:production
 bun run changeset
@@ -93,6 +99,12 @@ partial/stale trees, unexpected overlays, copied/absolute links, broken
 references, and false external claims. The gate is repository-local and
 deterministic; success proves none of remote Git, hosted CI, registry, release,
 deployment, provider, production, public-site, or external-consumer state.
+
+Use `bun run check:harness-foundation-epoch` only for the recorded
+target-specific closeout or after a review trigger requires a successor epoch.
+It validates the complete hash-bound local evidence graph but does not rerun
+the five journeys or establish Git publication, hosted CI, release, registry,
+deployment, provider, public-site, or external-consumer state.
 
 Use `bun run verification` after changes that affect docs routing, package
 exports, Effect config composition, HTTP API contracts, runtime layers or

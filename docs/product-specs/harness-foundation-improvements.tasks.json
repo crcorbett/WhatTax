@@ -510,7 +510,7 @@
     },
     {
       "id": "HFI-005",
-      "status": "pending",
+      "status": "in_progress",
       "acceptedFindingIds": [
         "HE-001",
         "HE-002",

@@ -87,7 +87,7 @@ Accepted HGI-206 repository-local requalification and closeout:
 - [`../verification/harness-epochs.md`](../verification/harness-epochs.md)
 - [`../verification/effectiveness.md`](../verification/effectiveness.md)
 
-Active harness-foundation migration evidence:
+Accepted harness-foundation migration evidence:
 
 - [`harness-foundation/audit-scope.json`](harness-foundation/audit-scope.json)
 - [`harness-foundation/audit-findings.json`](harness-foundation/audit-findings.json)
@@ -108,9 +108,10 @@ The active profile and focused repository gate preserve exact `HE-001` through
 overlays, two declared local extras, eight relative Claude links, and five
 retained journeys. HFI-004 qualifies target-specific local epoch
 `HFI-004-2026-07-24` against candidate `03716bf` with three rejected attempts
-retained. HFI-005 still owns current epoch/effectiveness and lifecycle
-reconciliation. No local evidence establishes remote Git, hosted CI, registry,
-release, deployment, provider, public-site, or external-consumer state.
+retained. HFI-005 reconciles the current epoch/effectiveness and lifecycle
+owners without rewriting the candidate or rejected-attempt evidence. No local
+evidence establishes remote Git, hosted CI, registry, release, deployment,
+provider, public-site, or external-consumer state.
 
 ## Current docs inventory
 
