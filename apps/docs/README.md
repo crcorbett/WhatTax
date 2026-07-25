@@ -93,7 +93,10 @@ bun run docs:validate
 package-owned public examples stay connected to current SDK/API/calculator
 exports.
 
-Run `build` before `preview`. Both `dev` and `preview` expose the app through
+Run `build` before `preview`. Turbo orders the package-owned content build
+before the app, while a direct Vite app build regenerates the same package-owned
+source through `source.config.ts`; both paths compile
+`@taxkit/docs-fumadocs/config` first. `dev` and `preview` expose the app through
 `https://docs.taxkit.localhost` with portless.
 
 `test:browser` runs the programmatic TanStack client-route harness in Chromium.

@@ -726,7 +726,7 @@
     },
     {
       "id": "DOCS-APP-006",
-      "status": "pending",
+      "status": "in_progress",
       "acceptedFindingIds": [
         "TDA-001",
         "TDA-002",

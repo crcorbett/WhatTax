@@ -41,10 +41,13 @@ checks. The development-aware graph covers repository tooling, tests and
 current application scaffolds. The production graph separately proves the
 eight code-bearing packages in the nine-artifact release closure,
 `@taxkit/scripts` exports and commands, and the standalone API runtime without
-test or development reachability. `@taxkit/tsconfig` is JSON-only and remains
+test or development reachability. It also models the real `apps/docs`,
+`@taxkit/docs-content` and `@taxkit/docs-fumadocs` production entries,
+including the generated browser/server source consumed by the app and the
+build-time Vite/source config. `@taxkit/tsconfig` is JSON-only and remains
 covered by strict packed/downstream artifact proof rather than a fabricated
-TypeScript entrypoint. Root tools and the docs/web apps are outside the
-production graph by ownership. Root verification also typechecks and executes
+TypeScript entrypoint. Root tools and `apps/web` remain outside the production
+graph by ownership. Root verification also typechecks and executes
 the root repository-path gate, which scans
 Git-tracked readable text and safely reports only repository-relative file,
 positive line and closed finding category. Binary files are identified by a
@@ -68,7 +71,12 @@ independent review, clocks, limitations and non-claims. It is a closeout check,
 not another root-verification or Quality-workflow edge.
 For docs, `apps/docs` type checking also
 typechecks checked examples,
-and dependent package builds run before type checks through Turbo. Heavier
+and dependent package builds run before type checks through Turbo.
+`@taxkit/docs-content#generate` names content, navigation, source config,
+canonical schema and package-manifest inputs, writes `.source/**`, and follows
+the compiled `@taxkit/docs-fumadocs` build. The content build executes that
+named generation command, and the docs app build follows both packages.
+Heavier
 docs runtime gates remain explicit package commands so normal local
 verification does not rebuild and validate the whole docs corpus on every
 change:
@@ -377,8 +385,12 @@ supporting gate and cannot replace semantic ownership or call-graph review.
 - Keep the development-aware `knip` graph and dedicated `knip:production`
   graph independent. Production entry and project patterns require Knip's
   trailing `!` marker, must map manifest exports to real source counterparts,
-  and must not include tests, fixtures, examples, generated output, root tools
-  or the docs/web apps. Exact exceptions need a named owner and runtime reason.
+  and must not include tests, fixtures, examples, root tools or `apps/web`.
+  The docs production graph intentionally includes `apps/docs`, both docs
+  packages and the generated `.source/browser.ts` and `.source/server.ts`
+  modules they actually consume; `--no-gitignore` admits those two generated
+  production inputs without admitting the unused generated dynamic entry.
+  Exact exceptions need a named owner and runtime reason.
   Knip does not replace SDK packed-artifact or downstream-consumer proof.
 - Keep `bun run release:check` as orchestration over canonical commands. A new
   release gate must first have an owning package command and focused tests; do

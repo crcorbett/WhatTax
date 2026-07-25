@@ -27,8 +27,10 @@ library with stable package boundaries and predictable bundle behavior.
   configured policy. HGI-205 owns adapter qualification and the existing
   repository-wide type-aware findings.
 - `knip` uses `knip.json` for development-aware dependency and workspace
-  hygiene and `knip.production.json` for production-only package, command and
-  API runtime reachability.
+  hygiene and `knip.production.json` for production-only package, command, API
+  and docs runtime reachability. The production command first generates the
+  docs source through the compiled Fumadocs config and admits the two ignored
+  generated modules that the built docs app actually consumes.
 - `tools/documentation` owns the Effect-native `check:docs` policy, bounded
   receipts, negative fixtures, and machine-readable owner contract.
 - `tools/documentation` also owns the flat sequential, non-executing
@@ -73,9 +75,11 @@ accepted Oxfmt gate; `bun run verification` invokes both. Do not remove
 Use `bun run fix` only after HGI-205 and only when you intend to accept
 formatter and safe lint fixes. Use `bun run knip` for the complete
 development-aware graph. Use `bun run knip:production` when changing package
-exports, repository command entrypoints or the standalone API runtime; it
-excludes test and development reachability. Neither command replaces the
-SDK-owned packed-artifact and strict downstream-consumer gates.
+exports, repository command entrypoints, the standalone API runtime or the docs
+production graph. It excludes test and development reachability while
+including the docs app, its two package boundaries and their real generated
+browser/server modules. Neither command replaces the SDK-owned packed-artifact
+and strict downstream-consumer gates.
 
 Use `bun run check:docs` for mechanical documentation ownership. Its bounded
 console output names the violated invariant, owner, target, recovery hint, and
@@ -261,11 +265,15 @@ and entrypoints before adding exact, ownership-explained exceptions.
 `knip.json` includes development tooling, tests and the current application
 scaffolds. `knip.production.json` uses trailing `!` production patterns for
 every source counterpart of the eight code-bearing release artifacts,
-`@taxkit/scripts` public and executable entrypoints, and `apps/api/src/index.ts`.
-It excludes tests, fixtures, examples, generated output, root tools and the
-docs/web apps. The JSON-only `@taxkit/tsconfig` artifact has no TypeScript
-source entrypoint and stays under strict downstream tarball proof. Both Knip
-graphs are part of root verification.
+`@taxkit/scripts` public and executable entrypoints, `apps/api/src/index.ts`,
+and the docs app/docs-package graph. It excludes tests, fixtures, examples,
+root tools and `apps/web`. The production command generates docs source first
+and uses `--no-gitignore` so the explicitly named `.source/browser.ts` and
+`.source/server.ts` production modules remain reachable; the unused generated
+dynamic module is not admitted as an entry. The JSON-only
+`@taxkit/tsconfig` artifact has no TypeScript source entrypoint and stays under
+strict downstream tarball proof. Both Knip graphs are part of root
+verification.
 
 ## Repository Path Hygiene
 

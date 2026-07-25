@@ -3,7 +3,18 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": ["dist/**", ".output/**", ".vercel/output/**"]
+      "outputs": ["dist/**", ".source/**", ".output/**", ".vercel/output/**"]
+    },
+    "generate": {
+      "dependsOn": ["^build"],
+      "inputs": [
+        "content/**",
+        "navigation.json",
+        "source.config.ts",
+        "src/schemas.ts",
+        "package.json"
+      ],
+      "outputs": [".source/**"]
     },
     "check-types": {
       "dependsOn": ["^build"],

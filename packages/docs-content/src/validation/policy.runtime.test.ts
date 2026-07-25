@@ -2,12 +2,8 @@ import { describe, expect, it } from "@effect/vitest";
 import { Effect, Option, Schema } from "effect";
 
 import { DocsSourcePath } from "../schemas.js";
-import {
-  getNavigation,
-  validateContent,
-  validateMdxComponentPolicy,
-  validationSummary,
-} from "./policy.js";
+import { validateMdxComponentPolicy } from "./mdx-component-policy.js";
+import { getNavigation, validateContent, validationSummary } from "./policy.js";
 
 describe("docs content validation policy", () => {
   it.effect("decodes navigation through the canonical schema", () =>

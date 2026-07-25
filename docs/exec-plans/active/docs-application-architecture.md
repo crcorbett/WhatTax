@@ -37,7 +37,7 @@ this plan.
 | `DOCS-APP-003` | completed | Canonical content service, app server runtime, safe error and import-boundary slice accepted. |
 | `DOCS-APP-004` | completed | Native route outcomes, built HTTP/browser harness and approved HGI-203 journey-epoch amendment accepted. |
 | `DOCS-APP-005` | completed | Router-native MDX links, navigation focus, responsive disclosure and accessibility proof accepted. |
-| `DOCS-APP-006` | pending | Depends on `DOCS-APP-005`. |
+| `DOCS-APP-006` | in progress | Production reachability, clean-candidate proof and retained evidence are in progress. |
 
 ## Baseline
 
@@ -311,6 +311,52 @@ versioning, publication, deployment or provider work.
 - Primary-owner review accepted the link semantics, route/container/leaf
   boundary, interaction evidence, accessibility foundation and bounded visual
   evidence for `TDA-005`, `TDA-007` and `TDA-P05`.
+
+### 2026-07-25 — `DOCS-APP-006` candidate preparation
+
+- Added the named docs-content `generate` command and a Turbo task whose exact
+  inputs include content, navigation, source config, canonical schemas and the
+  package manifest, whose output is `.source/**`, and whose dependency is the
+  compiled docs-fumadocs build. The content build executes that named
+  generation command; the docs app follows both package builds.
+- Development and production Knip now build generated content first. Production
+  analysis models `apps/docs`, `@taxkit/docs-content` and
+  `@taxkit/docs-fumadocs` rather than excluding those workspaces. It admits only
+  generated `.source/browser.ts` and `.source/server.ts` through
+  `--no-gitignore`; tests, fixtures and the unused generated dynamic entry
+  remain outside the production graph. No ignore, issue suppression or
+  workspace exclusion was added.
+- The prior candidates were investigated individually:
+  `policy.runtime.test.ts` and docs-content `@effect/vitest` execute three
+  validation tests; `validateMdxComponentPolicy` moved to a focused
+  schema-decoding ingress imported by production validation and its rejected
+  fixture. The unused app runtime disposal export was removed, and MDX link
+  classification now has one focused app policy module consumed by production
+  rendering and tests.
+- A clean proof removed docs-content `.source`, docs-fumadocs `dist`, and docs
+  app output before `bun install --frozen-lockfile`. Bun checked 681 installs
+  across 806 packages with no changes. Development and production Knip then
+  recreated the compiled config/generated source and passed.
+- The built harness now rejects a candidate that is not the exact checked-out
+  40-character commit or has tracked/untracked changes. Its bounded manifest
+  records the candidate, clean precondition, built-output digest, exact capture
+  command, Chromium version, timestamp, safe repository-relative owners,
+  expected/observed postconditions, PNG digests, reviewer, limitations,
+  non-claims and the reduced-motion not-applicable evidence.
+- Focused pre-candidate proof passed: content validation; six
+  docs-fumadocs tests; six docs-content tests; ten app server tests; seven app
+  browser route tests; package/app types and builds; and built HTTP/browser
+  proof with SSR `200`, missing `404`, zero client-navigation document requests
+  and zero diagnostics.
+- An initial Turbo draft made the content build depend on the named generation
+  task while also executing it, so canonical type checking ran the generator
+  twice and one process aborted on memory allocation. The duplicate edge was
+  removed; the build still executes the named command, the task retains its
+  explicit contract, and the focused 23-task graph plus fresh canonical
+  verification pass.
+- Final candidate commit, candidate-bound screenshot capture, primary-owner
+  visual acceptance and lifecycle closeout remain pending. No screenshot is
+  claimed as behavioral proof and no external state is claimed.
 
 ## Documentation impact
 

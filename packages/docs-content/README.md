@@ -117,7 +117,10 @@ implementation in `apps/docs` or reusable primitives in
   and reusable renderer primitives in `@taxkit/docs-fumadocs`.
 - Regenerate `.source/` with `bun run --filter=@taxkit/docs-content build`
   after changing content, `source.config.ts` or schema fields that affect
-  generated source.
+  generated source. The named lower-level command is
+  `bun run --filter=@taxkit/docs-content generate`; the package build executes
+  it, and Turbo records its inputs, `.source/**` output and upstream
+  docs-fumadocs build.
 - Run `bun run --filter=@taxkit/docs-content check-examples` after changing
   package-owned examples.
 - Keep docs identifiers, frontmatter, meta, navigation and tagged source errors

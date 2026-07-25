@@ -52,9 +52,10 @@
     "./source.config": "./source.config.ts"
   },
   "scripts": {
-    "build": "bun run --filter=@taxkit/docs-fumadocs build && fumadocs-mdx",
+    "build": "bun run generate",
     "check-examples": "tsc -p tsconfig.examples.json --noEmit",
     "check-types": "bun run --filter=@taxkit/docs-fumadocs build && tsc --noEmit && bun run check-examples",
+    "generate": "bun run --filter=@taxkit/docs-fumadocs build && fumadocs-mdx",
     "test": "bun run --filter=@taxkit/docs-fumadocs build && vitest run --passWithNoTests",
     "validate": "bun run ./src/validate.runtime.ts",
     "clean": "rm -rf .source .turbo *.tsbuildinfo"

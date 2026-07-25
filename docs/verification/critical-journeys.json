@@ -58,14 +58,14 @@
       "startingState": "Docs dependencies and the repository browser runtime are available locally.",
       "inputs": ["Validated MDX/navigation sources", "Local browser journey fixtures"],
       "stepsOrProcedureOwner": "bun run docs:validate then bun run --filter=docs test:browser then bun run --filter=docs test:built",
-      "expectedBehavior": ["Validated content renders in the generated production app, the initial response contains the requested MDX, hydration is diagnostic-free, client navigation crosses the server-function transport without a document reload, expected failures remain recoverable, and missing pages return HTTP 404 with framework-native not-found UI."],
-      "expectedSideEffects": ["Local build and browser artifacts only."],
+      "expectedBehavior": ["Validated content renders in the generated production app, the initial response contains the requested MDX, hydration is diagnostic-free, real sidebar and authored-MDX links cross the server-function transport without a document reload, client navigation restores heading focus without stealing initial hydration focus, keyboard/landmark/current-navigation/contrast/reduced-motion assertions pass, expected failures remain recoverable, and missing pages return HTTP 404 with framework-native not-found UI."],
+      "expectedSideEffects": ["Transient local build/browser output only, plus the bounded DAR-013 PNG/manifest set when the separately invoked candidate-bound screenshot mode is authorized."],
       "preservedInvariants": ["No network publication or deployed-site mutation."],
-      "oracle": "Direct HTTP assertions establish SSR body and 404 status before Playwright observes hydration, server-function navigation, pending, not-found and error/console states; screenshots are supplemental only.",
+      "oracle": "Direct HTTP assertions establish SSR body and 404 status before Playwright independently observes hydration, server-function requests, zero document requests during real internal navigation, focus/keyboard/landmark/contrast/motion behavior, pending, not-found and error/console states; candidate-bound screenshots are supplemental only.",
       "environment": "Local TaxKit checkout",
       "authority": "none",
-      "evidence": ["The docs-validation and docs-browser detail digests in the retained release attempt."],
-      "nonClaims": ["Local built/browser proof does not establish deployment, provider routing, a public URL, production behavior, or public availability."]
+      "evidence": ["The docs-validation and docs-browser detail digests in the retained release attempt.", "For DOCS-APP-006 only, the completed execution plan's candidate-bound DAR-013 PNG/manifest set after primary-owner visual review."],
+      "nonClaims": ["Local built/browser proof does not establish deployment, provider routing, a public URL, production behavior, or public availability.", "A screenshot does not prove HTTP status, SSR response content, hydration diagnostics, request type, keyboard/focus behavior, contrast, motion suppression or console cleanliness."]
     },
     {
       "id": "taxkit-release-closure",

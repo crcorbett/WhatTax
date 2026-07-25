@@ -39,9 +39,10 @@ callbacks or receive raw provider pages.
 ## Build ordering
 
 `source`, `types` and `default` package conditions point to source and compiled
-artifacts explicitly. Direct docs-content generation/tests, docs app
-types/build and both Knip commands build this package first so config loading
-never depends on stale pre-existing `dist`.
+artifacts explicitly. The named docs-content generation task depends on this
+package build. Direct docs-content generation/tests, docs app types/build and
+both Knip commands therefore compile this package before config loading and
+never depend on stale pre-existing `dist`.
 
 ```txt
 bun run --filter=@taxkit/docs-fumadocs test

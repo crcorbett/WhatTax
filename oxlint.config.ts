@@ -17,6 +17,7 @@ const decodingBoundaryFiles = [
 
   // Docs content and rendering-library representation boundaries.
   "packages/docs-content/src/live.layer.ts",
+  "packages/docs-content/src/validation/mdx-component-policy.ts",
   "packages/docs-content/src/validation/policy.runtime.test.ts",
   "packages/docs-content/src/validation/policy.ts",
   "packages/docs-fumadocs/src/live.layer.ts",

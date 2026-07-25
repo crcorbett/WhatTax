@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 
-import { classifyDocsHref } from "./components";
+import { classifyDocsHref } from "./link-destination";
 
 describe("docs MDX link policy", () => {
   test.each([

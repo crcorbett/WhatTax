@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import { mkdir } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 
@@ -22,6 +23,33 @@ const candidate = candidateArgument?.slice("--candidate=".length);
 const currentCommit =
   await Bun.$`git -C ${fileURLToPath(repositoryRoot)} rev-parse HEAD`.text();
 const normalizedCommit = currentCommit.trim();
+
+const sha256File = async (file: URL) =>
+  createHash("sha256")
+    .update(new Uint8Array(await Bun.file(file).arrayBuffer()))
+    .digest("hex");
+
+const sha256Directory = async (directory: URL) => {
+  const files = globalThis.Array.fromAsync(
+    new Bun.Glob("**/*").scan({
+      cwd: fileURLToPath(directory),
+      onlyFiles: true,
+    })
+  );
+  const hash = createHash("sha256");
+  const directoryFiles = await files;
+
+  for (const path of directoryFiles.toSorted()) {
+    hash.update(path);
+    hash.update("\0");
+    hash.update(
+      new Uint8Array(await Bun.file(new URL(path, directory)).arrayBuffer())
+    );
+    hash.update("\0");
+  }
+
+  return hash.digest("hex");
+};
 
 const parseRgb = (value: string): readonly [number, number, number] => {
   const channels = value.match(/\d+(?:\.\d+)?/gu)?.map(Number);
@@ -85,6 +113,14 @@ if (candidate !== undefined) {
     candidate,
     normalizedCommit,
     "The screenshot candidate must equal the checked-out commit."
+  );
+  const worktreeStatus =
+    await Bun.$`git -C ${fileURLToPath(repositoryRoot)} status --porcelain=v1 --untracked-files=all`.text();
+
+  assert.equal(
+    worktreeStatus.trim(),
+    "",
+    "Final screenshot capture requires a clean committed candidate."
   );
 }
 
@@ -157,6 +193,10 @@ const { origin } = server.url;
 const knownPath = "/guides/calculate-australian-take-home-pay";
 const missingPath = "/__docs-evidence__/missing";
 const browser = await chromium.launch({ headless: true });
+const browserVersion = browser.version();
+const builtOutputDigest = await sha256Directory(
+  new URL(".vercel/output/", appRoot)
+);
 
 try {
   let ready = false;
@@ -525,74 +565,178 @@ try {
       ),
     });
 
+    const screenshotDefinitions = [
+      {
+        expectedVisiblePostcondition:
+          "Labelled navigation, current guide, heading and body content are readable without clipping.",
+        file: "01-page-desktop-1440x1000.png",
+        fixture: null,
+        journey:
+          "Direct representative guide load settled after built-app hydration.",
+        limitations: [
+          "Does not prove SSR response content, hydration diagnostics, contrast or console cleanliness.",
+        ],
+        observedVisiblePostcondition:
+          "Labelled navigation, current guide, heading and representative body content are visible without clipping.",
+        route: knownPath,
+        viewport: { height: 1000, width: 1440 },
+      },
+      {
+        expectedVisiblePostcondition:
+          "The responsive navigation is visibly open and identifies the current guide.",
+        file: "02-nav-mobile-open-390x844.png",
+        fixture: null,
+        journey:
+          "Direct representative guide load at the narrow breakpoint with the real responsive navigation opened.",
+        limitations: [
+          "Does not prove keyboard operability, focus behavior, client routing or document-request behavior.",
+        ],
+        observedVisiblePostcondition:
+          "The expanded navigation trigger, open navigation and current guide are visible with the main content retained.",
+        route: knownPath,
+        viewport: { height: 844, width: 390 },
+      },
+      {
+        expectedVisiblePostcondition:
+          "The first Tab reveals the focused Skip to documentation link.",
+        file: "03-skip-link-focus-desktop-1440x1000.png",
+        fixture: null,
+        journey: "Fresh direct /start load followed by the first Tab keypress.",
+        limitations: [
+          "Does not prove tab order, activation, eventual focus target or contrast.",
+        ],
+        observedVisiblePostcondition:
+          "The Skip to documentation link and its focus indicator are visible.",
+        route: "/start",
+        viewport: { height: 1000, width: 1440 },
+      },
+      {
+        expectedVisiblePostcondition: delayedPageLoad.visiblePostcondition,
+        file: "04-pending-desktop-1440x1000.png",
+        fixture: {
+          id: delayedPageLoad.id,
+          owner: "apps/docs/test/fixtures/visual-states.ts",
+        },
+        journey:
+          "Client navigation from /start to the representative guide while the test-owned page load is held pending.",
+        limitations: [
+          "Does not prove loader transport, request type, eventual completion, motion behavior or console cleanliness.",
+        ],
+        observedVisiblePostcondition:
+          "The stable app surface and unambiguous Loading documentation state are visible without destructive collapse.",
+        route: delayedPageLoad.path,
+        viewport: { height: 1000, width: 1440 },
+      },
+      {
+        expectedVisiblePostcondition:
+          recoverableSourceError.visiblePostcondition,
+        file: "05-recoverable-error-desktop-1440x1000.png",
+        fixture: {
+          id: recoverableSourceError.id,
+          owner: "apps/docs/test/fixtures/visual-states.ts",
+        },
+        journey:
+          "Test-only recoverable source-failure composition with its admitted retry surface.",
+        limitations: [
+          "The fixture is not a production route.",
+          "Does not prove error tagging, Schema.Exit restoration, retry success or console cleanliness.",
+        ],
+        observedVisiblePostcondition:
+          "The navigation shell, sanitized unavailable message and retry affordance are visible without a raw cause or machine path.",
+        route: null,
+        viewport: { height: 1000, width: 1440 },
+      },
+      {
+        expectedVisiblePostcondition: "Documentation page not found",
+        file: "06-not-found-desktop-1440x1000.png",
+        fixture: null,
+        journey: "Direct load of the genuinely unmatched reserved path.",
+        limitations: [
+          "Does not prove HTTP 404 status or client/initial parity.",
+        ],
+        observedVisiblePostcondition:
+          "The framework-owned Documentation page not found surface is visible.",
+        route: missingPath,
+        viewport: { height: 1000, width: 1440 },
+      },
+    ] as const;
+    const screenshots = await Promise.all(
+      screenshotDefinitions.map(async (definition) => ({
+        ...definition,
+        sha256: await sha256File(new URL(definition.file, screenshotRoot)),
+      }))
+    );
+    const artifactRoot =
+      candidate === undefined
+        ? "tmp/docs-built/provisional-screenshots"
+        : `docs/exec-plans/active/docs-application-architecture/screenshots/${candidate}`;
     const manifest = {
+      artifactRoot,
+      artifactSafety: {
+        browserChrome: false,
+        machinePaths: false,
+        privateContent: false,
+        secretsOrAuthorizationData: false,
+      },
+      browser: {
+        name: "Chromium",
+        version: browserVersion,
+      },
+      builtOutput: {
+        path: "apps/docs/.vercel/output",
+        sha256: builtOutputDigest,
+      },
       candidate: candidate ?? normalizedCommit,
+      captureCommand:
+        candidate === undefined
+          ? "bun run --filter=docs test:built -- --screenshots"
+          : `bun run --filter=docs test:built -- --screenshots --candidate=${candidate}`,
+      capturedAt: new Date().toISOString(),
+      cleanWorktreePrecondition: candidate !== undefined,
       evidenceClass:
         candidate === undefined
           ? "provisional-uncommitted"
           : "committed-final-candidate",
       limitations: [
-        "Screenshots supplement and do not prove HTTP status, SSR, hydration, navigation request type, console cleanliness, focus, contrast or reduced motion.",
-        "The recoverable error image uses the narrow test-only recoverable-source-error composition fixture and is not a production route.",
+        "This is local built-candidate visual evidence only; it does not establish deployment, provider routing, a public URL, production behavior or public availability.",
+        "Screenshots supplement the independent HTTP, Playwright, accessibility, computed-style, request-trace and console oracles.",
       ],
+      nonClaims: [
+        "No screenshot proves HTTP status, SSR response content, hydration diagnostics, navigation request type, keyboard or focus behavior, contrast, reduced-motion suppression or console cleanliness.",
+        "No screenshot or manifest proves publication, deployment, hosting, canonical identity or public-site behavior.",
+      ],
+      owner: "DOCS-APP-006 built-app harness",
       reducedMotion: {
+        behavioralEvidence:
+          "The built harness emulates prefers-reduced-motion: reduce and asserts animationName=none and transitionDuration=0s on the app shell, navigation, article and route-state surfaces.",
+        codeEvidence: "apps/docs/src/styles.css",
         file: null,
+        journey:
+          "Representative guide with prefers-reduced-motion: reduce and all visually relevant app surfaces inspected.",
         reason:
           "No visually relevant CSS animation or transition exists in the app shell, navigation, article or route-state surfaces.",
         status: "not_applicable",
+        viewport: { height: 1000, width: 1440 },
       },
-      screenshots: [
-        {
-          file: "01-page-desktop-1440x1000.png",
-          fixture: null,
-          route: knownPath,
-          viewport: "1440x1000",
-          visiblePostcondition:
-            "Labelled navigation, current guide, heading and body content are readable without clipping.",
-        },
-        {
-          file: "02-nav-mobile-open-390x844.png",
-          fixture: null,
-          route: knownPath,
-          viewport: "390x844",
-          visiblePostcondition:
-            "The responsive navigation is visibly open and identifies the current guide.",
-        },
-        {
-          file: "03-skip-link-focus-desktop-1440x1000.png",
-          fixture: null,
-          route: "/start",
-          viewport: "1440x1000",
-          visiblePostcondition:
-            "The first Tab reveals the focused Skip to documentation link.",
-        },
-        {
-          file: "04-pending-desktop-1440x1000.png",
-          fixture: delayedPageLoad.id,
-          route: delayedPageLoad.path,
-          viewport: "1440x1000",
-          visiblePostcondition: delayedPageLoad.visiblePostcondition,
-        },
-        {
-          file: "05-recoverable-error-desktop-1440x1000.png",
-          fixture: recoverableSourceError.id,
-          route: null,
-          viewport: "1440x1000",
-          visiblePostcondition: recoverableSourceError.visiblePostcondition,
-        },
-        {
-          file: "06-not-found-desktop-1440x1000.png",
-          fixture: null,
-          route: missingPath,
-          viewport: "1440x1000",
-          visiblePostcondition: "Documentation page not found",
-        },
-      ],
+      reviewer: {
+        owner: "taxkit-product-owner",
+        status: "pending-primary-owner-visual-review",
+      },
+      schemaVersion: 1,
+      screenshots,
     };
+    const serializedManifest = `${JSON.stringify(manifest, null, 2)}\n`;
+
+    assert.equal(
+      serializedManifest.includes(fileURLToPath(repositoryRoot)),
+      false
+    );
+    assert.equal(serializedManifest.includes("/Users/"), false);
+    assert.equal(serializedManifest.includes("127.0.0.1"), false);
 
     await Bun.write(
       new URL("manifest.json", screenshotRoot),
-      `${JSON.stringify(manifest, null, 2)}\n`
+      serializedManifest
     );
   }
 

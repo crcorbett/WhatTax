@@ -701,37 +701,32 @@ computed-style, request-trace and console oracles.
 
 ## Current evidence limitations
 
-At the target revision, the supervising local `bun run verification` used the
-frozen installed graph and exposed the exact previously hidden baseline:
+Implementation has superseded the recorded target-revision baseline:
 
-- repository-path types/check, harness governance, Quality-workflow policy,
-  docs types/check, runbooks, the Effect language-service check, lint,
-  formatting, skill tests and Quality-workflow tests passed;
-- canonical verification then failed at `bun run knip`;
-- Knip could not load `apps/docs/vite.config.ts` or
-  `packages/docs-content/vitest.config.ts` because their source-config path
-  resolves `@taxkit/docs-fumadocs/config`, whose exported
-  `dist/config.js` was absent after the clean frozen install;
-- Knip also reported current baseline candidates:
-  `packages/docs-content/src/validation/policy.runtime.test.ts`,
-  docs-content dev dependency `@effect/vitest`, and exported
-  `validateMdxComponentPolicy`.
+- a clean generated/build precondition removed docs-content `.source`,
+  docs-fumadocs `dist` and the docs app output before the frozen install;
+- the frozen install checked 681 installs across 806 packages with no changes,
+  then both Knip graphs generated through the compiled Fumadocs config and
+  passed;
+- Turbo names content, navigation, source config, canonical schema and manifest
+  inputs, `.source/**` output, docs-fumadocs compilation, content generation and
+  app build order;
+- `policy.runtime.test.ts` and docs-content `@effect/vitest` are exercised by
+  the six-test content corpus; the MDX component policy is imported by both the
+  production validation path and its focused rejected fixture;
+- package tests/types/build, content validation, app types/build, the
+  seven-test browser route corpus and built HTTP/browser proof pass;
+- built proof observes SSR 200 content, direct missing 404, diagnostic-free
+  hydration, real internal navigation with zero document requests, focus,
+  keyboard, landmarks, responsive navigation, contrast, reduced motion,
+  pending, recoverable failure and framework-native not-found behavior.
 
-This is current local repository evidence, not a draft defect and not proof
-that the target architecture fails. `DOCS-APP-002` and `DOCS-APP-006` own the
-root correction: make the compiled docs-fumadocs config and build ordering
-explicit before development/production Knip loads the docs configs, then
-investigate each unused candidate and either make it genuinely production/test
-reachable or remove it if obsolete. Adding Knip ignores, issue suppressions or
-workspace exclusions is forbidden as the fix. Fresh final-candidate
-`bun run verification` must pass.
-
-Current-revision generation, package tests, app build, initial SSR, hydration,
-internal MDX client navigation, HTTP 404 and accessibility remain unproven in
-this draft.
-
-Fresh implementation-candidate evidence supersedes this baseline. Historical
-implemented SPECs and completed plans are trajectory evidence only.
+The candidate-bound retained screenshots, primary-owner image review and final
+lifecycle transition remain pending until the implementation is frozen as one
+clean commit. All proof remains local: it establishes no deployment, provider
+routing, public URL, publication, production behavior or public availability.
+Historical implemented SPECs and completed plans remain trajectory evidence
+only.
 
 ## Documentation-impact ledger
 

@@ -1,19 +1,26 @@
 {
   "$schema": "./node_modules/knip/schema.json",
-  "ignoreWorkspaces": [
-    ".",
-    "apps/docs",
-    "apps/web",
-    "packages/docs-content",
-    "packages/docs-fumadocs",
-    "packages/tsconfig"
-  ],
+  "ignoreWorkspaces": [".", "apps/web", "packages/tsconfig"],
   "ignoreIssues": {
     "packages/api/http/src/client/service.ts": ["duplicates"],
     "packages/scripts/src/release-readiness/evidence.boundary.ts": ["exports"],
     "packages/scripts/src/release-readiness/live.layer.ts": ["exports"]
   },
   "workspaces": {
+    "apps/docs": {
+      "entry": [
+        "src/router.tsx!",
+        "src/server.ts!",
+        "src/routes/**/*.{ts,tsx}!",
+        "vite.config.ts!"
+      ],
+      "project": [
+        "src/**/*.{ts,tsx}!",
+        "!src/**/*.type-test.ts!",
+        "vite.config.ts!"
+      ],
+      "vite": false
+    },
     "apps/api": {
       "entry": ["src/index.ts!"],
       "project": ["src/**/*.ts!"]
@@ -58,6 +65,38 @@
         "src/ledger/index.ts!"
       ],
       "project": ["src/**/*.ts!"]
+    },
+    "packages/docs-content": {
+      "entry": [
+        "source.config.ts!",
+        "src/client.ts!",
+        "src/errors.ts!",
+        "src/generated-source.layer.ts!",
+        "src/live.layer.ts!",
+        "src/schemas.ts!",
+        "src/server.ts!",
+        "src/service.ts!",
+        "src/validate.runtime.ts!"
+      ],
+      "project": [
+        ".source/browser.ts!",
+        ".source/server.ts!",
+        "source.config.ts!",
+        "src/**/*.ts!",
+        "!src/**/*.test.ts!",
+        "!src/test.layer.ts!"
+      ]
+    },
+    "packages/docs-fumadocs": {
+      "entry": [
+        "src/config.ts!",
+        "src/errors.ts!",
+        "src/live.layer.ts!",
+        "src/render/index.ts!",
+        "src/schemas.ts!",
+        "src/service.ts!"
+      ],
+      "project": ["src/**/*.ts!", "!src/**/*.test.ts!", "!src/test.layer.ts!"]
     },
     "packages/rules/au/income-tax": {
       "entry": [

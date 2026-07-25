@@ -8,5 +8,3 @@ import { makeDocsRuntime } from "./runtime-factory.server";
 export const docsRuntime = makeDocsRuntime(
   DocsContentServiceLive.pipe(Layer.provide(DocsGeneratedFumadocsSourceLive))
 );
-
-export const disposeDocsRuntime = () => docsRuntime.dispose();
