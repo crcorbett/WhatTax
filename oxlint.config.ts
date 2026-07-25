@@ -10,6 +10,7 @@ const decodingBoundaryFiles = [
   "packages/docs-content/examples/browser-http.ts",
   "packages/docs-content/examples/node-server.ts",
   "apps/docs/src/lib/docs/loaders.ts",
+  "apps/docs/src/lib/docs/loaders.server.ts",
   "apps/docs/src/lib/docs/route-boundary.browser.test.tsx",
   "apps/docs/src/lib/docs/route-boundary.ts",
   "apps/docs/src/lib/docs/route-boundary.test.js",
@@ -133,6 +134,7 @@ const schemaEncoderEgressFiles = [
   "apps/docs/src/lib/docs/route-boundary.ts",
   "apps/docs/src/lib/docs/route-boundary.browser.test.tsx",
   "apps/docs/src/lib/docs/route-boundary.test.js",
+  "apps/docs/src/lib/docs/loaders.server.ts",
   "packages/scripts/src/release-readiness/evidence.boundary.ts",
   "tools/oxlint/fixtures/effect-accepted.ts",
   "tools/documentation/check.runtime.ts",
@@ -150,7 +152,8 @@ const runtimeBoundaryFiles = [
   "apps/api/src/index.ts",
   "apps/docs/src/lib/docs/route-boundary.browser.test.tsx",
   "apps/docs/src/lib/docs/route-boundary.test.js",
-  "apps/docs/src/lib/runtime.client.ts",
+  "apps/docs/src/lib/runtime-factory.server.test.ts",
+  "apps/docs/src/lib/runtime-factory.server.ts",
   "apps/docs/src/lib/runtime.server.ts",
   "apps/web/src/lib/runtime.client.ts",
   "apps/web/src/lib/runtime.server.ts",
@@ -180,6 +183,7 @@ const runtimeBoundaryFiles = [
 
 const processBoundaryFiles = [
   "apps/api/scripts/smoke-public-routes.runtime.ts",
+  "apps/docs/scripts/check-import-boundaries.ts",
   "apps/docs/vitest.browser.config.ts",
   "packages/sdk/typescript/scripts/check-import-boundaries.ts",
   "tools/oxlint/fixtures/effect-accepted.ts",
@@ -192,6 +196,7 @@ const processBoundaryFiles = [
 
 const consoleBoundaryFiles = [
   "apps/api/scripts/smoke-public-routes.runtime.ts",
+  "apps/docs/scripts/check-import-boundaries.ts",
   "packages/docs-content/src/validate.runtime.ts",
   "packages/scripts/src/release-readiness/present.runtime.ts",
   "packages/sdk/typescript/scripts/check-import-boundaries.ts",
@@ -206,6 +211,7 @@ const consoleBoundaryFiles = [
 
 const bunAdapterFiles = [
   "apps/api/src/server.ts",
+  "apps/docs/scripts/check-import-boundaries.ts",
   "packages/sdk/typescript/scripts/check-import-boundaries.ts",
   "tools/oxlint/fixtures/bun-accepted.ts",
   "tools/oxlint/no-bare-effect-try-promise.test.ts",

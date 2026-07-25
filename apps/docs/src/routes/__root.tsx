@@ -1,11 +1,9 @@
 import {
-  createRootRouteWithContext,
+  createRootRoute,
   HeadContent,
   Outlet,
   Scripts,
 } from "@tanstack/react-router";
-
-import type { RouterContext } from "#/lib/route-runtime";
 
 import "../styles.css";
 
@@ -27,7 +25,7 @@ const RootComponent = () => (
   </main>
 );
 
-export const Route = createRootRouteWithContext<RouterContext>()({
+export const Route = createRootRoute({
   component: RootComponent,
   head: () => ({
     links: [

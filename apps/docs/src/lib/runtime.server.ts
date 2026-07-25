@@ -1,8 +1,12 @@
 import "@tanstack/react-start/server-only";
 import { DocsGeneratedFumadocsSourceLive } from "@taxkit/docs-content/generated-source";
 import { DocsContentServiceLive } from "@taxkit/docs-content/live";
-import { Layer, ManagedRuntime } from "effect";
+import { Layer } from "effect";
 
-export const docsRuntime = ManagedRuntime.make(
+import { makeDocsRuntime } from "./runtime-factory.server";
+
+export const docsRuntime = makeDocsRuntime(
   DocsContentServiceLive.pipe(Layer.provide(DocsGeneratedFumadocsSourceLive))
 );
+
+export const disposeDocsRuntime = () => docsRuntime.dispose();

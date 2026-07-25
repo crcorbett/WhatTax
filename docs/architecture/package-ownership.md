@@ -1,6 +1,6 @@
 ---
 status: canonical
-last_reviewed: 2026-07-14
+last_reviewed: 2026-07-25
 source_of_truth: docs
 confidence: high
 ---
@@ -112,10 +112,12 @@ while a future product workflow is still unscoped.
 
 `apps/docs`
 : Implemented public documentation app. It owns TanStack Start routes, the
-  docs app shell, route loaders, search/navigation presentation and app-local
+  docs app shell, route loaders, navigation presentation and app-local
   MDX component composition. It consumes package-owned content and Fumadocs
   helpers, but does not own canonical frontmatter, navigation, generated source
-  or reusable Fumadocs integration contracts.
+  or reusable Fumadocs integration contracts. It composes and executes one
+  server-only managed runtime; browser code restores encoded route transport
+  and does not own an Effect runtime.
 
 `apps/api`
 : Current standalone Bun API runtime. It owns process config, startup,

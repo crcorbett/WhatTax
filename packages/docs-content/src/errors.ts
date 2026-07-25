@@ -1,6 +1,21 @@
 import { Schema } from "effect";
 
-import { DocsPagePath, DocsPageSlug, DocsSourcePath } from "./schemas.js";
+import {
+  DocsNonEmptyText,
+  DocsPagePath,
+  DocsPageSlug,
+  DocsSourcePath,
+} from "./schemas.js";
+
+export const DocsSourceOperation = Schema.Literals([
+  "decode",
+  "getNavigation",
+  "getPage",
+  "listPages",
+  "read",
+  "validateContent",
+]);
+export type DocsSourceOperation = typeof DocsSourceOperation.Type;
 
 export class DocsPageNotFoundError extends Schema.TaggedErrorClass<DocsPageNotFoundError>()(
   "DocsPageNotFoundError",
@@ -19,7 +34,8 @@ export class DocsSlugNotFoundError extends Schema.TaggedErrorClass<DocsSlugNotFo
 export class DocsSourceError extends Schema.TaggedErrorClass<DocsSourceError>()(
   "DocsSourceError",
   {
-    cause: Schema.Defect(),
+    message: DocsNonEmptyText,
+    operation: DocsSourceOperation,
     source: Schema.optional(DocsSourcePath),
   }
 ) {}

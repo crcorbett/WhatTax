@@ -81,11 +81,20 @@ const examplesReferenceRequiredText = [
 const contentSourcePath = (path: string) =>
   Schema.decodeUnknownEffect(DocsSourcePath)(`content/${path}`);
 
-const sourceError = (cause: unknown, source?: DocsSourcePath) =>
+const sourceError = (source?: DocsSourcePath) =>
   Option.fromUndefinedOr(source).pipe(
     Option.match({
-      onNone: () => new DocsSourceError({ cause }),
-      onSome: (value) => new DocsSourceError({ cause, source: value }),
+      onNone: () =>
+        new DocsSourceError({
+          message: "The docs source could not be read.",
+          operation: "read",
+        }),
+      onSome: (value) =>
+        new DocsSourceError({
+          message: "The docs source could not be read.",
+          operation: "read",
+          source: value,
+        }),
     })
   );
 
@@ -96,7 +105,7 @@ const readText = (path: string) =>
     return yield* fileSystem.readFileString(path);
   }).pipe(
     Effect.provide(NodeFileSystem.layer),
-    Effect.mapError((cause) => sourceError(cause))
+    Effect.mapError(() => sourceError())
   );
 
 const fileExists = (path: string) =>
@@ -371,7 +380,7 @@ const collectMdxPaths = (
     Effect.map((paths) =>
       EffectArray.filter(paths, (path) => path.endsWith(".mdx"))
     ),
-    Effect.mapError((cause) => sourceError(cause))
+    Effect.mapError(() => sourceError())
   );
 
 const listMdxSources: EffectType.Effect<
@@ -379,13 +388,19 @@ const listMdxSources: EffectType.Effect<
   DocsSourceError
 > = collectMdxPaths(absoluteContentRoot).pipe(
   Effect.flatMap((paths) => Effect.forEach(paths, contentSourcePath)),
-  Effect.mapError((cause) => sourceError(cause)),
+  Effect.mapError(() => sourceError()),
   Effect.map((paths) => paths.toSorted(Order.String))
 );
 
 export const getNavigation: EffectType.Effect<DocsNavigation, DocsSourceError> =
   Schema.decodeUnknownEffect(DocsNavigation)(navigationRepresentation).pipe(
-    Effect.mapError((cause) => sourceError(cause))
+    Effect.mapError(
+      () =>
+        new DocsSourceError({
+          message: "The docs navigation representation was invalid.",
+          operation: "getNavigation",
+        })
+    )
   );
 
 const navigationLeaves = (navigation: DocsNavigation) =>
@@ -537,7 +552,7 @@ const validateReferenceIntegration = Effect.all({
   Effect.map(({ exampleIssues, openApiIssues }) =>
     EffectArray.flatten([exampleIssues, openApiIssues])
   ),
-  Effect.mapError((cause) => sourceError(cause))
+  Effect.mapError(() => sourceError())
 );
 
 export const validateContent: EffectType.Effect<

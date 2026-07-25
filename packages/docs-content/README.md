@@ -1,6 +1,6 @@
 ---
 status: canonical
-last_reviewed: 2026-07-21
+last_reviewed: 2026-07-25
 source_of_truth: package-root
 confidence: high
 ---
@@ -31,6 +31,8 @@ Those belong in the `apps/docs` runtime.
   content collection.
 - `src/live.layer.ts`: Effect service layer that serves navigation, validation
   and renderable Fumadocs page data.
+- `src/test.layer.ts`: deterministic `DocsContentService` composition over the
+  generic Fumadocs test Layer.
 - `.source/`: generated Fumadocs output. Regenerate it instead of editing it by
   hand.
 
@@ -42,6 +44,8 @@ code supplies one TaxKit generated-collection adapter to
 `FumadocsSource` service, decodes its generic representation into canonical
 TaxKit page values and maps generic source errors at the content boundary.
 The app composes the two Layers and executes the resulting server runtime.
+Generic source failures are mapped once into safe TaxKit content errors; raw
+provider causes and fixture content do not cross the package boundary.
 
 The authored `navigation.json` representation is decoded through
 `DocsNavigation`. This keeps TaxKit navigation and content policy at the same
@@ -115,6 +119,9 @@ implementation in `apps/docs` or reusable primitives in
   package-owned examples.
 - Keep docs identifiers, frontmatter, meta, navigation and tagged source errors
   schema-owned in this package.
+- Keep service tests on the deterministic test Layer so accepted, missing and
+  malformed content exercise the same canonical service contract as
+  production.
 
 ## Related docs
 

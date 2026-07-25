@@ -11,7 +11,7 @@ import { docsHomeRouteBoundary } from "./route-boundary";
 
 const homeSuccess = {
   navigation: {
-    contentRoot: "apps/docs/content",
+    contentRoot: "packages/docs-content/content",
     primaryNavigation: [],
     status: "published",
   },
@@ -24,7 +24,10 @@ const expectedErrors = [
     path: "content/start.mdx",
   }),
   new DocsPageNotFoundError({ path: "/missing" }),
-  new DocsSourceError({ cause: new Error("source failed") }),
+  new DocsSourceError({
+    message: "The docs source failed.",
+    operation: "getPage",
+  }),
 ];
 
 const encodeHomeExit = Schema.encodeSync(docsHomeRouteBoundary.codec);

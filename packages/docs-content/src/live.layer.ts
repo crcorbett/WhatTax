@@ -37,7 +37,13 @@ const contentPageFromSourcePage = (page: FumadocsSourcePage) =>
           source,
         }) satisfies DocsContentPage
     ),
-    Effect.mapError((cause) => new DocsSourceError({ cause }))
+    Effect.mapError(
+      () =>
+        new DocsSourceError({
+          message: "The docs page representation was invalid.",
+          operation: "decode",
+        })
+    )
   );
 
 export const DocsContentServiceLive = Layer.effect(
@@ -53,8 +59,13 @@ export const DocsContentServiceLive = Layer.effect(
           Effect.catchTag("FumadocsPageNotFoundError", () =>
             Effect.fail(new DocsPageNotFoundError({ path }))
           ),
-          Effect.catchTag("FumadocsSourceLoadError", (error) =>
-            Effect.fail(new DocsSourceError({ cause: error }))
+          Effect.catchTag("FumadocsSourceLoadError", () =>
+            Effect.fail(
+              new DocsSourceError({
+                message: "The docs page source could not be loaded.",
+                operation: "getPage",
+              })
+            )
           )
         ),
       listPages: () =>
@@ -62,8 +73,13 @@ export const DocsContentServiceLive = Layer.effect(
           Effect.flatMap((pages) =>
             Effect.forEach(pages, contentPageFromSourcePage)
           ),
-          Effect.catchTag("FumadocsSourceLoadError", (error) =>
-            Effect.fail(new DocsSourceError({ cause: error }))
+          Effect.catchTag("FumadocsSourceLoadError", () =>
+            Effect.fail(
+              new DocsSourceError({
+                message: "The docs page list could not be loaded.",
+                operation: "listPages",
+              })
+            )
           )
         ),
       validateContent: () => validateContent,

@@ -39,6 +39,11 @@
       "source": "./src/service.ts",
       "default": "./src/service.ts"
     },
+    "./test": {
+      "types": "./src/test.layer.ts",
+      "source": "./src/test.layer.ts",
+      "default": "./src/test.layer.ts"
+    },
     "./validate": {
       "types": "./src/validate.runtime.ts",
       "source": "./src/validate.runtime.ts",

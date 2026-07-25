@@ -1,6 +1,6 @@
 ---
 status: canonical
-last_reviewed: 2026-07-18
+last_reviewed: 2026-07-25
 source_of_truth: docs
 confidence: medium
 ---
@@ -168,9 +168,12 @@ stale-pattern audit are acceptance requirements, not an optional template.
 ## Runtime composition
 
 Use `ManagedRuntime.make(...)` for module-scoped app runtimes that run many
-Effects against the same fully provided service graph, such as web SSR and
-browser client runtimes. Do not create a `ManagedRuntime` inside route loaders,
-React components, request handlers or per-operation helpers.
+Effects against the same fully provided service graph. Do not create a
+`ManagedRuntime` inside route loaders, React components, request handlers or
+per-operation helpers. The docs app owns one server-only managed runtime and an
+explicit disposal operation for focused tests and host lifecycle integration;
+it has no browser Effect runtime. Browser routes restore the schema-encoded
+server-function transport and render canonical values.
 
 Use `@effect/platform-bun/BunRuntime.runMain(...)` for Bun process entrypoints
 where the root Effect is the process lifecycle. Process entrypoints should

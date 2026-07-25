@@ -76,7 +76,12 @@ const harnessRoute = createRoute({
       Match.when("source-error", () =>
         Effect.runPromise(
           docsHomeRouteBoundary.encodeExit(
-            Effect.fail(new DocsSourceError({ cause: new Error("source") }))
+            Effect.fail(
+              new DocsSourceError({
+                message: "The docs source failed.",
+                operation: "getPage",
+              })
+            )
           )
         )
       ),

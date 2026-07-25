@@ -1,6 +1,6 @@
 ---
 status: canonical
-last_reviewed: 2026-07-24
+last_reviewed: 2026-07-25
 source_of_truth: docs
 confidence: high
 ---
@@ -76,12 +76,19 @@ change:
 ```bash
 bun run docs:validate
 bun run docs:build
+bun run test:docs-boundaries
+bun run --filter=docs test
 bun run --filter=docs test:browser
 bun run --filter=@taxkit/docs-content test
 ```
 
 Run those package-local docs gates whenever MDX content, Fumadocs source
 wiring, docs examples, validation policy or docs rendering changes.
+`test:docs-boundaries` includes a negative browser import audit, the route
+transport codec corpus and a focused test that reuses one app-owned server
+runtime before the test owner disposes it. The package content test composes
+the deterministic `DocsContentService` test Layer over the generic
+`FumadocsSource` test Layer and covers accepted, missing and malformed content.
 
 Release-facing package work must also prove actual tarballs rather than
 workspace imports or dry-run file lists:

@@ -1,6 +1,6 @@
 ---
 status: canonical
-last_reviewed: 2026-07-21
+last_reviewed: 2026-07-25
 source_of_truth: app-root
 confidence: high
 ---
@@ -57,12 +57,15 @@ Production: docs page
 browser
   -> TanStack route loader
     -> createServerFn
-      -> DocsContentService
-        -> @taxkit/docs-content live layer
-          -> @taxkit/docs-fumadocs source adapter
-          -> packages/docs-content/.source/server
-          -> schema-decoded packages/docs-content/navigation.json representation
-      -> schema-encoded Exit representation
+      -> dynamic .server module
+        -> one app-owned ManagedRuntime
+          -> DocsContentService
+            -> @taxkit/docs-content live layer
+              -> @taxkit/docs-fumadocs FumadocsSource
+              -> TaxKit generated collection adapter
+              -> packages/docs-content/.source/server
+              -> schema-decoded navigation.json representation
+        -> schema-encoded Exit representation
     -> TanStack SSR hydration or client-navigation transport
       -> direct route-root restore and Result match
         -> @taxkit/docs-content/client
@@ -75,6 +78,8 @@ browser
 
 ```txt
 bun run --filter=docs dev
+bun run --filter=docs check-import-boundaries
+bun run --filter=docs test
 bun run --filter=docs test:browser
 bun run --filter=docs check-types
 bun run --filter=docs build
@@ -94,6 +99,14 @@ Run `build` before `preview`. Both `dev` and `preview` expose the app through
 It proves success, expected failures, malformed transport and framework error
 boundaries after `Route.useLoaderData`; it does not prove SSR or hydration. Use
 the built app for initial SSR, hydration and real client-navigation proof.
+
+`check-import-boundaries` rejects server-only content, service, generated-source
+and runtime imports from browser-reachable app modules. The docs app has no
+browser Effect runtime. Its `.server.ts` loader module is the only route edge
+that acquires `DocsContentService`, and the module-scoped server runtime is
+reused for the server isolate. The runtime factory exposes disposal so focused
+tests and future host lifecycle integration can release its Layer; the current
+hosting adapter does not provide an application shutdown hook.
 
 ## Authoring rules
 
@@ -139,6 +152,11 @@ docs change
 - Do not import raw `packages/docs-content/content` files from route loaders.
 - Do not import `@taxkit/docs-content/server` or generated `.source/server`
   modules from browser code.
+- Do not statically import content services, live Layers or the server runtime
+  from browser-reachable route modules. Keep execution behind the app-owned
+  `.server.ts` server-function implementation.
+- Do not add a browser Effect runtime. Browser routes restore the encoded
+  transport value and render canonical values.
 - Keep app-specific MDX components in `src/lib/mdx/components.tsx`.
 - Use TanStack `Link` for internal docs routes so navigation runs the client
   loader and server-function RPC. Use ordinary anchors for external URLs.

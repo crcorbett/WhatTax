@@ -10,7 +10,9 @@
     "build": "bun run --filter=@taxkit/docs-fumadocs build && vite build",
     "check-types": "bun run --filter=@taxkit/docs-fumadocs build && tsc --noEmit",
     "clean": "rm -rf .output .tanstack .turbo node_modules/.vite",
+    "check-import-boundaries": "bun run ./scripts/check-import-boundaries.ts",
     "preview": "portless run --name docs.taxkit vite preview",
+    "test": "vitest run --config vitest.server.config.ts",
     "test:browser": "vitest run --config vitest.browser.config.ts"
   },
   "dependencies": {

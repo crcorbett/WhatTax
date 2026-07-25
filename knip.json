@@ -48,13 +48,22 @@
     },
     "apps/docs": {
       "entry": [
+        "scripts/check-import-boundaries.ts",
         "src/lib/docs/route-boundary.type-test.ts",
+        "src/**/*.test.ts",
+        "src/**/*.server.ts",
         "src/router.tsx",
         "src/server.ts",
         "src/routes/**/*.{ts,tsx}",
+        "vitest.server.config.ts",
         "vite.config.ts"
       ],
-      "project": ["src/**/*.{ts,tsx}", "vite.config.ts"],
+      "project": [
+        "scripts/**/*.ts",
+        "src/**/*.{ts,tsx}",
+        "vitest.server.config.ts",
+        "vite.config.ts"
+      ],
       "ignore": ["examples/**/*.ts", "src/routeTree.gen.ts"],
       "ignoreDependencies": ["@taxkit/tsconfig"]
     },
@@ -90,6 +99,7 @@
         "src/schemas.ts",
         "src/server.ts",
         "src/service.ts",
+        "src/test.layer.ts",
         "src/validate.runtime.ts",
         "src/**/*.test.ts",
         "vitest.config.ts"

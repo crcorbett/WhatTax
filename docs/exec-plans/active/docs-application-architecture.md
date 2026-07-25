@@ -34,7 +34,7 @@ this plan.
 | --- | --- | --- |
 | `DOCS-APP-001` | completed | Package-owned content, navigation, examples, validation, lifecycle bindings and focused proof accepted. |
 | `DOCS-APP-002` | completed | Generic service/live/test Layers, compiled-config ordering and Knip reachability accepted. |
-| `DOCS-APP-003` | pending | Depends on `DOCS-APP-002`. |
+| `DOCS-APP-003` | completed | Canonical content service, app server runtime, safe error and import-boundary slice accepted. |
 | `DOCS-APP-004` | pending | Depends on `DOCS-APP-003`. |
 | `DOCS-APP-005` | pending | Depends on `DOCS-APP-004`. |
 | `DOCS-APP-006` | pending | Depends on `DOCS-APP-005`. |
@@ -159,6 +159,47 @@ clean committed implementation candidate. It belongs under this plan at
 - Primary-owner review accepted the generic substitution point, safe errors,
   one-ingress decoding, lazy Layers, compiled export graph, retirement set and
   `TDA-002`/`TDA-P01` outcome.
+
+### 2026-07-25 — `DOCS-APP-003` accepted
+
+- `DocsContentServiceLive` now maps generic source failures to safe
+  content-owned tagged errors and decodes generic page values into canonical
+  TaxKit values. The deterministic content test Layer composes over
+  `FumadocsSource` test fixtures and proves accepted, missing and malformed
+  content without leaking raw fixture data.
+- Removed `runtime.client.ts`, the unused router service context,
+  `route-runtime.ts` and the isomorphic runtime indirection. The app now owns
+  one module-scoped server `ManagedRuntime`, an explicit disposal operation and
+  a focused test proving service reuse and test-owned disposal.
+- Moved service acquisition and Effect execution into an app-owned
+  `.server.ts` server-function implementation. The browser-reachable loader
+  retains only the TanStack transport stub and a dynamic server import.
+- Added an AST-based app import audit that rejects static server-only content,
+  Fumadocs service, generated-source and runtime imports from
+  browser-reachable modules, rejects browser runtime execution, and verifies
+  the removed browser runtime stays absent.
+- Preserved the existing schema-encoded `Exit` transport and its success,
+  expected failure, malformed representation, defect and interruption corpus.
+  The programmatic browser route harness still proves only component transport
+  restoration and framework boundaries, not built SSR or hydration.
+- Focused proof passed:
+  - `bun run docs:validate` — zero issues.
+  - docs-fumadocs tests — two files and six tests passed.
+  - docs-content tests — two files and six tests passed.
+  - docs-content types/build, docs app types/build and the focused docs
+    boundary command.
+  - docs browser harness — seven tests passed.
+  - `bun run knip`, documentation policy, repository path policy and
+    `git diff --check`.
+  - `bun run verification`, including development and production Knip and all
+    23 Turbo type-check tasks. The existing docs-content missing-output warning
+    remains owned by `DOCS-APP-006`.
+- Primary-owner review accepted the final generated source ->
+  `FumadocsSource` -> `DocsContentService` -> app server runtime graph,
+  canonical errors, runtime lifetime, removal set and browser-negative proof.
+  Package versions and dependency declarations are unchanged; `bun.lock`
+  remains
+  `a917cbcf81d6917deb9876718494cfe2a6ca3d337d106d4813e6cc6bc84ba792`.
 
 ## Documentation impact
 

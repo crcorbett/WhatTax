@@ -1,6 +1,6 @@
 ---
 status: canonical
-last_reviewed: 2026-07-14
+last_reviewed: 2026-07-25
 source_of_truth: docs
 confidence: high
 ---
@@ -65,9 +65,13 @@ Web SSR and browser runtimes should use module-scoped
 Effect runtimes inside route loaders, React components or request-local helper
 functions.
 
-Docs SSR loaders use the same runtime rule. `apps/docs` keeps a module-scoped
-runtime for `DocsContentServiceLive`, decodes route input before lookup and
-preloads compiled MDX through the browser-safe client loader. App routes should
+Docs SSR loaders use the same runtime rule. `apps/docs` keeps one module-scoped
+server runtime for `DocsContentServiceLive`, composed over the TaxKit generated
+collection Layer, and exposes explicit disposal for tests and future host
+lifecycle integration. The browser owns no Effect runtime. A browser-reachable
+loader defines only the TanStack server-function transport stub; its dynamic
+`.server.ts` implementation acquires the service, decodes route input before
+lookup and preloads compiled MDX through the browser-safe client loader. App routes should
 not read `packages/docs-content/content` files, `navigation.json` or generated
 `.source/server` modules directly. `@taxkit/docs-content` bundles the authored
 navigation representation and decodes it with the canonical navigation schema,
@@ -176,6 +180,9 @@ before a second application needs it.
 - Keep frontend docs and component details out of rule packages.
 - Keep browser docs modules on browser-safe exports such as
   `@taxkit/docs-content/client` and `@taxkit/docs-fumadocs/render`.
+- Keep content service acquisition, live Layer composition and Effect runtime
+  execution in app-owned `.server.ts` modules. Run the focused import-boundary
+  audit and do not add a browser docs runtime.
 - Keep docs loader outcomes encoded until a direct route-root consumer restores
   them through the browser-safe route boundary.
 - Use TanStack router links for internal docs routes so client navigation runs

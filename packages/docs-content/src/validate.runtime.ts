@@ -25,7 +25,7 @@ const program = validateContent.pipe(
   ),
   Effect.tapErrorTag("DocsSourceError", (error) =>
     Effect.sync(() => {
-      console.error(error.cause);
+      console.error(error.message);
     })
   ),
   Effect.tapErrorTag("DocsValidationFailedError", (error) =>
