@@ -68,7 +68,7 @@ functions.
 Docs SSR loaders use the same runtime rule. `apps/docs` keeps a module-scoped
 runtime for `DocsContentServiceLive`, decodes route input before lookup and
 preloads compiled MDX through the browser-safe client loader. App routes should
-not read `apps/docs/content` files, `navigation.json` or generated
+not read `packages/docs-content/content` files, `navigation.json` or generated
 `.source/server` modules directly. `@taxkit/docs-content` bundles the authored
 navigation representation and decodes it with the canonical navigation schema,
 so built server functions do not depend on a source-relative filesystem path.

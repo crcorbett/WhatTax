@@ -52,7 +52,7 @@
   },
   {
     "id": "public-docs-manifest",
-    "target": "apps/docs/navigation.json",
+    "target": "packages/docs-content/navigation.json",
     "defect": "Point one public navigation entry at a missing authored page.",
     "mutation": {
       "search": "content/start/overview.mdx",

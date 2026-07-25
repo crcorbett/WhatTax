@@ -7,8 +7,8 @@ const decodingBoundaryFiles = [
   // Application configuration, executable smoke checks and checked examples.
   "apps/api/src/config.ts",
   "apps/api/scripts/smoke-public-routes.runtime.ts",
-  "apps/docs/examples/browser-http.ts",
-  "apps/docs/examples/node-server.ts",
+  "packages/docs-content/examples/browser-http.ts",
+  "packages/docs-content/examples/node-server.ts",
   "apps/docs/src/lib/docs/loaders.ts",
   "apps/docs/src/lib/docs/route-boundary.browser.test.tsx",
   "apps/docs/src/lib/docs/route-boundary.ts",

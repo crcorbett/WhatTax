@@ -1,9 +1,9 @@
 {
   "public": {
-    "roots": ["apps/docs/content"],
+    "roots": ["packages/docs-content/content"],
     "navigation": {
-      "path": "apps/docs/navigation.json",
-      "owner": "apps/docs-public-doc-owner"
+      "path": "packages/docs-content/navigation.json",
+      "owner": "packages/docs-content-public-doc-owner"
     },
     "statusDecision": {
       "acceptanceRecords": [],

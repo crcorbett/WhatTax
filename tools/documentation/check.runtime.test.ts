@@ -40,8 +40,11 @@ const policy = {
     },
   },
   public: {
-    navigation: { owner: "public", path: "apps/docs/navigation.json" },
-    roots: ["apps/docs/content"],
+    navigation: {
+      owner: "public",
+      path: "packages/docs-content/navigation.json",
+    },
+    roots: ["packages/docs-content/content"],
     statusDecision: {
       acceptanceRecords: [],
       owner: "product",
@@ -63,14 +66,14 @@ describe("documentation checker path classes", () => {
       owner: "product-owner",
       schemaVersion: 1,
       state: "accepted",
-      targetPath: "apps/docs/content/guide.mdx",
+      targetPath: "packages/docs-content/content/guide.mdx",
     });
     await expect(
       Effect.runPromise(decodePublicPageAcceptanceRecord(valid))
     ).resolves.toEqual(
       expect.objectContaining({
         state: "accepted",
-        targetPath: "apps/docs/content/guide.mdx",
+        targetPath: "packages/docs-content/content/guide.mdx",
       })
     );
     for (const invalid of [
@@ -80,14 +83,14 @@ describe("documentation checker path classes", () => {
         owner: "product-owner",
         schemaVersion: 1,
         state: "accepted",
-        targetPath: "apps/docs/content/guide.mdx",
+        targetPath: "packages/docs-content/content/guide.mdx",
       }),
       JSON.stringify({
         observedAt: "2026-07-21T22:30:00Z",
         owner: "product-owner",
         schemaVersion: 1,
         state: "draft",
-        targetPath: "apps/docs/content/guide.mdx",
+        targetPath: "packages/docs-content/content/guide.mdx",
       }),
       JSON.stringify({
         extra: true,
@@ -95,7 +98,7 @@ describe("documentation checker path classes", () => {
         owner: "product-owner",
         schemaVersion: 1,
         state: "accepted",
-        targetPath: "apps/docs/content/guide.mdx",
+        targetPath: "packages/docs-content/content/guide.mdx",
       }),
     ]) {
       const exit = await Effect.runPromiseExit(
@@ -107,7 +110,10 @@ describe("documentation checker path classes", () => {
 
   test("keeps public content, maintainer docs, generated OpenAPI, and workspace manifests separate", () => {
     expect(
-      classifyDocumentationPath(policy, "apps/docs/content/guide.mdx")
+      classifyDocumentationPath(
+        policy,
+        "packages/docs-content/content/guide.mdx"
+      )
     ).toBe("public");
     expect(
       classifyDocumentationPath(policy, "docs/architecture/README.md")

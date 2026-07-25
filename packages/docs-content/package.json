@@ -43,7 +43,8 @@
   },
   "scripts": {
     "build": "fumadocs-mdx",
-    "check-types": "tsc --noEmit",
+    "check-examples": "tsc -p tsconfig.examples.json --noEmit",
+    "check-types": "tsc --noEmit && bun run check-examples",
     "test": "vitest run --passWithNoTests",
     "validate": "bun run ./src/validate.runtime.ts",
     "clean": "rm -rf .source .turbo *.tsbuildinfo"

@@ -26,7 +26,7 @@ import { docsHomeRouteBoundary } from "#/lib/docs/route-boundary";
 
 const homeSuccess = {
   navigation: Schema.decodeUnknownSync(DocsNavigation)({
-    contentRoot: "apps/docs/content",
+    contentRoot: "packages/docs-content/content",
     primaryNavigation: [],
     status: "published",
   }),

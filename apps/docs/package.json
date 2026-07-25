@@ -8,8 +8,7 @@
   "scripts": {
     "dev": "portless run --name docs.taxkit vite dev",
     "build": "vite build",
-    "check-examples": "tsc -p tsconfig.examples.json --noEmit",
-    "check-types": "tsc --noEmit && bun run check-examples",
+    "check-types": "tsc --noEmit",
     "clean": "rm -rf .output .tanstack .turbo node_modules/.vite",
     "preview": "portless run --name docs.taxkit vite preview",
     "test:browser": "vitest run --config vitest.browser.config.ts"

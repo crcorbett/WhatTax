@@ -21,7 +21,7 @@ validation policy or generated Fumadocs source access; those live in
 Public MDX content lives in:
 
 ```txt
-apps/docs/content
+packages/docs-content/content
 ```
 
 Each top-level section owns an `index.mdx` file. Later content tasks can add
@@ -32,7 +32,7 @@ child pages below the matching section directory.
 The public docs navigation is defined in:
 
 ```txt
-apps/docs/navigation.json
+packages/docs-content/navigation.json
 ```
 
 The required top-level sections are:
@@ -61,7 +61,7 @@ browser
         -> @taxkit/docs-content live layer
           -> @taxkit/docs-fumadocs source adapter
           -> packages/docs-content/.source/server
-          -> schema-decoded apps/docs/navigation.json representation
+          -> schema-decoded packages/docs-content/navigation.json representation
       -> schema-encoded Exit representation
     -> TanStack SSR hydration or client-navigation transport
       -> direct route-root restore and Result match
@@ -79,12 +79,13 @@ bun run --filter=docs test:browser
 bun run --filter=docs check-types
 bun run --filter=docs build
 bun run --filter=docs preview
-bun run --filter=docs check-examples
+bun run --filter=@taxkit/docs-content check-examples
 bun run docs:validate
 ```
 
-`check-types` includes `check-examples`, so public examples stay connected to
-current SDK/API/calculator exports.
+`@taxkit/docs-content` `check-types` includes `check-examples`, so the
+package-owned public examples stay connected to current SDK/API/calculator
+exports.
 
 Run `build` before `preview`. Both `dev` and `preview` expose the app through
 `https://docs.taxkit.localhost` with portless.
@@ -127,7 +128,7 @@ docs change
     -> frontmatter and navigation schemas
     -> local links and allowed MDX components
     -> example and OpenAPI reference checks
-  -> docs check-examples
+  -> @taxkit/docs-content check-examples
     -> TypeScript example compilation
   -> docs build
     -> TanStack Start and Fumadocs rendering
@@ -135,7 +136,7 @@ docs change
 
 ## Guardrails
 
-- Do not import raw `apps/docs/content` files from route loaders.
+- Do not import raw `packages/docs-content/content` files from route loaders.
 - Do not import `@taxkit/docs-content/server` or generated `.source/server`
   modules from browser code.
 - Keep app-specific MDX components in `src/lib/mdx/components.tsx`.

@@ -9,18 +9,21 @@ confidence: high
 
 ## Scope
 
-Private source-only package for public TaxKit MDX content contracts. It owns
-Effect Schema frontmatter, meta and navigation schemas, tagged docs source
-errors, validation policy and the content service for `apps/docs/content`.
-Reusable Fumadocs internals come from `@taxkit/docs-fumadocs`.
+Private source-only package for authored public TaxKit MDX, navigation,
+examples and content contracts. It owns Effect Schema frontmatter, meta and
+navigation schemas, tagged docs source errors, validation policy, generated
+source configuration and the content service. Reusable Fumadocs internals come
+from `@taxkit/docs-fumadocs`.
 
 This package does not own routes, layout, MDX renderer components or search UI.
 Those belong in the `apps/docs` runtime.
 
 ## Main areas
 
-- `source.config.ts`: TaxKit collection declaration for `apps/docs/content`
-  using reusable `@taxkit/docs-fumadocs/config` helpers.
+- `content/`, `navigation.json` and `examples/`: the authored TaxKit public
+  documentation source.
+- `source.config.ts`: TaxKit collection declaration for `content/` using
+  reusable `@taxkit/docs-fumadocs/config` helpers.
 - `src/schemas.ts`: canonical docs frontmatter, meta, navigation and
   validation issue schemas.
 - `src/errors.ts`: tagged docs source and lookup errors.
@@ -41,14 +44,13 @@ return serialisable content page data for the current app route. The
 `getRenderablePage` and `listRenderablePages` methods expose compiled
 Fumadocs page data for server-side rendering integration.
 
-The authored `apps/docs/navigation.json` representation is bundled with the
-source-only package and decoded through `DocsNavigation`. This keeps the built
-server independent of source-relative filesystem paths while preserving the
-app-owned navigation file and package-owned schema contract.
+The authored `navigation.json` representation is decoded through
+`DocsNavigation`. This keeps TaxKit navigation and content policy at the same
+earliest semantic owner.
 
 This package is intentionally private and source-only. It is not a publishable
 runtime package because its server and client exports wrap generated
-Fumadocs/Vite modules for `apps/docs/content`. The package exports include
+Fumadocs/Vite modules for `content/`. The package exports include
 `types`, `source` and `default` entries that all point at source files so
 workspace consumers use the same generated-source boundary in development,
 build and type checking.
@@ -61,7 +63,7 @@ import `@taxkit/docs-content/server`.
 
 ## Frontmatter contract
 
-Every authored MDX page under `apps/docs/content` must provide:
+Every authored MDX page under `packages/docs-content/content` must provide:
 
 - `title`
 - `description`
@@ -101,7 +103,7 @@ implementation in `apps/docs` or reusable primitives in
 
 ## Guardrails
 
-- Keep authored content in `apps/docs/content`.
+- Keep authored content in `packages/docs-content/content`.
 - Keep generated source behind `@taxkit/docs-content`.
 - Do not import `packages/docs-content/.source/*` from browser/runtime code.
 - Do not add app routes, layout, renderer components or search behavior here.
@@ -110,6 +112,8 @@ implementation in `apps/docs` or reusable primitives in
 - Regenerate `.source/` with `bun run --filter=@taxkit/docs-content build`
   after changing content, `source.config.ts` or schema fields that affect
   generated source.
+- Run `bun run --filter=@taxkit/docs-content check-examples` after changing
+  package-owned examples.
 - Keep docs identifiers, frontmatter, meta, navigation and tagged source errors
   schema-owned in this package.
 

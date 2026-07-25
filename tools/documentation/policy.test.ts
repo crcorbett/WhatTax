@@ -48,9 +48,9 @@ const ownerPolicy: OwnerPolicy = {
   public: {
     navigation: {
       owner: "public-docs-owner",
-      path: "apps/docs/navigation.json",
+      path: "packages/docs-content/navigation.json",
     },
-    roots: ["apps/docs/content"],
+    roots: ["packages/docs-content/content"],
     statusDecision: {
       acceptanceRecords: [],
       owner: "product-owner",
@@ -78,7 +78,7 @@ const acceptedRecord = (targetPath: string) =>
     targetPath,
   });
 const completeOwnerFiles = [
-  { path: "apps/docs/navigation.json", text: '{"status":"draft"}' },
+  { path: "packages/docs-content/navigation.json", text: '{"status":"draft"}' },
   { path: "packages/docs-content/source.config.ts", text: "source" },
   { path: "packages/docs-content/package.json", text: "{}" },
   {
@@ -219,7 +219,7 @@ describe("documentation policy", () => {
       files: [
         ...completeOwnerFiles,
         {
-          path: "apps/docs/content/reference.mdx",
+          path: "packages/docs-content/content/reference.mdx",
           text: "---\nstatus: draft\n---",
         },
         { path: "apps/docs/package.json", text: "{}" },
@@ -239,14 +239,14 @@ describe("documentation policy", () => {
     ).toBe(true);
     expect(
       report.diagnostics.some(
-        (item) => item.target === "apps/docs/content/reference.mdx"
+        (item) => item.target === "packages/docs-content/content/reference.mdx"
       )
     ).toBe(false);
     expect(
       report.diagnostics.every(
         (item) =>
           item.invariant !== "maintainer-metadata" ||
-          item.target !== "apps/docs/content/reference.mdx"
+          item.target !== "packages/docs-content/content/reference.mdx"
       )
     ).toBe(true);
   });
@@ -256,7 +256,7 @@ describe("documentation policy", () => {
       files: [
         ...completeOwnerFiles,
         {
-          path: "apps/docs/content/reference.mdx",
+          path: "packages/docs-content/content/reference.mdx",
           text: "---\nstatus: review\n---",
         },
       ],
@@ -268,14 +268,18 @@ describe("documentation policy", () => {
       expect.objectContaining({
         invariant: "owner-policy",
         owner: "product-owner",
-        target: "apps/docs/content/reference.mdx",
+        target: "packages/docs-content/content/reference.mdx",
       })
     );
   });
 
   test("accepts published MDX and navigation only with exact addressable acceptance records", () => {
-    const acceptedReference = acceptedRecord("apps/docs/content/reference.mdx");
-    const acceptedNavigation = acceptedRecord("apps/docs/navigation.json");
+    const acceptedReference = acceptedRecord(
+      "packages/docs-content/content/reference.mdx"
+    );
+    const acceptedNavigation = acceptedRecord(
+      "packages/docs-content/navigation.json"
+    );
     const report = inspectDocumentation({
       acceptanceRecords: new Map([
         ["docs/documentation-audit/accepted-reference.json", acceptedReference],
@@ -286,14 +290,14 @@ describe("documentation policy", () => {
       ]),
       files: [
         ...completeOwnerFiles.filter(
-          (file) => file.path !== "apps/docs/navigation.json"
+          (file) => file.path !== "packages/docs-content/navigation.json"
         ),
         {
-          path: "apps/docs/content/reference.mdx",
+          path: "packages/docs-content/content/reference.mdx",
           text: "---\nstatus: published\n---",
         },
         {
-          path: "apps/docs/navigation.json",
+          path: "packages/docs-content/navigation.json",
           text: '{"status":"published"}',
         },
         {
@@ -313,11 +317,11 @@ describe("documentation policy", () => {
             ...ownerPolicy.public.statusDecision,
             acceptanceRecords: [
               {
-                path: "apps/docs/content/reference.mdx",
+                path: "packages/docs-content/content/reference.mdx",
                 record: "docs/documentation-audit/accepted-reference.json",
               },
               {
-                path: "apps/docs/navigation.json",
+                path: "packages/docs-content/navigation.json",
                 record: "docs/documentation-audit/accepted-navigation.json",
               },
             ],
@@ -349,7 +353,7 @@ describe("documentation policy", () => {
       files: [
         ...completeOwnerFiles,
         {
-          path: "apps/docs/content/reference.mdx",
+          path: "packages/docs-content/content/reference.mdx",
           text: "---\nstatus: published\n---",
         },
       ],
@@ -363,7 +367,7 @@ describe("documentation policy", () => {
         owner: "product-owner",
         repair:
           "bind this published public path to an addressable accepted record",
-        target: "apps/docs/content/reference.mdx",
+        target: "packages/docs-content/content/reference.mdx",
       })
     );
   });
@@ -373,7 +377,7 @@ describe("documentation policy", () => {
       files: [
         ...completeOwnerFiles,
         {
-          path: "apps/docs/content/reference.mdx",
+          path: "packages/docs-content/content/reference.mdx",
           text: "---\nstatus: published\n---",
         },
       ],
@@ -385,7 +389,7 @@ describe("documentation policy", () => {
             ...ownerPolicy.public.statusDecision,
             acceptanceRecords: [
               {
-                path: "apps/docs/content/reference.mdx",
+                path: "packages/docs-content/content/reference.mdx",
                 record: "docs/documentation-audit/missing-acceptance.json",
               },
             ],
@@ -409,7 +413,7 @@ describe("documentation policy", () => {
       files: [
         ...completeOwnerFiles,
         {
-          path: "apps/docs/content/reference.mdx",
+          path: "packages/docs-content/content/reference.mdx",
           text: "---\nstatus: published\n---",
         },
         {
@@ -425,7 +429,7 @@ describe("documentation policy", () => {
             ...ownerPolicy.public.statusDecision,
             acceptanceRecords: [
               {
-                path: "apps/docs/content/reference.mdx",
+                path: "packages/docs-content/content/reference.mdx",
                 record:
                   "docs/documentation-audit/not-an-acceptance-record.json",
               },
@@ -446,13 +450,15 @@ describe("documentation policy", () => {
 
   test("rejects an accepted record bound to the wrong target", () => {
     const record = "docs/documentation-audit/wrong-target.json";
-    const wrongTarget = acceptedRecord("apps/docs/content/other.mdx");
+    const wrongTarget = acceptedRecord(
+      "packages/docs-content/content/other.mdx"
+    );
     const report = inspectDocumentation({
       acceptanceRecords: new Map([[record, wrongTarget]]),
       files: [
         ...completeOwnerFiles,
         {
-          path: "apps/docs/content/reference.mdx",
+          path: "packages/docs-content/content/reference.mdx",
           text: "---\nstatus: published\n---",
         },
         {
@@ -467,7 +473,7 @@ describe("documentation policy", () => {
           statusDecision: {
             ...ownerPolicy.public.statusDecision,
             acceptanceRecords: [
-              { path: "apps/docs/content/reference.mdx", record },
+              { path: "packages/docs-content/content/reference.mdx", record },
             ],
           },
         },
@@ -478,7 +484,7 @@ describe("documentation policy", () => {
     expect(report.diagnostics).toContainEqual(
       expect.objectContaining({
         repair:
-          "bind the accepted record targetPath exactly to apps/docs/content/reference.mdx",
+          "bind the accepted record targetPath exactly to packages/docs-content/content/reference.mdx",
         target: record,
       })
     );
@@ -486,13 +492,15 @@ describe("documentation policy", () => {
 
   test("rejects a stale accepted-record binding for a draft path", () => {
     const record = "docs/documentation-audit/stale-acceptance.json";
-    const staleAcceptance = acceptedRecord("apps/docs/content/reference.mdx");
+    const staleAcceptance = acceptedRecord(
+      "packages/docs-content/content/reference.mdx"
+    );
     const report = inspectDocumentation({
       acceptanceRecords: new Map([[record, staleAcceptance]]),
       files: [
         ...completeOwnerFiles,
         {
-          path: "apps/docs/content/reference.mdx",
+          path: "packages/docs-content/content/reference.mdx",
           text: "---\nstatus: draft\n---",
         },
         {
@@ -507,7 +515,7 @@ describe("documentation policy", () => {
           statusDecision: {
             ...ownerPolicy.public.statusDecision,
             acceptanceRecords: [
-              { path: "apps/docs/content/reference.mdx", record },
+              { path: "packages/docs-content/content/reference.mdx", record },
             ],
           },
         },
@@ -519,7 +527,7 @@ describe("documentation policy", () => {
       expect.objectContaining({
         repair:
           "remove the stale accepted-record binding or restore the exact published public path",
-        target: "apps/docs/content/reference.mdx",
+        target: "packages/docs-content/content/reference.mdx",
       })
     );
   });
@@ -527,7 +535,9 @@ describe("documentation policy", () => {
   test("rejects duplicate public-path acceptance bindings", () => {
     const firstRecord = "docs/documentation-audit/accepted-reference-1.json";
     const secondRecord = "docs/documentation-audit/accepted-reference-2.json";
-    const acceptedReference = acceptedRecord("apps/docs/content/reference.mdx");
+    const acceptedReference = acceptedRecord(
+      "packages/docs-content/content/reference.mdx"
+    );
     const report = inspectDocumentation({
       acceptanceRecords: new Map([
         [firstRecord, acceptedReference],
@@ -536,7 +546,7 @@ describe("documentation policy", () => {
       files: [
         ...completeOwnerFiles,
         {
-          path: "apps/docs/content/reference.mdx",
+          path: "packages/docs-content/content/reference.mdx",
           text: "---\nstatus: published\n---",
         },
         { path: firstRecord, text: JSON.stringify(acceptedReference) },
@@ -550,11 +560,11 @@ describe("documentation policy", () => {
             ...ownerPolicy.public.statusDecision,
             acceptanceRecords: [
               {
-                path: "apps/docs/content/reference.mdx",
+                path: "packages/docs-content/content/reference.mdx",
                 record: firstRecord,
               },
               {
-                path: "apps/docs/content/reference.mdx",
+                path: "packages/docs-content/content/reference.mdx",
                 record: secondRecord,
               },
             ],
@@ -568,24 +578,26 @@ describe("documentation policy", () => {
       expect.objectContaining({
         repair:
           "keep exactly one accepted-record binding for each published public path",
-        target: "apps/docs/content/reference.mdx",
+        target: "packages/docs-content/content/reference.mdx",
       })
     );
   });
 
   test("rejects one acceptance record bound to duplicate public paths", () => {
     const record = "docs/documentation-audit/shared-acceptance.json";
-    const sharedAcceptance = acceptedRecord("apps/docs/content/reference.mdx");
+    const sharedAcceptance = acceptedRecord(
+      "packages/docs-content/content/reference.mdx"
+    );
     const report = inspectDocumentation({
       acceptanceRecords: new Map([[record, sharedAcceptance]]),
       files: [
         ...completeOwnerFiles,
         {
-          path: "apps/docs/content/reference.mdx",
+          path: "packages/docs-content/content/reference.mdx",
           text: "---\nstatus: published\n---",
         },
         {
-          path: "apps/docs/content/guide.mdx",
+          path: "packages/docs-content/content/guide.mdx",
           text: "---\nstatus: published\n---",
         },
         {
@@ -600,8 +612,8 @@ describe("documentation policy", () => {
           statusDecision: {
             ...ownerPolicy.public.statusDecision,
             acceptanceRecords: [
-              { path: "apps/docs/content/reference.mdx", record },
-              { path: "apps/docs/content/guide.mdx", record },
+              { path: "packages/docs-content/content/reference.mdx", record },
+              { path: "packages/docs-content/content/guide.mdx", record },
             ],
           },
         },

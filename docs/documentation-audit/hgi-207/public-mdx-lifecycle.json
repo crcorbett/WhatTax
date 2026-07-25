@@ -1,10 +1,10 @@
 {
   "id": "DEC-TAXKIT-HGI-207-PUBLIC-MDX-LIFECYCLE",
   "state": "accepted",
-  "semanticOwner": "TaxKit product owner with the apps/docs public-doc owner",
+  "semanticOwner": "TaxKit product owner with the packages/docs-content public-doc owner",
   "evidence": [
-    "The source receipt records that apps/docs/navigation.json and all 61 tracked public MDX files declare draft.",
-    "apps/docs/navigation.schema.json and @taxkit/docs-content validate status representation while the owner policy owns lifecycle consequences.",
+    "The retained source receipt records that the pre-relocation apps/docs navigation and all 61 tracked public MDX files declared draft; the current owner paths are packages/docs-content/navigation.json and packages/docs-content/content.",
+    "packages/docs-content/navigation.schema.json and @taxkit/docs-content validate status representation while the owner policy owns lifecycle consequences.",
     "docs/README.md separates public docs from maintainer-document lifecycle policy."
   ],
   "rejectedAlternatives": [

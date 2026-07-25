@@ -14,7 +14,7 @@ import {
 import type { Effect as EffectType } from "effect";
 import { parse as parseYaml } from "yaml";
 
-import navigationRepresentation from "../../../../apps/docs/navigation.json";
+import navigationRepresentation from "../../navigation.json";
 import { DocsSourceError } from "../errors.js";
 import {
   DocsNavigation,
@@ -25,10 +25,10 @@ import {
 } from "../schemas.js";
 import type { DocsNavigationLeaf, DocsValidationResult } from "../schemas.js";
 
-const docsRoot = "apps/docs";
-const contentRoot = "apps/docs/content";
-const examplesRoot = "apps/docs/examples";
-const navigationSource = "apps/docs/navigation.json";
+const docsRoot = "packages/docs-content";
+const contentRoot = "packages/docs-content/content";
+const examplesRoot = "packages/docs-content/examples";
+const navigationSource = "packages/docs-content/navigation.json";
 
 const repoRoot = resolve(import.meta.dirname, "../../../..");
 const absoluteDocsRoot = join(repoRoot, docsRoot);

@@ -1,7 +1,7 @@
 {
   "$schema": "./navigation.schema.json",
   "status": "draft",
-  "contentRoot": "apps/docs/content",
+  "contentRoot": "packages/docs-content/content",
   "primaryNavigation": [
     {
       "title": "Start",

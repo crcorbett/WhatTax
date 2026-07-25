@@ -70,7 +70,7 @@ export type DocsNavigationItem = typeof DocsNavigationItem.Type;
 
 export const DocsNavigation = Schema.Struct({
   $schema: Schema.optional(Schema.String),
-  contentRoot: Schema.Literal("apps/docs/content"),
+  contentRoot: Schema.Literal("packages/docs-content/content"),
   primaryNavigation: Schema.Array(DocsNavigationItem),
   status: DocsContentStatus,
 });

@@ -123,11 +123,11 @@ shutdown and platform serving for the implemented API app.
 
 `packages/docs-content`
 : Implemented private source-only content package. It owns TaxKit docs
-  frontmatter, meta, navigation, validation issues, tagged docs errors,
-  `DocsContentService`, the Fumadocs `source.config.ts` for
-  `apps/docs/content` and the generated `.source/*` boundary. It can read raw
-  MDX source text for validation policy, but app routes should use its service
-  and client exports instead of importing source files directly.
+  authored MDX, navigation, examples, frontmatter, meta, validation issues,
+  tagged docs errors, `DocsContentService`, the Fumadocs `source.config.ts`
+  and the generated `.source/*` boundary. It can read raw MDX source text for
+  validation policy, but app routes should use its service and client exports
+  instead of importing source files directly.
 
 `packages/docs-fumadocs`
 : Implemented private reusable package for generic Fumadocs integration. It

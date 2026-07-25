@@ -124,7 +124,7 @@ const expected = {
     command: ["bun", "run", "docs:validate"],
     recovery:
       "Restore the authored navigation source and rerun docs-validation.",
-    target: "apps/docs/navigation.json",
+    target: "packages/docs-content/navigation.json",
   },
   "public-export": {
     check: "downstream-consumer",

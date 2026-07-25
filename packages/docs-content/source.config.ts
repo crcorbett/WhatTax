@@ -11,7 +11,7 @@ const docsFrontmatterSchema = effectSchemaToStandardSchema(DocsPageFrontmatter);
 const docsMetaSchema = effectSchemaToStandardSchema(DocsMeta);
 
 const docsCollection = defineFumadocsDocsWithMeta({
-  dir: "../../apps/docs/content",
+  dir: "./content",
   frontmatterSchema: docsFrontmatterSchema,
   metaSchema: docsMetaSchema,
 });

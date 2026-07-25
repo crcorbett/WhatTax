@@ -21,22 +21,19 @@ on the open-source tax engine and avoid downstream private-product specifics.
 : Public documentation site. It owns the TanStack Start route runtime, app
   shell, app-specific MDX component composition and browser rendering.
 
-`apps/docs/content`
+`packages/docs-content/content`
 : Public MDX content root. It owns the Start, SDK, API, Guides, Concepts,
   Contributing and Reference section directories.
 
-`apps/docs/navigation.json`
+`packages/docs-content/navigation.json`
 : Public docs navigation contract. It owns top-level section order, section
-  source files, stable paths and primary reader metadata. The file remains
-  authored in the app so contributors can review route structure beside the
-  content, but it is decoded and enforced by `@taxkit/docs-content`.
+  source files, stable paths and primary reader metadata. It is authored,
+  decoded and enforced beside the package-owned content and examples.
 
 `packages/docs-content`
 : Private source-only package for TaxKit docs frontmatter, meta, navigation,
-  validation policy, tagged docs errors, generated Fumadocs source access and
-  the content service. It bundles the app-authored navigation representation
-  for built runtimes and decodes it through the package-owned navigation
-  schema.
+  authored MDX, examples, validation policy, tagged docs errors, generated
+  Fumadocs source access and the content service.
 
 `packages/docs-fumadocs`
 : Private reusable package for generic Fumadocs configuration, Effect Schema to
@@ -66,8 +63,8 @@ browser
     -> DocsContentService
       -> @taxkit/docs-fumadocs source adapter
         -> packages/docs-content/.source/server
-          -> apps/docs/content/**/*.mdx
-      -> apps/docs/navigation.json
+          -> packages/docs-content/content/**/*.mdx
+      -> packages/docs-content/navigation.json
     -> @taxkit/docs-content/client
       -> Fumadocs compiled MDX module
     -> @taxkit/docs-fumadocs/render primitives

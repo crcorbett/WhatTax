@@ -14,7 +14,9 @@ tombstone: false
 Live implementation plans belong here while work is in progress. Maintainer
 lifecycle is owned by [`../../README.md`](../../README.md).
 
-There are no active execution plans.
+Active execution plans:
+
+- [TaxKit docs application architecture](./docs-application-architecture.md)
 
 Completed harness work is retained under
 [`../completed/harness-foundation-improvements.md`](../completed/harness-foundation-improvements.md)
