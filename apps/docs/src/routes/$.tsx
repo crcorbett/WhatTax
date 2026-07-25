@@ -5,6 +5,12 @@ import type {
 } from "@taxkit/docs-content/schemas";
 import { Array, Match, Option, Result, pipe } from "effect";
 
+import {
+  DocsRecoverableError,
+  DocsRouteError,
+  DocsRouteNotFound,
+  DocsRoutePending,
+} from "#/components/docs-route-states";
 import { loadDocsPage } from "#/lib/docs/loaders";
 import { docsPageRouteBoundary } from "#/lib/docs/route-boundary";
 import { MdxDocument } from "#/lib/mdx/client-loader";
@@ -17,28 +23,13 @@ const DocsRouteFailure = ({ error }: { readonly error: DocsPageRouteError }) =>
   Match.value(error).pipe(
     Match.tags({
       DocsContentPreloadError: (preloadError) => (
-        <section className="docs-error" data-testid="loader-error">
-          <h1>Docs page is unavailable</h1>
-          <p>{preloadError.message}</p>
-        </section>
-      ),
-      DocsPageNotFoundError: () => (
-        <section className="docs-error" data-testid="loader-error">
-          <h1>Docs page not found</h1>
-          <p>The requested documentation page does not exist.</p>
-        </section>
+        <DocsRecoverableError message={preloadError.message} />
       ),
       DocsRouteTransportError: () => (
-        <section className="docs-error" data-testid="loader-error">
-          <h1>Docs page is unavailable</h1>
-          <p>The documentation route data could not be read.</p>
-        </section>
+        <DocsRecoverableError message="The documentation route data could not be read." />
       ),
       DocsSourceError: () => (
-        <section className="docs-error" data-testid="loader-error">
-          <h1>Docs page is unavailable</h1>
-          <p>The documentation source could not be loaded.</p>
-        </section>
+        <DocsRecoverableError message="The documentation source could not be loaded." />
       ),
     }),
     Match.exhaustive
@@ -130,5 +121,9 @@ export const Route = createFileRoute("/$")({
       ),
     });
   },
+  errorComponent: DocsRouteError,
   loader: loadDocsPage,
+  notFoundComponent: DocsRouteNotFound,
+  pendingComponent: DocsRoutePending,
+  pendingMs: 150,
 });

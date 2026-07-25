@@ -1,3 +1,5 @@
+import { fileURLToPath } from "node:url";
+
 import {
   defineFumadocsConfig,
   defineFumadocsDocsWithMeta,
@@ -11,7 +13,7 @@ const docsFrontmatterSchema = effectSchemaToStandardSchema(DocsPageFrontmatter);
 const docsMetaSchema = effectSchemaToStandardSchema(DocsMeta);
 
 const docsCollection = defineFumadocsDocsWithMeta({
-  dir: "./content",
+  dir: fileURLToPath(new URL("content", import.meta.url)),
   frontmatterSchema: docsFrontmatterSchema,
   metaSchema: docsMetaSchema,
 });

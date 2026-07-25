@@ -3,19 +3,13 @@ import {
   createRootRoute,
   createRoute,
   createRouter,
+  notFound,
   Outlet,
   RouterProvider,
 } from "@tanstack/react-router";
 import type { ErrorComponentProps } from "@tanstack/react-router";
-import {
-  DocsPageNotFoundError,
-  DocsSourceError,
-} from "@taxkit/docs-content/errors";
-import {
-  DocsNavigation,
-  DocsPagePath,
-  DocsSourcePath,
-} from "@taxkit/docs-content/schemas";
+import { DocsSourceError } from "@taxkit/docs-content/errors";
+import { DocsNavigation, DocsSourcePath } from "@taxkit/docs-content/schemas";
 import { Effect, Match, Result, Schema } from "effect";
 import { flushSync } from "react-dom";
 import { createRoot } from "react-dom/client";
@@ -62,17 +56,9 @@ const harnessRoute = createRoute({
           )
         )
       ),
-      Match.when("not-found-error", () =>
-        Effect.runPromise(
-          docsHomeRouteBoundary.encodeExit(
-            Effect.fail(
-              new DocsPageNotFoundError({
-                path: Schema.decodeUnknownSync(DocsPagePath)("/missing"),
-              })
-            )
-          )
-        )
-      ),
+      Match.when("not-found-error", () => {
+        throw notFound();
+      }),
       Match.when("source-error", () =>
         Effect.runPromise(
           docsHomeRouteBoundary.encodeExit(
@@ -118,9 +104,6 @@ const HarnessRoute = () => {
           DocsContentPreloadError: ({ _tag }) => (
             <div data-testid="expected-loader-error">{_tag}</div>
           ),
-          DocsPageNotFoundError: ({ _tag }) => (
-            <div data-testid="expected-loader-error">{_tag}</div>
-          ),
           DocsRouteTransportError: ({ _tag }) => (
             <div data-testid="transport-loader-error">{_tag}</div>
           ),
@@ -138,6 +121,9 @@ const routeTree = rootRoute.addChildren([
   harnessRoute.update({
     component: HarnessRoute,
     errorComponent: FrameworkError,
+    notFoundComponent: () => (
+      <div data-testid="framework-not-found">Not found</div>
+    ),
   }),
 ]);
 
@@ -228,7 +214,6 @@ describe("docs route boundary browser harness", () => {
 
   test.each([
     ["preload-error", "DocsContentPreloadError"],
-    ["not-found-error", "DocsPageNotFoundError"],
     ["source-error", "DocsSourceError"],
   ])("renders the %s expected failure in route UI", (scenario, tag) =>
     Effect.runPromise(
@@ -245,6 +230,21 @@ describe("docs route boundary browser harness", () => {
       )
     )
   );
+
+  test("routes missing pages to the TanStack not-found component", () =>
+    Effect.runPromise(
+      withRenderedHarnessRoute("/not-found-error", (render) =>
+        Effect.sync(() => {
+          expect(
+            render.host.querySelector('[data-testid="framework-not-found"]')
+          ).toHaveProperty("textContent", "Not found");
+          expect(
+            render.host.querySelector('[data-testid="expected-loader-error"]')
+          ).toBeNull();
+          expectCleanConsole(render);
+        })
+      )
+    ));
 
   test("renders malformed transport in route UI", () =>
     Effect.runPromise(

@@ -184,6 +184,7 @@ const runtimeBoundaryFiles = [
 const processBoundaryFiles = [
   "apps/api/scripts/smoke-public-routes.runtime.ts",
   "apps/docs/scripts/check-import-boundaries.ts",
+  "apps/docs/scripts/test-built.tsx",
   "apps/docs/vitest.browser.config.ts",
   "packages/sdk/typescript/scripts/check-import-boundaries.ts",
   "tools/oxlint/fixtures/effect-accepted.ts",
@@ -197,6 +198,7 @@ const processBoundaryFiles = [
 const consoleBoundaryFiles = [
   "apps/api/scripts/smoke-public-routes.runtime.ts",
   "apps/docs/scripts/check-import-boundaries.ts",
+  "apps/docs/scripts/test-built.tsx",
   "packages/docs-content/src/validate.runtime.ts",
   "packages/scripts/src/release-readiness/present.runtime.ts",
   "packages/sdk/typescript/scripts/check-import-boundaries.ts",
@@ -212,6 +214,7 @@ const consoleBoundaryFiles = [
 const bunAdapterFiles = [
   "apps/api/src/server.ts",
   "apps/docs/scripts/check-import-boundaries.ts",
+  "apps/docs/scripts/test-built.tsx",
   "packages/sdk/typescript/scripts/check-import-boundaries.ts",
   "tools/oxlint/fixtures/bun-accepted.ts",
   "tools/oxlint/no-bare-effect-try-promise.test.ts",

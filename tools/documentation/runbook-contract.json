@@ -5,7 +5,8 @@
   "reviewTrigger": "release command, Changesets, package graph, HGI-203 evidence, recovery, or authority-boundary change",
   "acceptedHandoff": {
     "packet": "docs/evidence/releases/HGI-203-local.json",
-    "journeyInventory": "docs/verification/critical-journeys.json",
+    "historicalJourneyInventory": "docs/evidence/releases/HGI-203-critical-journeys.json",
+    "currentJourneyInventory": "docs/verification/critical-journeys.json",
     "acceptedSummary": "docs/evidence/releases/HGI-203-accepted-attempt.json",
     "failedProvenance": "docs/evidence/releases/HGI-203-failed-attempts.json",
     "validationReceipt": "docs/documentation-audit/HGI-203-validation.json"
@@ -178,6 +179,7 @@
       ],
       "evidencePaths": [
         "docs/evidence/releases/HGI-203-local.json",
+        "docs/evidence/releases/HGI-203-critical-journeys.json",
         "docs/verification/critical-journeys.json",
         "docs/evidence/releases/HGI-203-accepted-attempt.json",
         "docs/evidence/releases/HGI-203-failed-attempts.json",

@@ -1,4 +1,5 @@
 import "@tanstack/react-start/server-only";
+import { notFound } from "@tanstack/react-router";
 import { DocsSourceError } from "@taxkit/docs-content/errors";
 import { DocsPagePath } from "@taxkit/docs-content/schemas";
 import { DocsContentService } from "@taxkit/docs-content/service";
@@ -61,6 +62,7 @@ export const loadDocsPageServer = (data: unknown) =>
           };
         })
       ),
+      Effect.catchTag("DocsPageNotFoundError", () => Effect.die(notFound())),
       docsPageRouteBoundary.encodeExit
     )
   );

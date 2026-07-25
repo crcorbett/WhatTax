@@ -19,7 +19,7 @@ activity counts are not efficacy.
 | Intervention | Decision | Evidence owner | Review trigger |
 | --- | --- | --- | --- |
 | Current maintainer router and lifecycle routing | Retain | `docs/README.md`, implemented harness-foundation SPEC, and completed plan route | stale-owner contradiction or lifecycle change |
-| Five critical journeys and bounded release evidence | Retain | `docs/verification/critical-journeys.json` and HFI-004 epoch validation | consumer boundary or oracle change |
+| Current critical journeys and bounded historical release evidence | Retain | `docs/verification/critical-journeys.json`, content-addressed `docs/evidence/releases/HGI-203-critical-journeys.json` and HFI-004 epoch validation | current consumer boundary, historical snapshot digest or oracle change |
 | Four canonical runbooks and authority stops | Retain | `docs/runbooks/README.md`, `docs/operations/authority-model.md`, and preserved HGI-204/HGI-205 validation | operation, principal, or recovery change |
 | Portable repo-local skills, profile, and deterministic gates | Retain | `.agents/skills/**`, `tools/skills/canonical-skill-baseline.json`, `docs/verification/repository-harness-profile.json`, `tools/governance/**`, and HFI-004 epoch validation | skill, profile, receipt, link, or enforcement change |
 | Any causal comparison or ablation claim | Inconclusive | independent grader result | condition-blind comparison is available |

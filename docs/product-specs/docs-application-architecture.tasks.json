@@ -30,8 +30,8 @@
       "bun run --filter=docs check-types",
       "bun run docs:build",
       "bun run --filter=docs test:browser",
-      "the DOCS-APP-004-owned built-app harness invocation, after it is added to apps/docs/package.json and backfilled into this task list",
-      "the verified screenshot-mode invocation of that harness on the exact clean final candidate, after it is backfilled",
+      "bun run --filter=docs test:built",
+      "bun run --filter=docs test:built -- --screenshots --candidate=<full-candidate-commit>",
       "bun run knip",
       "bun run knip:production",
       "bun run test:skills",
@@ -100,19 +100,22 @@
     },
     {
       "surface": "runbooks-operations",
-      "decision": "not_applicable",
+      "decision": "change_required",
       "paths": [
         "docs/runbooks/README.md",
-        "docs/operations/authority-model.md",
-        "tools/documentation/runbook-contract.json"
+        "docs/runbooks/release-readiness.md",
+        "tools/documentation/runbook-contract.json",
+        "tools/documentation/runbook-check.runtime.ts",
+        "tools/documentation/runbook-policy.ts"
       ],
-      "acceptance": "No operational procedure, environment, credential, deployment or provider action changes; current runbook and authority controls remain untouched."
+      "acceptance": "The approved DOCS-APP-004 journey-epoch amendment binds immutable HGI-203 evidence to an exact content-addressed historical inventory while independently validating the evolving current journey owner. Original packet, summary, attempt, manifests and validation receipt bytes remain unchanged; no command, environment, credential, deployment, recovery, provider or authority-stop change."
     },
     {
       "surface": "proof-evidence",
       "decision": "change_required",
       "paths": [
         "docs/verification/critical-journeys.json",
+        "docs/evidence/releases/HGI-203-critical-journeys.json",
         "docs/architecture/testing-and-quality.md",
         "apps/docs/src/**/*.test.*",
         "apps/docs/test/**",
@@ -530,7 +533,7 @@
     },
     {
       "id": "DOCS-APP-004",
-      "status": "pending",
+      "status": "completed",
       "acceptedFindingIds": [
         "TDA-004",
         "TDA-P02",
@@ -559,7 +562,8 @@
         "prove initial SSR content before JavaScript and hydration without mismatch",
         "use ephemeral local ports and command-owned process cleanup",
         "retain focused route-boundary tests for codec behavior without misclaiming them as built proof",
-        "after its exact invocation passes, backfill that invocation into the SPEC, sibling tasks, app README, frontend/testing architecture and critical-journey owner"
+        "after its exact invocation passes, backfill that invocation into the SPEC, sibling tasks, app README, frontend/testing architecture and critical-journey owner",
+        "apply the separately approved narrow journey-epoch amendment so immutable HGI-203 validates against its exact historical snapshot while the evolving current critical-journey owner validates independently"
       ],
       "outputs": [
         "framework-native app/root not-found, pending and error components",
@@ -569,15 +573,16 @@
         "apps/docs/test/fixtures/visual-states.ts with narrow pending and recoverable-error inputs",
         "initial SSR body, hydration, direct HTTP 404 and client missing-page assertions",
         "the exact passing harness invocation synchronized across the SPEC, sibling tasks, apps/docs/README.md, frontend/testing architecture and critical-journey owner",
+        "content-addressed HGI-203 historical journey snapshot plus schema and negative proof that current-owner substitution cannot satisfy the old packet digest",
         "synchronized SPEC/tasks/active plan"
       ],
-      "implementationPrompt": "Implement only DOCS-APP-004. Read the target initial SSR and missing/failure call graphs, installed TanStack Start/Router types and current route-boundary tests before editing. Map only the canonical missing-page error to framework notFound; keep expected source/preload failures encoded and keep defects/interruptions in the framework error channel. Add the smallest owning pending/not-found/error surfaces with stable shell behavior. Create one app-owned built-production HTTP/Playwright harness script in apps/docs/package.json using an ephemeral local port, readiness polling and command-owned cleanup. Give it SSR, hydration, 404, error and bounded screenshot modes. Choose its name from the implemented package contract rather than this draft. This task cannot complete until the script exists, its exact invocation passes, and that invocation is backfilled in the same slice into the SPEC, sibling tasks, apps/docs/README.md, testing architecture and critical-journey owner. Give deterministic pending and recoverable-error states one test-fixture owner and compose them only in the harness; do not add public evidence routes, environment switches or a generic scenario framework. Prove response body and status over HTTP before using Playwright for hydration or visual review. Keep route transport/outcome selection in routes, retry coordination in an app container and readonly rendering in leaves. Do not claim screenshots prove status, SSR, hydration or console behavior. Do not claim deployment or public-site behavior. Stop after primary-owner review of both HTTP and browser evidence.",
+      "implementationPrompt": "Implement only DOCS-APP-004. Read the target initial SSR and missing/failure call graphs, installed TanStack Start/Router types and current route-boundary tests before editing. Map only the canonical missing-page error to framework notFound; keep expected source/preload failures encoded and keep defects/interruptions in the framework error channel. Add the smallest owning pending/not-found/error surfaces with stable shell behavior. Create one app-owned built-production HTTP/Playwright harness script in apps/docs/package.json using an ephemeral local port, readiness polling and command-owned cleanup. Give it SSR, hydration, 404, error and bounded screenshot modes. Choose its name from the implemented package contract rather than this draft. This task cannot complete until the script exists, its exact invocation passes, and that invocation is backfilled in the same slice into the SPEC, sibling tasks, apps/docs/README.md, testing architecture and critical-journey owner. Apply the separately authorized governance amendment by retaining the exact HGI-203 journey bytes as a historical content-addressed snapshot and validating current journeys independently; never rewrite the old packet, summary, attempt, manifests or validation receipt and never weaken the digest oracle. Give deterministic pending and recoverable-error states one test-fixture owner and compose them only in the harness; do not add public evidence routes, environment switches or a generic scenario framework. Prove response body and status over HTTP before using Playwright for hydration or visual review. Keep route transport/outcome selection in routes, retry coordination in an app container and readonly rendering in leaves. Do not claim screenshots prove status, SSR, hydration or console behavior. Do not claim deployment or public-site behavior. Stop after primary-owner review of both HTTP and browser evidence.",
       "mandatoryVerification": [
         "bun run test:docs-boundaries",
         "bun run --filter=docs check-types",
         "bun run docs:build",
         "bun run --filter=docs test:browser",
-        "the DOCS-APP-004-owned built-app harness invocation after its package script exists and its exact verified invocation is backfilled",
+        "bun run --filter=docs test:built",
         "focused HTTP assertion that a known page response contains its MDX content before browser JavaScript",
         "focused HTTP assertion that a missing page returns status 404 and not 200",
         "focused built-browser assertion that hydration emits no mismatch, error or warning diagnostics",
@@ -585,6 +590,9 @@
         "provisional built-harness capture of pending, recoverable-error and not-found visible states using the exact SPEC routes/fixtures and viewports; final retained screenshots remain DOCS-APP-006-owned",
         "process cleanup and ephemeral-port audit for the built harness",
         "rg/readback proving the created package script and its exact passing invocation are backfilled into the SPEC, sibling tasks, apps/docs/README.md, testing architecture and critical-journey owner",
+        "exact SHA-256 equality between docs/evidence/releases/HGI-203-critical-journeys.json and the immutable packet journeyInventorySha256",
+        "negative runbook-policy test rejecting substitution of the evolving current inventory for the HGI-203 historical snapshot",
+        "bun run check:runbooks",
         "bun run check:docs",
         "bun run check:repository-paths",
         "bun run verification",
@@ -672,7 +680,7 @@
         "bun run --filter=docs check-types",
         "bun run docs:build",
         "bun run --filter=docs test:browser",
-        "the verified DOCS-APP-004-owned built-app harness invocation backfilled by DOCS-APP-004",
+        "bun run --filter=docs test:built",
         "focused link-classification tests covering internal path, .mdx path, query, fragment, external URL, mail and download cases",
         "built-browser assertion that sidebar and MDX internal links produce zero document requests and reach the expected route content",
         "built-browser assertion that focus moves to the named main/heading target after client navigation and initial hydration focus is not stolen",
@@ -798,9 +806,9 @@
         "bun run --filter=docs check-types",
         "bun run docs:build",
         "bun run --filter=docs test:browser",
-        "the verified DOCS-APP-004-owned built-app harness invocation backfilled by DOCS-APP-004",
+        "bun run --filter=docs test:built",
         "clean committed candidate precondition with full commit identity and no tracked or untracked implementation changes before screenshot capture",
-        "the verified screenshot-mode invocation of the DOCS-APP-004-owned built-app harness, as backfilled by DOCS-APP-004",
+        "bun run --filter=docs test:built -- --screenshots --candidate=<full-candidate-commit>",
         "manifest validation for full candidate commit, clean precondition, built-output digest, capture command, browser/version, timestamp, repository-relative route/fixture IDs, viewport, expected/observed visible postconditions, PNG digests, reviewer, limitations and non-claims",
         "secret/path safety audit proving no credentials, cookies, authorization data, private content, absolute checkout path, personal hostname or revealing browser chrome appears in the manifest or images",
         "primary-owner visual inspection of every required image; reduced-motion is either captured when a visually relevant transition exists or recorded not_applicable with code and behavioral evidence",

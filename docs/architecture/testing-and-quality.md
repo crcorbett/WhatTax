@@ -79,6 +79,7 @@ bun run docs:build
 bun run test:docs-boundaries
 bun run --filter=docs test
 bun run --filter=docs test:browser
+bun run --filter=docs test:built
 bun run --filter=@taxkit/docs-content test
 ```
 
@@ -112,7 +113,13 @@ route UI, framework error boundaries and console cleanliness, but it does not
 prove SSR or hydration. Prove initial SSR, hydration and client navigation
 separately against the built app on `https://docs.taxkit.localhost`, including
 a successful server-function response and no document request during the client
-transition.
+transition. `bun run --filter=docs test:built` is that built-production HTTP
+and Playwright proof: it serves the generated Nitro/Vercel function and static
+assets on an ephemeral local port, asserts SSR response content and HTTP 404
+before browser inspection, then proves clean hydration, server-function
+navigation, pending and client not-found behavior without another document
+request. The command owns server/browser cleanup. Its screenshot mode is
+supplemental visual evidence only.
 
 Public API route work should also capture contract evidence from the standalone
 API app:

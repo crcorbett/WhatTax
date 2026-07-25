@@ -38,7 +38,10 @@ Those belong in the `apps/docs` runtime.
 
 ## Runtime shape
 
-`fumadocs-mdx` compiles `source.config.ts` into `.source/`. Server-only package
+`fumadocs-mdx` compiles `source.config.ts` into `.source/`. The collection root
+is resolved from `source.config.ts` through its module URL because generation
+also runs from the docs app working directory; generated imports remain
+checkout-relative and portable in either consumer. Server-only package
 code supplies one TaxKit generated-collection adapter to
 `@taxkit/docs-fumadocs/live`. `DocsContentServiceLive` requires the generic
 `FumadocsSource` service, decodes its generic representation into canonical

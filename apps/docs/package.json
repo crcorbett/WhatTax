@@ -13,7 +13,8 @@
     "check-import-boundaries": "bun run ./scripts/check-import-boundaries.ts",
     "preview": "portless run --name docs.taxkit vite preview",
     "test": "vitest run --config vitest.server.config.ts",
-    "test:browser": "vitest run --config vitest.browser.config.ts"
+    "test:browser": "vitest run --config vitest.browser.config.ts",
+    "test:built": "bun run build && bun run ./scripts/test-built.tsx"
   },
   "dependencies": {
     "@tanstack/react-router": "catalog:",

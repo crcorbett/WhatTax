@@ -54,18 +54,18 @@
     {
       "id": "taxkit-docs-runtime",
       "actorOrConsumer": "Documentation-site reader",
-      "boundary": "Local docs content, built SSR, hydration, HTTP status, navigation, server-function, recoverable-error, and console behavior",
+      "boundary": "Local docs content, render, navigation, server-function, recoverable-error, and console behavior",
       "startingState": "Docs dependencies and the repository browser runtime are available locally.",
       "inputs": ["Validated MDX/navigation sources", "Local browser journey fixtures"],
-      "stepsOrProcedureOwner": "bun run docs:validate then bun run --filter=docs test:browser then bun run --filter=docs test:built",
-      "expectedBehavior": ["Validated content renders in the generated production app, the initial response contains the requested MDX, hydration is diagnostic-free, client navigation crosses the server-function transport without a document reload, expected failures remain recoverable, and missing pages return HTTP 404 with framework-native not-found UI."],
+      "stepsOrProcedureOwner": "bun run docs:validate then bun run --filter=docs test:browser",
+      "expectedBehavior": ["Local rendering, navigation, server functions, recoverable errors, and console cleanliness match the repository-owned fixtures."],
       "expectedSideEffects": ["Local build and browser artifacts only."],
       "preservedInvariants": ["No network publication or deployed-site mutation."],
-      "oracle": "Direct HTTP assertions establish SSR body and 404 status before Playwright observes hydration, server-function navigation, pending, not-found and error/console states; screenshots are supplemental only.",
+      "oracle": "The local browser harness observes route behavior and error/console states rather than a static snapshot alone.",
       "environment": "Local TaxKit checkout",
       "authority": "none",
       "evidence": ["The docs-validation and docs-browser detail digests in the retained release attempt."],
-      "nonClaims": ["Local built/browser proof does not establish deployment, provider routing, a public URL, production behavior, or public availability."]
+      "nonClaims": ["Local browser proof does not establish deployed SSR, hydration, production behavior, or public availability."]
     },
     {
       "id": "taxkit-release-closure",

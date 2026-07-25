@@ -48,7 +48,7 @@
     },
     "apps/docs": {
       "entry": [
-        "scripts/check-import-boundaries.ts",
+        "scripts/**/*.{ts,tsx}",
         "src/lib/docs/route-boundary.type-test.ts",
         "src/**/*.test.ts",
         "src/**/*.server.ts",
@@ -59,7 +59,8 @@
         "vite.config.ts"
       ],
       "project": [
-        "scripts/**/*.ts",
+        "scripts/**/*.{ts,tsx}",
+        "test/**/*.ts",
         "src/**/*.{ts,tsx}",
         "vitest.server.config.ts",
         "vite.config.ts"

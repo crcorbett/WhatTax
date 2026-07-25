@@ -5,14 +5,16 @@ import type {
 } from "@taxkit/docs-content/schemas";
 import { Array, Result, pipe } from "effect";
 
+import {
+  DocsRecoverableError,
+  DocsRouteError,
+  DocsRoutePending,
+} from "#/components/docs-route-states";
 import { loadDocsHome } from "#/lib/docs/loaders";
 import { docsHomeRouteBoundary } from "#/lib/docs/route-boundary";
 
 const DocsHomeFailure = () => (
-  <section className="docs-error" data-testid="loader-error">
-    <h1>Docs are unavailable</h1>
-    <p>The documentation source could not be loaded.</p>
-  </section>
+  <DocsRecoverableError message="The documentation source could not be loaded." />
 );
 
 const DocsHomeContent = ({
@@ -63,5 +65,8 @@ export const Route = createFileRoute("/")({
       ),
     });
   },
+  errorComponent: DocsRouteError,
   loader: loadDocsHome,
+  pendingComponent: DocsRoutePending,
+  pendingMs: 150,
 });

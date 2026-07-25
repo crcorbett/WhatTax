@@ -9,8 +9,9 @@ import { Effect, Record as EffectRecord, Schema } from "effect";
 
 import hgi203ValidationJson from "../../docs/documentation-audit/HGI-203-validation.json";
 import acceptedSummaryJson from "../../docs/evidence/releases/HGI-203-accepted-attempt.json";
+import historicalJourneyInventoryJson from "../../docs/evidence/releases/HGI-203-critical-journeys.json";
 import packetJson from "../../docs/evidence/releases/HGI-203-local.json";
-import journeyInventoryJson from "../../docs/verification/critical-journeys.json";
+import currentJourneyInventoryJson from "../../docs/verification/critical-journeys.json";
 import contractJson from "./runbook-contract.json";
 import { inspectRunbookContract } from "./runbook-policy.js";
 import type { RunbookInspection } from "./runbook-policy.js";
@@ -80,7 +81,12 @@ const validInspection = async (): Promise<RunbookInspection> => {
       decodeValidation(hgi203ValidationJson),
       Effect.runPromise(
         Schema.decodeUnknownEffect(ReleaseJourneyInventory)(
-          journeyInventoryJson
+          historicalJourneyInventoryJson
+        )
+      ),
+      Effect.runPromise(
+        Schema.decodeUnknownEffect(ReleaseJourneyInventory)(
+          currentJourneyInventoryJson
         )
       ),
     ]);
@@ -120,7 +126,7 @@ const validInspection = async (): Promise<RunbookInspection> => {
     contract,
     files,
     hgi203Validation,
-    journeyInventorySha256: packet.journeyInventorySha256,
+    historicalJourneyInventorySha256: packet.journeyInventorySha256,
     packet,
     packetSha256: `sha256:${hgi203Validation.candidate.packetSha256.replace(/^sha256:/u, "")}`,
     rootScripts: new Set([
@@ -289,6 +295,21 @@ describe("runbook policy", () => {
       inspectRunbookContract({ ...inspection, hgi203Validation })
     ).toContainEqual(
       expect.objectContaining({ invariant: "accepted-handoff" })
+    );
+  });
+
+  test("rejects substituting the evolving current journey owner for the historical HGI-203 snapshot", async () => {
+    const inspection = await validInspection();
+    expect(
+      inspectRunbookContract({
+        ...inspection,
+        historicalJourneyInventorySha256: `sha256:${"0".repeat(64)}`,
+      })
+    ).toContainEqual(
+      expect.objectContaining({
+        invariant: "accepted-handoff",
+        target: "docs/evidence/releases/HGI-203-local.json",
+      })
     );
   });
 

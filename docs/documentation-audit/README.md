@@ -44,14 +44,17 @@ Accepted HGI-203 release-readiness candidate and Git receipt:
 
 - [`HGI-203-candidate.json`](HGI-203-candidate.json)
 - [`HGI-203-validation.json`](HGI-203-validation.json)
+- [`../evidence/releases/HGI-203-critical-journeys.json`](../evidence/releases/HGI-203-critical-journeys.json)
 - [`../verification/critical-journeys.json`](../verification/critical-journeys.json)
 - [`../evidence/releases/HGI-203-local.json`](../evidence/releases/HGI-203-local.json)
 - [`../evidence/releases/HGI-203-failed-attempts.json`](../evidence/releases/HGI-203-failed-attempts.json)
 
 The accepted local packet passed the strict boundary, one exact final
 release-readiness attempt, independent acceptance and semantic Git readback.
-Its explicit non-claims still exclude publication, tags, releases,
-deployments, providers and public availability.
+Its content-addressed journey snapshot retains the exact inventory that attempt
+observed; the current inventory may evolve without rewriting or re-attributing
+the historical packet. Its explicit non-claims still exclude publication,
+tags, releases, deployments, providers and public availability.
 
 Accepted HGI-204 operational-runbook candidate and Git receipt:
 

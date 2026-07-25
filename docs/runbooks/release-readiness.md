@@ -3,8 +3,8 @@ document_type: runbook
 lifecycle: current
 authority: canonical
 owner: taxkit-release-readiness-operation-owner
-last_reviewed: 2026-07-22
-review_trigger: release graph, journey inventory, proof schema, package graph, or accepted HGI-203 evidence change
+last_reviewed: 2026-07-25
+review_trigger: release graph, current or historical journey inventory, proof schema, package graph, or accepted HGI-203 evidence change
 ---
 
 # Release readiness
@@ -20,13 +20,17 @@ scoped candidate packet. It does not include versioning or any external state.
 ## Preconditions
 
 - Read `docs/evidence/releases/HGI-203-local.json`,
+  `docs/evidence/releases/HGI-203-critical-journeys.json`,
   `docs/verification/critical-journeys.json`,
   `docs/evidence/releases/HGI-203-accepted-attempt.json`,
   `docs/evidence/releases/HGI-203-failed-attempts.json`, and
   `docs/documentation-audit/HGI-203-validation.json` as one accepted handoff.
 - Confirm the packet is `accepted`, its attempt succeeded once, its exact
-  summary, journey inventory, content manifest, hashes and attempt ID reconcile,
-  and failed provenance remains retained.
+  summary, historical journey snapshot, content manifest, hashes and attempt ID
+  reconcile, and failed provenance remains retained. The historical snapshot's
+  SHA-256 must equal the packet's original `journeyInventorySha256`; the
+  evolving current inventory is decoded independently and is not attributed to
+  the old attempt.
 - A new run requires a new schema-valid `candidate` packet and content manifest;
   never substitute `tmp/**`, a candidate, failed, superseded, inconclusive, or
   stale/hash-mismatched record for accepted proof.
@@ -62,20 +66,27 @@ Candidate mode's postcondition is one identified candidate, one immutable
 terminal attempt, exact journey outcomes, sanitized bounded evidence, and no
 false-success state. CI mode's postcondition is only a bounded nine-check report
 for the checked-out revision, with no candidate or attempt receipt.
-The five handoff paths above remain the canonical accepted HGI-203 evidence.
+The accepted HGI-203 packet, its exact historical journey snapshot, accepted
+summary, failed provenance and validation receipt remain the canonical
+historical handoff. The current journey inventory remains the canonical owner
+for new local verification and future candidates.
 
 ## Rollback
 
 If candidate code is rejected, revert the identified semantic candidate while
 retaining accepted, failed, superseded and inconclusive evidence. Never delete
 or rewrite an immutable attempt to make a later run appear successful.
+If the journey-epoch migration is reverted, revert its snapshot, contract,
+validator and documentation changes together; do not modify the original
+packet, summaries, manifests or validation receipt.
 
 ## Escalation
 
-Escalate mismatched hashes, missing detail, unknown terminal state, stale
-candidate identity, unredacted sensitive data, or an authority request to the
-requesting repository owner. Include exact artifact, last successful step,
-recovery hint and non-claims.
+Escalate mismatched snapshot hashes, a current inventory substituted for a
+historical one, missing detail, unknown terminal state, stale candidate
+identity, unredacted sensitive data, or an authority request to the requesting
+repository owner. Include exact artifact, last successful step, recovery hint
+and non-claims.
 
 ## Stop conditions
 
@@ -88,9 +99,13 @@ does not reconcile or the candidate identity was already consumed.
 
 Local commands do not observe a registry, Git provider, deployment provider,
 external consumer, deployed SSR/hydration, or public availability. Ignored raw
-detail is not clean-clone proof.
+detail is not clean-clone proof. The retained HGI-203 snapshot proves only the
+journey contract that its original attempt observed; it does not qualify later
+journey changes.
 
 ## Non-claims
 
 Completing this runbook does not claim package publication, a tag or release,
 Git publication, deployment, provider state, or external availability.
+Preserving the historical snapshot does not fabricate a new attempt or claim
+that HGI-203 exercised the current docs harness.

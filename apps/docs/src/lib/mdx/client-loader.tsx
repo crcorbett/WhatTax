@@ -20,9 +20,9 @@ export const preloadDocsContent = (
   source: DocsSourcePath
 ): Effect.Effect<void, DocsContentPreloadError> =>
   Effect.tryPromise({
-    catch: (cause) =>
+    catch: () =>
       new DocsContentPreloadError({
-        message: String(cause),
+        message: "The compiled documentation page could not be loaded.",
         path: source,
       }),
     try: () => docsContentLoader.preload(docsClientPath(source)),

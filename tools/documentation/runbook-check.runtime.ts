@@ -76,7 +76,8 @@ const makeProgram = (rootUrl: URL) =>
       "docs/runbooks/README.md",
       "docs/operations/authority-model.md",
       contract.acceptedHandoff.packet,
-      contract.acceptedHandoff.journeyInventory,
+      contract.acceptedHandoff.historicalJourneyInventory,
+      contract.acceptedHandoff.currentJourneyInventory,
       contract.acceptedHandoff.acceptedSummary,
       contract.acceptedHandoff.failedProvenance,
       contract.acceptedHandoff.validationReceipt,
@@ -145,8 +146,10 @@ const makeProgram = (rootUrl: URL) =>
     );
 
     const packetText = files.get(contract.acceptedHandoff.packet) ?? "";
-    const journeyInventoryText =
-      files.get(contract.acceptedHandoff.journeyInventory) ?? "";
+    const historicalJourneyInventoryText =
+      files.get(contract.acceptedHandoff.historicalJourneyInventory) ?? "";
+    const currentJourneyInventoryText =
+      files.get(contract.acceptedHandoff.currentJourneyInventory) ?? "";
     const acceptedSummaryText =
       files.get(contract.acceptedHandoff.acceptedSummary) ?? "";
     const validationText =
@@ -160,10 +163,22 @@ const makeProgram = (rootUrl: URL) =>
     );
     yield* Schema.decodeUnknownEffect(
       Schema.fromJsonString(ReleaseJourneyInventory)
-    )(journeyInventoryText).pipe(
+    )(historicalJourneyInventoryText).pipe(
       Effect.mapError(
         () =>
-          new RunbookValidationError({ operation: "decode-hgi-203-journeys" })
+          new RunbookValidationError({
+            operation: "decode-hgi-203-historical-journeys",
+          })
+      )
+    );
+    yield* Schema.decodeUnknownEffect(
+      Schema.fromJsonString(ReleaseJourneyInventory)
+    )(currentJourneyInventoryText).pipe(
+      Effect.mapError(
+        () =>
+          new RunbookValidationError({
+            operation: "decode-current-critical-journeys",
+          })
       )
     );
     const acceptedSummary = yield* Schema.decodeUnknownEffect(
@@ -207,7 +222,9 @@ const makeProgram = (rootUrl: URL) =>
       contract,
       files,
       hgi203Validation,
-      journeyInventorySha256: yield* sha256Text(journeyInventoryText),
+      historicalJourneyInventorySha256: yield* sha256Text(
+        historicalJourneyInventoryText
+      ),
       packet,
       packetSha256: yield* sha256Text(packetText),
       rootScripts: new Set(Record.keys(rootManifest.scripts ?? {})),

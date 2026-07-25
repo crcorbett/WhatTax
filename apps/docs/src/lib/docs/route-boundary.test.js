@@ -1,9 +1,6 @@
 import { describe, expect, test } from "bun:test";
 
-import {
-  DocsPageNotFoundError,
-  DocsSourceError,
-} from "@taxkit/docs-content/errors";
+import { DocsSourceError } from "@taxkit/docs-content/errors";
 import { Cause, Effect, Equal, Exit, Result, Schema } from "effect";
 
 import { DocsContentPreloadError, DocsRouteTransportError } from "./errors";
@@ -23,7 +20,6 @@ const expectedErrors = [
     message: "Unable to preload content",
     path: "content/start.mdx",
   }),
-  new DocsPageNotFoundError({ path: "/missing" }),
   new DocsSourceError({
     message: "The docs source failed.",
     operation: "getPage",
@@ -76,7 +72,10 @@ describe("docs route boundary", () => {
   });
 
   test("preserves standalone and composite defects and interruptions", async () => {
-    const expectedFailure = new DocsPageNotFoundError({ path: "/missing" });
+    const expectedFailure = new DocsSourceError({
+      message: "Expected source failure",
+      operation: "getPage",
+    });
     const causes = [
       Cause.die(new Error("standalone defect")),
       Cause.interrupt(101),
@@ -107,8 +106,18 @@ describe("docs route boundary", () => {
       },
       {
         cause: Cause.combine(
-          Cause.fail(new DocsPageNotFoundError({ path: "/first" })),
-          Cause.fail(new DocsPageNotFoundError({ path: "/second" }))
+          Cause.fail(
+            new DocsSourceError({
+              message: "First source failure",
+              operation: "getPage",
+            })
+          ),
+          Cause.fail(
+            new DocsSourceError({
+              message: "Second source failure",
+              operation: "getPage",
+            })
+          )
         ),
         message: "Docs route failure contained multiple expected errors",
       },
@@ -133,8 +142,18 @@ describe("docs route boundary", () => {
       encodeHomeExit(
         Exit.failCause(
           Cause.combine(
-            Cause.fail(new DocsPageNotFoundError({ path: "/first" })),
-            Cause.fail(new DocsPageNotFoundError({ path: "/second" }))
+            Cause.fail(
+              new DocsSourceError({
+                message: "First source failure",
+                operation: "getPage",
+              })
+            ),
+            Cause.fail(
+              new DocsSourceError({
+                message: "Second source failure",
+                operation: "getPage",
+              })
+            )
           )
         )
       ),

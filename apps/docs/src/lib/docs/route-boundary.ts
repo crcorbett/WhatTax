@@ -1,7 +1,4 @@
-import {
-  DocsPageNotFoundError,
-  DocsSourceError,
-} from "@taxkit/docs-content/errors";
+import { DocsSourceError } from "@taxkit/docs-content/errors";
 import { DocsContentPage, DocsNavigation } from "@taxkit/docs-content/schemas";
 import {
   Array,
@@ -42,7 +39,6 @@ const DocsPageLoaderSuccess = Schema.Struct({
 
 const DocsLoaderError = Schema.Union([
   DocsContentPreloadError,
-  DocsPageNotFoundError,
   DocsSourceError,
 ]);
 

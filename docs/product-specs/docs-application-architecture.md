@@ -34,6 +34,16 @@ policy or a source tree to copy.
 Implementation is tracked by the active
 [execution plan](../exec-plans/active/docs-application-architecture.md).
 
+On 2026-07-25 Cooper authorized one narrow governance amendment after
+`DOCS-APP-004` exposed a collision between the evolving current critical
+journey owner and immutable HGI-203 release evidence. The amendment preserves
+the original packet, summary, attempt, manifests and validation receipt
+unchanged; retains the exact journey bytes that HGI-203 observed as a
+content-addressed historical snapshot; and makes the runbook validator decode
+the current inventory independently. It does not fabricate a release attempt,
+weaken a digest, grant release authority or broaden this SPEC into release,
+versioning, publication or deployment work.
+
 ## Finding disposition register
 
 | ID | Decision | Consequence owned by this SPEC |
@@ -592,7 +602,7 @@ does not satisfy the container boundary.
 | Failure stability | Expected source/preload errors render recoverably; defects reach framework error policy. | deterministic route/service fixtures and built error journey. | Tests only restore a hand-built success value. |
 | Accessibility foundation | Keyboard, focus, landmarks, current page, contrast and reduced motion meet the minimum contract. | Browser assertions plus focused accessibility/contrast review. | Presence of ARIA attributes without interaction proof. |
 | Production reachability | All docs workspaces are analyzed and generated/build ordering is reproducible. | `bun run knip`, `bun run knip:production`, clean candidate build. | Ignored workspaces or stale `.source`. |
-| Visual-state evidence | Every required visible state is captured from the exact clean built candidate and indexed by a safe manifest. | The `DOCS-APP-004`-owned built-app harness screenshot-mode invocation after it exists and is backfilled; manifest validation; primary-owner visual review. | A screenshot from an uncommitted/stale build, or a visually correct image presented as proof of a non-visual behavior. |
+| Visual-state evidence | Every required visible state is captured from the exact clean built candidate and indexed by a safe manifest. | `bun run --filter=docs test:built -- --screenshots --candidate=<full-candidate-commit>`; manifest validation; primary-owner visual review. | A screenshot from an uncommitted/stale build, or a visually correct image presented as proof of a non-visual behavior. |
 | Repository closeout | Required docs, manifests, tasks and code agree. | `bun run check:docs`, `bun run check:repository-paths`, `bun run verification`, `git diff --check`. | Aggregate green result with no built docs journey. |
 
 Implementation closeout commands:
@@ -609,6 +619,7 @@ bun run --filter=@taxkit/docs-content build
 bun run --filter=docs check-types
 bun run docs:build
 bun run --filter=docs test:browser
+bun run --filter=docs test:built
 bun run knip
 bun run knip:production
 bun run test:skills
@@ -618,15 +629,15 @@ bun run verification
 git diff --check
 ```
 
-`DOCS-APP-004` must create one app-owned built-production HTTP/Playwright
-harness script in `apps/docs/package.json`. It must start the production build
-on an ephemeral local port, wait for readiness, run the SSR, hydration, 404,
-error and cleanup assertions, and provide the bounded screenshot mode. That
-task cannot complete until the script exists, its exact invocation has passed,
-and the same slice backfills the verified invocation into this SPEC, the
-sibling tasks, `apps/docs/README.md`, testing architecture and the critical
-journey owner. `DOCS-APP-006` runs that backfilled invocation and its verified
-screenshot mode; this proposed draft neither invents nor assumes their names.
+`bun run --filter=docs test:built` is the app-owned built-production
+HTTP/Playwright harness. It builds the app, starts the generated Nitro/Vercel
+function and static assets behind a command-owned ephemeral local server,
+checks readiness, runs the SSR, hydration, 404, pending, navigation,
+server-function, diagnostic and cleanup assertions, and then stops the browser
+and server. `bun run --filter=docs test:built -- --screenshots` adds the bounded
+provisional visual mode. `DOCS-APP-006` binds the retained visual set to the
+exact clean commit with
+`bun run --filter=docs test:built -- --screenshots --candidate=<full-candidate-commit>`.
 
 Local browser and built-app receipts prove only the tested local candidate.
 Deployment, provider, public URL and public-site behavior need separate
@@ -729,8 +740,8 @@ implemented SPECs and completed plans are trajectory evidence only.
 | Canonical docs | Change required | `docs/README.md`, `docs/architecture/{README,package-ownership,package-boundaries,frontend,content-and-posts,testing-and-quality}.md`, `tools/documentation/owner-policy.json` | Update ownership, target graphs, proof distinctions and public roots in `DOCS-APP-001`, `DOCS-APP-003`, `DOCS-APP-006`. |
 | Root/app/package READMEs | Change required | `README.md`, `apps/docs/README.md`, `packages/docs-content/README.md`, `packages/docs-fumadocs/README.md` | Describe the final owner, entrypoint, runtime and command contracts in the task that changes each boundary; reconcile in `DOCS-APP-006`. |
 | Architecture and standards | Change required | `docs/architecture/{package-ownership,package-boundaries,effect-services,frontend,content-and-posts,testing-and-quality}.md`, `docs/standards/{code-patterns,tooling}.md` | Architecture owners change; standards are preserved unless a focused rule needs clarification. `DOCS-APP-001` through `DOCS-APP-006`. |
-| Runbooks and operations | Not applicable | `docs/runbooks/README.md`, `docs/operations/authority-model.md`, `tools/documentation/runbook-contract.json` | No operational command, environment, credential, deployment or recovery procedure changes. Existing runbooks and authority controls must remain byte-for-byte untouched unless implementation proves an unavoidable dependency and stops for acceptance. |
-| Proof and evidence | Change required | `docs/verification/critical-journeys.json`, `docs/architecture/testing-and-quality.md`, current app browser harness, future execution-plan screenshot directory | Correct the docs journey oracle and add built-app evidence ownership in `DOCS-APP-004` through `DOCS-APP-006`. The only committed browser artifacts are the bounded `DAR-013` manifest/PNG set carried by the evidence-only closeout commit and moved with the plan from active to completed; transient builds, videos, traces, logs and unbounded/raw browser output are not committed. |
+| Runbooks and operations | Change required | `docs/runbooks/README.md`, `docs/runbooks/release-readiness.md`, `tools/documentation/runbook-contract.json`, `tools/documentation/runbook-{check.runtime,policy}.ts` | Apply only the approved `DOCS-APP-004` journey-epoch amendment: bind immutable HGI-203 to `docs/evidence/releases/HGI-203-critical-journeys.json`, schema-validate the evolving current owner independently, and preserve every original packet/receipt byte. No operational command, environment, credential, deployment, recovery or authority-stop change. |
+| Proof and evidence | Change required | `docs/verification/critical-journeys.json`, `docs/evidence/releases/HGI-203-critical-journeys.json`, immutable HGI-203 packet/receipts, `docs/architecture/testing-and-quality.md`, current app browser harness, future execution-plan screenshot directory | Preserve the original HGI-203 evidence unchanged while retaining its exact journey snapshot; correct the current docs journey oracle and add built-app evidence ownership in `DOCS-APP-004` through `DOCS-APP-006`. The only committed browser artifacts are the bounded `DAR-013` manifest/PNG set carried by the evidence-only closeout commit and moved with the plan from active to completed; transient builds, videos, traces, logs and unbounded/raw browser output are not committed. |
 | Skills, AGENTS and metadata | Change required | `.agents/skills/docs-maintainer/references/repository-profile.md`, `AGENTS.md`, `.claude/skills/docs-maintainer` | Update the local docs-maintainer profile paths/commands in `DOCS-APP-001` and `DOCS-APP-006`. Preserve `AGENTS.md`, skill implementation and relative instruction links; no skill baseline migration. |
 | Lint, config and CI | Change required | `knip.json`, `knip.production.json`, `turbo.json`, `oxlint.config.ts`, `package.json`, `.github/workflows/quality.yml` | Model generation, docs workspaces and the verified app-owned built-app harness invocation in `DOCS-APP-004` and `DOCS-APP-006`. Existing Quality workflow inherits canonical verification; no new deployment job. |
 | SPEC, tasks and lifecycle | Change required | this SPEC, sibling tasks, `docs/product-specs/index.md`, `docs/exec-plans/active/README.md` | Draft artifacts exist now. Create an active plan only when `DOCS-APP-001` begins; keep lifecycle synchronized and archive only after all proof passes in `DOCS-APP-006`. |

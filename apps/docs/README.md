@@ -81,6 +81,7 @@ bun run --filter=docs dev
 bun run --filter=docs check-import-boundaries
 bun run --filter=docs test
 bun run --filter=docs test:browser
+bun run --filter=docs test:built
 bun run --filter=docs check-types
 bun run --filter=docs build
 bun run --filter=docs preview
@@ -99,6 +100,16 @@ Run `build` before `preview`. Both `dev` and `preview` expose the app through
 It proves success, expected failures, malformed transport and framework error
 boundaries after `Route.useLoaderData`; it does not prove SSR or hydration. Use
 the built app for initial SSR, hydration and real client-navigation proof.
+
+`test:built` builds the production app and executes the generated Nitro/Vercel
+function plus static assets through a command-owned ephemeral local server. It
+asserts a known page in the HTTP response before browser JavaScript, hydration
+without warnings or errors, a real server-function client transition, pending
+state, framework-native client not-found behavior with no document reload, and
+a direct HTTP 404. The command owns browser/server cleanup. Add
+`-- --screenshots` for the bounded provisional pending, recoverable-error and
+not-found PNG/manifest set; final evidence additionally supplies the exact
+candidate with `--candidate=<full-candidate-commit>`.
 
 `check-import-boundaries` rejects server-only content, service, generated-source
 and runtime imports from browser-reachable app modules. The docs app has no

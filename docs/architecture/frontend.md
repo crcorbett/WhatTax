@@ -87,6 +87,14 @@ the page. Internal docs navigation uses TanStack `Link`; a browser click then
 runs the destination route loader and server-function RPC without a new
 document request.
 
+The catch-all server-function implementation maps only
+`DocsPageNotFoundError` to TanStack `notFound()`. The route owns the nearest
+`notFoundComponent`, so direct missing-page requests return HTTP 404 and client
+navigation renders the same framework state. Expected source/preload failures
+remain schema-encoded recoverable outcomes; defects and interruptions remain
+in the framework error channel. `bun run --filter=docs test:built` proves this
+against the generated production server and browser output.
+
 ```ts
 DocsContentService Effect
   -> browser-safe Schema.Exit JSON encoding

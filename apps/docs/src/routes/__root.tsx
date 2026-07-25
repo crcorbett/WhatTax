@@ -5,6 +5,12 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 
+import {
+  DocsRouteError,
+  DocsRouteNotFound,
+  DocsRoutePending,
+} from "#/components/docs-route-states";
+
 import "../styles.css";
 
 const RootShell = ({ children }: { readonly children: React.ReactNode }) => (
@@ -27,6 +33,7 @@ const RootComponent = () => (
 
 export const Route = createRootRoute({
   component: RootComponent,
+  errorComponent: DocsRouteError,
   head: () => ({
     links: [
       {
@@ -47,5 +54,7 @@ export const Route = createRootRoute({
       },
     ],
   }),
+  notFoundComponent: DocsRouteNotFound,
+  pendingComponent: DocsRoutePending,
   shellComponent: RootShell,
 });

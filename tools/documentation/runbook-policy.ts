@@ -18,7 +18,7 @@ export type RunbookInspection = Readonly<{
   contract: RunbookContract;
   files: ReadonlyMap<string, string>;
   hgi203Validation: Hgi203ValidationProjection;
-  journeyInventorySha256: string;
+  historicalJourneyInventorySha256: string;
   contentManifestSha256: string;
   packetSha256: string;
   packet: ReleaseProofPacket;
@@ -61,8 +61,10 @@ const requiredStops = [
 
 const requiredHandoff = {
   acceptedSummary: "docs/evidence/releases/HGI-203-accepted-attempt.json",
+  currentJourneyInventory: "docs/verification/critical-journeys.json",
   failedProvenance: "docs/evidence/releases/HGI-203-failed-attempts.json",
-  journeyInventory: "docs/verification/critical-journeys.json",
+  historicalJourneyInventory:
+    "docs/evidence/releases/HGI-203-critical-journeys.json",
   packet: "docs/evidence/releases/HGI-203-local.json",
   validationReceipt: "docs/documentation-audit/HGI-203-validation.json",
 } as const;
@@ -448,7 +450,7 @@ export const inspectRunbookContract = (
     inspection.packet.attempt.terminalState !== "success" ||
     inspection.packet.attempt.observedExitCode !== 0 ||
     inspection.packet.journeyInventorySha256 !==
-      inspection.journeyInventorySha256 ||
+      inspection.historicalJourneyInventorySha256 ||
     inspection.packet.attempt.detailArtifacts.length !== 1 ||
     summaryArtifact?.path !== requiredHandoff.acceptedSummary ||
     summaryArtifact.sha256 !== inspection.acceptedSummarySha256 ||
@@ -484,7 +486,7 @@ export const inspectRunbookContract = (
         "accepted-handoff",
         "taxkit-release-readiness-operation-owner",
         "docs/evidence/releases/HGI-203-local.json",
-        "bind the accepted HGI-203 packet, five journeys, bounded summary and failed provenance without candidate or tmp substitution"
+        "bind the accepted HGI-203 packet to its exact historical journey snapshot, bounded summary and failed provenance without candidate, current-owner or tmp substitution"
       )
     );
   }

@@ -3,8 +3,8 @@ document_type: runbook-index
 lifecycle: current
 authority: canonical
 owner: taxkit-runbook-contract-owner
-last_reviewed: 2026-07-22
-review_trigger: release command, Changesets, package graph, evidence, recovery, or authority-boundary change
+last_reviewed: 2026-07-25
+review_trigger: release command, Changesets, package graph, evidence epoch, recovery, or authority-boundary change
 ---
 
 # TaxKit runbooks

@@ -193,8 +193,9 @@ const AuthorityStop = Schema.Struct({
 export const RunbookContract = Schema.Struct({
   acceptedHandoff: Schema.Struct({
     acceptedSummary: Schema.NonEmptyString,
+    currentJourneyInventory: Schema.NonEmptyString,
     failedProvenance: Schema.NonEmptyString,
-    journeyInventory: Schema.NonEmptyString,
+    historicalJourneyInventory: Schema.NonEmptyString,
     packet: Schema.NonEmptyString,
     validationReceipt: Schema.NonEmptyString,
   }),

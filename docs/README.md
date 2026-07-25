@@ -54,7 +54,7 @@ lifecycle; migrate it only when its owner is materially revised.
 | Public docs product | [`../apps/docs/README.md`](../apps/docs/README.md), [`../packages/docs-content/README.md`](../packages/docs-content/README.md), and [`../packages/docs-fumadocs/README.md`](../packages/docs-fumadocs/README.md) | Consumer-facing content/runtime, not maintainer lifecycle policy. |
 | Repeatable release/recovery operations | [`runbooks/README.md`](runbooks/README.md) and [`operations/authority-model.md`](operations/authority-model.md) | Exactly four target-owned procedures; stop consequential operations when principal or receipt is unknown. |
 | CI controls and recurring automation | [`standards/controls.md`](standards/controls.md) and [`operations/automation-register.md`](operations/automation-register.md) | Quality workflow admission, release-graph controls, and report-only candidate boundaries; neither route grants external authority. |
-| Verification/critical journeys/proof | [`architecture/testing-and-quality.md`](architecture/testing-and-quality.md), [`verification/critical-journeys.json`](verification/critical-journeys.json), [`evidence/releases/HGI-203-local.json`](evidence/releases/HGI-203-local.json), and [`documentation-audit/HGI-203-validation.json`](documentation-audit/HGI-203-validation.json) | Accepted HGI-203 owns the five journeys and bounded local proof; HGI-204 runbooks consume it. Raw logs and secrets are never durable proof. |
+| Verification/critical journeys/proof | [`architecture/testing-and-quality.md`](architecture/testing-and-quality.md), [`verification/critical-journeys.json`](verification/critical-journeys.json), [`evidence/releases/HGI-203-critical-journeys.json`](evidence/releases/HGI-203-critical-journeys.json), [`evidence/releases/HGI-203-local.json`](evidence/releases/HGI-203-local.json), and [`documentation-audit/HGI-203-validation.json`](documentation-audit/HGI-203-validation.json) | The current inventory owns evolving journeys. Accepted HGI-203 retains the exact historical five-journey snapshot and bounded local proof that its immutable packet observed; HGI-204 validates both epochs without attributing current changes to the old attempt. Raw logs and secrets are never durable proof. |
 | Harness foundation and requalification | [`verification/repository-harness-profile.json`](verification/repository-harness-profile.json), [`documentation-audit/harness-foundation/accepted-findings.json`](documentation-audit/harness-foundation/accepted-findings.json), [`verification/harness-epochs.md`](verification/harness-epochs.md), and [`verification/effectiveness.md`](verification/effectiveness.md) | The TaxKit profile, accepted HE crosswalk, content-addressed skill receipt and focused gate own the implemented baseline. Current epoch `HFI-004-2026-07-24` qualifies fail-closed candidate `7c8a96e`; HGI-206 remains previous history. Neither establishes external state. |
 | References | [`references/README.md`](references/README.md) | Revalidate mutable external guidance. |
 | Audit/accounting | [`documentation-audit/README.md`](documentation-audit/README.md) | Dated evidence, not policy. |
@@ -90,8 +90,9 @@ and generated-source edges with bounded diagnostics and a JSON detail receipt.
 `published` means explicitly accepted current public documentation. Neither
 status proves runtime or external availability.
 
-`bun run check:runbooks` Schema-decodes the canonical runbook contract and
-accepted HGI-203 handoff, reconciles the exact four Markdown owners, commands,
-evidence paths, stop operations, index rows and authority rows, and writes only
-the ignored bounded receipt `tmp/runbook-validation-report.json`. It executes
-none of the documented procedures and establishes no consequential state.
+`bun run check:runbooks` Schema-decodes the canonical runbook contract, the
+current journey inventory and the exact historical HGI-203 journey snapshot,
+then reconciles the immutable packet digest, four Markdown owners, commands,
+evidence paths, stop operations, index rows and authority rows. It writes only
+the ignored bounded receipt `tmp/runbook-validation-report.json`, executes none
+of the documented procedures and establishes no consequential state.

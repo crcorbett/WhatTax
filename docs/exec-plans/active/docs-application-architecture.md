@@ -35,7 +35,7 @@ this plan.
 | `DOCS-APP-001` | completed | Package-owned content, navigation, examples, validation, lifecycle bindings and focused proof accepted. |
 | `DOCS-APP-002` | completed | Generic service/live/test Layers, compiled-config ordering and Knip reachability accepted. |
 | `DOCS-APP-003` | completed | Canonical content service, app server runtime, safe error and import-boundary slice accepted. |
-| `DOCS-APP-004` | pending | Depends on `DOCS-APP-003`. |
+| `DOCS-APP-004` | completed | Native route outcomes, built HTTP/browser harness and approved HGI-203 journey-epoch amendment accepted. |
 | `DOCS-APP-005` | pending | Depends on `DOCS-APP-004`. |
 | `DOCS-APP-006` | pending | Depends on `DOCS-APP-005`. |
 
@@ -66,6 +66,13 @@ The final screenshot set is captured only after all non-visual gates pass on a
 clean committed implementation candidate. It belongs under this plan at
 `screenshots/<full-candidate-commit>/` and may contain only the bounded
 `DAR-013` manifest and PNG set.
+
+Cooper authorized one narrow `DOCS-APP-004` governance amendment on 2026-07-25.
+It may decouple immutable HGI-203 evidence from the evolving current critical
+journey owner through an exact historical snapshot and focused validator
+change. It may not rewrite, re-date or re-attribute the historical packet,
+weaken its digest, fabricate an attempt, change authority stops or broaden into
+versioning, publication, deployment or provider work.
 
 ## Validation log
 
@@ -118,6 +125,68 @@ clean committed implementation candidate. It belongs under this plan at
   `TDA-P03` and `TDA-P04`. Package versions and dependency declarations are
   unchanged; the current and target `bun.lock` SHA-256 is
   `a917cbcf81d6917deb9876718494cfe2a6ca3d337d106d4813e6cc6bc84ba792`.
+
+### 2026-07-25 — `DOCS-APP-004` release-evidence contract discovery
+
+- Added and passed the app-owned built-production HTTP/Playwright harness,
+  including built SSR, hydration, client navigation, direct HTTP 404,
+  pending/error states, request counts, diagnostics and bounded provisional
+  screenshots. Its verified invocation is
+  `bun run --filter=docs test:built`.
+- Backfilled that invocation into the approved SPEC/task pair, app README,
+  frontend/testing owners and `docs/verification/critical-journeys.json`.
+- Focused docs boundaries, docs types, docs build, browser tests, built-app
+  tests, screenshot mode, docs policy, repository paths, lint, format, Knip and
+  governance tests pass. The lockfile remains unchanged.
+- Canonical verification stops at `bun run check:runbooks`. The exact
+  diagnostic is one `accepted-handoff` violation at
+  `docs/evidence/releases/HGI-203-local.json`.
+- Root cause: the accepted HGI-203 packet records SHA-256
+  `13b7c960ff7b5f5fef236cff4cef800409f822e6be2a552eaa78b64be2d8ad5a`
+  for the historical five-journey inventory. The required current docs journey
+  has changed truthfully to include the built-app harness, so its bytes no
+  longer match that historical packet.
+- Updating the old packet would falsely attribute the new built-app proof to
+  its 2026-07-22 attempt. Changing the runbook policy to support a historical
+  journey snapshot or a superseding evidence epoch changes an explicitly
+  excluded governance owner, so implementation stopped for acceptance.
+- Cooper then authorized only the snapshot/epoch correction. The retained
+  `docs/evidence/releases/HGI-203-critical-journeys.json` has SHA-256
+  `13b7c960ff7b5f5fef236cff4cef800409f822e6be2a552eaa78b64be2d8ad5a`,
+  exactly matching the immutable packet. The runbook validator now decodes the
+  historical and current inventories separately and rejects substituting the
+  current owner for the old digest.
+
+### 2026-07-25 — `DOCS-APP-004` accepted
+
+- Missing content now reaches TanStack's framework-native not-found channel;
+  direct built requests return HTTP 404, while expected source/preload failures
+  remain schema-encoded and defects/interruptions remain framework-owned.
+- App-owned pending, recoverable error, not-found and framework-error leaves
+  keep a stable shell and accept only readonly values/callbacks.
+- `bun run --filter=docs test:built` owns an ephemeral built-production server,
+  readiness, cleanup, direct SSR/body/status assertions, hydration diagnostics,
+  server-function navigation and bounded screenshot mode.
+- The exact invocation is synchronized across the SPEC/tasks, app README,
+  frontend/testing owners and current critical journey.
+- The immutable HGI-203 packet, summary, attempt, manifests and validation
+  receipt are unchanged. Its retained journey snapshot is byte-identical to
+  semantic commit `f3a7bdf4e63fcc6ce9dedaf963337def9f65c3a5` and matches
+  packet SHA-256
+  `13b7c960ff7b5f5fef236cff4cef800409f822e6be2a552eaa78b64be2d8ad5a`.
+- `bun run check:runbooks` passes; 18 focused policy tests include rejection of
+  current-owner substitution. Harness governance and its 12 tests pass.
+- Full DOCS-APP-004 proof passed: docs import boundaries, six codec tests, app
+  runtime test, docs types/build, seven browser tests, built SSR/hydration/404
+  proof, docs/path policy, lint, formatting, skills, Quality policy,
+  development/production Knip and all 23 Turbo type-check tasks.
+- Canonical `bun run verification` is green. The built proof observed
+  `SSR=200`, `missing=404`, `documents=1`, `serverFunctions=2` and
+  `diagnostics=0`. These are local candidate claims only; no deployment,
+  provider, public-site, release or publication behavior was observed.
+- Primary-owner review accepted `TDA-004`, preservation of `TDA-P02` and
+  `TDA-P05`, the route/container/leaf split, process lifetime, historical
+  evidence migration and rollback. `bun.lock` remains unchanged.
 
 ### 2026-07-25 — `DOCS-APP-002` accepted
 
@@ -205,4 +274,6 @@ clean committed implementation candidate. It belongs under this plan at
 
 The SPEC documentation-impact ledger is authoritative. This plan records task
 evidence and path-level completion; it does not duplicate architecture policy.
-Runbooks and operations remain evidenced not applicable and must not change.
+Runbooks and operations change only for the explicitly authorized HGI-203
+journey-epoch amendment. Commands, environments, authority stops and the
+immutable historical packet/receipt set remain preserved.
