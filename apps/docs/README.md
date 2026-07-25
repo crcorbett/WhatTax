@@ -104,12 +104,17 @@ the built app for initial SSR, hydration and real client-navigation proof.
 `test:built` builds the production app and executes the generated Nitro/Vercel
 function plus static assets through a command-owned ephemeral local server. It
 asserts a known page in the HTTP response before browser JavaScript, hydration
-without warnings or errors, a real server-function client transition, pending
-state, framework-native client not-found behavior with no document reload, and
-a direct HTTP 404. The command owns browser/server cleanup. Add
-`-- --screenshots` for the bounded provisional pending, recoverable-error and
-not-found PNG/manifest set; final evidence additionally supplies the exact
-candidate with `--candidate=<full-candidate-commit>`.
+without warnings or errors, real sidebar and authored-MDX client transitions
+with zero document requests, browser back/forward, heading focus without
+stealing initial-hydration focus, pending state, framework-native client
+not-found behavior and a direct HTTP 404. It also checks the skip link,
+landmarks, labelled/current navigation, mobile disclosure, representative
+contrast and reduced-motion rendering. The command owns browser/server cleanup.
+Add `-- --screenshots` for the bounded provisional DAR-013 PNG/manifest set;
+final evidence additionally supplies the exact candidate with
+`--candidate=<full-candidate-commit>`. Screenshot review supplements these
+behavioral assertions and cannot prove request type, focus behavior, contrast,
+motion suppression, HTTP status, hydration or console cleanliness.
 
 `check-import-boundaries` rejects server-only content, service, generated-source
 and runtime imports from browser-reachable app modules. The docs app has no
@@ -118,6 +123,17 @@ that acquires `DocsContentService`, and the module-scoped server runtime is
 reused for the server isolate. The runtime factory exposes disposal so focused
 tests and future host lifecycle integration can release its Layer; the current
 hosting adapter does not provide an application shutdown hook.
+
+The app-local MDX adapter classifies root-relative, query-only and authored
+relative `.mdx` destinations as TanStack routes while keeping external,
+protocol-relative, mail, download, repository-source and same-document
+destinations as anchors. It removes an authored `.mdx` suffix before any query
+or fragment without changing either suffix. Sidebar, home and MDX route links
+set one app-owned navigation-focus intent; the destination heading consumes it
+after a client transition. Initial hydration does not set that intent. The
+route container owns responsive navigation state and retry commands; render
+leaves receive readonly values and callbacks and do not acquire services or
+execute runtimes.
 
 ## Authoring rules
 

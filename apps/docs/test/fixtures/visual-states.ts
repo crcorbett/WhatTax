@@ -1,7 +1,7 @@
 export const delayedPageLoad = {
   delayMs: 800,
   id: "delayed-page-load",
-  path: "/reference",
+  path: "/guides/calculate-australian-take-home-pay",
   visiblePostcondition: "Loading documentation",
 } as const;
 

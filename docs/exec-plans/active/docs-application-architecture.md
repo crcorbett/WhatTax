@@ -36,7 +36,7 @@ this plan.
 | `DOCS-APP-002` | completed | Generic service/live/test Layers, compiled-config ordering and Knip reachability accepted. |
 | `DOCS-APP-003` | completed | Canonical content service, app server runtime, safe error and import-boundary slice accepted. |
 | `DOCS-APP-004` | completed | Native route outcomes, built HTTP/browser harness and approved HGI-203 journey-epoch amendment accepted. |
-| `DOCS-APP-005` | pending | Depends on `DOCS-APP-004`. |
+| `DOCS-APP-005` | completed | Router-native MDX links, navigation focus, responsive disclosure and accessibility proof accepted. |
 | `DOCS-APP-006` | pending | Depends on `DOCS-APP-005`. |
 
 ## Baseline
@@ -269,6 +269,48 @@ versioning, publication, deployment or provider work.
   Package versions and dependency declarations are unchanged; `bun.lock`
   remains
   `a917cbcf81d6917deb9876718494cfe2a6ca3d337d106d4813e6cc6bc84ba792`.
+
+### 2026-07-25 — `DOCS-APP-005` accepted
+
+- The app-owned MDX adapter now classifies root-relative, query-only and
+  authored relative `.mdx` links as TanStack destinations while retaining
+  ordinary anchors for external, protocol-relative, mail, download,
+  repository-source and same-document destinations. Query and fragment
+  suffixes survive `.mdx` removal.
+- Sidebar, home and MDX route links set one app-owned focus intent which the
+  destination heading consumes after client navigation. Initial hydration does
+  not set the intent. The responsive route container owns disclosure, current
+  item scrolling and retry callbacks; rendering leaves remain service- and
+  runtime-free.
+- Added the visible-on-focus skip link, one main landmark, labelled/current
+  navigation, 3px focus-visible treatment, mobile disclosure and
+  no-animation reduced-motion baseline.
+- Built behavior passed with `SSR=200`, direct missing `404`, zero document
+  requests across real sidebar and authored-MDX navigation, five total
+  document requests, eight server-function requests and zero diagnostics.
+  Focus, browser history, keyboard, landmark, mobile, contrast and
+  reduced-motion assertions also passed.
+- Ten focused app tests passed, including the internal/external/query/fragment
+  link-classification corpus. Seven programmatic browser route tests passed.
+  App types, docs build and the built production harness passed.
+- The ignored provisional DAR-013 set under
+  `tmp/docs-built/provisional-screenshots/` was recaptured and visually
+  reviewed. The representative page, current-item mobile disclosure, first-tab
+  skip link, pending, recoverable error and not-found states are readable,
+  unclipped and machine-path/secret safe. Reduced-motion PNG `07` is correctly
+  not applicable because no visually relevant transition exists. These images
+  do not prove the separate behavioral assertions.
+- Negative scope review found no `fumadocs-ui`, shared `packages/ui`, search
+  service/schema/index/UI, browser Effect runtime or presentation service
+  acquisition. `TDA-008` remains deferred.
+- `bun run check:docs`, `bun run check:repository-paths`, canonical
+  `bun run verification` and `git diff --check` passed. The two-package patch
+  Changeset remains accurate, dependency declarations are unchanged and
+  `bun.lock` retains
+  `a917cbcf81d6917deb9876718494cfe2a6ca3d337d106d4813e6cc6bc84ba792`.
+- Primary-owner review accepted the link semantics, route/container/leaf
+  boundary, interaction evidence, accessibility foundation and bounded visual
+  evidence for `TDA-005`, `TDA-007` and `TDA-P05`.
 
 ## Documentation impact
 

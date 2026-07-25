@@ -117,9 +117,17 @@ transition. `bun run --filter=docs test:built` is that built-production HTTP
 and Playwright proof: it serves the generated Nitro/Vercel function and static
 assets on an ephemeral local port, asserts SSR response content and HTTP 404
 before browser inspection, then proves clean hydration, server-function
-navigation, pending and client not-found behavior without another document
-request. The command owns server/browser cleanup. Its screenshot mode is
-supplemental visual evidence only.
+navigation through real sidebar and authored-MDX links, browser history,
+pending and client not-found behavior without another document request. It
+also asserts that initial hydration does not steal focus, client navigation
+focuses the destination heading, the skip link reaches the main landmark,
+navigation is labelled and current, the mobile disclosure is operable,
+representative interactive colours meet the owned contrast threshold, reduced
+motion removes no required information, and the console is clean. The command
+owns server/browser cleanup. Its screenshot mode is supplemental visual
+evidence only: a visually correct image does not prove SSR content, hydration,
+request resource type, HTTP status, keyboard or focus behavior, contrast,
+motion suppression or console cleanliness.
 
 Public API route work should also capture contract evidence from the standalone
 API app:

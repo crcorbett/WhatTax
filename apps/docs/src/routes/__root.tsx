@@ -4,12 +4,14 @@ import {
   Outlet,
   Scripts,
 } from "@tanstack/react-router";
+import { useEffect } from "react";
 
 import {
   DocsRouteError,
   DocsRouteNotFound,
   DocsRoutePending,
 } from "#/components/docs-route-states";
+import { requestDocsNavigationFocus } from "#/lib/navigation-focus";
 
 import "../styles.css";
 
@@ -19,17 +21,28 @@ const RootShell = ({ children }: { readonly children: React.ReactNode }) => (
       <HeadContent />
     </head>
     <body>
+      <a className="docs-skip-link" href="#docs-main">
+        Skip to documentation
+      </a>
       {children}
       <Scripts />
     </body>
   </html>
 );
 
-const RootComponent = () => (
-  <main className="docs-app-shell">
-    <Outlet />
-  </main>
-);
+const RootComponent = () => {
+  useEffect(() => {
+    addEventListener("popstate", requestDocsNavigationFocus);
+
+    return () => removeEventListener("popstate", requestDocsNavigationFocus);
+  }, []);
+
+  return (
+    <main className="docs-app-shell" id="docs-main" tabIndex={-1}>
+      <Outlet />
+    </main>
+  );
+};
 
 export const Route = createRootRoute({
   component: RootComponent,

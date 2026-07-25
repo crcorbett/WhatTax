@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import type {
   DocsContentPage,
   DocsNavigation,
@@ -12,9 +12,13 @@ import {
 } from "#/components/docs-route-states";
 import { loadDocsHome } from "#/lib/docs/loaders";
 import { docsHomeRouteBoundary } from "#/lib/docs/route-boundary";
+import { requestDocsNavigationFocus } from "#/lib/navigation-focus";
 
-const DocsHomeFailure = () => (
-  <DocsRecoverableError message="The documentation source could not be loaded." />
+const DocsHomeFailure = ({ onRetry }: { readonly onRetry: () => void }) => (
+  <DocsRecoverableError
+    message="The documentation source could not be loaded."
+    onRetry={onRetry}
+  />
 );
 
 const DocsHomeContent = ({
@@ -27,7 +31,9 @@ const DocsHomeContent = ({
   <section className="docs-home">
     <div className="docs-home__intro">
       <p className="docs-kicker">TaxKit docs</p>
-      <h1>Open-source tax engine, API and SDK documentation</h1>
+      <h1 id="docs-page-heading" tabIndex={-1}>
+        Open-source tax engine, API and SDK documentation
+      </h1>
       <p>
         Start with the integration path, then move through SDK, API, guides,
         concepts, contribution notes and reference material.
@@ -40,6 +46,7 @@ const DocsHomeContent = ({
           <Link
             className="docs-section-card"
             key={section.path}
+            onClick={requestDocsNavigationFocus}
             params={{ _splat: section.path.slice(1) }}
             to="/$"
           >
@@ -56,10 +63,17 @@ const DocsHomeContent = ({
 export const Route = createFileRoute("/")({
   component() {
     const loaderData = Route.useLoaderData();
+    const router = useRouter();
     const routeResult = docsHomeRouteBoundary.restore(loaderData);
 
     return Result.match(routeResult, {
-      onFailure: () => <DocsHomeFailure />,
+      onFailure: () => (
+        <DocsHomeFailure
+          onRetry={() => {
+            void router.invalidate();
+          }}
+        />
+      ),
       onSuccess: ({ navigation, pages }) => (
         <DocsHomeContent navigation={navigation} pages={pages} />
       ),

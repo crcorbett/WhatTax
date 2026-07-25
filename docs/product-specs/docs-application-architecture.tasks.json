@@ -632,7 +632,7 @@
     },
     {
       "id": "DOCS-APP-005",
-      "status": "pending",
+      "status": "completed",
       "acceptedFindingIds": [
         "TDA-005",
         "TDA-007",

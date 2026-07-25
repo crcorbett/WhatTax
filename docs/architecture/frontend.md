@@ -85,7 +85,13 @@ response before the route loader returns it. In both paths, the direct route
 root restores the value once and matches the typed `Result` before composing
 the page. Internal docs navigation uses TanStack `Link`; a browser click then
 runs the destination route loader and server-function RPC without a new
-document request.
+document request. The app MDX adapter treats root-relative, query-only and
+authored relative `.mdx` destinations as router destinations, removes only the
+`.mdx` suffix before a query or fragment, and keeps external, mail,
+protocol-relative, download, repository-source and same-document destinations
+as anchors. Focus movement is app policy: sidebar, home and MDX route links
+record one navigation intent and the destination heading consumes it after
+client navigation. Initial hydration does not record that intent.
 
 The catch-all server-function implementation maps only
 `DocsPageNotFoundError` to TanStack `notFound()`. The route owns the nearest
@@ -170,7 +176,8 @@ route loader/action or server function
 Do not add a hook, provider or wrapper component only to relocate a decoder or
 silence lint. Extract React composition when it owns reusable UI policy or
 removes meaningful repetition. App-specific composition remains app-owned;
-`packages/ui` remains planned.
+the docs accessibility and navigation UI stays in `apps/docs`, and this slice
+does not create or depend on `packages/ui`.
 
 MDX component registries follow the same composition rule. The docs app owns
 one registry under its MDX adapter, while routes and leaves import focused
@@ -194,7 +201,14 @@ before a second application needs it.
 - Keep docs loader outcomes encoded until a direct route-root consumer restores
   them through the browser-safe route boundary.
 - Use TanStack router links for internal docs routes so client navigation runs
-  the route loader. Keep ordinary anchors for external destinations.
+  the route loader. Preserve query and fragment semantics; keep ordinary
+  anchors for external, mail, download, repository-source and same-document
+  destinations.
+- Keep the skip link, one main landmark, labelled navigation, current-page
+  semantics, focus intent and responsive disclosure app-owned. Client
+  navigation may move focus to the page heading; initial hydration must not.
+- Keep all information and focus behavior available without animation. A
+  reduced-motion browser setting must not remove required state.
 - Do not import generated `.source/server` files or
   `@taxkit/docs-content/server` from browser modules.
 - Keep Fumadocs generated source access inside `@taxkit/docs-content` server
