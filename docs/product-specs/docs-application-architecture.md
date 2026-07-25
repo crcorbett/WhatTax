@@ -1,7 +1,7 @@
 ---
 document_type: product-spec
-lifecycle: current
-authority: canonical
+lifecycle: implemented
+authority: supporting
 owner: taxkit-product-owner
 last_reviewed: 2026-07-25
 review_trigger: accepted finding, implementation discovery, ownership change, or proof-boundary change
@@ -31,8 +31,10 @@ repository at commit `ed4306f1ffa8bb0f08dc0cffef8fe9ef3e7897f4`,
 inspected on 2026-07-25, supports the substitution principle but is not TaxKit
 policy or a source tree to copy.
 
-Implementation is tracked by the active
-[execution plan](../exec-plans/active/docs-application-architecture.md).
+Implementation completed on 25 July 2026. The historical
+[execution plan](../exec-plans/completed/docs-application-architecture.md)
+retains the task evidence, candidate identity, limitations and bounded visual
+artifacts.
 
 On 2026-07-25 Cooper authorized one narrow governance amendment after
 `DOCS-APP-004` exposed a collision between the evolving current critical
@@ -649,7 +651,7 @@ Final screenshot evidence belongs to the implementation execution plan, not to
 the application or package source tree. Capture into:
 
 ```text
-docs/exec-plans/active/docs-application-architecture/
+docs/exec-plans/completed/docs-application-architecture/
 └── screenshots/<full-candidate-commit>/
     ├── manifest.json
     ├── 01-page-desktop-1440x1000.png
@@ -699,7 +701,7 @@ status, keyboard/focus behavior, contrast, reduced-motion behavior or console
 cleanliness. Those claims retain their HTTP, Playwright, accessibility,
 computed-style, request-trace and console oracles.
 
-## Current evidence limitations
+## Implemented evidence and limitations
 
 Implementation has superseded the recorded target-revision baseline:
 
@@ -721,10 +723,20 @@ Implementation has superseded the recorded target-revision baseline:
   keyboard, landmarks, responsive navigation, contrast, reduced motion,
   pending, recoverable failure and framework-native not-found behavior.
 
-The candidate-bound retained screenshots, primary-owner image review and final
-lifecycle transition remain pending until the implementation is frozen as one
-clean commit. All proof remains local: it establishes no deployment, provider
-routing, public URL, publication, production behavior or public availability.
+The clean implementation candidate is
+`bf13ca114362708d461787585a9e8f83d0db55d2`. Fresh canonical verification and
+the non-visual built-app harness passed before screenshot capture. The retained
+[manifest](../exec-plans/completed/docs-application-architecture/screenshots/bf13ca114362708d461787585a9e8f83d0db55d2/manifest.json)
+records built-output SHA-256
+`40891fad961cc754c3fe09edd5a165d267dc662e967beef906f4066a1190c02d`,
+Chromium `148.0.7778.96`, six individually digested PNGs, exact routes or
+test-owned fixtures, viewports, expected and observed visible postconditions,
+safe artifact fields and primary-owner visual acceptance. Reduced-motion
+imagery is evidenced `not_applicable` because the app has no visually relevant
+transition; the independent computed-style oracle still passed.
+
+All proof remains local: it establishes no deployment, provider routing,
+public URL, publication, production behavior or public availability.
 Historical implemented SPECs and completed plans remain trajectory evidence
 only.
 
@@ -739,7 +751,7 @@ only.
 | Proof and evidence | Change required | `docs/verification/critical-journeys.json`, `docs/evidence/releases/HGI-203-critical-journeys.json`, immutable HGI-203 packet/receipts, `docs/architecture/testing-and-quality.md`, current app browser harness, future execution-plan screenshot directory | Preserve the original HGI-203 evidence unchanged while retaining its exact journey snapshot; correct the current docs journey oracle and add built-app evidence ownership in `DOCS-APP-004` through `DOCS-APP-006`. The only committed browser artifacts are the bounded `DAR-013` manifest/PNG set carried by the evidence-only closeout commit and moved with the plan from active to completed; transient builds, videos, traces, logs and unbounded/raw browser output are not committed. |
 | Skills, AGENTS and metadata | Change required | `.agents/skills/docs-maintainer/references/repository-profile.md`, `AGENTS.md`, `.claude/skills/docs-maintainer` | Update the local docs-maintainer profile paths/commands in `DOCS-APP-001` and `DOCS-APP-006`. Preserve `AGENTS.md`, skill implementation and relative instruction links; no skill baseline migration. |
 | Lint, config and CI | Change required | `knip.json`, `knip.production.json`, `turbo.json`, `oxlint.config.ts`, `package.json`, `.github/workflows/quality.yml` | Model generation, docs workspaces and the verified app-owned built-app harness invocation in `DOCS-APP-004` and `DOCS-APP-006`. Existing Quality workflow inherits canonical verification; no new deployment job. |
-| SPEC, tasks and lifecycle | Change required | this SPEC, sibling tasks, `docs/product-specs/index.md`, `docs/exec-plans/active/README.md` | Draft artifacts exist now. Create an active plan only when `DOCS-APP-001` begins; keep lifecycle synchronized and archive only after all proof passes in `DOCS-APP-006`. |
+| SPEC, tasks and lifecycle | Change required | this SPEC, sibling tasks, `docs/product-specs/index.md`, `docs/exec-plans/{active,completed}/README.md` | The implemented SPEC/tasks/index and historical plan agree; the bounded evidence moved with the plan only after all `DOCS-APP-006` proof passed. |
 | Tests and fixtures | Change required | current docs-content validation tests, docs-fumadocs tests, app route-boundary tests and browser config | Add deterministic live/test substitution, malformed/missing fixtures, import audits and built-app journeys in `DOCS-APP-001` through `DOCS-APP-006`. |
 | Config, exports and generated owners | Change required | three package manifests, `packages/docs-content/source.config.ts`, generated `.source`, app Vite config | Move source inputs, narrow exports, and enforce source/type/default plus generation/build ordering in `DOCS-APP-001`, `DOCS-APP-002`, and `DOCS-APP-006`. |
 | Public content lifecycle | Change required | current published MDX/frontmatter/navigation and `docs/documentation-audit/hgi-207/public-mdx-lifecycle.json` | Relocate without copy/status/taxonomy changes, preserve acceptance bindings by updating paths atomically in `DOCS-APP-001`; do not fabricate new publication acceptance. |

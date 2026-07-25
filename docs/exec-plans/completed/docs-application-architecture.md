@@ -1,11 +1,11 @@
 ---
 document_type: execution-plan
-lifecycle: current
+lifecycle: historical
 authority: supporting
-owner: taxkit-product-owner
+owner: taxkit-execution-history-owner
 last_reviewed: 2026-07-25
 review_trigger: task acceptance, implementation discovery, proof result, or lifecycle change
-successor: null
+successor: ../../product-specs/docs-application-architecture.md
 tombstone: false
 ---
 
@@ -19,7 +19,7 @@ Task list:
 
 ## Goal
 
-Implement `DOCS-APP-001` through `DOCS-APP-006` sequentially so authored
+Implemented `DOCS-APP-001` through `DOCS-APP-006` sequentially so authored
 content belongs to `packages/docs-content`, reusable Fumadocs source access is
 a narrow generic Effect service in `packages/docs-fumadocs`, and `apps/docs`
 owns TanStack Start execution, routing, UI and built-browser behavior.
@@ -37,7 +37,7 @@ this plan.
 | `DOCS-APP-003` | completed | Canonical content service, app server runtime, safe error and import-boundary slice accepted. |
 | `DOCS-APP-004` | completed | Native route outcomes, built HTTP/browser harness and approved HGI-203 journey-epoch amendment accepted. |
 | `DOCS-APP-005` | completed | Router-native MDX links, navigation focus, responsive disclosure and accessibility proof accepted. |
-| `DOCS-APP-006` | in progress | Production reachability, clean-candidate proof and retained evidence are in progress. |
+| `DOCS-APP-006` | completed | Production reachability, clean candidate `bf13ca114362708d461787585a9e8f83d0db55d2`, retained evidence and lifecycle closeout accepted. |
 
 ## Baseline
 
@@ -47,7 +47,7 @@ this plan.
   product-spec index pointer.
 - Frozen installed graph: Bun `1.3.14`; no dependency or lockfile changes are
   authorized.
-- Current known closeout baseline: canonical verification reaches Knip, then
+- Initial closeout baseline: canonical verification reached Knip, then
   cannot load the two docs configs because the compiled
   `@taxkit/docs-fumadocs/config` target is absent. `DOCS-APP-002` owns that
   correction without ignores or suppressions.
@@ -355,8 +355,47 @@ versioning, publication, deployment or provider work.
   explicit contract, and the focused 23-task graph plus fresh canonical
   verification pass.
 - Final candidate commit, candidate-bound screenshot capture, primary-owner
-  visual acceptance and lifecycle closeout remain pending. No screenshot is
-  claimed as behavioral proof and no external state is claimed.
+  visual acceptance and lifecycle closeout are recorded below. No screenshot
+  is claimed as behavioral proof and no external state is claimed.
+
+### 2026-07-25 — `DOCS-APP-006` accepted
+
+- Froze clean implementation candidate
+  `bf13ca114362708d461787585a9e8f83d0db55d2` after all non-visual gates
+  passed. Fresh `bun run verification` passed on that commit, including the
+  immutable release-boundary mutation corpus, both Knip modes and all 23
+  Turbo type-check tasks.
+- The candidate-owned built harness passed independently before capture:
+  representative SSR returned `200`, the genuinely missing path returned
+  `404`, real sidebar and authored-MDX navigation made zero document requests,
+  and hydration/navigation/error journeys emitted zero diagnostics.
+- Captured the bounded `DAR-013` set from the same clean candidate with
+  built-output SHA-256
+  `40891fad961cc754c3fe09edd5a165d267dc662e967beef906f4066a1190c02d`.
+  Chromium `148.0.7778.96` produced six PNGs with manifest-bound file digests.
+  The retained
+  [manifest](./docs-application-architecture/screenshots/bf13ca114362708d461787585a9e8f83d0db55d2/manifest.json)
+  owns their exact identity and limitations.
+  Reduced-motion imagery is `not_applicable`: there is no visually relevant
+  transition, while the independent computed-style reduced-motion assertion
+  passed.
+- Primary-owner visual review accepted the representative desktop page, open
+  narrow navigation, visible focused skip link, pending state, recoverable
+  error and framework-native not-found images. The manifest and PNGs expose no
+  browser chrome, private content, secret/authorization data or machine-local
+  path. Screenshots remain explicitly non-probative for HTTP status, SSR body,
+  hydration, request type, keyboard/focus behavior, contrast, motion
+  suppression and console cleanliness.
+- The final dependency declaration comparison and `bun.lock` SHA-256
+  `a917cbcf81d6917deb9876718494cfe2a6ca3d337d106d4813e6cc6bc84ba792`
+  remain unchanged. The two-package patch Changeset is pending intentionally;
+  no versioning, publication, deployment, provider action or public-site proof
+  occurred.
+- `TDA-001` through `TDA-007` and `TDA-P01` through `TDA-P05` are accepted.
+  `TDA-008` remains deferred, with no Fumadocs UI dependency, shared UI
+  package, search implementation, browser Effect runtime or public-copy
+  redesign. The completed plan and its bounded evidence moved together to the
+  historical owner.
 
 ## Documentation impact
 

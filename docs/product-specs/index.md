@@ -21,7 +21,7 @@ Specs:
 
 | Spec | Status | Notes |
 | --- | --- | --- |
-| [TaxKit docs application architecture](./docs-application-architecture.md) | Active | Accepted findings `TDA-001` through `TDA-007` define the active three-owner docs migration; search remains deferred. |
+| [TaxKit docs application architecture](./docs-application-architecture.md) | Implemented | The three-owner docs migration, native route outcomes, production graph and candidate-bound local proof are implemented; search remains deferred. |
 | [Harness foundation improvements](./harness-foundation-improvements.md) | Implemented | The portable six-skill baseline, stable TaxKit profile, deterministic governance gate, five retained journeys, and fail-closed epoch `7c8a96e` are implemented and locally verified. |
 | [Harness-governance documentation](./harness-governance-documentation.md) | Implemented | HGI-200 through HGI-208 are accepted locally; HGI-206 records the bounded repository epoch and closeout without claiming release, provider, or public actuality. |
 | [API compatibility harness](./api-compatibility-harness.md) | Implemented | OpenAPI snapshot, route fixtures and live API app smoke coverage are in place. |
