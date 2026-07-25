@@ -37,12 +37,11 @@ Those belong in the `apps/docs` runtime.
 ## Runtime shape
 
 `fumadocs-mdx` compiles `source.config.ts` into `.source/`. Server-only package
-code adapts that generated collection through `fumadocs-core/source` and the
-reusable `@taxkit/docs-fumadocs/source` helpers before exposing page data
-through `DocsContentService`. The existing `getPage` and `listPages` methods
-return serialisable content page data for the current app route. The
-`getRenderablePage` and `listRenderablePages` methods expose compiled
-Fumadocs page data for server-side rendering integration.
+code supplies one TaxKit generated-collection adapter to
+`@taxkit/docs-fumadocs/live`. `DocsContentServiceLive` requires the generic
+`FumadocsSource` service, decodes its generic representation into canonical
+TaxKit page values and maps generic source errors at the content boundary.
+The app composes the two Layers and executes the resulting server runtime.
 
 The authored `navigation.json` representation is decoded through
 `DocsNavigation`. This keeps TaxKit navigation and content policy at the same

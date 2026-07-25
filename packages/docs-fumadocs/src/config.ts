@@ -13,16 +13,13 @@ import type {
 } from "fumadocs-mdx/config";
 import remarkMermaid from "remark-mermaidjs";
 
-import { FumadocsCodeBlockMeta, FumadocsMeta } from "./schemas.js";
+import { FumadocsCodeBlockMeta } from "./schemas.js";
 
 export const effectSchemaToStandardSchema = <
   const SourceSchema extends Schema.Decoder<unknown, never>,
 >(
   schema: SourceSchema
 ) => Schema.toStandardSchemaV1(schema);
-
-export const fumadocsMetaStandardSchema =
-  effectSchemaToStandardSchema(FumadocsMeta);
 
 export const transformerCodeBlockMeta = (): ShikiTransformer => ({
   name: "taxkit:docs-code-block-meta",
@@ -70,26 +67,6 @@ export const defineFumadocsConfig = (
     mdxOptions: Option.fromUndefinedOr(config.mdxOptions).pipe(
       Option.getOrElse(sharedMdxOptions)
     ),
-  });
-
-export const defineFumadocsDocs = <
-  const FrontmatterSchema extends StandardSchemaV1,
->({
-  dir,
-  frontmatterSchema,
-}: {
-  readonly dir: string;
-  readonly frontmatterSchema: FrontmatterSchema;
-}): DocsCollection<FrontmatterSchema, typeof fumadocsMetaStandardSchema> =>
-  defineDocs<FrontmatterSchema, typeof fumadocsMetaStandardSchema>({
-    dir,
-    docs: {
-      async: true,
-      schema: frontmatterSchema,
-    },
-    meta: {
-      schema: fumadocsMetaStandardSchema,
-    },
   });
 
 export const defineFumadocsDocsWithMeta = <

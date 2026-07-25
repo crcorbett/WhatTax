@@ -81,9 +81,36 @@
       "project": ["src/**/*.ts"]
     },
     "packages/docs-content": {
-      "entry": ["source.config.ts", "src/errors.ts", "src/schemas.ts"],
-      "project": ["source.config.ts", "src/**/*.ts"],
+      "entry": [
+        "source.config.ts",
+        "src/client.ts",
+        "src/errors.ts",
+        "src/generated-source.layer.ts",
+        "src/live.layer.ts",
+        "src/schemas.ts",
+        "src/server.ts",
+        "src/service.ts",
+        "src/validate.runtime.ts",
+        "src/**/*.test.ts",
+        "vitest.config.ts"
+      ],
+      "project": ["source.config.ts", "src/**/*.ts", "vitest.config.ts"],
       "ignoreDependencies": ["@shikijs/core", "@taxkit/tsconfig", "typescript"]
+    },
+    "packages/docs-fumadocs": {
+      "entry": [
+        "src/config.ts",
+        "src/errors.ts",
+        "src/live.layer.ts",
+        "src/render/index.ts",
+        "src/schemas.ts",
+        "src/service.ts",
+        "src/test.layer.ts",
+        "src/**/*.test.ts",
+        "vitest.config.ts"
+      ],
+      "project": ["src/**/*.ts", "vitest.config.ts"],
+      "ignoreDependencies": ["@taxkit/tsconfig", "typescript"]
     },
     "packages/sdk/typescript": {
       "entry": [

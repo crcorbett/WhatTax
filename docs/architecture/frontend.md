@@ -183,7 +183,7 @@ before a second application needs it.
 - Do not import generated `.source/server` files or
   `@taxkit/docs-content/server` from browser modules.
 - Keep Fumadocs generated source access inside `@taxkit/docs-content` server
-  exports and reusable adapters in `@taxkit/docs-fumadocs/source`.
+  values from the `@taxkit/docs-fumadocs/service` boundary.
 - Apply the [abstraction admission
   contract](../design-docs/abstraction-admission.md) before sharing a hook,
   provider, component family or UI package.

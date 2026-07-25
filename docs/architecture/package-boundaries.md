@@ -199,6 +199,7 @@ owns:
 
 Implemented `@taxkit/docs-content` owns:
 
+- authored TaxKit MDX, navigation and checked examples
 - TaxKit docs frontmatter, meta, navigation and validation schemas
 - navigation and source-text validation policy
 - docs content service tags and live layers
@@ -208,8 +209,8 @@ Implemented `@taxkit/docs-fumadocs` owns:
 
 - reusable Fumadocs configuration helpers
 - Effect Schema to Standard Schema bridges
-- generic Fumadocs source loader adapters
-- generic page-tree conversion helpers
+- generic source representation Schemas and safe tagged errors
+- the named `FumadocsSource` service and generated-loader live/test Layers
 - generic browser-safe MDX render primitives
 
 Docs packages must not own rule-pack algorithms, API endpoint business logic

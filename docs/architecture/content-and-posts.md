@@ -37,8 +37,8 @@ on the open-source tax engine and avoid downstream private-product specifics.
 
 `packages/docs-fumadocs`
 : Private reusable package for generic Fumadocs configuration, Effect Schema to
-  Standard Schema bridging, source loader adapters, page-tree helpers and
-  generic MDX render primitives.
+  Standard Schema bridging, the generic source service and live/test Layers,
+  and generic MDX render primitives.
 
 `tools/documentation/owner-policy.json`
 : Machine-readable separation between public content, maintainer documents,
@@ -61,7 +61,7 @@ browser
   -> apps/docs route
     -> apps/docs route boundary schema
     -> DocsContentService
-      -> @taxkit/docs-fumadocs source adapter
+      -> @taxkit/docs-fumadocs FumadocsSource
         -> packages/docs-content/.source/server
           -> packages/docs-content/content/**/*.mdx
       -> packages/docs-content/navigation.json

@@ -14,6 +14,11 @@
       "source": "./src/live.layer.ts",
       "default": "./src/live.layer.ts"
     },
+    "./generated-source": {
+      "types": "./src/generated-source.layer.ts",
+      "source": "./src/generated-source.layer.ts",
+      "default": "./src/generated-source.layer.ts"
+    },
     "./server": {
       "types": "./src/server.ts",
       "source": "./src/server.ts",
@@ -42,10 +47,10 @@
     "./source.config": "./source.config.ts"
   },
   "scripts": {
-    "build": "fumadocs-mdx",
+    "build": "bun run --filter=@taxkit/docs-fumadocs build && fumadocs-mdx",
     "check-examples": "tsc -p tsconfig.examples.json --noEmit",
-    "check-types": "tsc --noEmit && bun run check-examples",
-    "test": "vitest run --passWithNoTests",
+    "check-types": "bun run --filter=@taxkit/docs-fumadocs build && tsc --noEmit && bun run check-examples",
+    "test": "bun run --filter=@taxkit/docs-fumadocs build && vitest run --passWithNoTests",
     "validate": "bun run ./src/validate.runtime.ts",
     "clean": "rm -rf .source .turbo *.tsbuildinfo"
   },

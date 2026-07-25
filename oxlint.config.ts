@@ -18,6 +18,8 @@ const decodingBoundaryFiles = [
   "packages/docs-content/src/live.layer.ts",
   "packages/docs-content/src/validation/policy.runtime.test.ts",
   "packages/docs-content/src/validation/policy.ts",
+  "packages/docs-fumadocs/src/live.layer.ts",
+  "packages/docs-fumadocs/src/test.layer.ts",
   "packages/docs-fumadocs/src/config.ts",
 
   // Public API normalisation and focused API contract tests.

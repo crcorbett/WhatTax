@@ -3,18 +3,21 @@
   "version": "0.0.3",
   "private": true,
   "type": "module",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
   "exports": {
-    ".": {
-      "source": "./src/index.ts",
-      "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
-    },
     "./config": {
       "source": "./src/config.ts",
       "types": "./dist/config.d.ts",
       "default": "./dist/config.js"
+    },
+    "./errors": {
+      "source": "./src/errors.ts",
+      "types": "./dist/errors.d.ts",
+      "default": "./dist/errors.js"
+    },
+    "./live": {
+      "source": "./src/live.layer.ts",
+      "types": "./dist/live.layer.d.ts",
+      "default": "./dist/live.layer.js"
     },
     "./render": {
       "source": "./src/render/index.ts",
@@ -26,15 +29,15 @@
       "types": "./dist/schemas.d.ts",
       "default": "./dist/schemas.js"
     },
-    "./source": {
-      "source": "./src/source.ts",
-      "types": "./dist/source.d.ts",
-      "default": "./dist/source.js"
+    "./service": {
+      "source": "./src/service.ts",
+      "types": "./dist/service.d.ts",
+      "default": "./dist/service.js"
     },
-    "./tree": {
-      "source": "./src/tree.ts",
-      "types": "./dist/tree.d.ts",
-      "default": "./dist/tree.js"
+    "./test": {
+      "source": "./src/test.layer.ts",
+      "types": "./dist/test.layer.d.ts",
+      "default": "./dist/test.layer.js"
     }
   },
   "scripts": {

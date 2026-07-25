@@ -45,7 +45,7 @@ const loadDocsPageData = createServerFn({ method: "GET" })
               `/${splat}`
             ).pipe(Effect.mapError((cause) => new DocsSourceError({ cause })));
             const navigation = yield* content.getNavigation();
-            const page = yield* content.getRenderablePage(path);
+            const page = yield* content.getPage(path);
             yield* preloadDocsContent(page.source);
 
             return {

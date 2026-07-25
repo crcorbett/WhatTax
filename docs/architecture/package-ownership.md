@@ -132,9 +132,10 @@ shutdown and platform serving for the implemented API app.
 `packages/docs-fumadocs`
 : Implemented private reusable package for generic Fumadocs integration. It
   owns Effect Schema to Standard Schema bridging, shared MDX compile config,
-  source-loader adapters, page-tree helpers and generic browser-safe MDX render
-  primitives. It must not own TaxKit-specific frontmatter, navigation,
-  validation policy, routes or generated content.
+  the schema-decoded `FumadocsSource` service, safe tagged errors,
+  generated-loader live and deterministic test Layers, and generic
+  browser-safe MDX render primitives. It must not own TaxKit-specific
+  frontmatter, navigation, validation policy, routes or generated content.
 
 ## Runtime shape
 

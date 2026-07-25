@@ -3,7 +3,6 @@ import { describe, expect, it } from "vitest";
 
 import {
   effectSchemaToStandardSchema,
-  fumadocsMetaStandardSchema,
   transformerCodeBlockMeta,
 } from "./config.js";
 
@@ -31,22 +30,6 @@ describe("effectSchemaToStandardSchema", () => {
         title: "Docs package",
       })
     ).toHaveProperty("issues");
-  });
-
-  it("exposes a generic Fumadocs meta schema", () => {
-    expect(
-      fumadocsMetaStandardSchema["~standard"].validate({
-        defaultOpen: true,
-        pages: ["index", "guide"],
-        title: "Docs",
-      })
-    ).toEqual({
-      value: {
-        defaultOpen: true,
-        pages: ["index", "guide"],
-        title: "Docs",
-      },
-    });
   });
 });
 

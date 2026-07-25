@@ -33,7 +33,7 @@ this plan.
 | Task | Status | Evidence |
 | --- | --- | --- |
 | `DOCS-APP-001` | completed | Package-owned content, navigation, examples, validation, lifecycle bindings and focused proof accepted. |
-| `DOCS-APP-002` | pending | Depends on `DOCS-APP-001`. |
+| `DOCS-APP-002` | completed | Generic service/live/test Layers, compiled-config ordering and Knip reachability accepted. |
 | `DOCS-APP-003` | pending | Depends on `DOCS-APP-002`. |
 | `DOCS-APP-004` | pending | Depends on `DOCS-APP-003`. |
 | `DOCS-APP-005` | pending | Depends on `DOCS-APP-004`. |
@@ -118,6 +118,47 @@ clean committed implementation candidate. It belongs under this plan at
   `TDA-P03` and `TDA-P04`. Package versions and dependency declarations are
   unchanged; the current and target `bun.lock` SHA-256 is
   `a917cbcf81d6917deb9876718494cfe2a6ca3d337d106d4813e6cc6bc84ba792`.
+
+### 2026-07-25 — `DOCS-APP-002` accepted
+
+- Replaced callback-per-operation loader helpers with the generic
+  `FumadocsSource` service, named `getPage`/`listPages` Effects, generic page
+  Schemas, safe lookup/load errors, a generated-adapter live Layer and decoded
+  deterministic test Layer.
+- The live adapter contains unknown provider ingress, promise/throw handling
+  and Schema decoding. Service values contain no provider page, raw client,
+  callback or unknown field, and the provider-failure test proves raw detail
+  does not escape the tagged error.
+- Removed the unused root barrel, duplicate generic meta, page-tree contract
+  and callback source exports. The generic render entry remains
+  production-used by the app.
+- Updated the existing content Layer and app composition in the same vertical
+  slice so no production consumer retained the deleted callback API.
+- Added explicit docs-fumadocs build edges to direct docs-content generation,
+  tests and types, direct app types/build, and both Knip commands. After a
+  frozen install with no changes, removing `dist` and running `bun run knip`
+  rebuilt `dist/config.js` before loading either docs config.
+- Baseline Knip candidates were resolved at their semantic owners:
+  - `policy.runtime.test.ts` is a development Knip entry and executes three
+    validation tests;
+  - docs-content `@effect/vitest` is used by that reachable test, while
+    docs-fumadocs uses it for service substitution/error tests;
+  - `validateMdxComponentPolicy` is called by production validation and its
+    focused accepted/rejected test.
+  No ignore, issue suppression or workspace exclusion was added.
+- `.changeset/quiet-docs-own.md` now records patch impact for both private docs
+  packages. Package versions, installed declarations and `bun.lock` remain
+  unchanged.
+- Focused proof passed:
+  - `bun install --frozen-lockfile` — 681 installs checked, no changes.
+  - docs-fumadocs test/types/build — two files and six tests passed.
+  - docs-content test/types, app types/build and browser harness.
+  - clean `dist` absence, `bun run knip`, compiled config existence and both
+    config-consumer loads.
+  - lint, format, documentation/path checks and `bun run verification`.
+- Primary-owner review accepted the generic substitution point, safe errors,
+  one-ingress decoding, lazy Layers, compiled export graph, retirement set and
+  `TDA-002`/`TDA-P01` outcome.
 
 ## Documentation impact
 

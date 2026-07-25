@@ -152,6 +152,15 @@ only at final SDK construction. A provider service must have an explicit live
 Layer and deterministic mock Layer with focused encoding, failure, malformed
 output and substitution tests.
 
+The Fumadocs generated-source boundary follows the same rule.
+`@taxkit/docs-fumadocs/service` exposes only named `getPage` and `listPages`
+Effects over schema-decoded generic page values. Its live Layer accepts one
+narrow generated-collection adapter at construction, contains unknown provider
+output plus promise and throw handling, and emits safe tagged errors.
+`@taxkit/docs-content` supplies the TaxKit collection adapter and decodes the
+generic value into its canonical content Schemas. Neither package executes a
+runtime; `apps/docs` composes the Layers and runs the server Effect.
+
 Use [the repo-owned effect client wrapper skill](../../.agents/skills/effect-client-wrapper/SKILL.md)
 when introducing or reviewing a provider adapter. Its canonical example and
 stale-pattern audit are acceptance requirements, not an optional template.

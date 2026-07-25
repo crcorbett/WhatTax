@@ -1,85 +1,61 @@
 ---
 status: canonical
-last_reviewed: 2026-06-14
+last_reviewed: 2026-07-25
 source_of_truth: package-root
-confidence: medium
+confidence: high
 ---
 
 # @taxkit/docs-fumadocs
 
 ## Scope
 
-Use this private package for reusable Fumadocs integration shared by TaxKit
-docs packages and apps. It owns generic MDX configuration, Effect Schema to
-Standard Schema bridging, Fumadocs source-loader adapters, page-tree conversion
-and browser-safe MDX primitives.
+This private compiled package owns the narrow reusable Fumadocs boundary:
+shared MDX compile configuration, generic source representation Schemas, safe
+tagged source errors, the named `FumadocsSource` Effect service, its
+generated-loader live Layer factory, deterministic test Layer and the generic
+render primitives used by the docs app.
 
-It does not own TaxKit frontmatter, navigation policy, validation rules, route
-loaders, app layout or generated content. Keep those in the content package or
-the docs app that owns the behaviour.
+It does not own TaxKit frontmatter, navigation, content roots, generated
+collection locations, routes, app layout or runtime execution.
 
 ## Exports
 
-| Export | Runtime | Use |
-| --- | --- | --- |
-| `@taxkit/docs-fumadocs` | Browser-safe | Shared schemas and page-tree helpers. |
-| `@taxkit/docs-fumadocs/schemas` | Browser-safe | Generic meta, code-block metadata, page-tree input schemas and tagged source errors. |
-| `@taxkit/docs-fumadocs/tree` | Browser-safe | Convert the package-owned page-tree contract to Fumadocs `PageTree` nodes. |
-| `@taxkit/docs-fumadocs/render` | Browser-safe React | Render generic MDX `pre` and image primitives. |
-| `@taxkit/docs-fumadocs/config` | Build-time | Configure `fumadocs-mdx`, shared Shiki options, Mermaid support and Standard Schema bridges. |
-| `@taxkit/docs-fumadocs/source` | Server or route-loader boundary | Wrap generated Fumadocs source methods in Effect errors. |
+| Export | Use |
+| --- | --- |
+| `@taxkit/docs-fumadocs/config` | Build-time shared `fumadocs-mdx` and Effect Schema bridging. |
+| `@taxkit/docs-fumadocs/schemas` | Generic decoded page and code-block representations. |
+| `@taxkit/docs-fumadocs/errors` | Safe generic lookup and source-load errors. |
+| `@taxkit/docs-fumadocs/service` | Named `getPage` and `listPages` service contract. |
+| `@taxkit/docs-fumadocs/live` | One generated-collection adapter at Layer construction. |
+| `@taxkit/docs-fumadocs/test` | Deterministic decoded fixture Layer. |
+| `@taxkit/docs-fumadocs/render` | Browser-safe generic picture and code-block primitives. |
 
-Browser modules should use only the root export, `./schemas`, `./tree` or
-`./render`. Server route loaders and content packages can use `./source` and
-build configuration can use `./config`.
+The live Layer is the only boundary that accepts generated-provider
+representations. It wraps provider throws and promises, decodes each value
+through the package Schemas and exposes only canonical service values and safe
+tagged errors. Consumers call named service operations; they do not pass
+callbacks or receive raw provider pages.
 
-## Schema bridge
+## Build ordering
 
-Use `effectSchemaToStandardSchema(...)` when a Fumadocs collection needs a
-Standard Schema contract:
-
-```ts
-import { effectSchemaToStandardSchema } from "@taxkit/docs-fumadocs/config";
-import { ProductDocsFrontmatter } from "./schemas";
-
-export const docsFrontmatterSchema =
-  effectSchemaToStandardSchema(ProductDocsFrontmatter);
-```
-
-The Effect Schema remains the source of truth. Fumadocs receives the Standard
-Schema adapter for build-time validation.
-
-## Source loader boundary
-
-Use `@taxkit/docs-fumadocs/source` from server-only content services or route
-loaders:
-
-```ts
-import { loadFumadocsPage } from "@taxkit/docs-fumadocs/source";
-```
-
-The helpers return `Effect` values and fail with package-owned tagged errors.
-Do not import generated `.source/server` files from browser modules.
-
-## Commands
+`source`, `types` and `default` package conditions point to source and compiled
+artifacts explicitly. Direct docs-content generation/tests, docs app
+types/build and both Knip commands build this package first so config loading
+never depends on stale pre-existing `dist`.
 
 ```txt
-bun run --filter=@taxkit/docs-fumadocs build
-bun run --filter=@taxkit/docs-fumadocs check-types
 bun run --filter=@taxkit/docs-fumadocs test
+bun run --filter=@taxkit/docs-fumadocs check-types
+bun run --filter=@taxkit/docs-fumadocs build
 ```
 
-Run `bun run verification` when package exports, README guidance or shared
-runtime behaviour changes.
-
-The build removes `dist` before TypeScript compilation so stale output cannot
-survive a successful build. This private docs package is not part of the
-nine-package release tarball closure.
+The package defines services and Layers only. It does not construct an
+application runtime or execute Effects.
 
 ## Related docs
 
-- `docs/product-specs/docs-fumadocs-package-separation.md`
+- `docs/product-specs/docs-application-architecture.md`
 - `docs/architecture/content-and-posts.md`
 - `docs/architecture/package-ownership.md`
-- `docs/architecture/frontend.md`
+- `docs/architecture/package-boundaries.md`
 - `docs/architecture/effect-services.md`
