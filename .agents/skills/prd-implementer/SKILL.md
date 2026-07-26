@@ -25,6 +25,20 @@ once during grounding, including its contract map and invariant register. Apply
 the stable invariant IDs through the owning task surfaces rather than copying
 the references into the SPEC, code, or final report.
 
+## Suggest one implementation goal
+
+When an approved SPEC has multiple implementation tasks and no active goal,
+suggest creating one goal for implementing the whole SPEC to verified
+completion. Present the proposed objective in user-facing language and create
+the goal only after the user explicitly requests or confirms it.
+
+Use the SPEC's accepted tasks as sequential milestones inside that one goal;
+do not create a separate goal for every task. Continue an existing matching
+goal instead of replacing it. Keep the goal active until all accepted tasks,
+documentation reconciliation, terminal review, and closeout verification are
+complete. Goal state coordinates persistence across turns; it never replaces
+the canonical task ledger, acceptance evidence, or proof receipts.
+
 ## Delegated Slice Prompt Contract
 
 Keep one primary trajectory accountable for integration, proof, delivery, and
