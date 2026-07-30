@@ -2,6 +2,8 @@ import * as Config from "effect/Config";
 import * as Effect from "effect/Effect";
 import * as Schema from "effect/Schema";
 
+import { DocsDeploymentStage } from "./docs-deployment-stage.js";
+
 export const docsCloudflareStackName = "TaxKitDocsCloudflare";
 export const docsWorkerResourceId = "DocsWebsite";
 export const docsWorkerCompatibilityDate = "2026-06-24";
@@ -10,13 +12,6 @@ export const docsWorkerAssetOutputDirectory = "client";
 export const docsWorkerAssetHeaders =
   "/assets/*\n  Cache-Control: public, max-age=31536000, immutable\n";
 export const docsWorkerGeneratedMain = "index.js";
-
-const PreviewStage = Schema.String.check(Schema.isPattern(/^pr-[1-9]\d*$/u));
-
-const DocsDeploymentStage = Schema.Union([
-  Schema.Literals(["prod"]),
-  PreviewStage,
-]).pipe(Schema.brand("taxkit/DocsDeploymentStage"));
 
 export const decodeDocsDeploymentStage = (value: unknown) =>
   Schema.decodeUnknownEffect(DocsDeploymentStage)(value).pipe(

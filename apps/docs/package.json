@@ -17,7 +17,8 @@
     "test": "vitest run --config vitest.server.config.ts",
     "test:browser": "vitest run --config vitest.browser.config.ts",
     "test:built": "bun run build && bun run ./scripts/test-built.tsx",
-    "test:cloudflare-built": "bun run ./scripts/test-cloudflare-built.tsx"
+    "test:cloudflare-built": "bun run ./scripts/test-cloudflare-built.tsx",
+    "test:cloudflare-hosted": "bun run ./scripts/test-cloudflare-hosted.tsx"
   },
   "dependencies": {
     "@tanstack/react-router": "catalog:",

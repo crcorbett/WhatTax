@@ -1,8 +1,10 @@
 ---
-status: canonical
-last_reviewed: 2026-07-25
-source_of_truth: app-root
-confidence: high
+document_type: app-readme
+lifecycle: current
+authority: canonical
+owner: taxkit-docs-app-owner
+last_reviewed: 2026-07-30
+review_trigger: docs route, content boundary, build target, runtime, proof or deployment ownership change
 ---
 
 # Docs app
@@ -83,6 +85,7 @@ bun run --filter=docs test
 bun run --filter=docs test:browser
 bun run --filter=docs test:built
 bun run --filter=docs test:cloudflare-built
+bun run --filter=docs test:cloudflare-hosted
 bun run --filter=docs build:cloudflare
 bun run --filter=docs check-types
 bun run --filter=docs build
@@ -146,6 +149,17 @@ Root `alchemy.run.ts` composes the same output through public Alchemy
 the build target and asset headers; root owns provider composition and
 Alchemy owns the physical Worker name. `.wrangler/**` and `dist/**` are
 ignored generated proof/build output and are never deployment receipts.
+
+Exact Preview, Production, teardown, rollback and Alchemy-state operations
+belong to `docs/runbooks/docs-deployment.md`; dated sanitized observations
+belong below `docs/evidence/deployments/`. The hosted harness requires the
+read-back URL, candidate, stage, environment, plan/config/lock/deployment-input
+digests, Worker/deployment/version identities, evidence directory and rollback
+identity. It writes candidate-qualified desktop/mobile PNGs and emits the
+behavioral observation used to build Schema-decoded receipts. The first dated
+Preview observation was torn down but did not meet the final evidence contract,
+so DCD-002 remains in requalification; it does not prove a current Preview,
+Production or rollback.
 
 `check-import-boundaries` rejects server-only content, service, generated-source
 and runtime imports from browser-reachable app modules. The docs app has no
