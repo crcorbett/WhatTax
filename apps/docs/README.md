@@ -161,7 +161,13 @@ Preview observation was torn down but did not meet the final evidence contract,
 so it remains disconfirming history. Fresh candidate `d9cb894…` passed the
 corrected hosted, screenshot and pre-mutation contracts, independent
 adversarial review and full repository gates and was then torn down; DCD-002
-is accepted. Neither chain proves a current Preview, Production or rollback.
+is accepted. DCD-003 then deployed that source to fixed `prod`, qualified
+`c99984c…` through Preview and Production, removed the successor Preview, and
+restored `d9cb894…` through the same normal Alchemy graph. The current
+dated Production readback observed one stable Worker URL and restored
+source-bound state; it does not establish timeless availability. This does not
+claim byte promotion, recovery from known broken content, a custom domain/DNS
+route, a paid plan or release/publication.
 
 `check-import-boundaries` rejects server-only content, service, generated-source
 and runtime imports from browser-reachable app modules. The docs app has no

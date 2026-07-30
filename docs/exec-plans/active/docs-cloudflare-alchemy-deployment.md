@@ -33,8 +33,8 @@ the milestone and acceptance owner.
 | --------- | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `DCD-001` | completed   | Accepted at `669a8f3…` after exact dependency/integrity readback, both built-app oracles, docs-maintainer reconciliation, focused Changeset, independent closure, and all change-owned gates. |
 | `DCD-002` | completed   | Accepted candidate `d9cb894…` passed fresh pre-deploy and pre-destroy state/provider readback, equal plans, Preview apply, the complete hosted/browser/screenshot contract, exact-stage teardown/absence, all gates and corrected-boundary independent review. |
-| `DCD-003` | pending     | The accepted `DCD-002` Preview identity now permits fixed Production and normal rollback work under the same bounded authority, subject to exact identity and safe-plan preflight.                                  |
-| `DCD-004` | pending     | Waits for accepted manual Preview and Production paths.                                                                                                                                                              |
+| `DCD-003` | completed   | Accepted after fixed Production, separately Preview-qualified successor, successor Production, restored-source rollback, provider/hosted/screenshot readback, owner reconciliation, full verification and corrected-boundary independent review. |
+| `DCD-004` | pending     | Ready to turn the accepted manual Preview, Production and teardown paths into the minimum protected delivery workflows.                                                                                              |
 | `DCD-005` | pending     | Waits for accepted automation and complete parity evidence.                                                                                                                                                          |
 
 ## Baseline
@@ -541,3 +541,152 @@ rollback. Changeset impact is evidenced `N/A`: this slice changes the private
 docs app, root deployment composition, repository-only proof/control owners
 and maintainer documentation, with no new package-facing behavior beyond the
 already retained DCD-001 Changeset.
+
+### 2026-07-30 — DCD-003 fixed Production and normal rollback observation
+
+The accepted DCD-002 candidate
+`d9cb8945529fb72158e59ca0daf02a98e1e4de1a` retained source-config digest
+`8cca8bb6717fa857ffd34820eaa15f8538efc4484296d74e24cedac59268cbd3`,
+lock digest
+`6d5e4ce309f557483eba5638d7501c183e523822bf147b976d72d13908d4224b`
+and deployment-input digest
+`dc49b540f885bc7c254dba2ef1c634c5539bde1f93b1b864a7863049da1fcb39`.
+Two fixed-stage create plans agreed on sanitized digest
+`78f27f84192f60bde775224446ff01c59703e15a7d5227030155b0f98cf2c506`
+and selected only `DocsBuild` plus `DocsWebsite`. The authorized Production
+apply created Worker
+`taxkitdocscloudflare-docswebsite-prod-ujphggiaxw5ryjev`, deployment
+`6ba54ad9-b281-44dd-bfe5-2956776d8935`, version
+`fab01e64-2ffa-4dc1-87f7-5497af95857a` and its stable read-back
+`workers.dev` URL. Provider and Alchemy state version `7` agreed.
+
+The complete hosted contract passed at the read-back URL: SSR, content-typed
+immutable assets, successful server functions, malformed-input rejection,
+direct/client `404`, hydration, no-document client navigation, focused
+accessibility, clean desktop/mobile diagnostics and two opt-in requests
+observing one module-scoped runtime construction in one observed isolate.
+Reviewed desktop and mobile image digests were respectively
+`2178f0005d757ff3fa6b3cd9cd54b00f4e255c105315ec17a1f3871bb36cb10f`
+and
+`86c685b85e2a016e96ca85ee94984ea4dd155094af66bbf6740dde41658eb9bd`.
+
+A normal rollback rehearsal required a distinct source candidate rather than
+misrepresenting same-source convergence as rollback. Existing reviewed commit
+`c99984c9f89b79027ecb7ea147aa1322b92d2cdf` changed repository-only DCD-002
+owners while leaving deployment-critical source config and lock inputs
+unchanged. A clean frozen rebuild produced distinct path-bearing output and
+deployment-input digest
+`42b6584e8f786f123e953f63769efbd03abb629b62695917f5ba37dd926361e9`;
+no byte-identity claim is made.
+
+Candidate c999 first passed isolated `pr-1` equal create plan
+`771fde06c1b012e488865be4095a521c1788d6379bf6154db19ed6ba31affbf8`,
+provider/hosted/screenshot proof and equal destroy plan
+`ca6feff415a97550efa625dd78c9c1a9a9720e929f6f6cfbb41fb781f5306d7a`.
+Readback then proved that Preview Worker, URL and stage absent. Its Production
+equal update plan
+`0d8d2533e4d1975fee3956464a831eb9f819c831b53e9f6ef1c3c74e13e29ed6`
+preserved the fixed Worker, URL and Alchemy instance while creating deployment
+`bb2b004d-65f3-4a0d-9d73-3b0bff7aa8a6` and version
+`0f7de178-8ca5-4573-a5a3-a35ea353cbe8`; hosted and screenshot proof passed.
+
+Finally, two rollback plans restoring d9 agreed on digest
+`4859d5b9977e07949baa4cfbba2495318ff21e8f89ac11a1a56c2696690d4fcb`.
+The same normal deploy graph preserved Worker, URL and state instance while
+creating deployment `bb00213f-f110-4732-a432-66825769e5a1` and version
+`47e7f073-b629-44f7-ad0f-bebcc7c3513b`. Final state bundle
+`6c1276f7dee956375e462c2a57e3b988f51f255297bce197aa34810ab3f4081f`
+equals the initial d9 Production bundle, and the full hosted/screenshot
+contract passed again. The latest dated readback observed restored d9; it is not
+a timeless availability claim.
+
+The verified mutation invocations were the runbook-owned
+`ALCHEMY_PLAIN=1 CI=1 bunx alchemy deploy --dry-run --stage prod --profile default --yes`
+(twice per candidate) followed by
+`ALCHEMY_PLAIN=1 CI=1 bunx alchemy deploy --stage prod --profile default --yes`.
+The c999 Preview used the already verified `pr-1` plan/deploy/destroy commands.
+Each hosted invocation used `bun run --filter=docs test:cloudflare-hosted` with
+the exact read-back URL, source, plan/config/lock/deployment-input,
+Worker/deployment/version, environment, evidence path and recovery identity
+inputs required by the runbook.
+
+The cross-receipt validator now fails unless the successor Preview is
+qualified and absent, two viewport classes bind each hosted provider identity,
+Production deployment/version IDs change, Worker/URL/state identity remains
+stable, and the restored bundle matches the initial accepted source. A
+previously unvalidated absent-stage flag was corrected from identity agreement
+to disagreement, and an exact c999 Git/credential receipt now prevents reuse of
+d9 identity. The receipt records no token values.
+
+Limitations and non-claims: Cloudflare billing subscription readback remained
+forbidden, so no paid plan is claimed. Cooper accepted the standard usage model
+and documented `workers.dev` business-critical limitation. This rehearsal did
+not introduce broken content and does not prove byte promotion, direct-version
+break glass, custom-domain/DNS state, release or publication. DCD-003 remains
+`in_progress` until docs-maintainer reconciliation, broad verification and
+fresh independent acceptance finish. Changeset impact is evidenced `N/A`
+because this slice changes private deployment operations, repository-only
+proof/Schemas and documentation, not package-facing behavior.
+
+### 2026-07-30 — DCD-003 first adversarial false-green review
+
+The required fresh independent reviewer returned `NOT READY` even though all
+then-current decoders and gates passed. `DCD3-FG-001` showed that consistently
+rebound delete/no-op plans could pass; `DCD3-FG-002` found accepted Preview,
+credential and fixed-Worker fields in the initial Production preflight were not
+cross-bound; `DCD3-FG-003` found successor/rollback authority and credential
+fields could disagree; `DCD3-FG-004` found rollback evidence paths were
+decorative; `DCD3-EVID-005` found initial and restored d9 manifests pointed to
+the same later-overwritten filenames; and `DCD3-CLAIM-006` rejected timeless
+“remains live” wording.
+
+The earliest policy owner now enforces Preview create/destroy and Production
+create/update actions, all accepted Preview source/config/lock/input and dated
+credential identities, authority-operation pairing, credential validity at
+preflight time, fixed Worker prefix/subdomain, rollback qualification, every
+loaded rollback path and screenshot epoch semantics. Negative tests attack
+destructive plan actions, accepted Preview/scope drift, authority mismatch,
+rollback path substitution and restored bundle mismatch.
+
+The initial and restored d9 manifests had independently recorded identical PNG
+digests before the filename overwrite was noticed. They now explicitly share
+content-addressed desktop/mobile bytes while retaining distinct
+candidate/deployment/version/capture/review manifests; validation fails unless
+both epoch manifests admit that deduplication and agree on path and digest.
+No image was fabricated or relabelled as a distinct capture. Durable wording
+now says only that the latest dated readback observed restored d9. DCD-003
+remains `in_progress` pending corrected gates and adversarial closure.
+
+Draft PR `#1` readback at remote head `c99984c…` still reports two failed
+Quality aggregates. Both hosted logs show canonical `bun run verification`
+passing and the later `bun run test` stage failing. The exact unchanged
+`packages/scripts/src/release-readiness/evidence.boundary.test.ts` baseline was
+already reproduced at the reviewed parent and branch head; no DCD-003 path
+touches that owner or immutable HGI evidence. A later direct one-file diagnostic
+was manually stopped after producing repeated timeout-only messages and is not
+acceptance evidence. The change-owned DCD-003 repository verification passes;
+the remote aggregate remains an explicitly retained unrelated baseline, not a
+green CI claim.
+
+### 2026-07-30 — DCD-003 independent closure and acceptance
+
+The first two adversarial passes remained `NOT READY` until the executable
+owner rejected plan-action substitution, detached Preview and credential
+identity, authority-operation drift, decorative rollback paths, ambiguous
+screenshot epochs and timeless availability wording. The final bounded review
+returned `READY` after the durable suite added explicit late-readback and
+expired-preflight attacks for Preview, initial Production, successor
+Production and rollback Production. It also proved that distinct screenshot
+paths remain valid while a shared path requires equal image digest, a
+digest-addressed filename and explicit content-addressed admission in both
+manifests.
+
+The final focused policy run passed `16` tests with `44` expectations, and the
+cross-receipt validator decoded the retained Production directory with zero
+violations. Repository verification, docs/runbook/path checks, the Nitro
+built-app regression oracle and diff hygiene passed before acceptance. The
+review did not call providers and does not refresh the dated Cloudflare,
+credential, availability, DNS, publication or release observations.
+
+DCD-003 is accepted. DCD-004 is the next dependency-ready milestone. Production
+is not destroyed, and no timeless availability claim is made.

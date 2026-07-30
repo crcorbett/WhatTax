@@ -158,14 +158,23 @@ The separate
 `docs/verification/docs-deployment-journeys.json` inventory owns only four
 deployment-supporting claims: local workerd, hosted Preview, hosted Production
 and Production rollback/operator proof. `bun run check:docs-deployment`
-Schema-decodes that owner and the admitted dated receipt. It does not join the
+Schema-decodes that owner and the admitted dated receipts. It does not join the
 five local release journeys. The accepted DCD-002 requalification chain binds
 exact candidate `d9cb8945529fb72158e59ca0daf02a98e1e4de1a`, exact
 pre-deploy and pre-destroy state/provider readback, equal plans, provider
 Worker/deployment/version/assets/URL readback, hosted HTTP/browser proof,
 reviewed desktop/mobile screenshots and exact-stage teardown/absence. It is a
-dated Preview-and-teardown observation, not Production, rollback, public
-domain or current Preview-availability proof.
+dated Preview-and-teardown observation, not current Preview availability.
+
+The accepted DCD-003 chain separately validates the first fixed `prod`
+deployment, the successor's trusted Preview and exact-stage absence, the
+successor Production update, and the normal source-bound redeploy of
+`d9cb894…`. Executable cross-receipt checks require two viewport classes,
+provider/hosted/screenshot identity equality, distinct deployment/version IDs,
+stable Worker/URL/state instance, and restoration of the initial d9 state
+bundle. A negative test changes the restored bundle hash and must fail. These
+dated observations establish no custom domain, DNS, byte promotion,
+known-bad-content recovery, paid-plan or release claim.
 
 The retained `0d714e6…` observation is disconfirming history: it did not
 establish the same pre-mutation, isolate-equality, mobile-request, public-cache,

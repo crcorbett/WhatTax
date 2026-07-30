@@ -7,6 +7,9 @@ import type {
   DeploymentHostedProofReceipt,
   DeploymentJourneyInventory,
   DeploymentPlanReceipt,
+  DeploymentProductionMutationPreflightReceipt,
+  DeploymentProductionPreflightReceipt,
+  DeploymentProductionRollbackReceipt,
   DeploymentProviderPreflightReceipt,
   DeploymentProviderReadback,
   DeploymentPreviewCredentialReadbackReceipt,
@@ -80,6 +83,19 @@ export const inspectDeploymentPlanReceipt = (
   return findings;
 };
 
+export const inspectDeploymentPlanActions = (
+  receipt: DeploymentPlanReceipt,
+  expectedAction: "create" | "update" | "delete"
+): readonly string[] =>
+  Array.every(
+    receipt.projection.logicalResources,
+    (resource) => resource.action === expectedAction
+  )
+    ? []
+    : [
+        `plan-actions: both owned resources must use ${expectedAction} for this operation`,
+      ];
+
 export const inspectHostedDeploymentProof = (
   receipt: DeploymentHostedProofReceipt
 ): readonly string[] => {
@@ -151,6 +167,7 @@ export const inspectPreviewEvidenceChain = (
 ): readonly string[] => {
   const findings = [
     ...inspectDeploymentPlanReceipt(plan),
+    ...inspectDeploymentPlanActions(plan, "create"),
     ...inspectHostedDeploymentProof(hosted),
     ...Array.flatMap(screenshots, (manifest) =>
       inspectScreenshotProviderBinding(manifest, provider)
@@ -189,6 +206,305 @@ export const inspectPreviewEvidenceChain = (
   return findings;
 };
 
+export const inspectProductionEvidenceChain = (
+  plan: DeploymentPlanReceipt,
+  provider: DeploymentProviderReadback,
+  hosted: DeploymentHostedProofReceipt,
+  screenshots: readonly DeploymentScreenshotManifest[],
+  environment: "production" | "rollback",
+  expectedAction: "create" | "update"
+): readonly string[] => {
+  const findings = [
+    ...inspectDeploymentPlanReceipt(plan),
+    ...inspectDeploymentPlanActions(plan, expectedAction),
+    ...inspectHostedDeploymentProof(hosted),
+    ...Array.flatMap(screenshots, (manifest) =>
+      inspectScreenshotProviderBinding(manifest, provider)
+    ),
+  ];
+  if (
+    plan.operation !== "production-equal-replan" ||
+    plan.projection.stage !== "prod" ||
+    plan.projection.candidate.exactCommit !== provider.candidateCommit ||
+    plan.acceptedPlanSha256 !== provider.acceptedPlanSha256 ||
+    plan.projection.configSha256 !== provider.configSha256 ||
+    plan.projection.candidate.deploymentInputSha256 !==
+      provider.deploymentInputSha256 ||
+    plan.projection.candidate.lockfileSha256 !== provider.lockfileSha256 ||
+    provider.stage !== "prod" ||
+    hosted.environment !== environment ||
+    hosted.candidateCommit !== provider.candidateCommit ||
+    hosted.url !== provider.url ||
+    deploymentRecordDigest(hosted.provider) !==
+      deploymentRecordDigest(provider) ||
+    screenshots.length !== 2 ||
+    HashSet.size(
+      HashSet.fromIterable(
+        screenshots.map((manifest) => manifest.viewport.kind)
+      )
+    ) !== 2 ||
+    Array.some(
+      screenshots,
+      (manifest) =>
+        manifest.environment !== "production" || manifest.stage !== "prod"
+    )
+  ) {
+    findings.push(
+      "production-evidence-chain: plan, provider, hosted and two-viewport screenshot receipts must bind one fixed Production candidate"
+    );
+  }
+  return findings;
+};
+
+export const inspectInitialProductionPreflight = (
+  receipt: DeploymentProductionPreflightReceipt,
+  plan: DeploymentPlanReceipt,
+  acceptedPreviewProvider: DeploymentProviderReadback,
+  acceptedPreviewHosted: DeploymentHostedProofReceipt,
+  acceptedPreviewTeardown: DeploymentPreviewTeardownReceipt,
+  credentialReadback: DeploymentPreviewCredentialReadbackReceipt,
+  resultingProvider: DeploymentProviderReadback
+): readonly string[] => {
+  const mismatch = [
+    inspectDeploymentPlanActions(plan, "create").length > 0,
+    receipt.acceptedPlanSha256 !== plan.acceptedPlanSha256,
+    receipt.candidate.exactCommit !== plan.projection.candidate.exactCommit,
+    receipt.candidate.deploymentInputSha256 !==
+      plan.projection.candidate.deploymentInputSha256,
+    receipt.candidate.lockfileSha256 !==
+      plan.projection.candidate.lockfileSha256,
+    receipt.candidate.sourceConfigSha256 !== plan.projection.configSha256,
+    receipt.acceptedPreview.candidateCommit !==
+      acceptedPreviewProvider.candidateCommit,
+    receipt.acceptedPreview.candidateCommit !==
+      acceptedPreviewHosted.candidateCommit,
+    receipt.acceptedPreview.candidateCommit !==
+      acceptedPreviewTeardown.candidateCommit,
+    receipt.acceptedPreview.deploymentInputSha256 !==
+      acceptedPreviewProvider.deploymentInputSha256,
+    receipt.acceptedPreview.lockfileSha256 !==
+      acceptedPreviewProvider.lockfileSha256,
+    receipt.acceptedPreview.sourceConfigSha256 !==
+      acceptedPreviewProvider.configSha256,
+    receipt.lastKnownGood.candidateCommit !==
+      acceptedPreviewProvider.candidateCommit,
+    receipt.candidate.exactCommit !== acceptedPreviewProvider.candidateCommit,
+    receipt.candidate.exactCommit !== resultingProvider.candidateCommit,
+    receipt.account.accountId !== acceptedPreviewProvider.accountId,
+    receipt.account.accountId !== resultingProvider.accountId,
+    receipt.credentials.accountId !== credentialReadback.accountId,
+    receipt.credentials.accountId !== resultingProvider.accountId,
+    receipt.credentials.scopeSetSha256 !== credentialReadback.scopeSetSha256,
+    receipt.credentials.expiresAt !== credentialReadback.expiresAt,
+    receipt.credentials.profile !== credentialReadback.profile,
+    receipt.candidate.exactCommit !== credentialReadback.candidateCommit,
+    credentialReadback.observedAt > receipt.observedAt,
+    receipt.observedAt >= receipt.credentials.expiresAt,
+    !resultingProvider.physicalWorkerName.startsWith(
+      receipt.provider.workerPrefix
+    ),
+    !resultingProvider.url.endsWith(
+      `.${receipt.account.workersSubdomain}.workers.dev`
+    ),
+    receipt.stage !== "prod",
+    plan.projection.stage !== "prod",
+    resultingProvider.stage !== "prod",
+    receipt.provider.matchingWorkerCount !== 0,
+    receipt.state.stagePresent,
+    receipt.state.resources.length !== 0,
+  ].some(Boolean);
+  return mismatch
+    ? [
+        "production-initial-preflight: accepted Preview, equal Production plan, credential, empty fixed stage and candidate inputs must agree before first deploy",
+      ]
+    : [];
+};
+
+export const inspectProductionMutationPreflight = (
+  receipt: DeploymentProductionMutationPreflightReceipt,
+  plan: DeploymentPlanReceipt,
+  currentProvider: DeploymentProviderReadback,
+  resultingProvider: DeploymentProviderReadback,
+  credentialReadback: DeploymentPreviewCredentialReadbackReceipt
+): readonly string[] => {
+  const expectedRollbackTarget =
+    receipt.operation === "production-deploy-preflight"
+      ? currentProvider.candidateCommit
+      : resultingProvider.candidateCommit;
+  const mismatch = [
+    inspectDeploymentPlanActions(plan, "update").length > 0,
+    receipt.acceptedPlanSha256 !== plan.acceptedPlanSha256,
+    receipt.candidate.exactCommit !== plan.projection.candidate.exactCommit,
+    receipt.candidate.deploymentInputSha256 !==
+      plan.projection.candidate.deploymentInputSha256,
+    receipt.candidate.lockfileSha256 !==
+      plan.projection.candidate.lockfileSha256,
+    receipt.candidate.sourceConfigSha256 !== plan.projection.configSha256,
+    receipt.credentials.accountId !== currentProvider.accountId,
+    receipt.credentials.accountId !== resultingProvider.accountId,
+    receipt.credentials.accountId !== credentialReadback.accountId,
+    receipt.credentials.scopeSetSha256 !== credentialReadback.scopeSetSha256,
+    receipt.credentials.expiresAt !== credentialReadback.expiresAt,
+    receipt.credentials.profile !== credentialReadback.profile,
+    receipt.candidate.exactCommit !== credentialReadback.candidateCommit,
+    credentialReadback.observedAt > receipt.observedAt,
+    receipt.observedAt >= receipt.credentials.expiresAt,
+    receipt.currentProduction.candidateCommit !==
+      currentProvider.candidateCommit,
+    receipt.currentProduction.provider.deploymentId !==
+      currentProvider.deploymentId,
+    receipt.currentProduction.provider.versionId !== currentProvider.versionId,
+    receipt.currentProduction.provider.physicalWorkerName !==
+      currentProvider.physicalWorkerName,
+    receipt.currentProduction.provider.url !== currentProvider.url,
+    receipt.rollbackTarget.candidateCommit !== expectedRollbackTarget,
+    receipt.authority.operation !==
+      (receipt.operation === "production-deploy-preflight"
+        ? "production-deploy"
+        : "production-rollback-redeploy"),
+    receipt.candidate.exactCommit !== resultingProvider.candidateCommit,
+    currentProvider.physicalWorkerName !== resultingProvider.physicalWorkerName,
+    currentProvider.url !== resultingProvider.url,
+    currentProvider.state.instanceId !== resultingProvider.state.instanceId,
+    receipt.stage !== "prod",
+    plan.projection.stage !== "prod",
+    resultingProvider.stage !== "prod",
+    !receipt.state.workerIdentityAgreement,
+  ].some(Boolean);
+  return mismatch
+    ? [
+        "production-mutation-preflight: current provider/state identity, rollback target, equal plan and resulting fixed Worker must agree",
+      ]
+    : [];
+};
+
+export const inspectProductionRollbackReceipt = (
+  receipt: DeploymentProductionRollbackReceipt,
+  initialProvider: DeploymentProviderReadback,
+  successorPreviewProvider: DeploymentProviderReadback,
+  successorPreviewTeardown: DeploymentPreviewTeardownReceipt,
+  successorProvider: DeploymentProviderReadback,
+  restoredProvider: DeploymentProviderReadback,
+  initialScreenshots: readonly DeploymentScreenshotManifest[],
+  restoredScreenshots: readonly DeploymentScreenshotManifest[],
+  expectedPaths: {
+    readonly initialProviderReadbackPath: string;
+    readonly restoredHostedProofPath: string;
+    readonly restoredPlanPath: string;
+    readonly restoredPreflightPath: string;
+    readonly restoredProviderReadbackPath: string;
+    readonly restoredScreenshotManifestPaths: readonly [string, string];
+    readonly successorHostedProofPath: string;
+    readonly successorPreviewHostedProofPath: string;
+    readonly successorPreviewProviderReadbackPath: string;
+    readonly successorPreviewTeardownPath: string;
+    readonly successorProviderReadbackPath: string;
+    readonly successorScreenshotManifestPaths: readonly [string, string];
+  }
+): readonly string[] => {
+  const screenshotEpochsValid =
+    initialScreenshots.length === 2 &&
+    restoredScreenshots.length === 2 &&
+    Array.every(initialScreenshots, (initial) => {
+      const restored = restoredScreenshots.find(
+        (candidate) => candidate.viewport.kind === initial.viewport.kind
+      );
+      return (
+        restored !== undefined &&
+        (initial.imagePath !== restored.imagePath ||
+          (initial.imageSha256 === restored.imageSha256 &&
+            initial.imagePath.includes(initial.imageSha256.slice(0, 12)) &&
+            initial.limitations.some((limitation) =>
+              limitation.includes("content-addressed")
+            ) &&
+            restored.limitations.some((limitation) =>
+              limitation.includes("content-addressed")
+            )))
+      );
+    });
+  const mismatch = [
+    initialProvider.physicalWorkerName !== successorProvider.physicalWorkerName,
+    successorProvider.physicalWorkerName !==
+      restoredProvider.physicalWorkerName,
+    initialProvider.url !== successorProvider.url,
+    successorProvider.url !== restoredProvider.url,
+    initialProvider.state.instanceId !== successorProvider.state.instanceId,
+    successorProvider.state.instanceId !== restoredProvider.state.instanceId,
+    initialProvider.deploymentId === successorProvider.deploymentId,
+    successorProvider.deploymentId === restoredProvider.deploymentId,
+    initialProvider.versionId === successorProvider.versionId,
+    successorProvider.versionId === restoredProvider.versionId,
+    receipt.acceptedPlanSha256 !== restoredProvider.acceptedPlanSha256,
+    receipt.initialProduction.candidateCommit !==
+      initialProvider.candidateCommit,
+    receipt.initialProduction.deploymentId !== initialProvider.deploymentId,
+    receipt.initialProduction.versionId !== initialProvider.versionId,
+    receipt.initialProduction.stateBundleSha256 !==
+      initialProvider.state.bundleSha256,
+    receipt.successor.candidateCommit !== successorProvider.candidateCommit,
+    receipt.successor.candidateCommit !==
+      successorPreviewProvider.candidateCommit,
+    receipt.successor.deploymentId !== successorProvider.deploymentId,
+    receipt.successor.versionId !== successorProvider.versionId,
+    receipt.successor.stateBundleSha256 !==
+      successorProvider.state.bundleSha256,
+    receipt.restoredProduction.candidateCommit !==
+      restoredProvider.candidateCommit,
+    receipt.restoredProduction.deploymentId !== restoredProvider.deploymentId,
+    receipt.restoredProduction.versionId !== restoredProvider.versionId,
+    receipt.restoredProduction.stateBundleSha256 !==
+      restoredProvider.state.bundleSha256,
+    receipt.stableIdentity.physicalWorkerName !==
+      restoredProvider.physicalWorkerName,
+    receipt.stableIdentity.url !== restoredProvider.url,
+    receipt.stableIdentity.stateInstanceId !==
+      restoredProvider.state.instanceId,
+    initialProvider.state.bundleSha256 !== restoredProvider.state.bundleSha256,
+    initialProvider.candidateCommit !== restoredProvider.candidateCommit,
+    successorPreviewTeardown.candidateCommit !==
+      successorPreviewProvider.candidateCommit,
+    successorPreviewTeardown.physicalWorkerName !==
+      successorPreviewProvider.physicalWorkerName,
+    successorPreviewTeardown.state.stagePresent,
+    successorPreviewTeardown.provider.matchingWorkerCount !== 0,
+    receipt.initialProduction.providerReadbackPath !==
+      expectedPaths.initialProviderReadbackPath,
+    receipt.successor.providerReadbackPath !==
+      expectedPaths.successorProviderReadbackPath,
+    receipt.successor.hostedProofPath !==
+      expectedPaths.successorHostedProofPath,
+    receipt.successor.previewProviderReadbackPath !==
+      expectedPaths.successorPreviewProviderReadbackPath,
+    receipt.successor.previewHostedProofPath !==
+      expectedPaths.successorPreviewHostedProofPath,
+    receipt.successor.previewTeardownPath !==
+      expectedPaths.successorPreviewTeardownPath,
+    !Array.every(
+      receipt.successor.screenshotManifestPaths,
+      (path, index) =>
+        path === expectedPaths.successorScreenshotManifestPaths[index]
+    ),
+    receipt.restoredProduction.providerReadbackPath !==
+      expectedPaths.restoredProviderReadbackPath,
+    receipt.restoredProduction.hostedProofPath !==
+      expectedPaths.restoredHostedProofPath,
+    receipt.restoredProduction.planPath !== expectedPaths.restoredPlanPath,
+    receipt.restoredProduction.preflightPath !==
+      expectedPaths.restoredPreflightPath,
+    !Array.every(
+      receipt.restoredProduction.screenshotManifestPaths,
+      (path, index) =>
+        path === expectedPaths.restoredScreenshotManifestPaths[index]
+    ),
+    !screenshotEpochsValid,
+  ].some(Boolean);
+  return mismatch
+    ? [
+        "production-rollback-binding: qualified successor Preview, fixed Production identity, distinct transitions, restored source bundle and Preview absence must agree",
+      ]
+    : [];
+};
+
 export const inspectPreviewMutationPreflight = (
   receipt: DeploymentPreviewMutationPreflightReceipt,
   gitReadback: DeploymentGitReadbackReceipt,
@@ -197,6 +513,12 @@ export const inspectPreviewMutationPreflight = (
   credentialReadback: DeploymentPreviewCredentialReadbackReceipt,
   providerAfterApply?: DeploymentProviderReadback
 ): readonly string[] => {
+  const findings = [
+    ...inspectDeploymentPlanActions(
+      plan,
+      receipt.operation === "preview-deploy-preflight" ? "create" : "delete"
+    ),
+  ];
   const commonMismatch = [
     receipt.candidate.exactCommit !== gitReadback.pullRequest.headSha,
     receipt.candidate.exactCommit !== plan.projection.candidate.exactCommit,
@@ -215,6 +537,8 @@ export const inspectPreviewMutationPreflight = (
     receipt.credentials.profile !== credentialReadback.profile,
     receipt.candidate.exactCommit !== credentialReadback.candidateCommit,
     receipt.stage !== credentialReadback.stage,
+    credentialReadback.observedAt > receipt.observedAt,
+    receipt.observedAt >= receipt.credentials.expiresAt,
     providerAfterApply !== undefined &&
       receipt.credentials.accountId !== providerAfterApply.accountId,
     !receipt.limitations.some((limitation) =>
@@ -248,11 +572,12 @@ export const inspectPreviewMutationPreflight = (
       destroyIdentity?.versionId !== providerAfterApply?.versionId,
       destroyIdentity?.url !== providerAfterApply?.url,
     ].some(Boolean);
-  return commonMismatch || deployMismatch || destroyMismatch
-    ? [
-        "preview-mutation-preflight: candidate, credential scope, plan, provider and state identities must prove the exact deploy or destroy target before mutation",
-      ]
-    : [];
+  if (commonMismatch || deployMismatch || destroyMismatch) {
+    findings.push(
+      "preview-mutation-preflight: candidate, credential scope, plan, provider and state identities must prove the exact deploy or destroy target before mutation"
+    );
+  }
+  return findings;
 };
 
 export const inspectPreviewTeardownReceipt = (
@@ -260,7 +585,10 @@ export const inspectPreviewTeardownReceipt = (
   plan: DeploymentPlanReceipt,
   provider: DeploymentProviderReadback
 ): readonly string[] => {
-  const findings = [...inspectDeploymentPlanReceipt(plan)];
+  const findings = [
+    ...inspectDeploymentPlanReceipt(plan),
+    ...inspectDeploymentPlanActions(plan, "delete"),
+  ];
   if (
     plan.operation !== "preview-destroy" ||
     receipt.destroyPlanSha256 !== plan.acceptedPlanSha256 ||

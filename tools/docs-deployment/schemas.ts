@@ -379,9 +379,7 @@ export const DeploymentPreviewCredentialReadbackReceipt = Schema.Struct({
   ),
   owner: Schema.Literal("taxkit-docs-deployment-operation-owner"),
   profile: Schema.Literal("default"),
-  receiptId: Schema.Literal(
-    "DCD-002-preview-credential-readback-d9cb894-2026-07-30"
-  ),
+  receiptId: Schema.NonEmptyString,
   requiredScopesPresent: Schema.Literal(true),
   schemaVersion: Schema.Literal(1),
   scopeSetSha256: Sha256,
@@ -389,6 +387,261 @@ export const DeploymentPreviewCredentialReadbackReceipt = Schema.Struct({
 });
 export type DeploymentPreviewCredentialReadbackReceipt =
   typeof DeploymentPreviewCredentialReadbackReceipt.Type;
+
+export const DeploymentProductionPreflightReceipt = Schema.Struct({
+  acceptedPlanSha256: Sha256,
+  acceptedPreview: Schema.Struct({
+    candidateCommit: CommitSha,
+    deploymentInputSha256: Sha256,
+    hostedProofPath: Schema.Literal(
+      "docs/evidence/deployments/2026-07-30-preview-pr-1/hosted-proof-d9cb894.json"
+    ),
+    lockfileSha256: Sha256,
+    providerReadbackPath: Schema.Literal(
+      "docs/evidence/deployments/2026-07-30-preview-pr-1/provider-readback-d9cb894.json"
+    ),
+    sourceConfigSha256: Sha256,
+    teardownPath: Schema.Literal(
+      "docs/evidence/deployments/2026-07-30-preview-pr-1/teardown-d9cb894.json"
+    ),
+  }),
+  account: Schema.Struct({
+    accountId: CloudflareAccountId,
+    billingSubscriptionReadback: Schema.Literal("forbidden-403"),
+    costAndLimitAcceptance: Schema.Struct({
+      acceptedAtLocal: Schema.Literal("2026-07-30 Australia/Melbourne"),
+      acceptedBy: Schema.Literal("Cooper, TaxKit repository/product owner"),
+      limitsDocumentation: Schema.Literal(
+        "https://developers.cloudflare.com/workers/platform/limits/"
+      ),
+      pricingDocumentation: Schema.Literal(
+        "https://developers.cloudflare.com/workers/platform/pricing/"
+      ),
+      productionWorkersDevLimitationAccepted: Schema.Literal(true),
+      routingDocumentation: Schema.Literal(
+        "https://developers.cloudflare.com/workers/configuration/routing/"
+      ),
+      standardUsageModelAccepted: Schema.Literal(true),
+    }),
+    defaultUsageModel: Schema.Literal("standard"),
+    planTierClaim: Schema.Literal("not-established"),
+    workersSubdomain: Schema.NonEmptyString,
+  }),
+  authority: Schema.Struct({
+    approvingPrincipal: Schema.Literal(
+      "Cooper, TaxKit repository/product owner"
+    ),
+    durationOrRevocation: Schema.NonEmptyString,
+    executingPrincipal: Schema.Literal(
+      "authorized TaxKit docs deployment implementation thread"
+    ),
+    operation: Schema.Literal("production-deploy"),
+  }),
+  candidate: Schema.Struct({
+    deploymentInputSha256: Sha256,
+    exactCommit: CommitSha,
+    lockfileSha256: Sha256,
+    sourceConfigSha256: Sha256,
+  }),
+  credentials: Schema.Struct({
+    accountId: CloudflareAccountId,
+    expiresAt: Schema.String.check(
+      Schema.isPattern(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/u)
+    ),
+    profile: Schema.Literal("default"),
+    scopeSetSha256: Sha256,
+  }),
+  lastKnownGood: Schema.Struct({
+    candidateCommit: CommitSha,
+    priorProductionDeployment: Schema.Literal("absent-first-production"),
+    qualification: Schema.Literal("accepted-preview-source"),
+  }),
+  limitations: Schema.NonEmptyArray(Schema.NonEmptyString),
+  nonClaims: Schema.NonEmptyArray(Schema.NonEmptyString),
+  observedAt: Schema.String.check(
+    Schema.isPattern(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/u)
+  ),
+  operation: Schema.Literal("production-deploy-preflight"),
+  owner: Schema.Literal("taxkit-docs-deployment-operation-owner"),
+  postcondition: Schema.Literal(
+    "fixed-production-stage-absent-and-safe-to-create"
+  ),
+  provider: Schema.Struct({
+    matchingWorkerCount: Schema.Literal(0),
+    workerPrefix: Schema.Literal("taxkitdocscloudflare-docswebsite-prod-"),
+  }),
+  receiptId: Schema.Literal(
+    "DCD-003-production-deploy-preflight-d9cb894-2026-07-30"
+  ),
+  rollback: Schema.NonEmptyString,
+  schemaVersion: Schema.Literal(1),
+  stack: Schema.Literal("TaxKitDocsCloudflare"),
+  stage: Schema.Literal("prod"),
+  state: Schema.Struct({
+    id: Schema.Literal("cloudflare-http"),
+    resources: Schema.Tuple([]),
+    stagePresent: Schema.Literal(false),
+    version: Schema.Literal(7),
+  }),
+});
+export type DeploymentProductionPreflightReceipt =
+  typeof DeploymentProductionPreflightReceipt.Type;
+
+const ProductionProviderIdentity = Schema.Struct({
+  deploymentId: ProviderIdentity,
+  physicalWorkerName: ProviderIdentity,
+  url: WorkersDevUrl,
+  versionId: ProviderIdentity,
+});
+
+export const DeploymentProductionMutationPreflightReceipt = Schema.Struct({
+  acceptedPlanSha256: Sha256,
+  authority: Schema.Struct({
+    approvingPrincipal: Schema.Literal(
+      "Cooper, TaxKit repository/product owner"
+    ),
+    durationOrRevocation: Schema.NonEmptyString,
+    executingPrincipal: Schema.Literal(
+      "authorized TaxKit docs deployment implementation thread"
+    ),
+    operation: Schema.Literals([
+      "production-deploy",
+      "production-rollback-redeploy",
+    ]),
+  }),
+  candidate: Schema.Struct({
+    deploymentInputSha256: Sha256,
+    exactCommit: CommitSha,
+    lockfileSha256: Sha256,
+    sourceConfigSha256: Sha256,
+  }),
+  credentials: Schema.Struct({
+    accountId: CloudflareAccountId,
+    expiresAt: Schema.String.check(
+      Schema.isPattern(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/u)
+    ),
+    profile: Schema.Literal("default"),
+    scopeSetSha256: Sha256,
+  }),
+  currentProduction: Schema.Struct({
+    candidateCommit: CommitSha,
+    provider: ProductionProviderIdentity,
+  }),
+  limitations: Schema.NonEmptyArray(Schema.NonEmptyString),
+  nonClaims: Schema.NonEmptyArray(Schema.NonEmptyString),
+  observedAt: Schema.String.check(
+    Schema.isPattern(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/u)
+  ),
+  operation: Schema.Literals([
+    "production-deploy-preflight",
+    "production-rollback-preflight",
+  ]),
+  owner: Schema.Literal("taxkit-docs-deployment-operation-owner"),
+  postcondition: Schema.Literal(
+    "fixed-production-worker-and-state-agree-and-update-is-safe"
+  ),
+  receiptId: Schema.NonEmptyString,
+  rollback: Schema.NonEmptyString,
+  rollbackTarget: Schema.Struct({
+    candidateCommit: CommitSha,
+    qualification: Schema.NonEmptyString,
+  }),
+  schemaVersion: Schema.Literal(1),
+  stack: Schema.Literal("TaxKitDocsCloudflare"),
+  stage: Schema.Literal("prod"),
+  state: Schema.Struct({
+    id: Schema.Literal("cloudflare-http"),
+    resources: Schema.Tuple([
+      Schema.Struct({
+        logicalId: Schema.Literal("DocsBuild"),
+        status: Schema.Literals(["created", "updated"]),
+      }),
+      Schema.Struct({
+        logicalId: Schema.Literal("DocsWebsite"),
+        status: Schema.Literals(["created", "updated"]),
+      }),
+    ]),
+    version: Schema.Literal(7),
+    workerIdentityAgreement: Schema.Literal(true),
+  }),
+});
+export type DeploymentProductionMutationPreflightReceipt =
+  typeof DeploymentProductionMutationPreflightReceipt.Type;
+
+const ProductionEvidenceIdentityFields = {
+  candidateCommit: CommitSha,
+  deploymentId: ProviderIdentity,
+  providerReadbackPath: RepositoryEvidencePath,
+  stateBundleSha256: Sha256,
+  versionId: ProviderIdentity,
+} as const;
+const ProductionEvidenceIdentity = Schema.Struct(
+  ProductionEvidenceIdentityFields
+);
+
+export const DeploymentProductionRollbackReceipt = Schema.Struct({
+  acceptedPlanSha256: Sha256,
+  authority: Schema.Struct({
+    approvingPrincipal: Schema.Literal(
+      "Cooper, TaxKit repository/product owner"
+    ),
+    operation: Schema.Literal("production-rollback-redeploy"),
+  }),
+  initialProduction: ProductionEvidenceIdentity,
+  limitations: Schema.NonEmptyArray(Schema.NonEmptyString),
+  nonClaims: Schema.NonEmptyArray(Schema.NonEmptyString),
+  observedAt: Schema.String.check(
+    Schema.isPattern(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/u)
+  ),
+  operation: Schema.Literal("production-normal-source-bound-rollback"),
+  owner: Schema.Literal("taxkit-docs-deployment-operation-owner"),
+  postcondition: Schema.Literal(
+    "stable-production-worker-restored-to-qualified-source"
+  ),
+  receiptId: Schema.Literal(
+    "DCD-003-production-normal-rollback-d9cb894-2026-07-30"
+  ),
+  recovery: Schema.NonEmptyString,
+  restoredProduction: Schema.Struct({
+    ...ProductionEvidenceIdentityFields,
+    hostedProofPath: RepositoryEvidencePath,
+    planPath: RepositoryEvidencePath,
+    preflightPath: RepositoryEvidencePath,
+    screenshotManifestPaths: Schema.Tuple([
+      RepositoryEvidencePath,
+      RepositoryEvidencePath,
+    ]),
+  }),
+  schemaVersion: Schema.Literal(1),
+  stableIdentity: Schema.Struct({
+    physicalWorkerName: ProviderIdentity,
+    stateInstanceId: ProviderIdentity,
+    url: WorkersDevUrl,
+  }),
+  stack: Schema.Literal("TaxKitDocsCloudflare"),
+  stage: Schema.Literal("prod"),
+  successor: Schema.Struct({
+    ...ProductionEvidenceIdentityFields,
+    hostedProofPath: RepositoryEvidencePath,
+    previewHostedProofPath: RepositoryEvidencePath,
+    previewProviderReadbackPath: RepositoryEvidencePath,
+    previewTeardownPath: RepositoryEvidencePath,
+    screenshotManifestPaths: Schema.Tuple([
+      RepositoryEvidencePath,
+      RepositoryEvidencePath,
+    ]),
+  }),
+  verifiedPostconditions: Schema.Struct({
+    deploymentIdChangedAtEachTransition: Schema.Literal(true),
+    providerAndStateAgree: Schema.Literal(true),
+    restoredBundleMatchesInitial: Schema.Literal(true),
+    stableWorkerIdentityPreserved: Schema.Literal(true),
+    successorPreviewRemoved: Schema.Literal(true),
+    versionIdChangedAtEachTransition: Schema.Literal(true),
+  }),
+});
+export type DeploymentProductionRollbackReceipt =
+  typeof DeploymentProductionRollbackReceipt.Type;
 
 const PreviewMutationProviderIdentity = Schema.Struct({
   deploymentId: ProviderIdentity,

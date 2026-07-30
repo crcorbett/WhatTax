@@ -170,12 +170,34 @@ and describe it as a same-source rebuild unless byte identity is proved.
 Repeat canonical plan/equal-replan, provider readback, hosted behavioral proof
 and bounded screenshots against the stable read-back `workers.dev` URL.
 
+The verified fixed-stage plan/apply invocations are:
+
+```sh
+ALCHEMY_PLAIN=1 CI=1 bunx alchemy deploy --dry-run --stage prod --profile default --yes
+ALCHEMY_PLAIN=1 CI=1 bunx alchemy deploy --stage prod --profile default --yes
+```
+
+Run the dry-run twice and accept only equal sanitized projections selecting
+`DocsBuild` and `DocsWebsite`. Immediately before apply, bind the candidate,
+lock, source/config and deployment-input digests to accepted Preview evidence;
+then re-read credentials, account, exact `prod` state and matching Worker
+inventory. Run the hosted proof command above with environment `production`
+and only the provider/state-agreed URL and deployment/version identity.
+
 ### Normal rollback
 
 Select the retained last-known-good source, keep the same stack, `prod` stage
 and physical Worker identity, run the normal build/plan/equal-replan/deploy
 path, then prove provider version and hosted postcondition. A prior version ID
 or successful API response alone is insufficient.
+
+The verified rollback used the same two invocations above with the restored
+source candidate and environment `rollback` for hosted proof. It required a
+distinct deployment/version after apply, the same Worker name, URL and Alchemy
+instance, and the target's expected state bundle. Requalify any successor in
+isolated Preview first and remove that Preview only after retaining its proof.
+Do not describe a same-source rebuild as byte promotion unless byte identity is
+independently established.
 
 ### Break-glass version rollback
 
@@ -226,6 +248,51 @@ The retained disconfirming DCD-002 files include:
 - `docs/evidence/deployments/2026-07-30-preview-pr-1/destroy-plan-0d714e6.json`;
   and
 - `docs/evidence/deployments/2026-07-30-preview-pr-1/teardown-0d714e6.json`.
+
+The accepted DCD-003 Production and rollback route is
+`docs/evidence/deployments/2026-07-30-production-prod/`. Its initial d9 plan,
+preflight, provider, hosted and screenshot receipts bind the first fixed
+Production. The `rollback-successor-preview-*` records bind the separately
+qualified c999 Preview and exact-stage teardown; the
+`rollback-successor-production-*` records bind its fixed-Worker update. The
+`rollback-*d9cb894` records bind the restored source, while
+`rollback-receipt-d9cb894.json` cross-checks all three Production identities,
+Preview absence and the restored bundle. `bun run check:docs-deployment`
+Schema-decodes each JSON owner and verifies every retained PNG digest.
+
+The exact DCD-003 sidecars are:
+
+- `docs/evidence/deployments/2026-07-30-production-prod/plan-d9cb894.json`;
+- `docs/evidence/deployments/2026-07-30-production-prod/predeploy-d9cb894.json`;
+- `docs/evidence/deployments/2026-07-30-production-prod/provider-readback-d9cb894.json`;
+- `docs/evidence/deployments/2026-07-30-production-prod/hosted-proof-d9cb894.json`;
+- `docs/evidence/deployments/2026-07-30-production-prod/screenshot-desktop-d9cb894.json`;
+- `docs/evidence/deployments/2026-07-30-production-prod/screenshot-mobile-d9cb894.json`;
+- `docs/evidence/deployments/2026-07-30-production-prod/rollback-successor-preview-git-readback-c99984c.json`;
+- `docs/evidence/deployments/2026-07-30-production-prod/rollback-successor-preview-credential-readback-c99984c.json`;
+- `docs/evidence/deployments/2026-07-30-production-prod/rollback-successor-preview-plan-c99984c.json`;
+- `docs/evidence/deployments/2026-07-30-production-prod/rollback-successor-preview-predeploy-c99984c.json`;
+- `docs/evidence/deployments/2026-07-30-production-prod/rollback-successor-preview-provider-c99984c.json`;
+- `docs/evidence/deployments/2026-07-30-production-prod/rollback-successor-preview-hosted-c99984c.json`;
+- `docs/evidence/deployments/2026-07-30-production-prod/rollback-successor-preview-screenshot-desktop-c99984c.json`;
+- `docs/evidence/deployments/2026-07-30-production-prod/rollback-successor-preview-screenshot-mobile-c99984c.json`;
+- `docs/evidence/deployments/2026-07-30-production-prod/rollback-successor-preview-destroy-plan-c99984c.json`;
+- `docs/evidence/deployments/2026-07-30-production-prod/rollback-successor-preview-predestroy-c99984c.json`;
+- `docs/evidence/deployments/2026-07-30-production-prod/rollback-successor-preview-teardown-c99984c.json`;
+- `docs/evidence/deployments/2026-07-30-production-prod/rollback-successor-production-plan-c99984c.json`;
+- `docs/evidence/deployments/2026-07-30-production-prod/rollback-successor-production-predeploy-c99984c.json`;
+- `docs/evidence/deployments/2026-07-30-production-prod/rollback-successor-production-provider-c99984c.json`;
+- `docs/evidence/deployments/2026-07-30-production-prod/rollback-successor-production-hosted-c99984c.json`;
+- `docs/evidence/deployments/2026-07-30-production-prod/rollback-successor-production-screenshot-desktop-c99984c.json`;
+- `docs/evidence/deployments/2026-07-30-production-prod/rollback-successor-production-screenshot-mobile-c99984c.json`;
+- `docs/evidence/deployments/2026-07-30-production-prod/rollback-plan-d9cb894.json`;
+- `docs/evidence/deployments/2026-07-30-production-prod/rollback-predeploy-d9cb894.json`;
+- `docs/evidence/deployments/2026-07-30-production-prod/rollback-provider-d9cb894.json`;
+- `docs/evidence/deployments/2026-07-30-production-prod/rollback-hosted-d9cb894.json`;
+- `docs/evidence/deployments/2026-07-30-production-prod/rollback-screenshot-desktop-d9cb894.json`;
+- `docs/evidence/deployments/2026-07-30-production-prod/rollback-screenshot-mobile-d9cb894.json`;
+  and
+- `docs/evidence/deployments/2026-07-30-production-prod/rollback-receipt-d9cb894.json`.
 
 ## Rollback
 
@@ -278,9 +345,26 @@ Historical receipts cannot establish current provider state. The earlier
 state/provider receipts and complete hosted/screenshot/state false-green
 oracles.
 
+The DCD-003 fixed Production readback is bound to restored source
+`d9cb8945529fb72158e59ca0daf02a98e1e4de1a`, Worker
+`taxkitdocscloudflare-docswebsite-prod-ujphggiaxw5ryjev` and its read-back
+`workers.dev` URL. Cloudflare recommends a route or custom domain for
+business-critical traffic; Cooper explicitly accepted that limitation and the
+standard usage model for this initial endpoint. Billing subscription readback
+remained forbidden, so no paid tier or future cost is established. The
+rollback successor and target share deployment-critical config/lock identity,
+and the rehearsal did not introduce broken content. It proves the normal
+source-bound path, not byte promotion or disaster recovery from a known-bad
+release. Initial and restored d9 screenshot manifests recorded identical
+desktop/mobile digests; they intentionally share content-addressed PNG bytes
+while retaining separate epoch/provider/reviewer manifests. Treat shared image
+paths without that digest equality and explicit limitation as a false green.
+
 ## Non-claims
 
-The accepted Preview receipt does not establish a currently available Preview,
-Production, normal rollback, custom-domain/DNS state, release, publication or
-public-domain behavior. Preview screenshots do not replace provider, HTTP,
-browser, accessibility, console, cache-header or teardown proof.
+The accepted Preview receipt does not establish a currently available Preview.
+The DCD-003 receipts establish dated fixed Production and normal source-bound
+rollback observations only; they do not establish a custom-domain/DNS route,
+paid plan, byte promotion, known-bad-content recovery, release or publication.
+Screenshots do not replace provider, HTTP, browser, accessibility, console,
+cache-header, teardown or rollback proof.

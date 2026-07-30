@@ -10,11 +10,13 @@ review_trigger: deployment target, runtime adapter, provider resource, state, do
 # Deployment
 
 The docs app has a locally qualified Cloudflare Worker build and an Alchemy
-deployment composition. DCD-002 also established one dated, exact-candidate
-Preview observation at the provider URL and then safely removed that isolated
-stage. Production remains a separate evidence claim until its dated readback
-is accepted. Earlier failed Preview attempts remain historical
-disconfirming evidence, not current provider truth.
+deployment composition. DCD-002 established one dated, exact-candidate Preview
+observation and safely removed that isolated stage. DCD-003 deployed the same
+accepted source to fixed stage `prod`, qualified a distinct successor through
+Preview and Production, and restored the accepted source through the normal
+Alchemy graph while preserving the Worker URL and state identity. Earlier
+failed Preview attempts remain historical disconfirming evidence, not current
+provider truth.
 
 ## Scope
 
@@ -81,9 +83,27 @@ asset-header correction, but it lacked complete pre-mutation and
 candidate/screenshot/state bindings. It is trajectory evidence, not the
 accepted Preview chain.
 
-Preview and Production are required outcomes of the active SPEC. Preview owns
-an isolated deterministic stage and is destroyed only through exact-stage
-readback. Production owns the fixed `prod` stage and stable provider URL.
+The accepted DCD-003 Production evidence first rebuilt exact Preview-qualified
+source `d9cb894…` into fixed stage `prod`. Cloudflare and Alchemy readback
+agreed on Worker
+`taxkitdocscloudflare-docswebsite-prod-ujphggiaxw5ryjev`, stable provider URL,
+assets, deployment/version and state instance. The full hosted and bounded
+screenshot contract passed.
+
+The normal rollback rehearsal then qualified repository successor `c99984c…`
+through a temporary isolated `pr-1` Preview, removed that Preview, deployed it
+through the same fixed Production graph, and redeployed `d9cb894…`. The two
+Production updates retained the Worker name, URL and Alchemy instance while
+creating distinct deployment/version identities; final state restored the
+initial d9 bundle hash. Deployment-critical source configuration and lock
+identity were unchanged, but path-bearing clean-build output differed, so this
+is source-bound rollback evidence—not byte promotion or recovery from known
+broken content.
+
+Preview owns an isolated deterministic stage and is destroyed only through
+exact-stage readback. Production owns the fixed `prod` stage and stable
+provider URL. The latest dated readback observed restored `d9cb894…`; it is not
+a timeless availability claim.
 Custom-domain attachment is a future successor and must preserve the
 Production Worker identity and deployment contract.
 

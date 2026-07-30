@@ -516,7 +516,7 @@
     },
     {
       "id": "DCD-003",
-      "status": "pending",
+      "status": "completed",
       "acceptedFindingIds": [
         "TK-CF-004",
         "TK-CF-006",

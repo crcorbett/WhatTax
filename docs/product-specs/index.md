@@ -21,7 +21,7 @@ Specs:
 
 | Spec | Status | Notes |
 | --- | --- | --- |
-| [Docs Cloudflare and Alchemy deployment](./docs-cloudflare-alchemy-deployment.md) | Active — DCD-003 next | DCD-002 accepted exact candidate `d9cb8945529fb72158e59ca0daf02a98e1e4de1a` after isolated `pr-1` Preview plan/deploy/provider/hosted/screenshot proof, exact-stage teardown/absence, corrected false-green validators and fresh independent acceptance. Production remains pending. |
+| [Docs Cloudflare and Alchemy deployment](./docs-cloudflare-alchemy-deployment.md) | Active — DCD-003 accepted; DCD-004 next | Fixed Production and a normal source-bound rollback rehearsal passed provider/hosted/screenshot readback while preserving the Worker URL and restoring accepted source `d9cb894…`; corrected-boundary independent review and all acceptance gates passed. |
 | [TaxKit docs application architecture](./docs-application-architecture.md) | Implemented | The three-owner docs migration, native route outcomes, production graph and candidate-bound local proof are implemented; search remains deferred. |
 | [Harness foundation improvements](./harness-foundation-improvements.md) | Implemented | The portable six-skill baseline, stable TaxKit profile, deterministic governance gate, five retained journeys, and fail-closed epoch `7c8a96e` are implemented and locally verified. |
 | [Harness-governance documentation](./harness-governance-documentation.md) | Implemented | HGI-200 through HGI-208 are accepted locally; HGI-206 records the bounded repository epoch and closeout without claiming release, provider, or public actuality. |

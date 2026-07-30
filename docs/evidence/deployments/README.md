@@ -49,15 +49,24 @@ describes current provider state.
 
 ## Production
 
-Production receipts will bind the Preview-accepted source to the fixed stage,
-stable provider URL, provider readback, hosted proof and bounded screenshots.
-No Production receipt exists yet.
+`2026-07-30-production-prod/` binds Preview-accepted source `d9cb894…` to
+fixed stage `prod`, its equal plan, preflight, stable provider Worker URL,
+Alchemy/provider readback, full hosted proof and reviewed desktop/mobile
+screenshots. It also retains the separately Preview-qualified `c99984c…`
+successor, that Preview's teardown/absence, its Production update, and the
+restored d9 readback. The latest dated provider observation served restored d9;
+historical receipts do not establish current availability.
 
 ## Rollback
 
-Rollback receipts will bind the last-known-good source, fixed Worker/stage,
-normal source-bound redeploy, provider/version readback and hosted
-postcondition. No rollback receipt exists yet.
+`2026-07-30-production-prod/rollback-receipt-d9cb894.json` cross-binds the
+initial, successor and restored provider identities. The same Worker URL and
+Alchemy instance survived both updates, deployment/version identities changed,
+and the restored state bundle equals the initial d9 bundle. The successor and
+target share deployment-critical configuration and lock identity while their
+path-bearing clean outputs differ. This is normal source-bound rollback proof,
+not byte promotion, direct provider-version rollback or recovery from
+deliberately broken content.
 
 Secrets, raw tokens, request bodies, credential values and unsanitized provider
 output are forbidden. Historical release and harness evidence remains

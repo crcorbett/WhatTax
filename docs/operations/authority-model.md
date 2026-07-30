@@ -81,3 +81,16 @@ Worker and stage absent. This consumed no Production, rollback, DNS,
 publication or broader reconciliation authority. The earlier `0d714e6…`
 observation remains historical because it did not retain both pre-mutation
 envelopes.
+
+The DCD-003 Production and normal rollback chain under
+`docs/evidence/deployments/2026-07-30-production-prod/` consumed only the
+already approved fixed `prod` Worker/assets operations and narrow Alchemy
+state. Each create/update used a fresh equal plan and immediate credential,
+account, stage, provider and state preflight. The successor was independently
+qualified in `pr-1` and that stage was removed before its Production update.
+Normal rollback used the same source-bound deploy graph and retained the fixed
+Worker URL and Alchemy instance while creating a new deployment/version.
+Production destroy, direct provider-version selection, custom-domain/DNS work,
+credential disclosure or scope expansion remain outside that consumed
+envelope. The broad existing OAuth grant remains a capability limitation, not
+broader authority.

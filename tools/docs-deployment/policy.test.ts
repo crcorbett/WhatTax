@@ -5,6 +5,7 @@ import { Effect, Schema } from "effect";
 import credentialReadbackJson from "../../docs/evidence/deployments/2026-07-30-preview-pr-1/credential-readback-d9cb894.json";
 import destroyPlanJson from "../../docs/evidence/deployments/2026-07-30-preview-pr-1/destroy-plan-d9cb894.json";
 import acceptedGitReadbackJson from "../../docs/evidence/deployments/2026-07-30-preview-pr-1/git-readback-d9cb894.json";
+import acceptedPreviewHostedJson from "../../docs/evidence/deployments/2026-07-30-preview-pr-1/hosted-proof-d9cb894.json";
 import planJson from "../../docs/evidence/deployments/2026-07-30-preview-pr-1/plan.json";
 import acceptedPredeployJson from "../../docs/evidence/deployments/2026-07-30-preview-pr-1/predeploy-d9cb894.json";
 import acceptedPredestroyJson from "../../docs/evidence/deployments/2026-07-30-preview-pr-1/predestroy-d9cb894.json";
@@ -15,17 +16,40 @@ import teardownJson from "../../docs/evidence/deployments/2026-07-30-preview-pr-
 import receiptJson from "../../docs/evidence/deployments/2026-07-30-preview-preflight/authority-preflight.json";
 import gitAuthorityJson from "../../docs/evidence/deployments/2026-07-30-preview-preflight/git-authority.json";
 import gitReadbackJson from "../../docs/evidence/deployments/2026-07-30-preview-preflight/git-readback.json";
+import initialProductionPlanJson from "../../docs/evidence/deployments/2026-07-30-production-prod/plan-d9cb894.json";
+import initialProductionPreflightJson from "../../docs/evidence/deployments/2026-07-30-production-prod/predeploy-d9cb894.json";
+import initialProductionProviderJson from "../../docs/evidence/deployments/2026-07-30-production-prod/provider-readback-d9cb894.json";
+import restoredHostedJson from "../../docs/evidence/deployments/2026-07-30-production-prod/rollback-hosted-d9cb894.json";
+import restoredPlanJson from "../../docs/evidence/deployments/2026-07-30-production-prod/rollback-plan-d9cb894.json";
+import restoredPreflightJson from "../../docs/evidence/deployments/2026-07-30-production-prod/rollback-predeploy-d9cb894.json";
+import restoredProviderJson from "../../docs/evidence/deployments/2026-07-30-production-prod/rollback-provider-d9cb894.json";
+import rollbackReceiptJson from "../../docs/evidence/deployments/2026-07-30-production-prod/rollback-receipt-d9cb894.json";
+import restoredDesktopJson from "../../docs/evidence/deployments/2026-07-30-production-prod/rollback-screenshot-desktop-d9cb894.json";
+import restoredMobileJson from "../../docs/evidence/deployments/2026-07-30-production-prod/rollback-screenshot-mobile-d9cb894.json";
+import successorCredentialReadbackJson from "../../docs/evidence/deployments/2026-07-30-production-prod/rollback-successor-preview-credential-readback-c99984c.json";
+import successorPreviewProviderJson from "../../docs/evidence/deployments/2026-07-30-production-prod/rollback-successor-preview-provider-c99984c.json";
+import successorPreviewTeardownJson from "../../docs/evidence/deployments/2026-07-30-production-prod/rollback-successor-preview-teardown-c99984c.json";
+import successorProductionPlanJson from "../../docs/evidence/deployments/2026-07-30-production-prod/rollback-successor-production-plan-c99984c.json";
+import successorProductionPreflightJson from "../../docs/evidence/deployments/2026-07-30-production-prod/rollback-successor-production-predeploy-c99984c.json";
+import successorProductionProviderJson from "../../docs/evidence/deployments/2026-07-30-production-prod/rollback-successor-production-provider-c99984c.json";
+import initialProductionDesktopJson from "../../docs/evidence/deployments/2026-07-30-production-prod/screenshot-desktop-d9cb894.json";
+import initialProductionMobileJson from "../../docs/evidence/deployments/2026-07-30-production-prod/screenshot-mobile-d9cb894.json";
 import inventoryJson from "../../docs/verification/docs-deployment-journeys.json";
 import {
   deploymentRecordDigest,
   inspectDeploymentOwners,
+  inspectDeploymentPlanActions,
   inspectGitAuthorityReceipt,
   inspectGitReadbackReceipt,
   inspectDeploymentPlanReceipt,
   inspectHostedDeploymentProof,
+  inspectInitialProductionPreflight,
   inspectPreviewEvidenceChain,
   inspectPreviewMutationPreflight,
   inspectPreviewTeardownReceipt,
+  inspectProductionEvidenceChain,
+  inspectProductionMutationPreflight,
+  inspectProductionRollbackReceipt,
   inspectProviderPreflightReceipt,
   inspectScreenshotImageDigest,
   inspectScreenshotProviderBinding,
@@ -38,6 +62,9 @@ import {
   DeploymentJourneyInventory,
   DeploymentPlanProjection,
   DeploymentPlanReceipt,
+  DeploymentProductionPreflightReceipt,
+  DeploymentProductionMutationPreflightReceipt,
+  DeploymentProductionRollbackReceipt,
   DeploymentProviderPreflightReceipt,
   DeploymentProviderReadback,
   DeploymentPreviewCredentialReadbackReceipt,
@@ -120,6 +147,28 @@ const hashA = "a".repeat(64);
 const hashB = "b".repeat(64);
 const candidateCommit = "669a8f3bc484ddf5975f40940c8bdc14e6f1ba11";
 const providerUrl = "https://taxkit-docs-pr-17.taxkit-preview.workers.dev";
+const productionEvidenceRoot =
+  "docs/evidence/deployments/2026-07-30-production-prod";
+const productionRollbackPaths = {
+  initialProviderReadbackPath: `${productionEvidenceRoot}/provider-readback-d9cb894.json`,
+  restoredHostedProofPath: `${productionEvidenceRoot}/rollback-hosted-d9cb894.json`,
+  restoredPlanPath: `${productionEvidenceRoot}/rollback-plan-d9cb894.json`,
+  restoredPreflightPath: `${productionEvidenceRoot}/rollback-predeploy-d9cb894.json`,
+  restoredProviderReadbackPath: `${productionEvidenceRoot}/rollback-provider-d9cb894.json`,
+  restoredScreenshotManifestPaths: [
+    `${productionEvidenceRoot}/rollback-screenshot-desktop-d9cb894.json`,
+    `${productionEvidenceRoot}/rollback-screenshot-mobile-d9cb894.json`,
+  ],
+  successorHostedProofPath: `${productionEvidenceRoot}/rollback-successor-production-hosted-c99984c.json`,
+  successorPreviewHostedProofPath: `${productionEvidenceRoot}/rollback-successor-preview-hosted-c99984c.json`,
+  successorPreviewProviderReadbackPath: `${productionEvidenceRoot}/rollback-successor-preview-provider-c99984c.json`,
+  successorPreviewTeardownPath: `${productionEvidenceRoot}/rollback-successor-preview-teardown-c99984c.json`,
+  successorProviderReadbackPath: `${productionEvidenceRoot}/rollback-successor-production-provider-c99984c.json`,
+  successorScreenshotManifestPaths: [
+    `${productionEvidenceRoot}/rollback-successor-production-screenshot-desktop-c99984c.json`,
+    `${productionEvidenceRoot}/rollback-successor-production-screenshot-mobile-c99984c.json`,
+  ],
+} as const;
 
 const decodeProviderContracts = async () => {
   const projection = await Effect.runPromise(
@@ -472,6 +521,24 @@ describe("docs deployment provider receipt contracts", () => {
     ).toContainEqual(expect.stringContaining("preview-mutation-preflight"));
     expect(
       inspectPreviewMutationPreflight(
+        {
+          ...preflight,
+          observedAt: "2026-07-30T18:25:04Z",
+        },
+        gitReadback,
+        plan,
+        authority,
+        credentialReadback
+      )
+    ).toContainEqual(expect.stringContaining("preview-mutation-preflight"));
+    expect(
+      inspectPreviewMutationPreflight(preflight, gitReadback, plan, authority, {
+        ...credentialReadback,
+        observedAt: "2026-07-30T10:28:00Z",
+      })
+    ).toContainEqual(expect.stringContaining("preview-mutation-preflight"));
+    expect(
+      inspectPreviewMutationPreflight(
         wrongAccountPreflight,
         gitReadback,
         plan,
@@ -537,7 +604,6 @@ describe("docs deployment provider receipt contracts", () => {
         ),
       ])
     );
-
     expect(
       inspectPreviewMutationPreflight(
         predestroy,
@@ -567,5 +633,403 @@ describe("docs deployment provider receipt contracts", () => {
     expect(
       inspectPreviewTeardownReceipt(teardown, destroyPlan, provider)
     ).toEqual([]);
+  });
+
+  test("binds fixed Production rollback to distinct provider transitions and the restored state bundle", async () => {
+    const [
+      initialProvider,
+      successorPreviewProvider,
+      successorPreviewTeardown,
+      successorProvider,
+      restoredPlan,
+      restoredPreflight,
+      restoredProvider,
+      restoredHosted,
+      initialDesktop,
+      initialMobile,
+      restoredDesktop,
+      restoredMobile,
+      rollbackReceipt,
+      credentialReadback,
+      successorPlan,
+      successorPreflight,
+      successorCredentialReadback,
+    ] = await Effect.runPromise(
+      Effect.all([
+        Schema.decodeUnknownEffect(DeploymentProviderReadback)(
+          initialProductionProviderJson
+        ),
+        Schema.decodeUnknownEffect(DeploymentProviderReadback)(
+          successorPreviewProviderJson
+        ),
+        Schema.decodeUnknownEffect(DeploymentPreviewTeardownReceipt)(
+          successorPreviewTeardownJson
+        ),
+        Schema.decodeUnknownEffect(DeploymentProviderReadback)(
+          successorProductionProviderJson
+        ),
+        Schema.decodeUnknownEffect(DeploymentPlanReceipt)(restoredPlanJson),
+        Schema.decodeUnknownEffect(
+          DeploymentProductionMutationPreflightReceipt
+        )(restoredPreflightJson),
+        Schema.decodeUnknownEffect(DeploymentProviderReadback)(
+          restoredProviderJson
+        ),
+        Schema.decodeUnknownEffect(DeploymentHostedProofReceipt)(
+          restoredHostedJson
+        ),
+        Schema.decodeUnknownEffect(DeploymentScreenshotManifest)(
+          initialProductionDesktopJson
+        ),
+        Schema.decodeUnknownEffect(DeploymentScreenshotManifest)(
+          initialProductionMobileJson
+        ),
+        Schema.decodeUnknownEffect(DeploymentScreenshotManifest)(
+          restoredDesktopJson
+        ),
+        Schema.decodeUnknownEffect(DeploymentScreenshotManifest)(
+          restoredMobileJson
+        ),
+        Schema.decodeUnknownEffect(DeploymentProductionRollbackReceipt)(
+          rollbackReceiptJson
+        ),
+        Schema.decodeUnknownEffect(DeploymentPreviewCredentialReadbackReceipt)(
+          credentialReadbackJson
+        ),
+        Schema.decodeUnknownEffect(DeploymentPlanReceipt)(
+          successorProductionPlanJson
+        ),
+        Schema.decodeUnknownEffect(
+          DeploymentProductionMutationPreflightReceipt
+        )(successorProductionPreflightJson),
+        Schema.decodeUnknownEffect(DeploymentPreviewCredentialReadbackReceipt)(
+          successorCredentialReadbackJson
+        ),
+      ])
+    );
+    const [distinctRestoredDesktop, distinctRestoredMobile] =
+      await Effect.runPromise(
+        Effect.all([
+          Schema.decodeUnknownEffect(DeploymentScreenshotManifest)({
+            ...restoredDesktop,
+            imagePath:
+              "docs/evidence/deployments/2026-07-30-production-prod/production-desktop-c99984c.png",
+          }),
+          Schema.decodeUnknownEffect(DeploymentScreenshotManifest)({
+            ...restoredMobile,
+            imagePath:
+              "docs/evidence/deployments/2026-07-30-production-prod/production-mobile-c99984c.png",
+          }),
+        ])
+      );
+
+    expect(
+      inspectProductionMutationPreflight(
+        restoredPreflight,
+        restoredPlan,
+        successorProvider,
+        restoredProvider,
+        credentialReadback
+      )
+    ).toEqual([]);
+    expect(
+      inspectProductionMutationPreflight(
+        successorPreflight,
+        successorPlan,
+        initialProvider,
+        successorProvider,
+        {
+          ...successorCredentialReadback,
+          observedAt: "2026-07-30T11:37:00Z",
+        }
+      )
+    ).toContainEqual(expect.stringContaining("production-mutation-preflight"));
+    expect(
+      inspectProductionMutationPreflight(
+        {
+          ...successorPreflight,
+          observedAt: successorPreflight.credentials.expiresAt,
+        },
+        successorPlan,
+        initialProvider,
+        successorProvider,
+        successorCredentialReadback
+      )
+    ).toContainEqual(expect.stringContaining("production-mutation-preflight"));
+    expect(
+      inspectProductionMutationPreflight(
+        restoredPreflight,
+        restoredPlan,
+        successorProvider,
+        restoredProvider,
+        {
+          ...credentialReadback,
+          observedAt: "2026-07-30T11:40:00Z",
+        }
+      )
+    ).toContainEqual(expect.stringContaining("production-mutation-preflight"));
+    expect(
+      inspectProductionMutationPreflight(
+        {
+          ...restoredPreflight,
+          observedAt: restoredPreflight.credentials.expiresAt,
+        },
+        restoredPlan,
+        successorProvider,
+        restoredProvider,
+        credentialReadback
+      )
+    ).toContainEqual(expect.stringContaining("production-mutation-preflight"));
+    expect(
+      inspectProductionEvidenceChain(
+        restoredPlan,
+        restoredProvider,
+        restoredHosted,
+        [restoredDesktop, restoredMobile],
+        "rollback",
+        "update"
+      )
+    ).toEqual([]);
+    expect(
+      inspectProductionRollbackReceipt(
+        rollbackReceipt,
+        initialProvider,
+        successorPreviewProvider,
+        successorPreviewTeardown,
+        successorProvider,
+        restoredProvider,
+        [initialDesktop, initialMobile],
+        [distinctRestoredDesktop, distinctRestoredMobile],
+        productionRollbackPaths
+      )
+    ).toEqual([]);
+    expect(
+      inspectProductionRollbackReceipt(
+        rollbackReceipt,
+        initialProvider,
+        successorPreviewProvider,
+        successorPreviewTeardown,
+        successorProvider,
+        restoredProvider,
+        [initialDesktop, initialMobile],
+        [
+          {
+            ...restoredDesktop,
+            limitations: ["Content-addressed admission removed for attack."],
+          },
+          restoredMobile,
+        ],
+        productionRollbackPaths
+      )
+    ).toContainEqual(expect.stringContaining("production-rollback-binding"));
+    expect(
+      inspectProductionRollbackReceipt(
+        rollbackReceipt,
+        initialProvider,
+        successorPreviewProvider,
+        successorPreviewTeardown,
+        successorProvider,
+        restoredProvider,
+        [initialDesktop, initialMobile],
+        [restoredDesktop, restoredMobile],
+        productionRollbackPaths
+      )
+    ).toEqual([]);
+    expect(
+      inspectProductionRollbackReceipt(
+        rollbackReceipt,
+        initialProvider,
+        successorPreviewProvider,
+        successorPreviewTeardown,
+        successorProvider,
+        {
+          ...restoredProvider,
+          state: {
+            ...restoredProvider.state,
+            bundleSha256: "c".repeat(64),
+          },
+        },
+        [initialDesktop, initialMobile],
+        [restoredDesktop, restoredMobile],
+        productionRollbackPaths
+      )
+    ).toContainEqual(expect.stringContaining("production-rollback-binding"));
+    expect(
+      inspectDeploymentPlanActions(
+        {
+          ...restoredPlan,
+          projection: {
+            ...restoredPlan.projection,
+            logicalResources: [
+              {
+                ...restoredPlan.projection.logicalResources[0],
+                action: "delete",
+              },
+              {
+                ...restoredPlan.projection.logicalResources[1],
+                action: "delete",
+              },
+            ],
+          },
+        },
+        "update"
+      )
+    ).toContainEqual(expect.stringContaining("plan-actions"));
+    expect(
+      inspectProductionMutationPreflight(
+        {
+          ...restoredPreflight,
+          authority: {
+            ...restoredPreflight.authority,
+            operation: "production-deploy",
+          },
+        },
+        restoredPlan,
+        successorProvider,
+        restoredProvider,
+        credentialReadback
+      )
+    ).toContainEqual(expect.stringContaining("production-mutation-preflight"));
+    expect(
+      inspectProductionRollbackReceipt(
+        {
+          ...rollbackReceipt,
+          restoredProduction: {
+            ...rollbackReceipt.restoredProduction,
+            planPath: rollbackReceipt.successor.providerReadbackPath,
+          },
+        },
+        initialProvider,
+        successorPreviewProvider,
+        successorPreviewTeardown,
+        successorProvider,
+        restoredProvider,
+        [initialDesktop, initialMobile],
+        [restoredDesktop, restoredMobile],
+        productionRollbackPaths
+      )
+    ).toContainEqual(expect.stringContaining("production-rollback-binding"));
+  });
+
+  test("rejects an initial Production preflight detached from accepted Preview or credential identity", async () => {
+    const [
+      plan,
+      preflight,
+      previewProvider,
+      previewHosted,
+      previewTeardown,
+      credentialReadback,
+      productionProvider,
+    ] = await Effect.runPromise(
+      Effect.all([
+        Schema.decodeUnknownEffect(DeploymentPlanReceipt)(
+          initialProductionPlanJson
+        ),
+        Schema.decodeUnknownEffect(DeploymentProductionPreflightReceipt)(
+          initialProductionPreflightJson
+        ),
+        Schema.decodeUnknownEffect(DeploymentProviderReadback)(
+          providerReadbackJson
+        ),
+        Schema.decodeUnknownEffect(DeploymentHostedProofReceipt)(
+          acceptedPreviewHostedJson
+        ),
+        Schema.decodeUnknownEffect(DeploymentPreviewTeardownReceipt)(
+          teardownJson
+        ),
+        Schema.decodeUnknownEffect(DeploymentPreviewCredentialReadbackReceipt)(
+          credentialReadbackJson
+        ),
+        Schema.decodeUnknownEffect(DeploymentProviderReadback)(
+          initialProductionProviderJson
+        ),
+      ])
+    );
+
+    expect(
+      inspectInitialProductionPreflight(
+        preflight,
+        plan,
+        previewProvider,
+        previewHosted,
+        previewTeardown,
+        credentialReadback,
+        productionProvider
+      )
+    ).toEqual([]);
+    expect(
+      inspectInitialProductionPreflight(
+        {
+          ...preflight,
+          acceptedPreview: {
+            ...preflight.acceptedPreview,
+            sourceConfigSha256: "c".repeat(64),
+          },
+        },
+        plan,
+        previewProvider,
+        previewHosted,
+        previewTeardown,
+        credentialReadback,
+        productionProvider
+      )
+    ).toContainEqual(expect.stringContaining("production-initial-preflight"));
+    expect(
+      inspectInitialProductionPreflight(
+        preflight,
+        plan,
+        previewProvider,
+        previewHosted,
+        previewTeardown,
+        {
+          ...credentialReadback,
+          observedAt: "2026-07-30T11:08:00Z",
+        },
+        productionProvider
+      )
+    ).toContainEqual(expect.stringContaining("production-initial-preflight"));
+    expect(
+      inspectInitialProductionPreflight(
+        {
+          ...preflight,
+          credentials: {
+            ...preflight.credentials,
+            scopeSetSha256: "c".repeat(64),
+          },
+        },
+        plan,
+        previewProvider,
+        previewHosted,
+        previewTeardown,
+        credentialReadback,
+        productionProvider
+      )
+    ).toContainEqual(expect.stringContaining("production-initial-preflight"));
+    const unrelatedProvider = await Effect.runPromise(
+      Schema.decodeUnknownEffect(DeploymentProviderReadback)({
+        ...productionProvider,
+        physicalWorkerName: "unrelated-worker",
+        state: {
+          ...productionProvider.state,
+          output: {
+            ...productionProvider.state.output,
+            workerName: "unrelated-worker",
+            workerUrl: "https://unrelated.other.workers.dev",
+          },
+        },
+        url: "https://unrelated.other.workers.dev",
+      })
+    );
+    expect(
+      inspectInitialProductionPreflight(
+        preflight,
+        plan,
+        previewProvider,
+        previewHosted,
+        previewTeardown,
+        credentialReadback,
+        unrelatedProvider
+      )
+    ).toContainEqual(expect.stringContaining("production-initial-preflight"));
   });
 });

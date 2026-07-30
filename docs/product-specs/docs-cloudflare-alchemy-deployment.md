@@ -165,11 +165,14 @@ oracle before workerd and provider proof exist.
 
 The reviewed baseline had no deployment runbook, Cloudflare authority
 envelopes, Alchemy state owner, mutating workflow controls, hosted screenshot
-contract, provider-bound evidence route, or rollback receipt. DCD-002 has now
-admitted the smallest runbook, authority/receipt owner, deployment journey
-inventory and validator, and one provider-bound Preview/teardown chain with
-bounded screenshots. Repeatable workflows, Production and rollback receipts
-remain absent.
+contract, provider-bound evidence route, or rollback receipt. DCD-002 admitted
+the smallest runbook, authority/receipt owner, deployment journey inventory and
+one provider-bound Preview/teardown chain. DCD-003 has now observed fixed
+Production, a separately Preview-qualified successor, and normal source-bound
+rollback to the accepted source with bounded screenshots and provider/state
+readback. Owner reconciliation, broad verification and corrected-boundary
+independent review accepted DCD-003. Repeatable workflows remain absent and are
+owned by DCD-004.
 
 ## Goals
 
