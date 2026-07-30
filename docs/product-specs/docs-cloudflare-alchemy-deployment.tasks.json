@@ -2,8 +2,8 @@
   "$schema": "https://taxkit.local/schemas/product-spec-task-plan.v1.json",
   "spec": "docs/product-specs/docs-cloudflare-alchemy-deployment.md",
   "title": "Docs Cloudflare and Alchemy Deployment Tasks",
-  "status": "proposed",
-  "last_reviewed": "2026-07-28",
+  "status": "active",
+  "last_reviewed": "2026-07-30",
   "principles": [
     "Deliver one complete consumer/operator outcome in each vertical slice; do not build a horizontal infrastructure or governance platform first.",
     "Upgrade Effect/Platform and Alchemy together to exact 4.0.0-beta.100 and 2.0.0-beta.64 pins in the first slice; do not propose beta.63 or latest.",
@@ -17,7 +17,7 @@
     "After grounding and before editing DCD-001, create one goal for the complete DCD-001 through DCD-005 implementation with no token budget, then create the active execution plan and keep the ledger tasks as milestones under that goal."
   ],
   "globalVerification": {
-    "commitPolicy": "The reviewed planning commit authorizes no implementation or provider operation. When DCD-001 implementation is separately authorized, the implementation thread must first create one goal covering DCD-001 through DCD-005, documentation reconciliation, independent review, verification and closeout, without a token budget; keep it active through authority stops and apply the goal tool's completion/blocking rules. Then create and route an active execution plan. Commit each coherent accepted slice only after its focused gates, task-local impact rows, primary-owner review, authority receipt where provider mutation occurred, and explicit no-Changeset decision. Any implementation, dependency, runtime, build, provider-config or candidate change invalidates the applicable workerd/Preview/Production/screenshot evidence. Push, versioning, tagging, package publication and custom-domain/DNS mutation remain separately authorized and outside this task list.",
+    "commitPolicy": "One no-budget goal and active plan already coordinate DCD-001 through DCD-005. Cooper granted upfront authority on 2026-07-30 Australia/Melbourne for this thread to preflight credentials/account, plan/equal-replan, deploy/read back/prove and tear down exact TaxKit docs Preview resources, deploy/read back/prove fixed Production, and rehearse normal source-bound rollback using only the accepted Worker/assets and narrow Alchemy state resources. Each mutation still requires the exact identity, redaction, scope, stage lock, safety and receipt preconditions; a mismatch stops without broadening authority. Commit each coherent accepted slice only after its focused gates, task-local impact rows, primary-owner review, authority receipt where provider mutation occurred, and exact Changeset artifact or evidenced no-Changeset decision. Any implementation, dependency, runtime, build, provider-config or candidate change invalidates the applicable workerd/Preview/Production/screenshot evidence. Push, merge, PR, versioning, tagging, package publication, credential disclosure/rotation/scope expansion, unrelated provider resources and custom-domain/DNS mutation remain outside this task list.",
     "requiredBeforeFinalPR": [
       "bun install --frozen-lockfile",
       "bun run docs:validate",
@@ -35,12 +35,12 @@
       "bun run verification",
       "git diff --check",
       "focused execution of every task-created workerd, provider, screenshot, teardown and rollback command using the exact invocation backfilled by its owning task",
-      "fresh primary-owner review of final ownership, Effect shape, authority, proof, lifecycle, bridge retirement and no-Changeset rationale"
+      "fresh primary-owner review of final ownership, Effect shape, authority, proof, lifecycle, bridge retirement and Changeset decision"
     ],
     "evidenceRequired": [
       "Exact source commit, package manifest, lockfile, Alchemy source, compatibility-date and build-config identities",
       "Exact Effect/Platform beta.100 and Alchemy beta.64 package integrity and peer-compatibility receipt",
-      "Local workerd receipt covering SSR, assets, server functions, 404, hydration, navigation, runtime reuse, filesystem absence, bundle/startup limits and console cleanliness",
+      "Local workerd receipt covering SSR, assets, server functions, 404, hydration, navigation, runtime reuse, filesystem absence, compressed bundle limit, local readiness timing and console cleanliness",
       "Preview plan digest, equal replan, Alchemy state and Cloudflare Worker/deployment/version readback, hosted proof, teardown or explicit stop receipt, and bounded desktop/mobile screenshot manifest",
       "Production plan digest, accepted Preview source/config/dependency identity, provider readback, hosted proof, bounded desktop/mobile screenshot manifest and normal rollback/redeploy receipt",
       "Workflow Schema/control receipts for exact SHA, stage locks, cancellation, protected environments, plan equality, PR-close teardown and report-only orphan inventory",
@@ -64,11 +64,7 @@
     {
       "surface": "dependency-manifest-lock",
       "decision": "change_required",
-      "paths": [
-        "package.json",
-        "bun.lock",
-        "apps/docs/package.json"
-      ],
+      "paths": ["package.json", "bun.lock", "apps/docs/package.json"],
       "acceptance": "The root catalog and lock resolve the exact accepted beta.100/beta.64 graph; the docs manifest changes only for the real build/harness dependency or script proved by DCD-001. Other catalog-consuming manifests are preserved but proportionally qualified unless the upgrade proves a textual owner change."
     },
     {
@@ -77,10 +73,13 @@
       "paths": [
         "apps/docs/package.json",
         "apps/docs/vite.config.ts",
+        "apps/docs/wrangler.jsonc",
+        "apps/docs/public/_headers",
         "apps/docs/src/server.ts",
         "apps/docs/src/lib/build/**",
         "apps/docs/src/lib/runtime.server.ts",
         "apps/docs/src/lib/runtime-factory.server.ts",
+        "apps/docs/scripts/test-cloudflare-built.tsx",
         "apps/docs/scripts/test-built.tsx",
         "apps/docs/README.md"
       ],
@@ -88,31 +87,31 @@
     },
     {
       "surface": "content-and-fumadocs-packages",
-      "decision": "preserve",
-      "paths": [
-        "packages/docs-content/**",
-        "packages/docs-fumadocs/**"
-      ],
-      "acceptance": "No deployment/provider responsibility enters either package; a change is permitted only after a retained workerd failure proves a request-time filesystem or generated-source defect at its existing owner."
+      "decision": "change_required",
+      "paths": ["packages/docs-content/**", "packages/docs-fumadocs/**"],
+      "acceptance": "Retained workerd failure proved eager generated-source filesystem reachability in docs-content, so bundled navigation and lazy validation are corrected at that owner; no deployment/provider responsibility enters either package and docs-fumadocs remains unchanged."
     },
     {
       "surface": "root-alchemy-and-repository-tools",
       "decision": "change_required",
       "paths": [
         "alchemy.run.ts",
+        "tsconfig.alchemy.json",
         "tools/docs-deployment/**"
       ],
-      "acceptance": "Root composition owns one Cloudflare Website and remote state; tool-local Effect boundaries own plan, readback, receipts and provider operations without a new package, raw client or generic callback."
+      "acceptance": "Root composition owns one app build Command, one prebuilt Cloudflare Worker and remote state; tool-local Effect boundaries own plan, readback, receipts and provider operations without a new package, raw client or generic callback."
     },
     {
       "surface": "turbo-knip-ignore",
       "decision": "change_required",
       "paths": [
-        "turbo.json",
+        "knip.json",
         "knip.production.json",
-        ".gitignore"
+        "oxlint.config.ts",
+        ".gitignore",
+        "turbo.json"
       ],
-      "acceptance": "Alchemy, app deployment entries, generated Worker proof and temporary bridge outputs are reachable while stale Nitro/Vercel outputs are removed only in DCD-005."
+      "acceptance": "Root Alchemy and app deployment entries are reachable in development and production Knip, exact new config/test/process adapters are admitted to existing lint boundary lists, transient .wrangler output is ignored, and turbo.json remains unchanged until bridge retirement requires it."
     },
     {
       "surface": "architecture",
@@ -128,10 +127,7 @@
     {
       "surface": "readmes",
       "decision": "change_required",
-      "paths": [
-        "README.md",
-        "apps/docs/README.md"
-      ],
+      "paths": ["README.md", "apps/docs/README.md"],
       "acceptance": "Entry points route the verified local and operational commands after their owning tasks create them without copying runbook procedures."
     },
     {
@@ -181,10 +177,7 @@
     {
       "surface": "quality-workflow",
       "decision": "preserve",
-      "paths": [
-        ".github/workflows/quality.yml",
-        "tools/quality-workflow/**"
-      ],
+      "paths": [".github/workflows/quality.yml", "tools/quality-workflow/**"],
       "acceptance": "Quality retains contents:read, its current cancellation policy and canonical local release graph without provider credentials or deployment steps."
     },
     {
@@ -223,7 +216,7 @@
     },
     {
       "surface": "dns-domain-stateful-services-third-party-observability",
-      "decision": "not_applicable",
+      "decision": "change_required",
       "paths": [
         "alchemy.run.ts",
         "docs/product-specs/docs-cloudflare-alchemy-deployment.md"
@@ -238,15 +231,12 @@
         "docs/architecture/deployment.md",
         "docs/runbooks/docs-deployment.md"
       ],
-      "acceptance": "Root Website composition explicitly enables only bounded built-in invocation logs with traces and sensitive fields absent after DCD-001 source/config qualification and DCD-002 provider readback, or records observability disabled until DCD-005 rather than inheriting an undocumented default."
+      "acceptance": "Root Worker composition explicitly enables bounded built-in invocation logs with persistence while traces and sensitive fields remain absent; DCD-002 confirms the provider readback rather than inheriting an undocumented default."
     },
     {
       "surface": "new-package-lint-generic-abstraction",
       "decision": "not_applicable",
-      "paths": [
-        "packages/**",
-        "tools/oxlint/**"
-      ],
+      "paths": ["packages/**", "tools/oxlint/**"],
       "acceptance": "No infrastructure package, generic provider framework or lint rule is added; a tool-local provider service exists only if direct readback proves a real substitution boundary."
     },
     {
@@ -261,19 +251,19 @@
     },
     {
       "surface": "changesets-release-publication",
-      "decision": "not_applicable",
+      "decision": "change_required",
       "paths": [
         ".changeset/**",
         "docs/standards/versioning.md",
         "docs/runbooks/versioning.md"
       ],
-      "acceptance": "The affected apps, root tooling and packages are private and this SPEC changes no public export or consumer package contract; each slice rechecks that fact and adds no Changeset unless implementation changes it."
+      "acceptance": "DCD-001 changes version-managed @taxkit/docs-content Worker behavior and retains .changeset/fresh-workers-render.md as a patch Changeset. Later slices recheck their own package impact; no Changeset is consumed or published by this SPEC."
     }
   ],
   "tasks": [
     {
       "id": "DCD-001",
-      "status": "pending",
+      "status": "completed",
       "acceptedFindingIds": [
         "TK-CF-001",
         "TK-CF-002",
@@ -296,17 +286,17 @@
       "goal": "Produce one frozen exact candidate on Effect/Platform beta.100 and Alchemy beta.64 whose real Cloudflare Worker bundle passes local workerd and current Nitro regression proof.",
       "scope": [
         "after grounding and before editing this task, create the single no-budget implementation goal covering DCD-001 through DCD-005, documentation reconciliation, required independent review, verification and closeout, then create and route the active execution plan",
-        "pin effect, @effect/platform-bun, @effect/platform-node and @effect/vitest to exact 4.0.0-beta.100 and alchemy to exact 2.0.0-beta.64",
+        "pin effect, @effect/platform-bun, @effect/platform-node and @effect/vitest to exact 4.0.0-beta.100 and alchemy to exact 2.0.0-beta.64, and override @effect/platform-node-shared plus @effect/sql-d1 to beta.100 so prerelease caret resolution cannot introduce beta.102 peers",
         "regenerate bun.lock and verify peer constraints and package integrity without unrelated dependency upgrades",
         "correct affected Effect API usage at existing owners and prove the whole repository graph without compatibility wrappers",
-        "add root alchemy.run.ts with Cloudflare providers, Cloudflare remote state and one DocsWebsite resource",
-        "use the installed beta.64 ALCHEMY_CLOUDFLARE_VITE_INJECTED signal for the smallest app-owned Schema-decoded build branch, with no Site argv heuristic or duplicate Cloudflare plugin",
-        "keep compatibility date, nodejs_compat, Worker-first assets and the explicit bounded built-in invocation-log policy in root Website composition; qualify its exact option, sampling, persistence and cost semantics locally, then leave provider readback to DCD-002; disable observability and retain the DCD-005 gap if the bounded policy cannot be expressed",
+        "add root alchemy.run.ts with Cloudflare providers, Cloudflare remote state, one Command.Build and one prebuilt DocsWebsite Worker resource using only public Alchemy APIs",
+        "use the app-owned Schema-decoded TAXKIT_DOCS_BUILD_TARGET signal and exact @cloudflare/vite-plugin@1.47.0 for the Cloudflare build, with no Site argv heuristic, Alchemy private import or duplicate Cloudflare plugin",
+        "keep compatibility date, nodejs_compat, default asset-first full-stack routing and the explicit bounded built-in invocation-log policy in root Worker composition; qualify its exact option, persistence and cost semantics locally, then leave provider readback to DCD-002",
         "preserve apps/docs/src/server.ts and route/React/ManagedRuntime architecture",
-        "first prove an official exact-pinned workerd-compatible harness dependency and a supported provider-free Alchemy/TanStack seam whose Worker/assets are the deployable Website artifact; stop without provider access if beta.64 exposes no supported seam",
-        "create one repository command that executes that emitted Worker, then backfill its exact verified invocation into the SPEC, task, app README and active plan",
+        "prove that exact @cloudflare/vite-plugin@1.47.0 and wrangler@4.114.0 emit and execute the same Worker/assets passed through Alchemy Command.Build to Cloudflare.Worker bundle:false without provider or state access",
+        "create and execute bun run --filter=docs test:cloudflare-built against that emitted Worker, then keep the exact invocation synchronized in the SPEC, task, app README and active plan",
         "instrument module-scoped runtime construction and isolate reuse",
-        "prove no request-time filesystem dependency and inspect bundle/startup limits",
+        "prove no request-time filesystem dependency, check the compressed bundle limit and record local readiness timing without treating it as provider CPU-startup validation",
         "retain Nitro/Vercel test:built unchanged as an independent regression oracle",
         "update deployment/frontend/testing/package ownership architecture and app/root README pointers required by this slice",
         "record carrying cost, review triggers, rollback and disconfirming evidence for the dependency and dual-build path"
@@ -317,7 +307,7 @@
         "root alchemy.run.ts",
         "smallest app build-policy change, extracted below apps/docs/src/lib/build only if the tested branch earns a semantic owner",
         "focused app build/runtime tests and instrumentation",
-        "exact-pinned official local Worker harness dependency, supported deployable artifact receipt and task-created command under its narrow app or tools/docs-deployment owner",
+        "exact @cloudflare/vite-plugin@1.47.0, wrangler@4.114.0 and workerd@1.20260722.1 graph, supported deployable artifact receipt and apps/docs/scripts/test-cloudflare-built.tsx",
         "local workerd receipt bound to the exact candidate",
         "updated apps/docs/README.md and affected architecture owners",
         "synchronized SPEC/tasks when installed APIs or final paths differ"
@@ -326,38 +316,62 @@
         "authority": "Local source, manifest, lockfile, build and test changes only; no provider or credential access.",
         "stopConditions": [
           "Alchemy beta.64 cannot resolve against the exact beta.100 graph",
-          "beta.64 exposes no supported provider-free Worker/assets seam or the local harness would test an artifact other than the deployable Website artifact",
+          "the public Command.Build plus Cloudflare.Worker bundle:false path cannot consume the same Worker/assets exercised by the local harness",
           "an affected workspace needs an unaccepted dependency or architecture change",
           "the Worker requires an unsupported Node API or request-time filesystem access without a clear existing owner",
-          "bundle/startup limits cannot be met without scope expansion"
+          "the compressed bundle limit cannot be met or provider startup qualification later contradicts the candidate without a clear in-scope correction"
         ],
         "rollback": "Revert the coherent dependency/build slice to the last frozen beta.98/Nitro graph and retain the failed compatibility receipt.",
         "recovery": "Correct the earliest existing app/package owner or seek Cooper's smallest dependency/runtime decision; do not add wrappers or provider resources."
       },
+      "retainedFailedEvidence": {
+        "observedAt": "2026-07-29",
+        "candidate": "96a825cebd22798044678389851be6ee9154d1df",
+        "package": "alchemy@2.0.0-beta.64",
+        "integrity": "sha512-gjDKSezvKSR9SMcyb6OajAWHcMMOWwZo3l5MKYVeO6O1PktOz4KMncP05j1IWwryG6BAu8/a/s2shtsn6TeEsA==",
+        "evidence": [
+          "src/Cloudflare/Workers/WorkerProvider.ts privately imports ./Vite.ts and calls viteBuild while preparing the deployable Worker",
+          "src/Cloudflare/Workers/LocalWorkerProvider.ts calls viteDev, so alchemy dev runs the development server rather than exposing the collected production Worker/assets result",
+          "src/Cloudflare/Workers/index.ts does not export the Vite build module",
+          "the more-specific ./Cloudflare/* package export maps alchemy/Cloudflare/Workers/Vite to a nonexistent Vite/index module; exact isolated Bun and Node probes both reject the import",
+          "@distilled.cloud/cloudflare-runtime@0.13.8 pins workerd@1.20260704.1, but no first-class Alchemy command emits the exact deployable Website artifact for that runtime without entering provider preparation",
+          "the first official-plugin workerd attempt used Worker-first asset routing and returned 404 for a generated asset; the accepted correction retains Cloudflare's default asset-first full-stack routing",
+          "the first isolated Worker request failed because docs-content eagerly imported validation policy with generated-source filesystem access; the accepted earliest-owner correction bundles navigation and loads validation policy only for validation"
+        ],
+        "nonClaims": [
+          "No dependency graph was changed or installed.",
+          "No TaxKit Cloudflare Worker or assets were built or executed.",
+          "No provider credential, state, plan, resource or mutation was accessed.",
+          "The failed probe did not establish that the separate official Cloudflare Vite plugin was an equivalent artifact producer."
+        ],
+        "resolution": "Cooper authorized the bounded architecture amendment: retain Effect/Platform beta.100 and Alchemy beta.64, replace Website.Vite with exact @cloudflare/vite-plugin@1.47.0 output consumed through Alchemy Command.Build and Cloudflare.Worker bundle:false, and prove that path before provider work."
+      },
       "documentationImpact": [
         "Change required: SPEC/tasks/active plan, root manifest/lock, app README and materially affected deployment/frontend/testing/package ownership architecture.",
-        "Preserve: docs-content/docs-fumadocs ownership and public content unless workerd supplies direct defect evidence.",
-        "N/A: app deployment modules, runbook, provider authority, automation, hosted screenshots, DNS and provider receipts remain absent unless the local seam proves a real app runtime boundary."
+        "Change required / Preserve: workerd supplied direct eager-filesystem-reachability evidence for docs-content, so correct bundled navigation and lazy validation at that semantic owner while preserving docs-fumadocs and deployment-neutral package responsibility.",
+        "N/A: runbook, provider authority implementation, automation, hosted screenshots, DNS and provider receipts remain absent in this local slice."
       ],
       "mandatoryVerification": [
-        "npm package metadata/integrity readback for the exact Effect/Platform beta.100 and Alchemy beta.64 pins",
-        "package integrity, frozen-lock reachability and official-source receipt for the selected exact local Worker harness dependency",
+        "npm package metadata/integrity readback for the exact Effect/Platform beta.100, transitive platform-node-shared/sql-d1 beta.100 and Alchemy beta.64 pins",
+        "package integrity, frozen-lock reachability and official-source receipt for exact @cloudflare/vite-plugin@1.47.0, wrangler@4.114.0 and workerd@1.20260722.1",
         "bun install --frozen-lockfile",
         "bun run --filter=@taxkit/docs-content test",
         "bun run --filter=@taxkit/docs-fumadocs test",
         "bun run --filter=docs test",
         "bun run --filter=docs test:browser",
         "bun run --filter=docs test:built",
+        "bun run --filter=docs test:cloudflare-built",
         "bun run --filter=docs check-types",
+        "bun run check:docs-deployment:types",
         "bun run docs:build",
-        "prove the task-created local command needs no provider credential, provider mutation or Alchemy remote-state access, then execute it and backfill its exact verified invocation before completion",
+        "prove bun run --filter=docs test:cloudflare-built needs no provider credential, provider mutation or Alchemy remote-state access",
         "focused negative audit proving the Worker request path does not execute filesystem access, expose unexpected process.env values or construct an Effect runtime per request",
-        "bundle-size and startup-time comparison with the selected Cloudflare plan limits",
+        "compressed bundle-size comparison with the selected Cloudflare plan limit plus local readiness timing explicitly separated from DCD-002 provider startup qualification",
         "bun run check:docs",
         "bun run check:repository-paths",
         "bun run verification",
         "git diff --check",
-        "explicit no-Changeset rationale unless a private package's public contract changes"
+        "focused patch Changeset .changeset/fresh-workers-render.md for the @taxkit/docs-content Worker-compatibility behavior change"
       ],
       "browserVerification": [
         "Against the emitted Worker in workerd, prove initial SSR, real assets, hydration, server-function transport, zero-document client navigation, direct and client not-found behavior, accessibility and clean console.",
@@ -365,13 +379,13 @@
       ],
       "qualityAudits": [
         "Review the final local call/resource graph, exact dependency graph, package integrity, Effect API changes and absence of compatibility wrappers.",
-        "Review the exact Alchemy Vite injection branch, app-owned build policy, root-owned composition, bounded observability, Schema/branded identities, tagged errors, flat lazy Effect flow, no raw provider client and no helper/module sprawl.",
-        "Review module-scoped runtime lifetime, filesystem negative oracle, Node compatibility, bundle/startup limits, Turbo/Knip reachability and bridge carrying cost.",
+        "Review the exact Schema-decoded app build branch, official Cloudflare plugin, public Alchemy Command.Build/prebuilt-Worker composition, bounded observability, branded identities, tagged errors, flat lazy Effect flow, no raw provider client and no helper/module sprawl.",
+        "Review module-scoped runtime lifetime and temporary proof-header ownership, filesystem negative oracle, Node compatibility, compressed bundle limit, local readiness timing, Turbo/Knip reachability and bridge carrying cost.",
         "Review all task-local documentation-impact rows and migrate only materially revised legacy architecture metadata."
       ],
       "parentAudit": {
         "required": true,
-        "basis": "Review the dependency/build diff, workerd and Nitro receipts, final call graph, Effect/runtime ownership, limits, documentation ledger and no-Changeset decision.",
+        "basis": "Review the dependency/build diff, workerd and Nitro receipts, final call graph, Effect/runtime ownership, limits, documentation ledger and focused docs-content Changeset.",
         "recovery": "Correct the earliest owner, retain a disconfirming receipt, re-scope the slice or seek Cooper's smallest decision before DCD-002."
       },
       "completionCriteria": [
@@ -379,7 +393,7 @@
         "One supported deployable Cloudflare Worker/assets artifact passes the complete local workerd contract without provider or remote-state access.",
         "The existing Nitro built harness remains independently green and clearly temporary.",
         "No provider, Preview, Production, public URL or deployment claim is made.",
-        "The exact new command invocation and final paths are backfilled into current intent and app routing owners.",
+        "The exact bun run --filter=docs test:cloudflare-built invocation and final paths are backfilled into current intent and app routing owners.",
         "The primary owner accepts the slice before DCD-002."
       ],
       "commitAfterPassing": true
@@ -395,19 +409,11 @@
         "TK-CF-007",
         "TK-CF-010"
       ],
-      "requirementIds": [
-        "DCD-005",
-        "DCD-006",
-        "DCD-009",
-        "DCD-010",
-        "DCD-012"
-      ],
+      "requirementIds": ["DCD-005", "DCD-006", "DCD-009", "DCD-010", "DCD-012"],
       "title": "Prove the first isolated Preview and teardown boundary",
       "type": "vertical-preview",
-      "dependsOn": [
-        "DCD-001"
-      ],
-      "goal": "Under separately supplied authority, deploy one exact trusted-PR candidate to an isolated workers.dev Preview, prove it, retain bounded screenshots and safely destroy it or record the exact teardown stop.",
+      "dependsOn": ["DCD-001"],
+      "goal": "Under Cooper's recorded 2026-07-30 bounded authority, deploy one exact trusted-PR candidate to an isolated workers.dev Preview, prove it, retain bounded screenshots and safely destroy it or record an exact safety/capability stop.",
       "scope": [
         "add one canonical docs deployment runbook covering state, Preview, Production, teardown, rollback and reconciliation as distinct operation sections",
         "change the runbook contract and routes from exactly four to exactly five without changing the original four runbooks' substantive ownership",
@@ -418,12 +424,12 @@
         "create and backfill the exact verified manual Preview plan, deploy, proof and teardown command invocations",
         "read back account, plan, Workers subdomain and Alchemy state before mutation",
         "complete state bootstrap/adoption under its separate envelope before application planning and stop if the installed plan path can mutate provider or state resources",
-        "run a separately authorized non-mutating plan, retain its candidate/stage/config-bound sanitized digest for human acceptance, then use a distinct protected deploy approval, exclusive stage authority window and equal replan before apply",
+        "run the authorized non-mutating plan, retain its candidate/stage/config-bound sanitized digest for acceptance under the recorded envelope, then use a distinct exclusive stage authority window and equal replan before apply",
         "deploy and read back the isolated Worker, deployment/version, assets and provider URL",
         "read back the applied built-in invocation-log and trace settings or confirm observability remains explicitly disabled",
         "run hosted HTTP/browser/accessibility/console/cache-header proof",
         "capture one representative desktop and one representative mobile screenshot with the complete candidate/provider/reviewer manifest",
-        "destroy the exact Preview with the same stage lock and prove absence, or retain the explicit missing-authority/resource stop"
+        "destroy the exact Preview with the same stage lock and prove absence, or retain the explicit safety, identity or capability stop"
       ],
       "outputs": [
         "docs/runbooks/docs-deployment.md and exact-five runbook contract",
@@ -438,9 +444,9 @@
         "synchronized SPEC/tasks/active plan with exact command invocations and observed limitations"
       ],
       "authorityAndStops": {
-        "authority": "Separately approved principals must name non-mutating plan, provider inventory, Alchemy state, exact Preview stage/resource deploy and destroy operations, credential scope/duration/revocation, readback, rollback and escalation. Manual mutations require one named principal and an exclusive authority window because GitHub concurrency is not an Alchemy distributed lock.",
+        "authority": "Approving principal Cooper authorized this implementation thread on 2026-07-30 Australia/Melbourne to use existing authenticated identities for account/credential preflight, narrow Alchemy state bootstrap/adoption, sanitized plan/equal replan, exact deterministic Preview Worker/assets deploy/readback/proof, teardown and absence readback. Authority lasts for this implementation goal until completion, revocation or identity/safety mismatch; it excludes credential disclosure/rotation/scope expansion, unrelated resources and broad reconciliation. Manual mutations require an exclusive stage authority window because GitHub concurrency is not an Alchemy distributed lock.",
         "stopConditions": [
-          "account, plan, Workers subdomain, principal, credential scope, state identity, approval or teardown authority is unknown",
+          "account, plan, Workers subdomain, executing identity, credential scope/revocation, state identity or exact teardown target is unknown or contradicts the recorded envelope",
           "candidate is no longer the trusted PR head",
           "accepted plan and replan digests differ",
           "the plan projection includes ANSI, timestamps, secrets or omits accepted candidate/stage/config/resource identity",
@@ -509,23 +515,15 @@
         "TK-CF-007",
         "TK-CF-011"
       ],
-      "requirementIds": [
-        "DCD-006",
-        "DCD-007",
-        "DCD-009",
-        "DCD-010",
-        "DCD-012"
-      ],
+      "requirementIds": ["DCD-006", "DCD-007", "DCD-009", "DCD-010", "DCD-012"],
       "title": "Prove fixed Production and normal rollback",
       "type": "vertical-production",
-      "dependsOn": [
-        "DCD-002"
-      ],
-      "goal": "Under separately supplied Production authority, deploy the accepted Preview source/config/dependency identity to the fixed Production workers.dev URL and prove normal rollback/redeploy.",
+      "dependsOn": ["DCD-002"],
+      "goal": "Under Cooper's recorded 2026-07-30 bounded authority, deploy the accepted Preview source/config/dependency identity to the fixed Production workers.dev URL and prove normal rollback/redeploy.",
       "scope": [
         "extend existing deployment Schemas/commands/runbook only for Production plan, deploy, provider readback, proof and normal rollback",
         "require the exact accepted Preview source, lock, package, Alchemy and configuration identities",
-        "use one fixed prod stage, one stable Worker identity, a separately reviewed non-mutating plan and a distinct protected Production deploy approval",
+        "use one fixed prod stage, one stable Worker identity, an accepted non-mutating plan and a distinct exclusive Production mutation window under the recorded envelope",
         "create and backfill the exact verified Production plan/deploy/readback/proof and rollback invocations",
         "retain the canonical candidate/stage/config-bound sanitized plan projection and digest, then reacquire an exclusive Production authority window, recheck freshness and require equal replan before apply",
         "derive the Production base URL from provider readback rather than a configured or hard-coded host",
@@ -545,7 +543,7 @@
         "updated deployment/testing architecture and active intent with observed Production limits/non-claims"
       ],
       "authorityAndStops": {
-        "authority": "Separately approved Production plan and deploy principals/environments must name the fixed Worker/stage, non-mutating plan, deploy/readback operation, credential duration/revocation, approval, exclusive authority window, last-known-good rollback target and escalation.",
+        "authority": "Approving principal Cooper authorized this implementation thread on 2026-07-30 Australia/Melbourne to use existing authenticated identities for the fixed Production stage's account/credential preflight, sanitized plan/equal replan, Worker/assets deploy/readback/proof and normal source-bound rollback/redeploy. The operation still requires exact executing identity, credential scope/revocation, stable Worker/stage, exclusive mutation window, last-known-good target and safe provider/state agreement; mismatch stops without authority expansion.",
         "stopConditions": [
           "accepted Preview identity is missing or differs from the Production candidate inputs",
           "Production plan/replan digest differs",
@@ -624,9 +622,7 @@
       ],
       "title": "Admit repeatable Preview, Production and teardown delivery",
       "type": "vertical-automation",
-      "dependsOn": [
-        "DCD-003"
-      ],
+      "dependsOn": ["DCD-003"],
       "goal": "Turn the accepted manual paths into the smallest protected plan/deploy/teardown operations plus one report-only orphan inventory without widening Quality.",
       "scope": [
         "create exact-SHA Preview, Production and PR-close teardown workflows using pinned actions and frozen installs; one workflow may expose separate plan and deploy operations",
@@ -736,9 +732,7 @@
       ],
       "title": "Complete parity and retire the Nitro migration bridge",
       "type": "vertical-closeout",
-      "dependsOn": [
-        "DCD-004"
-      ],
+      "dependsOn": ["DCD-004"],
       "goal": "Close only the remaining Cloudflare proof/lifecycle gaps, demonstrate Preview/Production/rollback parity and make Cloudflare the sole production build and deployment path.",
       "scope": [
         "inventory the remaining behavioral and operational deltas against the temporary Nitro harness",

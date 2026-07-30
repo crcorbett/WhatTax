@@ -82,6 +82,8 @@ bun run --filter=docs check-import-boundaries
 bun run --filter=docs test
 bun run --filter=docs test:browser
 bun run --filter=docs test:built
+bun run --filter=docs test:cloudflare-built
+bun run --filter=docs build:cloudflare
 bun run --filter=docs check-types
 bun run --filter=docs build
 bun run --filter=docs preview
@@ -119,6 +121,32 @@ final evidence additionally supplies the exact candidate with
 behavioral assertions and cannot prove request type, focus behavior, contrast,
 motion suppression, HTTP status, hydration or console cleanliness.
 
+`build:cloudflare` selects the exact official Cloudflare Vite adapter and emits
+the deployable no-bundle Worker at `dist/server/index.js` plus `dist/client`
+assets. `test:cloudflare-built` rebuilds that target, strips provider
+credentials from the child environment, performs a Wrangler dry-run, and runs
+an isolated output-only copy under real workerd. It reuses the built-app
+behavioral contract for SSR, assets, server functions, 404, hydration,
+no-document navigation, accessibility and console cleanliness, and adds
+concurrent-isolate, filesystem, binding, compressed-upload-size, local
+readiness-timing and immutable asset-header oracles. The local timing is not a
+Cloudflare CPU-startup-limit receipt. The exact verified invocation is:
+
+```sh
+bun run --filter=docs test:cloudflare-built
+```
+
+This is local workerd evidence only. It does not prove Alchemy state, a
+Cloudflare deployment, a `workers.dev` URL, Preview, Production or rollback.
+The Nitro `test:built` path remains an independent migration oracle until the
+accepted deployment SPEC retires it.
+
+Root `alchemy.run.ts` composes the same output through public Alchemy
+`Command.Build` and `Cloudflare.Worker({ bundle: false })`. `apps/docs` owns
+the build target and asset headers; root owns provider composition and
+Alchemy owns the physical Worker name. `.wrangler/**` and `dist/**` are
+ignored generated proof/build output and are never deployment receipts.
+
 `check-import-boundaries` rejects server-only content, service, generated-source
 and runtime imports from browser-reachable app modules. The docs app has no
 browser Effect runtime. Its `.server.ts` loader module is the only route edge
@@ -126,6 +154,15 @@ that acquires `DocsContentService`, and the module-scoped server runtime is
 reused for the server isolate. The runtime factory exposes disposal so focused
 tests and future host lifecycle integration can release its Layer; the current
 hosting adapter does not provide an application shutdown hook.
+
+The Worker entry accepts the exact
+`x-taxkit-docs-runtime-proof: construction-count` opt-in header and returns a
+non-secret construction count plus random isolate identifier. This temporary
+deployment-migration channel proves reuse across requests; it is not a public
+API. Review it when the runtime, Worker entry, privacy boundary or proof
+channel changes. Retire it after an equally strong non-public provider oracle
+exists; otherwise retain its bounded one-identifier/two-header carrying cost
+explicitly through migration parity.
 
 The app-local MDX adapter classifies root-relative, query-only and authored
 relative `.mdx` destinations as TanStack routes while keeping external,

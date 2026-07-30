@@ -1,8 +1,10 @@
 ---
-status: canonical
-last_reviewed: 2026-07-25
-source_of_truth: docs
-confidence: high
+document_type: architecture
+lifecycle: current
+authority: canonical
+owner: taxkit-quality-owner
+last_reviewed: 2026-07-30
+review_trigger: verification graph, proof boundary, CI, deployment, or test-owner change
 ---
 
 # Testing and quality
@@ -88,6 +90,7 @@ bun run test:docs-boundaries
 bun run --filter=docs test
 bun run --filter=docs test:browser
 bun run --filter=docs test:built
+bun run --filter=docs test:cloudflare-built
 bun run --filter=@taxkit/docs-content test
 ```
 
@@ -136,6 +139,37 @@ owns server/browser cleanup. Its screenshot mode is supplemental visual
 evidence only: a visually correct image does not prove SSR content, hydration,
 request resource type, HTTP status, keyboard or focus behavior, contrast,
 motion suppression or console cleanliness.
+
+`bun run --filter=docs test:cloudflare-built` independently builds the official
+Cloudflare target, verifies Wrangler's no-bundle dry-run without credentials or
+bindings, and copies only `dist/server` and `dist/client` to an isolated
+temporary directory before starting Wrangler/workerd. It proves initial SSR,
+static assets and immutable cache headers, direct and client not-found
+behavior, hydration, server-function transport, no-document client navigation,
+sequential/concurrent request isolation, representative accessibility and
+console/page cleanliness. It also checks the gzip upload against the 3 MiB
+Workers Free limit and records local process-to-first-response and
+first-response-request timing. Those timings are readiness observations, not
+Cloudflare CPU-startup-limit validation. The provider must establish the
+account plan, upload acceptance, deployment/runtime identity and applicable
+startup-limit readback.
+
+The built graph retains Node filesystem code in two qualified, non-normal-route
+branches: generated Fumadocs `getText("raw")`, while the runtime adapter calls
+`getText("processed")`, and the lazily imported validation policy. The harness
+executes normal requests from a temporary working tree containing only emitted
+output; it also rejects checkout-absolute paths in the filesystem-bearing
+modules. It fails if these branches spread, bindings appear, credential names
+enter output, the Worker constructs per request, or output-only execution
+fails.
+
+The Worker entry exposes temporary migration instrumentation only when a
+request opts in with `x-taxkit-docs-runtime-proof: construction-count`. The
+returned construction count and random isolate identifier contain no
+configuration or user data and are not a public API guarantee. This channel is
+owned by the deployment migration, reviewed on runtime/entry/privacy changes,
+and retired after an equally strong non-public provider oracle exists;
+otherwise its bounded carrying cost remains explicit.
 
 Public API route work should also capture contract evidence from the standalone
 API app:
@@ -368,8 +402,8 @@ supporting gate and cannot replace semantic ownership or call-graph review.
   values from neutral fragments so the checker and its tests remain inside the
   policy they prove. Reports must never include matched text, usernames,
   process stderr or surrounding content.
-- Repo-owned skill changes must pass the skill validator and `bun run
-  test:skills`. Canonical baseline or repository-profile changes must also pass
+- Repo-owned skill changes must pass `bun run test:skills` and the skill
+  validator. Canonical baseline or repository-profile changes must also pass
   `bun run check:harness-governance`, which compares only repository-local
   paths with the content-addressed receipt and never reads a user home or
   installed global skill collection. Epoch requalification must additionally

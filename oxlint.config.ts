@@ -14,6 +14,11 @@ const decodingBoundaryFiles = [
   "apps/docs/src/lib/docs/route-boundary.browser.test.tsx",
   "apps/docs/src/lib/docs/route-boundary.ts",
   "apps/docs/src/lib/docs/route-boundary.test.js",
+  "apps/docs/scripts/test-cloudflare-built.tsx",
+  "apps/docs/src/lib/build/cloudflare-stack.test.ts",
+  "apps/docs/src/lib/build/cloudflare-stack.ts",
+  "apps/docs/src/lib/build/docs-build-target.ts",
+  "packages/docs-content/src/navigation.ts",
 
   // Docs content and rendering-library representation boundaries.
   "packages/docs-content/src/live.layer.ts",
@@ -156,6 +161,9 @@ const runtimeBoundaryFiles = [
   "apps/docs/src/lib/runtime-factory.server.test.ts",
   "apps/docs/src/lib/runtime-factory.server.ts",
   "apps/docs/src/lib/runtime.server.ts",
+  "apps/docs/scripts/test-cloudflare-built.tsx",
+  "apps/docs/src/lib/build/cloudflare-stack.test.ts",
+  "apps/docs/vite.config.ts",
   "apps/web/src/lib/runtime.client.ts",
   "apps/web/src/lib/runtime.server.ts",
   "packages/docs-content/src/validate.runtime.ts",
@@ -185,6 +193,7 @@ const runtimeBoundaryFiles = [
 const processBoundaryFiles = [
   "apps/api/scripts/smoke-public-routes.runtime.ts",
   "apps/docs/scripts/check-import-boundaries.ts",
+  "apps/docs/scripts/test-cloudflare-built.tsx",
   "apps/docs/scripts/test-built.tsx",
   "apps/docs/vitest.browser.config.ts",
   "packages/sdk/typescript/scripts/check-import-boundaries.ts",
@@ -199,6 +208,7 @@ const processBoundaryFiles = [
 const consoleBoundaryFiles = [
   "apps/api/scripts/smoke-public-routes.runtime.ts",
   "apps/docs/scripts/check-import-boundaries.ts",
+  "apps/docs/scripts/test-cloudflare-built.tsx",
   "apps/docs/scripts/test-built.tsx",
   "packages/docs-content/src/validate.runtime.ts",
   "packages/scripts/src/release-readiness/present.runtime.ts",
@@ -215,6 +225,7 @@ const consoleBoundaryFiles = [
 const bunAdapterFiles = [
   "apps/api/src/server.ts",
   "apps/docs/scripts/check-import-boundaries.ts",
+  "apps/docs/scripts/test-cloudflare-built.tsx",
   "apps/docs/scripts/test-built.tsx",
   "packages/sdk/typescript/scripts/check-import-boundaries.ts",
   "tools/oxlint/fixtures/bun-accepted.ts",

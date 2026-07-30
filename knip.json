@@ -12,6 +12,7 @@
   "workspaces": {
     ".": {
       "entry": [
+        "alchemy.run.ts",
         "package.json",
         "turbo.json",
         "oxfmt.config.ts",

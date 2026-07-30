@@ -1,41 +1,72 @@
 ---
-status: canonical
-last_reviewed: 2026-06-25
-source_of_truth: docs
-confidence: medium
+document_type: architecture
+lifecycle: current
+authority: canonical
+owner: taxkit-architecture-owner
+last_reviewed: 2026-07-30
+review_trigger: deployment target, runtime adapter, provider resource, state, domain, or rollback change
 ---
 
 # Deployment
 
-The repo currently has a standalone Bun API app, a buildable TanStack Start
-web scaffold, a buildable TanStack Start docs app, an HTTP API package with
-public calculation routes and a private TypeScript SDK package. The long-term
-deployment shape is still early and should stay thin until a real hosting
-target exists.
+The docs app now has a locally qualified Cloudflare Worker build and an
+Alchemy deployment composition. Provider Preview and Production remain
+separate evidence claims until their dated readbacks are accepted.
 
 ## Scope
 
-This doc records deployment boundaries and known runtime targets. It should be
-updated when package publishing or a real hosting target becomes real.
+This doc owns durable deployment and resource boundaries. Exact operator
+steps belong in the target-owned deployment runbook; current implementation
+intent and task state belong in the active SPEC and execution plan.
 
 ## Current runtime shape
 
 - `apps/api` runs as a Bun HTTP server and serves `/api/*`.
 - `apps/web` builds through Vite/TanStack Start and calls `apps/api` over HTTP.
-- `apps/docs` builds through TanStack Start and renders public MDX docs through
-  `@taxkit/docs-content` and `@taxkit/docs-fumadocs`.
+- `apps/docs` owns two temporary build modes. The default Nitro/Vercel output
+  remains an independent migration oracle. `TAXKIT_DOCS_BUILD_TARGET=cloudflare`
+  selects exact `@cloudflare/vite-plugin@1.47.0`, which emits
+  `dist/server/index.js`, its server modules and `dist/client` assets.
+- Root `alchemy.run.ts` owns one `TaxKitDocsCloudflare` stack, branded
+  `pr-<number>` or `prod` stage admission, `Cloudflare.state()`, one
+  `Command.Build`, and one logical `DocsWebsite` Worker. It uploads the
+  plugin-produced output through `Cloudflare.Worker({ bundle: false })`;
+  Alchemy owns the physical Worker name.
+- The Worker uses compatibility date `2026-06-24`, `nodejs_compat`, default
+  asset-first full-stack routing, a provider Worker URL, built-in invocation
+  logs and disabled traces. Hashed `/assets/*` responses are immutable.
+- The initial app has no runtime bindings, secrets or stateful application
+  service. KV, D1, R2, Durable Objects, Queues, Hyperdrive, Cron, custom
+  domains, DNS and third-party observability are absent.
 - `@taxkit/api-http` builds as a package and exposes health, generated docs,
   OpenAPI JSON, metadata and public calculation route contracts.
 - `@taxkit/sdk` builds as a private package for local and downstream
   validation. It has not been published to npm.
 
-## Planned runtime shape
+## Docs deployment graph
 
-- `apps/api` should remain the standalone public API runtime.
-- `apps/docs` should host the public docs site once a deployment target is
-  chosen.
-- `packages/sdk/typescript` should publish browser-safe, Effect-native, schema,
-  testing and jurisdiction subpath entrypoints after explicit release approval.
+```text
+frozen source and lock
+  -> apps/docs build:cloudflare
+    -> Cloudflare Vite plugin
+      -> dist/server/index.js plus modules
+      -> dist/client assets
+  -> root Alchemy Command.Build
+    -> Cloudflare.Worker("DocsWebsite", bundle: false)
+      -> isolated pr-N Worker or fixed prod Worker
+      -> read-back workers.dev URL
+```
+
+The local command copies only emitted output to a temporary directory, removes
+checkout paths from the generated Wrangler config, strips provider credential
+variables, runs Wrangler dry-run and then runs the same no-bundle module graph
+under workerd. Local proof does not establish provider state or deployment.
+
+Preview and Production are required outcomes of the active SPEC. Preview owns
+an isolated deterministic stage and is destroyed only through exact-stage
+readback. Production owns the fixed `prod` stage and stable provider URL.
+Custom-domain attachment is a future successor and must preserve the
+Production Worker identity and deployment contract.
 
 ## Local runtime shape
 
@@ -54,12 +85,32 @@ bun run --filter=docs dev
 `https://docs.taxkit.localhost`. Production deployment should provide
 equivalent API base URL environment values explicitly.
 
+The focused Cloudflare candidate proof is:
+
+```sh
+bun run --filter=docs test:cloudflare-built
+```
+
+It proves the emitted no-bundle Worker and assets locally under real workerd.
+The retained Nitro oracle is `bun run --filter=docs test:built`. Agreement
+between them is migration evidence, not provider or public-availability proof.
+
 ## Guardrails
 
 - Do not couple engine packages to deployment providers.
+- Keep provider composition at root and app build semantics in `apps/docs`;
+  do not add an infrastructure package or expose a raw provider client.
+- Decode stage and provider readback representations at their ingress and keep
+  physical names and URLs provider-owned.
+- Treat `.wrangler/**` and `apps/docs/dist/**` as ignored generated output.
+- Keep normal docs requests independent of repository files. Generated
+  Fumadocs raw-text access and validation policy may retain Node filesystem
+  code only behind their non-runtime operations.
 - Keep server-only handlers behind explicit server exports.
-- Verify `bun run verification` before deployment changes.
-- Add deployment-specific checks only when a real deploy target exists.
+- Keep local, workerd, Preview, Production, provider-state, rollback and future
+  domain claims separate.
+- Provider mutation requires the named authority, sanitized plan/equal replan,
+  stage lock, readback and receipt defined by the deployment runbook.
 
 ## Related docs
 

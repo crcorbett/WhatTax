@@ -11,9 +11,10 @@
     ],
     "catalog": {
       "@effect/language-service": "0.87.0",
-      "@effect/platform-bun": "4.0.0-beta.98",
-      "@effect/platform-node": "4.0.0-beta.98",
-      "@effect/vitest": "4.0.0-beta.98",
+      "@effect/platform-bun": "4.0.0-beta.100",
+      "@effect/platform-node": "4.0.0-beta.100",
+      "@effect/vitest": "4.0.0-beta.100",
+      "@cloudflare/vite-plugin": "1.47.0",
       "@tanstack/react-router": "1.169.2",
       "@tanstack/react-start": "1.167.65",
       "@types/bun": "1.3.14",
@@ -21,13 +22,15 @@
       "@types/react": "^19.2.7",
       "@types/react-dom": "^19.2.3",
       "@vitejs/plugin-react": "^5.1.1",
-      "effect": "4.0.0-beta.98",
+      "alchemy": "2.0.0-beta.64",
+      "effect": "4.0.0-beta.100",
       "nitro": "3.0.260429-beta",
       "react": "^19.2.3",
       "react-dom": "^19.2.3",
       "typescript": "^5.9.3",
       "vite": "^8.0.11",
-      "vitest": "^4.1.5"
+      "vitest": "^4.1.5",
+      "wrangler": "4.114.0"
     }
   },
   "type": "module",
@@ -36,6 +39,7 @@
     "changeset": "changeset",
     "check": "ultracite check --type-aware",
     "check:docs": "bun run tools/documentation/check.runtime.ts",
+    "check:docs-deployment:types": "tsc --noEmit -p tsconfig.alchemy.json",
     "check:docs:types": "tsc --noEmit -p tools/documentation/tsconfig.json",
     "check:effect-language-service": "effect-language-service check && tsc --noEmit -p tools/effect-language-service/tsconfig.json",
     "check:harness-governance": "bun --conditions=source run tools/governance/check.runtime.ts",
@@ -72,14 +76,18 @@
     "test:quality-workflow": "bun test tools/quality-workflow",
     "test:skills": "bun test tools/skills",
     "test:release-readiness": "bun run --filter=@taxkit/scripts test -- release-readiness",
-    "verification": "bun run check:repository-paths:types && bun run check:repository-paths && bun run check:harness-governance && bun run check:quality-workflow && bun run check:docs:types && bun run check:docs && bun run check:runbooks && bun run check:effect-language-service && bun run lint && bun run format:check && bun run test:skills && bun run test:quality-workflow && bun run knip && bun run knip:production && bun run check-types",
+    "verification": "bun run check:repository-paths:types && bun run check:repository-paths && bun run check:harness-governance && bun run check:quality-workflow && bun run check:docs:types && bun run check:docs && bun run check:runbooks && bun run check:effect-language-service && bun run check:docs-deployment:types && bun run lint && bun run format:check && bun run test:skills && bun run test:quality-workflow && bun run knip && bun run knip:production && bun run check-types",
     "version-packages": "changeset version",
     "version-repo": "changeset version"
+  },
+  "dependencies": {
+    "alchemy": "catalog:"
   },
   "devDependencies": {
     "@changesets/cli": "^2.31.0",
     "@effect/language-service": "catalog:",
     "@effect/platform-bun": "catalog:",
+    "@effect/platform-node": "catalog:",
     "@taxkit/scripts": "workspace:*",
     "@types/bun": "catalog:",
     "effect": "catalog:",
@@ -91,6 +99,10 @@
     "typescript": "^5.9.3",
     "ultracite": "7.7.0",
     "yaml": "^2.9.0"
+  },
+  "overrides": {
+    "@effect/platform-node-shared": "4.0.0-beta.100",
+    "@effect/sql-d1": "4.0.0-beta.100"
   },
   "engines": {
     "bun": ">=1.3.14",

@@ -81,6 +81,7 @@ bun install
 bun run --filter=api dev
 bun run --filter=web dev
 bun run --filter=docs dev
+bun run --filter=docs test:cloudflare-built
 bun run check:repository-paths
 bun run check:harness-governance
 bun run check:docs
@@ -97,6 +98,9 @@ bun run version-repo
 portless URL into `TAXKIT_API_BASE_URL` and `VITE_TAXKIT_API_BASE_URL` before
 serving the web app at `https://taxkit.localhost`. `bun run --filter=docs dev`
 serves the public docs app at `https://docs.taxkit.localhost`. `bun run
+--filter=docs test:cloudflare-built` builds the exact Cloudflare target and
+exercises an isolated copy of its Worker/assets under local workerd; it does
+not access provider credentials or prove a deployment. `bun run
 check:repository-paths` rejects machine-local checkout references in tracked
 readable text without printing the matched private value. `bun run check:docs`
 checks maintainer metadata, links, documented commands, workspace README

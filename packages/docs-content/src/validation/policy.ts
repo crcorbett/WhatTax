@@ -14,15 +14,18 @@ import {
 import type { Effect as EffectType } from "effect";
 import { parse as parseYaml } from "yaml";
 
-import navigationRepresentation from "../../navigation.json";
 import { DocsSourceError } from "../errors.js";
+import { getNavigation } from "../navigation.js";
 import {
-  DocsNavigation,
   DocsPageFrontmatter,
   DocsSourcePath,
   DocsValidationIssue,
 } from "../schemas.js";
-import type { DocsNavigationLeaf, DocsValidationResult } from "../schemas.js";
+import type {
+  DocsNavigation,
+  DocsNavigationLeaf,
+  DocsValidationResult,
+} from "../schemas.js";
 import { validateMdxComponentPolicy } from "./mdx-component-policy.js";
 
 const docsRoot = "packages/docs-content";
@@ -335,16 +338,7 @@ const listMdxSources: EffectType.Effect<
   Effect.map((paths) => paths.toSorted(Order.String))
 );
 
-export const getNavigation: EffectType.Effect<DocsNavigation, DocsSourceError> =
-  Schema.decodeUnknownEffect(DocsNavigation)(navigationRepresentation).pipe(
-    Effect.mapError(
-      () =>
-        new DocsSourceError({
-          message: "The docs navigation representation was invalid.",
-          operation: "getNavigation",
-        })
-    )
-  );
+export { getNavigation } from "../navigation.js";
 
 const navigationLeaves = (navigation: DocsNavigation) =>
   EffectArray.flatMap(navigation.primaryNavigation, (section) => [
