@@ -21,14 +21,17 @@
         "tools/repository-paths/check.runtime.ts",
         "tools/repository-paths/*.test.ts",
         "tools/quality-workflow/check.runtime.ts",
-        "tools/quality-workflow/*.test.ts"
+        "tools/quality-workflow/*.test.ts",
+        "tools/docs-deployment/check.runtime.ts",
+        "tools/docs-deployment/*.test.ts"
       ],
       "project": [
         "*.json",
         "*.ts",
         "tools/effect-language-service/**/*.ts",
         "tools/repository-paths/**/*.ts",
-        "tools/quality-workflow/**/*.ts"
+        "tools/quality-workflow/**/*.ts",
+        "tools/docs-deployment/**/*.ts"
       ],
       "ignoreDependencies": ["typescript"]
     },

@@ -158,8 +158,10 @@ digests, Worker/deployment/version identities, evidence directory and rollback
 identity. It writes candidate-qualified desktop/mobile PNGs and emits the
 behavioral observation used to build Schema-decoded receipts. The first dated
 Preview observation was torn down but did not meet the final evidence contract,
-so DCD-002 remains in requalification; it does not prove a current Preview,
-Production or rollback.
+so it remains disconfirming history. Fresh candidate `d9cb894…` passed the
+corrected hosted, screenshot and pre-mutation contracts, independent
+adversarial review and full repository gates and was then torn down; DCD-002
+is accepted. Neither chain proves a current Preview, Production or rollback.
 
 `check-import-boundaries` rejects server-only content, service, generated-source
 and runtime imports from browser-reachable app modules. The docs app has no

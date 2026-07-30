@@ -89,7 +89,7 @@ availability.
 
 Use `bun run check:runbooks` after any runbook, release command, Changesets,
 package graph, HGI-203 handoff, recovery or authority-boundary change. It checks
-the exact four-runbook inventory and canonical paths, public command existence,
+the exact five-runbook inventory and canonical paths, public command existence,
 prose/sidecar agreement, unique owners, substantive required sections, accepted
 proof binding and unknown-principal stops. It executes no documented command;
 its only output artifact is the ignored bounded

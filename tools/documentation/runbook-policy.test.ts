@@ -136,6 +136,7 @@ const validInspection = async (): Promise<RunbookInspection> => {
       "test:release-readiness",
       "verification",
       "version-repo",
+      "check:docs-deployment",
     ]),
     runbookPaths: [
       "docs/runbooks/README.md",
@@ -151,7 +152,7 @@ const validInspection = async (): Promise<RunbookInspection> => {
 };
 
 describe("runbook policy", () => {
-  test("accepts the strict four-runbook contract and parses a substantive final section", async () => {
+  test("accepts the strict five-runbook contract and parses a substantive final section", async () => {
     const inspection = await validInspection();
     expect(inspectRunbookContract(inspection)).toEqual([]);
     expect(ReleaseProofPacket).toBeDefined();

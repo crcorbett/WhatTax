@@ -3,7 +3,7 @@ document_type: authority-model
 lifecycle: current
 authority: canonical
 owner: taxkit-authority-model-owner
-last_reviewed: 2026-07-22
+last_reviewed: 2026-07-30
 review_trigger: identity, release, Git, registry, deployment, provider, credential, or recovery change
 ---
 
@@ -39,3 +39,45 @@ The exact machine-checked records live in
 `tools/documentation/runbook-contract.json`. That sidecar and this table must
 agree; neither grants authority. Provider/registry/deployment claims require
 current target-system readback by the authorized principal.
+
+## Dated TaxKit docs deployment envelope
+
+The generic table remains the fail-closed default. Cooper's bounded 2026-07-30
+approval is a dated exception only for this implementation goal and the exact
+TaxKit docs resources in
+`docs/evidence/deployments/2026-07-30-preview-preflight/authority-preflight.json`.
+The approving principal is Cooper; the executing principal is the authorized
+implementation thread using existing authenticated identities. The receipt
+separates credential/account preflight, state bootstrap/adoption, Preview
+plan/deploy/destroy, Production plan/deploy, normal rollback/redeploy and
+Alchemy reconciliation.
+
+That envelope expires on goal completion, explicit revocation or any
+identity/safety mismatch. Cooper's successor Git exception is decoded from
+`docs/evidence/deployments/2026-07-30-preview-preflight/git-authority.json`.
+It admits one exact `codex/` branch, push, draft pull request and later coherent
+accepted-slice pushes. Merge, force-push, branch deletion, conversion to ready,
+credential disclosure, rotation or scope expansion, custom-domain/DNS work,
+unrelated resources, publication and release remain excluded. Readback belongs
+to the operation owner and must retain sanitized Git, account, stage, resource,
+state, Worker/deployment/version, URL and postcondition identities.
+
+The original preflight receipt remains a failed historical observation: the
+exact local commit was not then a GitHub trusted PR head. The successor
+authority permitted the narrow Git recovery. The Schema-decoded
+`git-readback.json` receipt now establishes draft PR `#1`, exact head
+`669a8f3bc484ddf5975f40940c8bdc14e6f1ba11` and deterministic stage `pr-1`;
+it establishes no provider state.
+
+The accepted DCD-002 requalification chain under
+`docs/evidence/deployments/2026-07-30-preview-pr-1/` binds candidate
+`d9cb8945529fb72158e59ca0daf02a98e1e4de1a` to separate pre-deploy,
+deploy/proof, pre-destroy and destroy/absence envelopes. The executing
+credential had a broad existing scope set; receipts retain only its sorted
+scope digest and required-capability decision, while authority remained
+limited to the exact TaxKit two-resource plans. Provider and Alchemy readback
+agreed before each mutation, and the final receipt proves the exact Preview
+Worker and stage absent. This consumed no Production, rollback, DNS,
+publication or broader reconciliation authority. The earlier `0d714e6…`
+observation remains historical because it did not retain both pre-mutation
+envelopes.

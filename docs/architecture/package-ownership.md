@@ -129,6 +129,12 @@ Root `alchemy.run.ts`
   and one prebuilt Worker resource. It is not a package, reusable provider
   facade or application runtime owner.
 
+`tools/docs-deployment`
+: Repository-local Schema, policy and command boundary for docs deployment
+  authority, stable journey inventory and sanitized dated receipts. It owns no
+  provider-generic framework, raw client, app runtime or reusable package. The
+  current validator performs no provider operation.
+
 `apps/api`
 : Current standalone Bun API runtime. It owns process config, startup,
 shutdown and platform serving for the implemented API app.

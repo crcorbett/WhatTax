@@ -9,9 +9,12 @@ review_trigger: deployment target, runtime adapter, provider resource, state, do
 
 # Deployment
 
-The docs app now has a locally qualified Cloudflare Worker build and an
-Alchemy deployment composition. Provider Preview and Production remain
-separate evidence claims until their dated readbacks are accepted.
+The docs app has a locally qualified Cloudflare Worker build and an Alchemy
+deployment composition. DCD-002 also established one dated, exact-candidate
+Preview observation at the provider URL and then safely removed that isolated
+stage. Production remains a separate evidence claim until its dated readback
+is accepted. Earlier failed Preview attempts remain historical
+disconfirming evidence, not current provider truth.
 
 ## Scope
 
@@ -61,6 +64,22 @@ The local command copies only emitted output to a temporary directory, removes
 checkout paths from the generated Wrangler config, strips provider credential
 variables, runs Wrangler dry-run and then runs the same no-bundle module graph
 under workerd. Local proof does not establish provider state or deployment.
+
+The accepted Preview requalification used candidate
+`d9cb8945529fb72158e59ca0daf02a98e1e4de1a` at deterministic stage `pr-1`.
+Alchemy created one prebuilt Worker/assets resource after two equal sanitized
+plans. Cloudflare readback and hosted proof agreed on the physical Worker,
+deployment/version, assets, provider URL, invocation-log persistence and
+disabled traces. The `/assets/*` cache contract required the root composition
+to pass the app-owned `_headers` file through the public Worker asset
+configuration. Exact-stage destroy subsequently removed the Preview Worker
+and stage resources. These dated observations prove neither current Preview
+availability nor Production.
+
+The earlier `0d714e6…` observation remains retained because it exposed the
+asset-header correction, but it lacked complete pre-mutation and
+candidate/screenshot/state bindings. It is trajectory evidence, not the
+accepted Preview chain.
 
 Preview and Production are required outcomes of the active SPEC. Preview owns
 an isolated deterministic stage and is destroyed only through exact-stage
@@ -117,3 +136,5 @@ between them is migration evidence, not provider or public-availability proof.
 - [API and SDK](./api-and-sdk.md)
 - [Frontend](./frontend.md)
 - [Testing and quality](./testing-and-quality.md)
+- [Docs deployment runbook](../runbooks/docs-deployment.md)
+- [Dated deployment evidence](../evidence/deployments/README.md)

@@ -21,7 +21,7 @@ Specs:
 
 | Spec | Status | Notes |
 | --- | --- | --- |
-| [Docs Cloudflare and Alchemy deployment](./docs-cloudflare-alchemy-deployment.md) | Active — DCD-002 next | DCD-001 is accepted locally on the exact beta.100/beta.64 graph and official Cloudflare Vite to public Alchemy prebuilt-Worker path; DCD-002 begins only after the coherent slice commit. The failed Website.Vite collector and Worker-first routing paths remain retained evidence. Preview/Production authority is recorded, while no provider claim exists yet. |
+| [Docs Cloudflare and Alchemy deployment](./docs-cloudflare-alchemy-deployment.md) | Active — DCD-003 next | DCD-002 accepted exact candidate `d9cb8945529fb72158e59ca0daf02a98e1e4de1a` after isolated `pr-1` Preview plan/deploy/provider/hosted/screenshot proof, exact-stage teardown/absence, corrected false-green validators and fresh independent acceptance. Production remains pending. |
 | [TaxKit docs application architecture](./docs-application-architecture.md) | Implemented | The three-owner docs migration, native route outcomes, production graph and candidate-bound local proof are implemented; search remains deferred. |
 | [Harness foundation improvements](./harness-foundation-improvements.md) | Implemented | The portable six-skill baseline, stable TaxKit profile, deterministic governance gate, five retained journeys, and fail-closed epoch `7c8a96e` are implemented and locally verified. |
 | [Harness-governance documentation](./harness-governance-documentation.md) | Implemented | HGI-200 through HGI-208 are accepted locally; HGI-206 records the bounded repository epoch and closeout without claiming release, provider, or public actuality. |

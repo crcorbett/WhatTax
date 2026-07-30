@@ -154,6 +154,23 @@ Cloudflare CPU-startup-limit validation. The provider must establish the
 account plan, upload acceptance, deployment/runtime identity and applicable
 startup-limit readback.
 
+The separate
+`docs/verification/docs-deployment-journeys.json` inventory owns only four
+deployment-supporting claims: local workerd, hosted Preview, hosted Production
+and Production rollback/operator proof. `bun run check:docs-deployment`
+Schema-decodes that owner and the admitted dated receipt. It does not join the
+five local release journeys. The accepted DCD-002 requalification chain binds
+exact candidate `d9cb8945529fb72158e59ca0daf02a98e1e4de1a`, exact
+pre-deploy and pre-destroy state/provider readback, equal plans, provider
+Worker/deployment/version/assets/URL readback, hosted HTTP/browser proof,
+reviewed desktop/mobile screenshots and exact-stage teardown/absence. It is a
+dated Preview-and-teardown observation, not Production, rollback, public
+domain or current Preview-availability proof.
+
+The retained `0d714e6…` observation is disconfirming history: it did not
+establish the same pre-mutation, isolate-equality, mobile-request, public-cache,
+state-detail or screenshot-input contract.
+
 The built graph retains Node filesystem code in two qualified, non-normal-route
 branches: generated Fumadocs `getText("raw")`, while the runtime adapter calls
 `getText("processed")`, and the lazily imported validation policy. The harness

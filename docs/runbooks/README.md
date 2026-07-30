@@ -3,7 +3,7 @@ document_type: runbook-index
 lifecycle: current
 authority: canonical
 owner: taxkit-runbook-contract-owner
-last_reviewed: 2026-07-25
+last_reviewed: 2026-07-30
 review_trigger: release command, Changesets, package graph, evidence epoch, recovery, or authority-boundary change
 ---
 
@@ -18,8 +18,9 @@ and skills teach boundaries and judgment without copying these procedures.
 | `versioning` | `docs/runbooks/versioning.md` | `taxkit-versioning-operation-owner` |
 | `packed-consumer-proof` | `docs/runbooks/packed-consumer-proof.md` | `taxkit-packed-consumer-operation-owner` |
 | `recovery` | `docs/runbooks/recovery.md` | `taxkit-recovery-operation-owner` |
+| `docs-deployment` | `docs/runbooks/docs-deployment.md` | `taxkit-docs-deployment-operation-owner` |
 
-These are exactly the four canonical TaxKit runbooks. Before any consequential
+These are exactly the five canonical TaxKit runbooks. Before any consequential
 operation, apply the [authority model](../operations/authority-model.md). Run
 `bun run check:runbooks` to inspect their structural and semantic contract. The
 validator executes no documented command and writes only the ignored bounded

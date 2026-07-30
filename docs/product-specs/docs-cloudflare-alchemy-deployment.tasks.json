@@ -17,7 +17,7 @@
     "After grounding and before editing DCD-001, create one goal for the complete DCD-001 through DCD-005 implementation with no token budget, then create the active execution plan and keep the ledger tasks as milestones under that goal."
   ],
   "globalVerification": {
-    "commitPolicy": "One no-budget goal and active plan already coordinate DCD-001 through DCD-005. Cooper granted upfront authority on 2026-07-30 Australia/Melbourne for this thread to preflight credentials/account, plan/equal-replan, deploy/read back/prove and tear down exact TaxKit docs Preview resources, deploy/read back/prove fixed Production, and rehearse normal source-bound rollback using only the accepted Worker/assets and narrow Alchemy state resources. Each mutation still requires the exact identity, redaction, scope, stage lock, safety and receipt preconditions; a mismatch stops without broadening authority. Commit each coherent accepted slice only after its focused gates, task-local impact rows, primary-owner review, authority receipt where provider mutation occurred, and exact Changeset artifact or evidenced no-Changeset decision. Any implementation, dependency, runtime, build, provider-config or candidate change invalidates the applicable workerd/Preview/Production/screenshot evidence. Push, merge, PR, versioning, tagging, package publication, credential disclosure/rotation/scope expansion, unrelated provider resources and custom-domain/DNS mutation remain outside this task list.",
+    "commitPolicy": "One no-budget goal and active plan already coordinate DCD-001 through DCD-005. Cooper granted upfront authority on 2026-07-30 Australia/Melbourne for this thread to preflight credentials/account, plan/equal-replan, deploy/read back/prove and tear down exact TaxKit docs Preview resources, deploy/read back/prove fixed Production, and rehearse normal source-bound rollback using only the accepted Worker/assets and narrow Alchemy state resources. Cooper's successor Git authority admits one exact codex/docs-cloudflare-alchemy-deployment branch at DCD-001 commit 669a8f3bc484ddf5975f40940c8bdc14e6f1ba11, its push, one draft pull request against main, readback, and later coherent accepted-slice pushes to the same branch. Each mutation still requires the exact identity, redaction, scope, stage lock, safety and receipt preconditions; a mismatch stops without broadening authority. Commit each coherent accepted slice only after its focused gates, task-local impact rows, primary-owner review, authority receipt where provider mutation occurred, and exact Changeset artifact or evidenced no-Changeset decision. Any implementation, dependency, runtime, build, provider-config or candidate change invalidates the applicable workerd/Preview/Production/screenshot evidence. Merge, force-push, branch deletion, PR-ready conversion, versioning, tagging, package publication, credential disclosure/rotation/scope expansion, unrelated provider resources and custom-domain/DNS mutation remain outside this task list.",
     "requiredBeforeFinalPR": [
       "bun install --frozen-lockfile",
       "bun run docs:validate",
@@ -400,7 +400,7 @@
     },
     {
       "id": "DCD-002",
-      "status": "pending",
+      "status": "completed",
       "acceptedFindingIds": [
         "TK-CF-003",
         "TK-CF-004",
@@ -418,6 +418,7 @@
         "add one canonical docs deployment runbook covering state, Preview, Production, teardown, rollback and reconciliation as distinct operation sections",
         "change the runbook contract and routes from exactly four to exactly five without changing the original four runbooks' substantive ownership",
         "update the authority model with independent provider inventory, state bootstrap/adoption, Preview plan/deploy and Preview destroy envelopes",
+        "retain the failed local-only candidate receipt, then Schema-decode and execute Cooper's successor authority for the exact codex branch, push, draft pull request and remote/PR identity readback before deriving pr-N",
         "update the TaxKit docs-maintainer profile, repository-harness-profile, effectiveness owner and current overlay receipt, then perform proportional profile/runbook requalification without changing historical HGI/HFI receipts",
         "create the separate four-entry docs deployment journey owner and dated deployment evidence route",
         "create Schema-backed stage, canonical sanitized plan projection/digest, provider readback, authority, receipt, journey and screenshot manifests plus focused journey/receipt policy tests under tools/docs-deployment",
@@ -434,6 +435,7 @@
       "outputs": [
         "docs/runbooks/docs-deployment.md and exact-five runbook contract",
         "updated docs/runbooks/README.md, recovery.md, docs router, authority model, repository profile, repository-harness-profile and effectiveness owner",
+        "dated Git authority and trusted draft-PR readback receipts for the exact DCD-001 candidate",
         "updated current profile overlay receipt and proportional requalification evidence",
         "docs/verification/docs-deployment-journeys.json",
         "docs/evidence/deployments/README.md and one dated Preview evidence directory",
@@ -459,7 +461,7 @@
         "recovery": "Use the new runbook's state/provider reconciliation section or stop with the exact resource and escalation owner."
       },
       "documentationImpact": [
-        "Change required: one runbook, runbook router/contract/validator/profile, docs/verification/repository-harness-profile.json, docs/verification/effectiveness.md, authority model, deployment evidence route, Preview architecture and app/root pointers.",
+        "Change required: one runbook, runbook router/contract/validator/profile, docs/standards/tooling.md, docs/verification/repository-harness-profile.json, docs/verification/effectiveness.md, authority model, deployment evidence route, Preview architecture and app pointers.",
         "Change required: docs/runbooks/recovery.md only for its provider-runbook pointer; Preserve the other three existing runbooks' substantive procedures.",
         "Preserve: current release journeys, HGI-203/HGI-206/HFI, prior harness epochs and completed docs-app evidence.",
         "N/A: repeatable workflows, Production mutation, automatic orphan deletion and custom domain remain absent."
@@ -472,9 +474,15 @@
         "bun run check:harness-governance",
         "bun run docs:validate",
         "bun run --filter=docs test:built",
-        "execute the task-created authorized Preview plan/deploy/readback/proof commands and backfill their exact invocations",
-        "execute the task-created exact-stage teardown command or retain the complete authority stop; backfill the exact invocation only after safe execution",
-        "execute the task-created focused validator for the four-entry deployment journey inventory and reconcile every journey to its receipt/oracle class; backfill the exact invocation before completion",
+        "ALCHEMY_PLAIN=1 CI=1 bunx alchemy plan --stage pr-1 --profile default, executed twice with equal sanitized digest for the exact trusted candidate",
+        "ALCHEMY_PLAIN=1 CI=1 bunx alchemy deploy --stage pr-1 --profile default --yes, followed by independent Cloudflare and Alchemy-state readback",
+        "bun run --filter=docs test:cloudflare-hosted with the read-back URL, candidate, Worker/deployment/version, stage, environment, plan/config/lock/deployment-input digests, evidence directory and rollback identity supplied through its exact TAXKIT_DOCS_* ingress",
+        "ALCHEMY_PLAIN=1 CI=1 bunx alchemy destroy --dry-run --stage pr-1 --profile default --yes, executed twice with equal sanitized digest",
+        "ALCHEMY_PLAIN=1 CI=1 bunx alchemy destroy --stage pr-1 --profile default --yes, followed by exact Worker, URL, stage and resource absence readback",
+        "bun run check:docs-deployment:types",
+        "bun run check:docs-deployment-tools:types",
+        "bun run check:docs-deployment",
+        "bun run test:docs-deployment",
         "Schema-decode all plan, authority, provider, hosted and screenshot receipts and verify every image digest",
         "prove the read-back Preview URL's HTTP, SSR, assets, hydration, navigation request types, server functions, accessibility, 404/error, cache/headers and console behavior",
         "bun run verification",
@@ -631,6 +639,7 @@
         "keep Quality as the existing independent read-only cancellable workflow and consume its exact candidate result without adding provider credentials",
         "require protected environments, accepted canonical sanitized plan projection/digest and equal replan before every apply without claiming an Alchemy-native digest or distributed lock",
         "derive all Worker URLs and provider identities from readback",
+        "create one supported Schema-decoded state/provider inventory command for workflow and operator use; do not admit Alchemy beta.64's internal placeholder stage into deployable identity",
         "admit separate Schema-decoded automation entries for Preview, Production and teardown with exact principals/resources/environments",
         "add one report-only orphan inventory that compares open PRs, Alchemy stages and Cloudflare resources without destroying anything",
         "create deployment-only Schemas, policy and negative fixtures under tools/docs-deployment while preserving tools/quality-workflow unchanged",
@@ -656,6 +665,7 @@
           "pull_request_target checks out or executes candidate code",
           "PR-close teardown does not use a reviewed default-branch implementation commit",
           "workflow identity differs from the checked-out exact SHA",
+          "state/provider inventory depends on an internal placeholder sentinel or cannot prove the exact account, stage and resource without mutation",
           "a mutation lock is cancellable or keyed more narrowly than the target stage",
           "a newer run cannot detect a stale candidate after acquiring the lock",
           "plan equality, protected approval or provider readback can be bypassed",

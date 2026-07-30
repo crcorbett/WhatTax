@@ -138,6 +138,7 @@ export const RunbookId = Schema.Literals([
   "versioning",
   "packed-consumer-proof",
   "recovery",
+  "docs-deployment",
 ]);
 export type RunbookId = typeof RunbookId.Type;
 

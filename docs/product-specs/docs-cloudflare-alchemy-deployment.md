@@ -26,9 +26,16 @@ A custom domain is a future successor. It must attach to the same Production
 Worker identity and must not block or redefine the initial deployment
 contract.
 
-This SPEC is proposed implementation intent. It does not establish a
-Cloudflare account, plan, Workers subdomain, credential, Alchemy state store,
-Preview, Production deployment, public availability, rollback, or DNS state.
+This SPEC remains proposed implementation intent until all five slices close.
+DCD-002 dated evidence now establishes the sanitized Cloudflare account and
+Workers subdomain identities, one exact-candidate Alchemy/Worker/assets
+Preview requalification at candidate `d9cb894…`, including exact
+pre-mutation readback, hosted proof, bounded screenshots and exact-stage
+teardown. The Preview is no longer available. The earlier `0d714e6…`
+observation remains disconfirming history. DCD-002 is accepted after full
+repository gates and fresh independent corrected-boundary review. That
+evidence does not establish a paid plan, future cost, Production deployment,
+public-domain availability, rollback, release, publication or DNS state.
 Implementation began from reviewed commit
 `96a825cebd22798044678389851be6ee9154d1df`; the
 [active execution plan](../exec-plans/active/docs-cloudflare-alchemy-deployment.md)
@@ -156,9 +163,13 @@ the Vercel Build Output API. Replacing the Nitro adapter immediately would also
 remove TaxKit's only independent built SSR/hydration/navigation regression
 oracle before workerd and provider proof exist.
 
-The current repository also has no deployment runbook, Cloudflare authority
+The reviewed baseline had no deployment runbook, Cloudflare authority
 envelopes, Alchemy state owner, mutating workflow controls, hosted screenshot
-contract, provider-bound evidence route, or rollback receipt.
+contract, provider-bound evidence route, or rollback receipt. DCD-002 has now
+admitted the smallest runbook, authority/receipt owner, deployment journey
+inventory and validator, and one provider-bound Preview/teardown chain with
+bounded screenshots. Repeatable workflows, Production and rollback receipts
+remain absent.
 
 ## Goals
 
@@ -617,8 +628,8 @@ One runbook is sufficient because these operations share the same docs
 deployment target and recovery graph. The Alchemy state section must still
 separate its account-wide resources, principal, lifecycle, backup/recovery,
 drift, orphan detection and retirement from an application stage. The existing
-four runbooks remain canonical; the contract changes from exactly four to
-exactly five.
+four runbooks retain their substantive ownership; DCD-002 changes the canonical
+contract from exactly four to exactly five.
 
 Remote state carries an account-wide Worker, state Durable Object and secret
 material plus ongoing drift/recovery work. Review it on an Alchemy upgrade,
@@ -882,7 +893,10 @@ executing identity, account, plan, Workers subdomain, credential scope or
 revocation, state/resource identity, unsafe drift, secret-exposure risk,
 destroy scope beyond the named stage, or provider contradiction still stops
 mutation. Custom-domain/DNS, unrelated resources, third-party observability,
-package publication/release, push, merge and PR remain outside the envelope.
+package publication/release and merge remain outside the provider envelope.
+Cooper's successor Git envelope admits only the exact DCD-001 candidate branch,
+push, draft pull request/readback and later coherent accepted-slice pushes;
+force-push, branch deletion and conversion to ready remain excluded.
 Each DCD-002/DCD-003 receipt must restate and Schema-decode the applicable
 operation, principal, resource, environment, duration, revocation, readback,
 rollback and postconditions before mutation.
@@ -914,10 +928,10 @@ Raw provider logs, credentials and mutable dashboards remain outside Git.
 | Other workspace manifests         | Preserve                   | Catalog consumers receive beta.100 through the root catalog and require proportional qualification, not textual churn, unless the upgrade proves a workspace-owned manifest change.                                                                                                                                                                                                                                                                                                                                      |
 | Content packages                  | Change required / Preserve | DCD-001 workerd proved an owning eager-filesystem-reachability defect in `packages/docs-content/**`; correct bundled navigation and lazy validation policy at that owner. Preserve `packages/docs-fumadocs/**` and keep both packages deployment-neutral.                                                                                                                                                                                                                                                                |
 | Root deployment composition       | Change required            | New `alchemy.run.ts`; no infrastructure package.                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
-| Turbo/Knip/ignore/lint boundaries | Change required / Preserve | Add root `alchemy.run.ts` reachability to `knip.json` and `knip.production.json`, admit only the exact new config/test/process boundary files in `oxlint.config.ts`, and ignore transient `.wrangler` output in `.gitignore`. Preserve `turbo.json` until bridge retirement requires it.                                                                                                                                                                                                                                 |
+| Turbo/Knip/ignore/lint boundaries | Change required / Preserve | Add root `alchemy.run.ts` reachability to `knip.json` and `knip.production.json`, admit only the exact new config/test/process boundary files in `oxlint.config.ts`, and ignore transient `.wrangler` and `.alchemy` output in `.gitignore`. Preserve `turbo.json` until bridge retirement requires it.                                                                                                                                                                                                                   |
 | Architecture                      | Change required            | `docs/architecture/deployment.md`, `frontend.md`, `testing-and-quality.md`, `package-ownership.md`; migrate materially edited legacy metadata.                                                                                                                                                                                                                                                                                                                                                                           |
-| Root/app/package READMEs          | Change required / Preserve | Update `README.md` and `apps/docs/README.md` pointers; preserve docs-content/docs-fumadocs READMEs unless their runtime contract changes.                                                                                                                                                                                                                                                                                                                                                                                |
-| Runbooks/router/profile           | Change required            | `docs/runbooks/docs-deployment.md`, `docs/runbooks/README.md`, `docs/runbooks/recovery.md`, `docs/README.md`, `tools/documentation/runbook-contract.json`, runbook Schemas/policy/tests, `.agents/skills/docs-maintainer/references/repository-profile.md`, `docs/verification/repository-harness-profile.json`, `docs/verification/effectiveness.md`, `tools/skills/canonical-skill-baseline.json`, and a proportional successor entry in `docs/verification/harness-epochs.md`; preserve prior epoch and HFI receipts. |
+| Root/app/package READMEs          | Change required / Preserve | Update `apps/docs/README.md`; preserve root `README.md` because its existing `docs/README.md` pointer remains sufficient, and preserve docs-content/docs-fumadocs READMEs unless their runtime contract changes.                                                                                                                                                                                                                                                                                                 |
+| Runbooks/router/profile           | Change required            | `docs/runbooks/docs-deployment.md`, `docs/runbooks/README.md`, `docs/runbooks/recovery.md`, `docs/README.md`, `docs/standards/tooling.md`, `tools/documentation/runbook-contract.json`, runbook Schemas/policy/tests, `.agents/skills/docs-maintainer/references/repository-profile.md`, `docs/verification/repository-harness-profile.json`, `docs/verification/effectiveness.md`, `tools/skills/canonical-skill-baseline.json`, and a proportional successor entry in `docs/verification/harness-epochs.md`; preserve prior epoch and HFI receipts. |
 | Authority                         | Change required            | `docs/operations/authority-model.md` and machine-checked runbook authority records.                                                                                                                                                                                                                                                                                                                                                                                                                                      |
 | Automation/controls/CI            | Change required            | Deployment-only Schema/policy/fixtures under `tools/docs-deployment/**`, `docs/operations/automation-register.md`, `docs/standards/controls.md`, `.github/workflows/docs-*.yml`; preserve `tools/quality-workflow/**` and `.github/workflows/quality.yml` as independently read-only.                                                                                                                                                                                                                                    |
 | Local/browser proof               | Change required            | Existing docs tests plus task-created workerd/provider commands under `tools/docs-deployment/**`; reuse the implemented browser harness.                                                                                                                                                                                                                                                                                                                                                                                 |
@@ -926,7 +940,7 @@ Raw provider logs, credentials and mutable dashboards remain outside Git.
 | Secrets/config                    | Change required / N/A      | Add deployment/receipt Schemas and authority metadata; application runtime secret or binding is N/A until evidenced. Never store values.                                                                                                                                                                                                                                                                                                                                                                                 |
 | DNS/custom domain                 | N/A                        | No zone, route, domain, certificate, hostname, DNS workflow or task. Preserve the future identity boundary in architecture only.                                                                                                                                                                                                                                                                                                                                                                                         |
 | Application stateful services     | N/A                        | No KV, D1, R2, application Durable Object, Queue, Hyperdrive or Cron. Alchemy remote state is control-plane state only.                                                                                                                                                                                                                                                                                                                                                                                                  |
-| Observability                     | Change required / N/A      | Root Worker composition explicitly enables bounded built-in invocation logs with persistence, while traces remain disabled; DCD-002 must confirm provider readback. Custom telemetry and third-party destinations are N/A.                                                                                                                                                                                                                                                                                               |
+| Observability                     | Change required / N/A      | Root Worker composition explicitly enables bounded built-in invocation logs with persistence, while traces remain disabled; DCD-002 provider readback confirmed those exact settings. Custom telemetry and third-party destinations are N/A.                                                                                                                                                                                                                                                                        |
 | New package/service/lint          | N/A unless proved          | No package or lint rule. Add a tool-local provider service only if direct readback needs a real substitution boundary.                                                                                                                                                                                                                                                                                                                                                                                                   |
 | HGI/HFI/completed history         | Preserve                   | HGI-203, HGI-206, HFI and completed docs-app SPEC/tasks/plan/evidence remain unchanged.                                                                                                                                                                                                                                                                                                                                                                                                                                  |
 | Release/Changesets                | Change required            | `packages/docs-content` behavior changes so ordinary Worker requests use bundled navigation without request-time filesystem access. Retain `.changeset/fresh-workers-render.md` as a patch Changeset; do not consume or publish it in this SPEC.                                                                                                                                                                                                                                                                         |
@@ -987,8 +1001,12 @@ bun run --filter=docs test
 bun run --filter=docs test:browser
 bun run --filter=docs test:built
 bun run --filter=docs test:cloudflare-built
+bun run --filter=docs test:cloudflare-hosted
 bun run --filter=docs check-types
 bun run check:docs-deployment:types
+bun run check:docs-deployment-tools:types
+bun run check:docs-deployment
+bun run test:docs-deployment
 bun run docs:build
 bun run check:quality-workflow
 bun run check:docs
@@ -1005,7 +1023,10 @@ descriptive ledger gate with the exact verified invocation before that task
 can complete.
 
 Local checks do not prove a hosted Preview, Production deployment, provider
-state, public availability or rollback. Provider proof requires separately
+state, public availability or rollback. The hosted command requires the exact
+provider-read-back URL, Worker, deployment/version and candidate environment
+values; its DCD-002 receipt is a dated Preview observation, not a reusable
+local claim or current-availability proof. Provider proof requires separately
 authorized readback and hosted journey receipts.
 
 ## Acceptance criteria

@@ -5,6 +5,7 @@ dist
 .turbo
 .vercel
 .wrangler
+.alchemy
 tmp/
 *.tsbuildinfo
 .env
