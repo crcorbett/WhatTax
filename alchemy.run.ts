@@ -17,6 +17,8 @@ import {
   docsWorkerResourceId,
 } from "./apps/docs/src/lib/build/cloudflare-stack.js";
 
+const docsWorkerBuildOutputRoot = "apps/docs/dist";
+
 export default Alchemy.Stack(
   docsCloudflareStackName,
   {
@@ -39,7 +41,7 @@ export default Alchemy.Stack(
         date: docsWorkerCompatibilityDate,
         flags: [...docsWorkerCompatibilityFlags],
       },
-      main: Output.interpolate`${build.outdir}/server/${docsWorkerGeneratedMain}`,
+      main: `${docsWorkerBuildOutputRoot}/server/${docsWorkerGeneratedMain}`,
       observability: docsWorkerObservability,
       subdomain: {
         enabled: true,
