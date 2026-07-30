@@ -1,6 +1,7 @@
 import * as Alchemy from "alchemy";
 import * as Cloudflare from "alchemy/Cloudflare";
 import * as Command from "alchemy/Command";
+import * as Output from "alchemy/Output";
 import { Stack } from "alchemy/Stack";
 import { Stage } from "alchemy/Stage";
 import * as Effect from "effect/Effect";
@@ -32,13 +33,13 @@ export default Alchemy.Stack(
       outdir: "dist",
     });
     const worker = yield* Cloudflare.Worker(docsWorkerResourceId, {
-      assets: `${build.outdir}/${docsWorkerAssetOutputDirectory}`,
+      assets: Output.interpolate`${build.outdir}/${docsWorkerAssetOutputDirectory}`,
       bundle: false,
       compatibility: {
         date: docsWorkerCompatibilityDate,
         flags: [...docsWorkerCompatibilityFlags],
       },
-      main: `${build.outdir}/server/${docsWorkerGeneratedMain}`,
+      main: Output.interpolate`${build.outdir}/server/${docsWorkerGeneratedMain}`,
       observability: docsWorkerObservability,
       subdomain: {
         enabled: true,
