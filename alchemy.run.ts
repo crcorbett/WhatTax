@@ -9,6 +9,7 @@ import * as Effect from "effect/Effect";
 import {
   decodeDocsDeploymentStage,
   docsCloudflareStackName,
+  docsWorkerAssetHeaders,
   docsWorkerAssetOutputDirectory,
   docsWorkerCompatibilityDate,
   docsWorkerCompatibilityFlags,
@@ -35,7 +36,10 @@ export default Alchemy.Stack(
       outdir: "dist",
     });
     const worker = yield* Cloudflare.Worker(docsWorkerResourceId, {
-      assets: Output.interpolate`${build.outdir}/${docsWorkerAssetOutputDirectory}`,
+      assets: {
+        directory: Output.interpolate`${build.outdir}/${docsWorkerAssetOutputDirectory}`,
+        headers: docsWorkerAssetHeaders,
+      },
       bundle: false,
       compatibility: {
         date: docsWorkerCompatibilityDate,

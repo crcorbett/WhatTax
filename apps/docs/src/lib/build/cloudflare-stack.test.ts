@@ -1,8 +1,10 @@
 import { Effect } from "effect";
+import { readFile } from "node:fs/promises";
 import { describe, expect, it } from "vitest";
 
 import {
   decodeDocsDeploymentStage,
+  docsWorkerAssetHeaders,
   docsWorkerObservability,
 } from "./cloudflare-stack";
 
@@ -39,5 +41,14 @@ describe("docs Cloudflare stack policy", () => {
         persist: false,
       },
     });
+  });
+
+  it("keeps the Vite and Alchemy asset-header inputs identical", async () => {
+    const headers = await readFile(
+      new URL("../../../public/_headers", import.meta.url),
+      "utf-8"
+    );
+
+    expect(headers).toBe(docsWorkerAssetHeaders);
   });
 });
