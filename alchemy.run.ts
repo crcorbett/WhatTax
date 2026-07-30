@@ -43,10 +43,6 @@ export default Alchemy.Stack(
       },
       main: `${docsWorkerBuildOutputRoot}/server/${docsWorkerGeneratedMain}`,
       observability: docsWorkerObservability,
-      subdomain: {
-        enabled: true,
-        previewsEnabled: false,
-      },
       url: true,
     });
 
