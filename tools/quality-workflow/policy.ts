@@ -23,6 +23,7 @@ const expectedConcurrencyGroup = [
 ].join("");
 const allowedRunSteps = new Set([
   "bun install --frozen-lockfile",
+  "bunx playwright install --with-deps chromium",
   "bun run check:quality-workflow",
   "bun run release:check -- --ci",
 ]);
@@ -189,10 +190,11 @@ const inspectSteps = (steps: unknown): readonly QualityWorkflowFinding[] => {
   const setupStep = asRecord(steps[1]);
   const setupWith = asRecord(setupStep?.with);
   const installStep = asRecord(steps[2]);
-  const policyStep = asRecord(steps[3]);
-  const releaseStep = asRecord(steps[4]);
+  const browserStep = asRecord(steps[3]);
+  const policyStep = asRecord(steps[4]);
+  const releaseStep = asRecord(steps[5]);
   const exactSteps =
-    steps.length === 5 &&
+    steps.length === 6 &&
     checkoutStep !== null &&
     hasOnly(checkoutStep, ["uses"]) &&
     checkoutStep.uses ===
@@ -207,6 +209,9 @@ const inspectSteps = (steps: unknown): readonly QualityWorkflowFinding[] => {
     installStep !== null &&
     hasOnly(installStep, ["run"]) &&
     installStep.run === "bun install --frozen-lockfile" &&
+    browserStep !== null &&
+    hasOnly(browserStep, ["run"]) &&
+    browserStep.run === "bunx playwright install --with-deps chromium" &&
     policyStep !== null &&
     hasOnly(policyStep, ["run"]) &&
     policyStep.run === "bun run check:quality-workflow" &&
@@ -238,7 +243,7 @@ const inspectSteps = (steps: unknown): readonly QualityWorkflowFinding[] => {
           finding(
             "workflow-mutation-step",
             ".github/workflows/quality.yml:jobs.quality.steps",
-            "Remove extra mutation, release, build, test or verification steps; the canonical release graph owns those checks."
+            "Retain only the exact runner bootstrap steps and canonical release graph owned by this policy."
           ),
         ]),
   ];

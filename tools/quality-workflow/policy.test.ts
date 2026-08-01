@@ -36,6 +36,7 @@ jobs:
         with:
           bun-version-file: .bun-version
       - run: bun install --frozen-lockfile
+      - run: bunx playwright install --with-deps chromium
       - run: bun run check:quality-workflow
       - run: bun run release:check -- --ci
 `;
@@ -46,6 +47,23 @@ const findingsFor = (text: string) =>
 describe("quality workflow policy", () => {
   test("accepts the decoded bounded read-only canonical release graph", () => {
     expect(findingsFor(acceptedWorkflow)).toEqual([]);
+  });
+
+  test("rejects a changed or omitted browser bootstrap command", () => {
+    for (const workflow of [
+      acceptedWorkflow.replace(
+        "bunx playwright install --with-deps chromium",
+        "bunx playwright install chromium"
+      ),
+      acceptedWorkflow.replace(
+        "      - run: bunx playwright install --with-deps chromium\n",
+        ""
+      ),
+    ]) {
+      expect(findingsFor(workflow).map((item) => item.invariant)).toContain(
+        "workflow-mutation-step"
+      );
+    }
   });
 
   test("rejects a floating action, authority expansion and bypassed graph in the actual job", () => {
