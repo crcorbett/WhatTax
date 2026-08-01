@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, test } from "bun:test";
+import { afterEach, describe, expect, test as bunTest } from "bun:test";
 import { rm } from "node:fs/promises";
 import { join } from "node:path";
 
@@ -9,6 +9,7 @@ const generatedConsumer = join(
   "tools/oxlint/fixtures/.generated-route-transport-consumer.tsx"
 );
 const temporaryFiles: string[] = [];
+const test = bunTest.serial;
 
 const runOxlint = (
   paths: readonly string[],
