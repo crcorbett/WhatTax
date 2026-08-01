@@ -36,7 +36,7 @@ jobs:
         with:
           bun-version-file: .bun-version
       - run: bun install --frozen-lockfile
-      - run: bunx playwright install --with-deps chromium
+      - run: apps/docs/node_modules/.bin/playwright install --with-deps chromium
       - run: bun run check:quality-workflow
       - run: bun run release:check -- --ci
 `;
@@ -52,11 +52,11 @@ describe("quality workflow policy", () => {
   test("rejects a changed or omitted browser bootstrap command", () => {
     for (const workflow of [
       acceptedWorkflow.replace(
-        "bunx playwright install --with-deps chromium",
-        "bunx playwright install chromium"
+        "apps/docs/node_modules/.bin/playwright install --with-deps chromium",
+        "bunx playwright install --with-deps chromium"
       ),
       acceptedWorkflow.replace(
-        "      - run: bunx playwright install --with-deps chromium\n",
+        "      - run: apps/docs/node_modules/.bin/playwright install --with-deps chromium\n",
         ""
       ),
     ]) {

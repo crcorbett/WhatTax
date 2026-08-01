@@ -23,7 +23,7 @@ const expectedConcurrencyGroup = [
 ].join("");
 const allowedRunSteps = new Set([
   "bun install --frozen-lockfile",
-  "bunx playwright install --with-deps chromium",
+  "apps/docs/node_modules/.bin/playwright install --with-deps chromium",
   "bun run check:quality-workflow",
   "bun run release:check -- --ci",
 ]);
@@ -211,7 +211,8 @@ const inspectSteps = (steps: unknown): readonly QualityWorkflowFinding[] => {
     installStep.run === "bun install --frozen-lockfile" &&
     browserStep !== null &&
     hasOnly(browserStep, ["run"]) &&
-    browserStep.run === "bunx playwright install --with-deps chromium" &&
+    browserStep.run ===
+      "apps/docs/node_modules/.bin/playwright install --with-deps chromium" &&
     policyStep !== null &&
     hasOnly(policyStep, ["run"]) &&
     policyStep.run === "bun run check:quality-workflow" &&
