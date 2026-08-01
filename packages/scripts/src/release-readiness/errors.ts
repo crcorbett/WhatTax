@@ -37,6 +37,8 @@ export class CiReleaseCheckFailedError extends Data.TaggedError(
   readonly failedCheck: ReleaseCheck["id"];
   readonly lastSuccessfulCheck: ReleaseCheck["id"] | null;
   readonly observedExitCode: number | null;
+  readonly stderrExcerpt: string;
+  readonly stdoutExcerpt: string;
   readonly target: string;
   readonly terminalState: ReleaseTerminalState;
 }> {}
@@ -77,6 +79,8 @@ export const formatReleaseReadinessError = Match.typeTags<
     failedCheck,
     lastSuccessfulCheck,
     observedExitCode,
+    stderrExcerpt,
+    stdoutExcerpt,
     target,
     terminalState,
   }) =>
@@ -85,6 +89,8 @@ export const formatReleaseReadinessError = Match.typeTags<
       `target: ${target}`,
       `exitCode: ${observedExitCode ?? "unavailable"}`,
       `last successful check: ${lastSuccessfulCheck ?? "none"}`,
+      `stdout excerpt: ${stdoutExcerpt || "unavailable"}`,
+      `stderr excerpt: ${stderrExcerpt || "unavailable"}`,
       "recovery: repair the named local boundary and rerun CI; no candidate or attempt receipt exists in CI mode.",
     ].join("\n"),
   ReleaseAttemptFailedError: ({ attempt }) =>

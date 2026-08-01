@@ -61,6 +61,30 @@ describe("release readiness", () => {
       })
   );
 
+  it.effect("renders bounded sanitized CI failure excerpts", () =>
+    Effect.gen(function* testCiFailureExcerpt() {
+      const results = HashMap.set(
+        successfulResults,
+        "build",
+        new TestCommandOutput({
+          exitCode: 2,
+          stderr: "build failed",
+          stdout: "partial build output",
+        })
+      );
+      const memory = yield* makeReleaseCommandRunnerTest(results);
+      const error = yield* runCiReleaseReadiness(checks).pipe(
+        Effect.provide(memory.layer),
+        Effect.flip
+      );
+      const rendered = formatReleaseReadinessError(error);
+
+      expect(rendered).toContain("stdout excerpt: partial build output");
+      expect(rendered).toContain("stderr excerpt: build failed");
+      expect(yield* Ref.get(memory.invocations)).toHaveLength(3);
+    })
+  );
+
   it.effect(
     "runs every canonical check once in order with exact arguments and cwd",
     () =>
