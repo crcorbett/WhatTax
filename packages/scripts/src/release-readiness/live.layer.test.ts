@@ -56,8 +56,8 @@ describe("release readiness live layer", () => {
         );
 
         expect(outcome.terminalState).toBe("success");
-        expect(outcome.stdoutExcerpt.length).toBeLessThanOrEqual(1024);
-        expect(outcome.stderrExcerpt.length).toBeLessThanOrEqual(1024);
+        expect(outcome.stdoutExcerpt.length).toBeLessThanOrEqual(4096);
+        expect(outcome.stderrExcerpt.length).toBeLessThanOrEqual(4096);
         expect(outcome.stdoutExcerpt).toContain("tail-marker");
         expect(outcome.stdoutDetail).not.toBeNull();
         expect(outcome.stderrDetail).not.toBeNull();

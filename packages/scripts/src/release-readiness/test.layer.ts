@@ -11,7 +11,11 @@ import {
 
 import { ReleaseCommandExecutionError } from "./errors.js";
 import type { ReleaseCheckId, ReleaseTerminalState } from "./schemas.js";
-import { ReleaseCommandOutcome, ReleaseDetailArtifact } from "./schemas.js";
+import {
+  releaseExcerptLimit,
+  ReleaseCommandOutcome,
+  ReleaseDetailArtifact,
+} from "./schemas.js";
 import { ReleaseCommandRunner } from "./service.js";
 
 const testDigest = `sha256:${"a".repeat(64)}`;
@@ -68,12 +72,12 @@ export const makeReleaseCommandRunnerTest = (
                         path: `tmp/release-readiness/${check.id}-stderr.log`,
                         sha256: testDigest,
                       }),
-                      stderrExcerpt: output.stderr.slice(0, 1024),
+                      stderrExcerpt: output.stderr.slice(-releaseExcerptLimit),
                       stdoutDetail: new ReleaseDetailArtifact({
                         path: `tmp/release-readiness/${check.id}-stdout.log`,
                         sha256: testDigest,
                       }),
-                      stdoutExcerpt: output.stdout.slice(0, 1024),
+                      stdoutExcerpt: output.stdout.slice(-releaseExcerptLimit),
                       terminalState,
                     });
 

@@ -1,6 +1,6 @@
 import { Array, Schema } from "effect";
 
-export const releaseExcerptLimit = 1024;
+export const releaseExcerptLimit = 4096;
 
 const CommitSha = Schema.String.check(Schema.isPattern(/^[a-f0-9]{40}$/u));
 const RelativeEvidencePath = Schema.String.check(
