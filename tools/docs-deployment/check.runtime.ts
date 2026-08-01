@@ -4,6 +4,8 @@ import { Array, Console, Effect, Match } from "effect";
 import * as Path from "effect/Path";
 
 import { readDeploymentJson, readDeploymentSha256 } from "./input.boundary.js";
+import { DocsDeploymentOrphanInventoryReceipt } from "./orphan-inventory.schemas.js";
+import { inspectDocsDeploymentOrphanInventoryReceipt } from "./orphan-inventory.service.js";
 import {
   inspectDeploymentOwners,
   inspectGitAuthorityReceipt,
@@ -396,6 +398,11 @@ export const checkDocsDeployment = (repositoryRoot: string) =>
         DeploymentProviderReadback
       ),
     });
+    const orphanInventory = yield* readDeploymentJson(
+      repositoryRoot,
+      "docs/evidence/deployments/2026-07-30-orphan-inventory/report.json",
+      DocsDeploymentOrphanInventoryReceipt
+    );
     const [desktopImageSha256, mobileImageSha256] = yield* Effect.all([
       readDeploymentSha256(repositoryRoot, desktopScreenshot.imagePath),
       readDeploymentSha256(repositoryRoot, mobileScreenshot.imagePath),
@@ -559,6 +566,7 @@ export const checkDocsDeployment = (repositoryRoot: string) =>
         [production.restoredDesktop, production.restoredMobile],
         productionRollbackPaths
       ),
+      ...inspectDocsDeploymentOrphanInventoryReceipt(orphanInventory),
       ...inspectScreenshotImageDigest(
         production.initialDesktop,
         productionImageDigests.initialDesktop
@@ -599,7 +607,7 @@ const program = Effect.gen(function* docsDeploymentMain() {
   const repositoryRoot = yield* path.fromFileUrl(repositoryRootUrl);
   const findings = yield* checkDocsDeployment(repositoryRoot);
   yield* Console.info(
-    `Docs deployment validation: journeys=4; preflightReceipts=11; gitAuthorityReceipts=1; gitReadbackReceipts=5; planReceipts=11; providerReadbackReceipts=6; hostedProofReceipts=6; screenshotManifests=12; teardownReceipts=3; rollbackReceipts=1; failedApplyReceipts=1; violations=${findings.length}; providerReadOperations=35; providerMutations=10.`
+    `Docs deployment validation: journeys=4; preflightReceipts=11; gitAuthorityReceipts=1; gitReadbackReceipts=5; planReceipts=11; providerReadbackReceipts=6; hostedProofReceipts=6; screenshotManifests=12; teardownReceipts=3; rollbackReceipts=1; failedApplyReceipts=1; orphanInventoryReceipts=1; violations=${findings.length}; providerReadOperations=42; providerMutations=10.`
   );
   return yield* Array.match(findings, {
     onEmpty: () => Effect.void,

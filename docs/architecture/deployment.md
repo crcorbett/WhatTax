@@ -43,6 +43,11 @@ intent and task state belong in the active SPEC and execution plan.
 - The initial app has no runtime bindings, secrets or stateful application
   service. KV, D1, R2, Durable Objects, Queues, Hyperdrive, Cron, custom
   domains, DNS and third-party observability are absent.
+- `tools/docs-deployment/automation-register.json` and `controls.json` own the
+  Schema-decoded desired state for three mutating workflow classes and one
+  report-only orphan inventory. Their validator reports zero externally
+  established automations. They neither create GitHub environments/secrets nor
+  replace the accepted manual operation path.
 - `@taxkit/api-http` builds as a package and exposes health, generated docs,
   OpenAPI JSON, metadata and public calculation route contracts.
 - `@taxkit/sdk` builds as a private package for local and downstream
@@ -66,6 +71,20 @@ The local command copies only emitted output to a temporary directory, removes
 checkout paths from the generated Wrangler config, strips provider credential
 variables, runs Wrangler dry-run and then runs the same no-bundle module graph
 under workerd. Local proof does not establish provider state or deployment.
+
+`bun run check:docs-deployment-inventory` is the separate credentialed,
+provider-bound readback owner. It compares exact `TaxKitDocsCloudflare` state
+stages/resources with account Worker enumeration through public installed
+Alchemy APIs, fails on disagreement and emits only sanitized identities and
+non-claims. It is deliberately outside root verification and does not build,
+plan, apply, destroy or prove hosted behavior.
+
+`bun run check:docs-deployment-orphans` composes that readback with an exact
+read-only GitHub open-PR query. Its Schema-decoded receipt classifies each
+`pr-N` stage as trusted-active, untrusted or an orphan candidate and separately
+reports trusted open PRs without a stage. It has no provider-write or deletion
+operation. A candidate is only a dated human-review input, never teardown
+authority.
 
 The accepted Preview requalification used candidate
 `d9cb8945529fb72158e59ca0daf02a98e1e4de1a` at deterministic stage `pr-1`.
@@ -150,6 +169,9 @@ between them is migration evidence, not provider or public-availability proof.
   domain claims separate.
 - Provider mutation requires the named authority, sanitized plan/equal replan,
   stage lock, readback and receipt defined by the deployment runbook.
+- Treat workflow code, protected GitHub environments, credential identities and
+  dated hosted receipts as separate establishment conditions. Do not infer any
+  of them from the local automation register.
 
 ## Related docs
 

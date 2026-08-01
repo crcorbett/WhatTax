@@ -44,6 +44,14 @@ const decodingBoundaryFiles = [
   "tools/documentation/runbook-check.runtime.test.ts",
   "tools/documentation/runbook-policy.test.ts",
   "tools/docs-deployment/input.boundary.ts",
+  "tools/docs-deployment/automation.check.runtime.ts",
+  "tools/docs-deployment/automation.policy.test.ts",
+  "tools/docs-deployment/inventory.runtime.ts",
+  "tools/docs-deployment/inventory.service.test.ts",
+  "tools/docs-deployment/inventory.service.ts",
+  "tools/docs-deployment/orphan-inventory.runtime.ts",
+  "tools/docs-deployment/orphan-inventory.service.test.ts",
+  "tools/docs-deployment/orphan-inventory.service.ts",
   "tools/docs-deployment/policy.test.ts",
   "tools/repository-paths/check.runtime.ts",
   "tools/repository-paths/policy.test.ts",
@@ -147,6 +155,8 @@ const schemaEncoderEgressFiles = [
   "tools/oxlint/fixtures/effect-accepted.ts",
   "tools/documentation/check.runtime.ts",
   "tools/documentation/runbook-check.runtime.ts",
+  "tools/docs-deployment/inventory.runtime.ts",
+  "tools/docs-deployment/orphan-inventory.runtime.ts",
 ];
 
 const throwingCodecTestFiles = [
@@ -192,6 +202,13 @@ const runtimeBoundaryFiles = [
   "tools/governance/check.runtime.ts",
   "tools/governance/policy.test.ts",
   "tools/docs-deployment/check.runtime.ts",
+  "tools/docs-deployment/automation.check.runtime.ts",
+  "tools/docs-deployment/automation.policy.test.ts",
+  "tools/docs-deployment/inventory.runtime.ts",
+  "tools/docs-deployment/inventory.service.test.ts",
+  "tools/docs-deployment/orphan-inventory.runtime.ts",
+  "tools/docs-deployment/orphan-inventory.service.test.ts",
+  "tools/docs-deployment/orphan-inventory.service.ts",
   "tools/docs-deployment/policy.test.ts",
 ];
 
@@ -210,6 +227,10 @@ const processBoundaryFiles = [
   "tools/evals/harness-foundation/check.runtime.ts",
   "tools/governance/check.runtime.ts",
   "tools/docs-deployment/check.runtime.ts",
+  "tools/docs-deployment/automation.check.runtime.ts",
+  "tools/docs-deployment/inventory.runtime.ts",
+  "tools/docs-deployment/orphan-inventory.runtime.ts",
+  "tools/docs-deployment/orphan-inventory.service.ts",
 ];
 
 const consoleBoundaryFiles = [
@@ -229,6 +250,9 @@ const consoleBoundaryFiles = [
   "tools/evals/harness-foundation/check.runtime.ts",
   "tools/governance/check.runtime.ts",
   "tools/docs-deployment/check.runtime.ts",
+  "tools/docs-deployment/automation.check.runtime.ts",
+  "tools/docs-deployment/inventory.runtime.ts",
+  "tools/docs-deployment/orphan-inventory.runtime.ts",
 ];
 
 const bunAdapterFiles = [
@@ -251,6 +275,9 @@ const bunAdapterFiles = [
   "tools/evals/harness-foundation/check.runtime.ts",
   "tools/governance/check.runtime.ts",
   "tools/docs-deployment/check.runtime.ts",
+  "tools/docs-deployment/automation.check.runtime.ts",
+  "tools/docs-deployment/inventory.runtime.ts",
+  "tools/docs-deployment/orphan-inventory.runtime.ts",
 ];
 
 const bunRuntimeEntrypointFiles = [
@@ -271,6 +298,9 @@ const bunRuntimeEntrypointFiles = [
   "tools/evals/harness-foundation/check.runtime.ts",
   "tools/governance/check.runtime.ts",
   "tools/docs-deployment/check.runtime.ts",
+  "tools/docs-deployment/automation.check.runtime.ts",
+  "tools/docs-deployment/inventory.runtime.ts",
+  "tools/docs-deployment/orphan-inventory.runtime.ts",
 ];
 
 export default defineConfig({

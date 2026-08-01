@@ -34,7 +34,7 @@ the milestone and acceptance owner.
 | `DCD-001` | completed   | Accepted at `669a8f3…` after exact dependency/integrity readback, both built-app oracles, docs-maintainer reconciliation, focused Changeset, independent closure, and all change-owned gates. |
 | `DCD-002` | completed   | Accepted candidate `d9cb894…` passed fresh pre-deploy and pre-destroy state/provider readback, equal plans, Preview apply, the complete hosted/browser/screenshot contract, exact-stage teardown/absence, all gates and corrected-boundary independent review. |
 | `DCD-003` | completed   | Accepted after fixed Production, separately Preview-qualified successor, successor Production, restored-source rollback, provider/hosted/screenshot readback, owner reconciliation, full verification and corrected-boundary independent review. |
-| `DCD-004` | pending     | Ready to turn the accepted manual Preview, Production and teardown paths into the minimum protected delivery workflows.                                                                                              |
+| `DCD-004` | in_progress | Local automation/control and report-only inventory owners are ready for partial retention; hosted workflows, protected environments and CI credential identities remain capability-gated.                         |
 | `DCD-005` | pending     | Waits for accepted automation and complete parity evidence.                                                                                                                                                          |
 
 ## Baseline
@@ -690,3 +690,196 @@ credential, availability, DNS, publication or release observations.
 
 DCD-003 is accepted. DCD-004 is the next dependency-ready milestone. Production
 is not destroyed, and no timeless availability claim is made.
+
+### 2026-07-30 — DCD-004 automation admission grounding
+
+DCD-004 began from clean local/upstream commit
+`114bce654baad8377667c701988b4fdfc3b4685c`. Draft PR `#1` was open and draft
+at that exact head against `main` `9c82bf9…`; its two Quality jobs were queued
+at readback. The TaxKit repository reported zero GitHub environments and zero
+repository Actions secrets, with default workflow permission `read`. This
+establishes neither credential absence outside GitHub nor authority to create
+environment resources; it means no hosted mutation workflow can yet claim a
+protected environment or GitHub-hosted credential identity.
+
+Current Site comparative implementation was read from its `origin/main`
+`7504112d7133a4dac95ef4b26a0dbfca7ca75649`, not the stale local checkout.
+TaxKit adapts only exact-SHA checkout, frozen installation, digest-bound
+two-phase mutation, non-cancellable mutation concurrency and retained receipt
+principles. It rejects Site-specific stack, domain, Axiom, AOX, secret,
+hard-coded URL/version and package-script machinery.
+
+The local DCD-004 owner and negative workflow policy can proceed. Hosted
+workflow execution remains a capability gate until the workflow exists on the
+default branch and the named protected environments and secret identities are
+available. Creating or weakening those GitHub resources is not inferred from
+repository-edit or branch-push authority.
+
+Read-only installed-version proof showed that the public `Cloudflare.state()`
+Layer can inventory the exact stack without evaluating `alchemy.run.ts` under
+the rejected `placeholder` stage. With state version `7`, it observed stack
+`TaxKitDocsCloudflare`, only stage `prod`, and the two expected logical
+resources. A separate authorized Production dry-run selected exactly
+`DocsBuild` and `DocsWebsite` for update and performed no mutation. These
+observations prove a viable DCD-004 readback implementation route; they do not
+admit a workflow, refresh Cloudflare Worker/deployment/version availability or
+replace the dated DCD-003 receipts.
+
+The smallest unresolved capability is external rather than architectural:
+
+- the reviewed workflow implementation must first exist on the default branch,
+  which requires a merge and any draft-to-ready transition outside current Git
+  authority;
+- GitHub must have separately protected Preview, Production and Preview
+  teardown environments; and
+- those environments need narrowly scoped account/token secret identities
+  supplied without exposing, copying or widening the current local OAuth
+  credential outside an explicit credential-storage authority.
+
+Until those conditions exist, DCD-004 remains `in_progress`. Do not add dormant
+workflow command literals, auto-create unprotected environments, move provider
+credentials into Quality, or claim a hosted workflow receipt. Recovery is to
+retain the accepted manual runbook path and resume the workflow/code/control
+slice only after the exact GitHub environments, credential principals and
+default-branch execution path can be tested.
+
+Both Quality runs for exact remote head `114bce6…` completed with the same
+bounded result as earlier heads: canonical `bun run verification` passed, then
+the aggregate `bun run test` boundary exited `1`. Hosted logs did not identify
+a new DCD-003 or DCD-004 owner, and the previously reproduced unchanged
+release-readiness evidence-boundary baseline remains the applicable
+classification. This is not a green CI claim and does not relax the DCD-004
+requirement to consume a successful exact-candidate Quality result before
+workflow mutation.
+
+The first local DCD-004 owner is now concrete:
+
+- `tools/docs-deployment/automation.schemas.ts`,
+  `automation-register.json`, `controls.json`, `automation.policy.ts` and
+  `automation.policy.test.ts` own exactly three mutation contracts and one
+  report-only orphan contract;
+- `tools/docs-deployment/automation.check.runtime.ts`, reached by
+  `bun run check:docs-deployment-automation`, decodes both registers, enforces
+  exact per-class principals, credential/resource/denial sets, triggers,
+  revision sources, Quality stops and cross-field identities, rejects every
+  external establishment until a hosted receipt decoder exists, and reports
+  the number of externally established entries;
+- all four entries remain `not-established` with no receipt, matching the
+  GitHub environment/secret/default-branch capability readback; and
+- root verification and development Knip now reach the focused owner, while
+  Quality's provider-free, read-only authority remains preserved.
+
+Focused acceptance currently passes the deployment tool typecheck, the new
+automation validator and `27` deployment-policy tests with `61` expectations.
+This admits local desired state only; it is neither a hosted workflow receipt
+nor DCD-004 completion.
+
+The task-created provider-bound command is now exactly
+`bun run check:docs-deployment-inventory`. It owns a small
+`DocsDeploymentInventory` service/Layer, branded stage/resource/Worker
+identities, tagged input/read/disagreement errors and one-time Schema decoding
+of state and provider ingress. Its test Layer accepts agreement and rejects a
+different physical Worker. The live command fails before state initialization
+unless `CI=1`, cached state-store credentials exist and their account identity
+matches the authenticated Cloudflare environment; it never emits credential
+or account values.
+
+The latest authorized execution observed state store `cloudflare-http` version
+`7`, only stage `prod`, logical resources `DocsBuild` and `DocsWebsite`, and
+one matching Alchemy-tagged physical Worker
+`taxkitdocscloudflare-docswebsite-prod-ujphggiaxw5ryjev`. It performed no
+mutation. The command is intentionally excluded from root verification and
+Quality because it is provider-bound; this observation establishes neither
+deployment/version identity, hosted behavior nor future availability.
+
+The task-created report-only command is now exactly
+`bun run check:docs-deployment-orphans`. It runs the existing supported
+state/provider command plus the exact read-only `gh pr list` projection named
+in the receipt Schema, decodes each source once and recomputes classification
+before encoding. Its first execution exposed two bounded implementation
+failures before success: the process graph initially lacked an Effect `Scope`,
+then the byte collector passed `Array.from` as an indexed callback and failed
+strict UTF-8 decoding. Both failures produced named non-mutating errors; the
+runtime now owns scope and performs an explicit byte flatten.
+
+The accepted dated report at
+`docs/evidence/deployments/2026-07-30-orphan-inventory/report.json` observed
+exact remote PR `#1` at `114bce6…`, only `prod` in Alchemy state, and the same
+fixed Production Worker in Cloudflare. It found zero Preview stages and zero
+orphan candidates, classifying PR `#1` only as a trusted open PR without a
+stage. The receipt fixes mutation capability to `none` and automatic deletion
+to `prohibited`; root deployment validation decodes it and recomputes the
+classification. It is a dated read-only observation, not scheduled automation,
+teardown authority, hosted behavior or future-state proof.
+
+The fresh bounded reviewer returned `READY FOR PARTIAL RETENTION` for this
+owner after independently attacking trusted, cross-repository, missing-PR and
+missing-stage classifications, command identity, mutation capability and
+receipt omission. It found only the exact existing inventory command and
+bounded open-PR read reachable, with no provider client, write, apply, destroy
+or deletion path. The final focused suite passed `27` tests with `61`
+expectations; deployment validation decoded one orphan receipt with zero
+violations, and full repository verification passed.
+
+Docs-maintainer impact for this increment is `Change required` for the
+deployment tool/Schemas/tests, dated evidence, package/Knip/Oxlint
+reachability, architecture, testing, runbook, automation/control, active
+SPEC/task/index and plan owners. `Preserve` applies to Quality's read-only,
+provider-free authority, deployment-neutral docs packages, all earlier
+deployment and HGI/HFI evidence, and the fixed Production resource. `N/A`
+applies to a new Changeset, automatic deletion, workflow establishment,
+credential storage, DNS/domain, third-party observability, release and
+publication.
+
+The fresh independent DCD-004 review initially returned `NOT READY FOR PARTIAL
+RETENTION`. It proved that the first policy admitted additive credentials and
+resources, floating candidate sources, omitted Quality stops and an arbitrary
+non-null external receipt. The owning policy now compares the exact
+per-automation principal, credential, resource, denial, trigger and revision
+sets; Preview and Production require the exact-candidate Quality stop; any
+`established` external state fails closed until a hosted receipt decoder
+exists. Durable negative fixtures retain each attack. The same reviewer
+re-ran the attacks and returned `READY FOR PARTIAL RETENTION`; this accepts
+only the local desired-state and inventory owner, not DCD-004 or any hosted
+workflow claim.
+
+Changeset impact is evidenced `N/A` for this partial DCD-004 owner: it changes
+repository-private deployment tooling, governance records and maintainer
+documentation, not a version-managed package or public API. The unconsumed
+DCD-001 docs-content patch Changeset remains the only package-facing Changeset
+in this SPEC.
+
+### 2026-08-01 — DCD-004 Quality repair and partial-retention successor
+
+The prior red Quality classification is superseded for exact remote head
+`630b3b5a4de4bfcadb5b0befb622dde9894a7d51`. GitHub Actions runs
+`30690654403` and `30690655494` both completed successfully for the push and
+draft-PR events. Their complete `release:check -- --ci` graphs passed; this is
+hosted CI evidence only, not deployment or provider proof.
+
+Three change-owned runner defects were corrected without widening authority:
+
+- `34caed9b…` pins the route-rule subprocess to Oxlint's supported `unix`
+  reporter so GitHub annotation mode cannot change its diagnostic contract;
+- `b18d9307…` installs Chromium through the frozen app-local Playwright 1.61.1
+  executable instead of the rejected floating `bunx` resolution; and
+- `630b3b5a…` fetches complete checkout history and materialises the configured
+  local `main` ref so the ninth Changesets gate can compare the candidate.
+
+The intermediate red receipts remain disconfirming evidence: `34caed9b…`
+advanced past workspace tests but lacked Chromium; `e736597b…` proved that
+floating `bunx` installed a different Playwright browser revision and was
+rejected; and `b18d9307…` advanced through build and browser proof but lacked
+`main` comparison history. Quality still has `contents: read`, cancellable
+workflow/ref concurrency, no provider credential and no deployment step.
+Docs-maintainer impact for this correction is `Change required` for the Quality
+executable policy, negative fixtures, testing/control/automation wording,
+SPEC/task impact rows and this plan; deployment authority, provider state and
+public availability remain `N/A`.
+
+The already reviewed DCD-004 local desired-state, state/provider inventory and
+report-only orphan owner remain the partial-retention candidate. DCD-004 stays
+`in_progress`: no `.github/workflows/docs-*.yml`, protected environment,
+GitHub-hosted credential principal or repeatable hosted workflow receipt has
+yet been established. The next boundary is a fresh readback of those external
+capabilities after this partial owner is committed.

@@ -77,6 +77,22 @@ Read back the executing principal, exact account, plan/entitlement,
 resource inventory. Keep only sanitized identities. Stop if Alchemy and the
 independent provider reader disagree.
 
+The supported repeatable state/provider readback invocation is:
+
+```sh
+bun run check:docs-deployment-inventory
+```
+
+It uses only the public installed `Cloudflare.state()` and Worker Provider
+`list()` operations. It requires `CI=1`, a cached state-store credential and
+agreement between that credential's account identity and the current
+Cloudflare environment before state initialization. It decodes state and
+provider output once, filters provider inventory by exact Alchemy stack tags,
+and fails on state/Worker disagreement. It prints no account ID, token or raw
+provider response. Do not place it in root verification: it is a
+credentialed, provider-bound observation whose exact execution belongs in an
+authorized operation or report-only workflow.
+
 ### Alchemy state bootstrap, adoption and recovery
 
 Treat Alchemy state as a separate control-plane lifecycle. Before application
@@ -308,6 +324,56 @@ trusted PR head, plan inequality, provider/state contradiction, unsafe destroy,
 secret exposure, failed hosted proof or rollback mismatch to Cooper and the
 exact target owner. Retain the failed receipt without broadening authority.
 
+## Repeatable automation admission
+
+The deployment-only desired-state and control records live in
+`tools/docs-deployment/automation-register.json` and
+`tools/docs-deployment/controls.json`; validate them with
+`bun run check:docs-deployment-automation`. They admit Preview, Production,
+Preview teardown and report-only orphan inventory without changing the
+read-only Quality workflow.
+
+An automation is not operational merely because its local record validates.
+Before marking its `externalState` as `established`, require all of:
+
+1. reviewed workflow code on the default branch;
+2. the exact protected GitHub environment named by the record;
+3. a narrowly scoped credential identity supplied without repository or log
+   disclosure;
+4. an exact candidate/default-branch source and non-cancellable stage lock;
+5. accepted canonical plan digest plus equal replan for mutation;
+6. state/provider and hosted postcondition readback; and
+7. a retained dated receipt named in `externalState.receipt`.
+
+The current register intentionally records all four entries as
+`not-established`. GitHub readback found no repository environments or Actions
+secrets, and the reviewed workflow implementation is not on the default
+branch. Do not create an unprotected workflow, copy the broad local OAuth
+credential into GitHub, or invent an unexecuted command merely to advance the
+task. Continue to use this manual runbook under an exact authority envelope
+until those external conditions can be established and tested.
+
+PR-close teardown must run reviewed default-branch implementation code, derive
+only exact `pr-N`, share that stage's non-cancellable mutation lock, and prove
+state/provider/URL absence. Scheduled orphan inventory is report-only: it may
+compare open pull requests, exact TaxKit stages and exact TaxKit Workers, but
+has no write or automatic-deletion authority. An incomplete inventory is an
+inconclusive report, not destroy permission.
+
+The exact authorized operator invocation is:
+
+```sh
+bun run check:docs-deployment-orphans
+```
+
+It runs the existing state/provider inventory plus one exact GitHub open-PR
+read, Schema-decodes both sources, recomputes every classification and emits no
+credential, account value or raw provider response. Retain its JSON at a dated
+deployment-evidence route. The 2026-07-30 receipt observed only fixed
+Production, no Preview stage or orphan candidate, and one trusted open PR
+without a stage. Do not turn that observation into deletion or absence proof
+for a later provider epoch.
+
 ## Stop conditions
 
 Stop before unrelated `versioning`, `commit`, `push`, `tag`, `release`,
@@ -340,7 +406,13 @@ rejects. DCD-002 therefore used direct Schema-decoded state-store and
 Cloudflare readback. Do not admit that internal sentinel into deployable stage
 identity or use the failing generic command as an absence oracle; DCD-004 must
 provide a supported repeatable readback owner before workflow admission.
-Historical receipts cannot establish current provider state. The earlier
+Historical receipts cannot establish current provider state. The public
+`Cloudflare.state()` Layer and Worker Provider `list()` now back the supported
+`check:docs-deployment-inventory` command without evaluating `alchemy.run.ts`
+under the rejected placeholder stage. Its latest local authorized read
+observed state/provider agreement for only `prod`, `DocsBuild` and
+`DocsWebsite`. This does not establish hosted workflow execution,
+deployment/version identity, application behavior or future availability. The earlier
 `0d714e6…` chain is not accepted because it lacked exact pre-mutation
 state/provider receipts and complete hosted/screenshot/state false-green
 oracles.

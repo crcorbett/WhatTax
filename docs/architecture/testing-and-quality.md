@@ -241,11 +241,16 @@ The Quality workflow invokes `bun run release:check -- --ci` for every
 configured pull request and push rather than relying on path filters. The
 explicit CI mode runs the same nine ordered checks without consuming or
 rewriting an HGI-203 candidate packet; it returns bounded local command detail
-only. A non-CI `release:check` remains the authority-bound new-candidate
+only. Its exact read-only runner bootstrap fetches complete Git history,
+materialises the configured `main` comparison ref and installs Chromium through
+the frozen app-local Playwright executable before the canonical graph. This
+keeps Changesets and docs build/browser proof bound to the checked-out graph;
+floating `bunx` resolution is rejected. A non-CI `release:check` remains the authority-bound new-candidate
 operation in the release-readiness runbook. Its static contract is owned by
 [`../../tools/quality-workflow/check.runtime.ts`](../../tools/quality-workflow/check.runtime.ts): it rejects missing read-only permissions, timeout or concurrency
-limits, floating action references, absent canonical graph invocation, and
-additional workflow-local release steps. Its fixtures name public exports,
+limits, floating action or browser-tool resolution, shallow/ambiguous release
+history, absent canonical graph invocation, and additional workflow-local
+release steps. Its fixtures name public exports,
 packed SDK, API, docs, manifests, workflows, and release scripts as
 release-relevant boundaries. This is local workflow-configuration proof only;
 it does not prove a hosted run, publication, deployment, registry state, or
@@ -254,6 +259,29 @@ external consumer behaviour.
 The harness gate is not a separate Quality workflow step. The existing
 `release:check -- --ci` graph begins with root verification and therefore
 inherits it without duplicating execution or widening workflow authority.
+
+Deployment automation is intentionally outside Quality. The local
+`check:docs-deployment-automation` command Schema-decodes four target-owned
+automation records plus four controls and runs focused negative fixtures for
+candidate trust, mutation locking, equal replans, teardown safety,
+credential/environment denial and report-only orphan handling. This proves
+repository desired state only. A hosted workflow claim additionally requires
+default-branch workflow identity, protected-environment and credential
+readback, exact-candidate execution, provider/state agreement and a dated
+receipt. Quality retains `contents: read`, cancellable concurrency and no
+provider credential or mutation edge.
+
+The credentialed `check:docs-deployment-inventory` command is also excluded
+from root verification and Quality. Its focused service fixtures prove
+state/provider agreement and disagreement behavior without a provider; an
+authorized live invocation separately checks exact TaxKit state and Workers.
+Neither fixture nor live inventory proves hosted application behavior.
+
+The provider-bound `check:docs-deployment-orphans` command adds one exact
+read-only GitHub query and classifies the resulting open-PR/state/Worker graph.
+Focused fixtures retain trusted, cross-repository and missing-PR stage cases
+plus a false-green classification attack. Root deployment validation decodes
+the retained dated report, but does not rerun either credentialed source.
 
 The five consumer-visible release journeys are maintained in
 [`../verification/critical-journeys.json`](../verification/critical-journeys.json):

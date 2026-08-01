@@ -172,7 +172,7 @@
         "docs/operations/automation-register.md",
         "docs/standards/controls.md"
       ],
-      "acceptance": "Three mutating classes and one report-only orphan inventory are Schema-admitted; exact-SHA, authority, stage locks, non-cancellation, digest equality, proof, recovery and retirement fail closed."
+      "acceptance": "Three mutating classes and one report-only orphan inventory are Schema-admitted; exact-SHA, authority, stage locks, non-cancellation, digest equality, proof, recovery and retirement fail closed. The exact local report-only command and dated receipt are owned under tools/docs-deployment and docs/evidence/deployments."
     },
     {
       "surface": "quality-workflow",
@@ -612,7 +612,7 @@
     },
     {
       "id": "DCD-004",
-      "status": "pending",
+      "status": "in_progress",
       "acceptedFindingIds": [
         "TK-CF-003",
         "TK-CF-005",
@@ -642,7 +642,7 @@
         "create one supported Schema-decoded state/provider inventory command for workflow and operator use; do not admit Alchemy beta.64's internal placeholder stage into deployable identity",
         "admit separate Schema-decoded automation entries for Preview, Production and teardown with exact principals/resources/environments",
         "add one report-only orphan inventory that compares open PRs, Alchemy stages and Cloudflare resources without destroying anything",
-        "create deployment-only Schemas, policy and negative fixtures under tools/docs-deployment while preserving tools/quality-workflow unchanged",
+        "create deployment-only Schemas, policy and negative fixtures under tools/docs-deployment while preserving Quality's independent read-only/cancellable authority; any narrow quality-workflow prerequisite correction requires exact hosted failure and green successor receipts",
         "allow same-repository trusted PR candidates only; never run candidate code through pull_request_target, and make PR-close teardown check out reviewed default-branch implementation code rather than PR head",
         "retain a bounded receipt on success, failure, cancellation or provider disagreement",
         "document cancellation, idempotence/convergence, stopping, recovery, escalation, carrying cost, review triggers and retirement in each control",
@@ -676,11 +676,13 @@
       },
       "documentationImpact": [
         "Change required: workflow files, tools/docs-deployment automation/control Schemas/policy/fixtures, automation/control docs, runbook references and evidence.",
-        "Preserve: .github/workflows/quality.yml, tools/quality-workflow/** and the current local release graph.",
+        "Preserve: Quality's independent read-only/cancellable authority and canonical release graph. Change required only for exact hosted-evidenced runner prerequisites in .github/workflows/quality.yml and tools/quality-workflow/**; never add provider credentials or deployment steps.",
         "N/A: automatic orphan deletion, generic CI framework, new lint rule, custom domain and third-party observability."
       ],
       "mandatoryVerification": [
-        "execute the task-created focused deployment automation/control validator and backfill its exact invocation before completion",
+        "bun run check:docs-deployment-automation",
+        "bun run check:docs-deployment-inventory under the named readback authority",
+        "bun run check:docs-deployment-orphans under the named report-only authority",
         "bun run test:quality-workflow",
         "bun run check:quality-workflow",
         "deployment-owner negative fixtures for mutable action pins, credential exposure, wrong SHA, fork/untrusted access, pull_request_target candidate execution, stale default-branch teardown code, weak stage lock, cancellation, missing plan acceptance/equality, missing protected approval, unsafe teardown and mutating orphan audit",
@@ -703,7 +705,7 @@
         "Review each whole workflow from trigger through exact checkout, Quality, lock, plan, approval, apply, readback, proof, receipt and recovery.",
         "Review independent principals/resources/environments, credential scope, cancellation, convergence, stale-candidate handling and PR-close destroy safety.",
         "Review deployment-only automation Schema ownership, negative fixtures, bounded output, no helper/framework/lint sprawl and report-only orphan semantics.",
-        "Review that Quality and tools/quality-workflow remain unchanged in authority and independently cancellable."
+        "Review that Quality and tools/quality-workflow remain unchanged in authority, independently cancellable and free of provider credentials or deployment steps; reconcile any narrow hosted-evidenced runner prerequisite correction."
       ],
       "parentAudit": {
         "required": true,

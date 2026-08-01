@@ -23,6 +23,9 @@
         "tools/quality-workflow/check.runtime.ts",
         "tools/quality-workflow/*.test.ts",
         "tools/docs-deployment/check.runtime.ts",
+        "tools/docs-deployment/automation.check.runtime.ts",
+        "tools/docs-deployment/inventory.runtime.ts",
+        "tools/docs-deployment/orphan-inventory.runtime.ts",
         "tools/docs-deployment/*.test.ts"
       ],
       "project": [

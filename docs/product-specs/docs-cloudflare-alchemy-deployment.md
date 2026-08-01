@@ -172,7 +172,14 @@ Production, a separately Preview-qualified successor, and normal source-bound
 rollback to the accepted source with bounded screenshots and provider/state
 readback. Owner reconciliation, broad verification and corrected-boundary
 independent review accepted DCD-003. Repeatable workflows remain absent and are
-owned by DCD-004.
+owned by DCD-004. DCD-004 has admitted the deployment-only Schema/control
+desired state for three mutating classes and one report-only orphan inventory,
+with every external-state entry still `not-established`. No workflow file,
+protected GitHub environment, credential identity or hosted workflow receipt
+is claimed. Quality's authority remains read-only and independently
+cancellable; its exact runner bootstrap was corrected during DCD-004 to use
+the frozen app-local Playwright executable and complete `main` comparison
+history after hosted failures exposed those missing prerequisites.
 
 ## Goals
 
@@ -581,6 +588,12 @@ smallest three mutating workflow classes:
 Also admit one report-only orphan inventory. It may compare open PRs, Alchemy
 stages and Cloudflare resources; it must not destroy anything.
 
+The implementation-owned local command is
+`bun run check:docs-deployment-orphans`. It emits a Schema-decoded,
+provider-bound dated report with no write/deletion capability; the first
+observation is retained separately from the still-unestablished hosted
+automation class.
+
 Each workflow must use exact-SHA checkout, pinned actions, frozen installation
 and a two-phase contract. A cancellable, non-mutating plan operation emits the
 candidate/stage/config-bound sanitized digest receipt. A separately invoked
@@ -936,7 +949,7 @@ Raw provider logs, credentials and mutable dashboards remain outside Git.
 | Root/app/package READMEs          | Change required / Preserve | Update `apps/docs/README.md`; preserve root `README.md` because its existing `docs/README.md` pointer remains sufficient, and preserve docs-content/docs-fumadocs READMEs unless their runtime contract changes.                                                                                                                                                                                                                                                                                                 |
 | Runbooks/router/profile           | Change required            | `docs/runbooks/docs-deployment.md`, `docs/runbooks/README.md`, `docs/runbooks/recovery.md`, `docs/README.md`, `docs/standards/tooling.md`, `tools/documentation/runbook-contract.json`, runbook Schemas/policy/tests, `.agents/skills/docs-maintainer/references/repository-profile.md`, `docs/verification/repository-harness-profile.json`, `docs/verification/effectiveness.md`, `tools/skills/canonical-skill-baseline.json`, and a proportional successor entry in `docs/verification/harness-epochs.md`; preserve prior epoch and HFI receipts. |
 | Authority                         | Change required            | `docs/operations/authority-model.md` and machine-checked runbook authority records.                                                                                                                                                                                                                                                                                                                                                                                                                                      |
-| Automation/controls/CI            | Change required            | Deployment-only Schema/policy/fixtures under `tools/docs-deployment/**`, `docs/operations/automation-register.md`, `docs/standards/controls.md`, `.github/workflows/docs-*.yml`; preserve `tools/quality-workflow/**` and `.github/workflows/quality.yml` as independently read-only.                                                                                                                                                                                                                                    |
+| Automation/controls/CI            | Change required / Preserve | Deployment-only Schema/policy/fixtures under `tools/docs-deployment/**`, `docs/operations/automation-register.md`, `docs/standards/controls.md`, `.github/workflows/docs-*.yml`. Preserve Quality's independent read-only/cancellable authority; DCD-004 may narrowly correct `.github/workflows/quality.yml` and `tools/quality-workflow/**` when exact hosted receipts prove a prerequisite defect, without adding provider credentials or deployment steps.                                                                 |
 | Local/browser proof               | Change required            | Existing docs tests plus task-created workerd/provider commands under `tools/docs-deployment/**`; reuse the implemented browser harness.                                                                                                                                                                                                                                                                                                                                                                                 |
 | Deployment journeys/evidence      | Change required            | New `docs/verification/docs-deployment-journeys.json` and `docs/evidence/deployments/**`; preserve current release journeys and immutable evidence.                                                                                                                                                                                                                                                                                                                                                                      |
 | Screenshots                       | Change required            | Bounded Preview/Production PNGs plus Schema-decoded manifests under the dated deployment evidence route.                                                                                                                                                                                                                                                                                                                                                                                                                 |

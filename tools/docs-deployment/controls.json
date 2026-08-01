@@ -1,0 +1,46 @@
+[
+  {
+    "evidence": "bun run check:docs-deployment-automation",
+    "fixture": "tools/docs-deployment/automation.policy.test.ts",
+    "id": "docs-workflow-candidate-trust",
+    "owner": "taxkit-docs-deployment-automation-owner",
+    "preventedFailure": "A fork, stale SHA, failed Quality result or pull_request_target candidate execution reaches deployment credentials.",
+    "recovery": "Repair the exact candidate/default-branch binding and issue a new attempt.",
+    "retirementCondition": "A stronger accepted workflow identity policy replaces exact-SHA and trusted-source enforcement.",
+    "reviewTrigger": "Workflow trigger, checkout, candidate, Quality or principal change.",
+    "signal": "A docs deployment workflow candidate is selected."
+  },
+  {
+    "evidence": "bun run check:docs-deployment-automation",
+    "fixture": "tools/docs-deployment/automation.policy.test.ts",
+    "id": "docs-workflow-mutation-lock",
+    "owner": "taxkit-docs-deployment-automation-owner",
+    "preventedFailure": "A cancellable or weakly keyed mutation bypasses equal replan, protected approval or provider/state readback.",
+    "recovery": "Restore the non-cancellable stage lock and equal canonical plan contract.",
+    "retirementCondition": "A stronger provider-aware distributed lock replaces the repository orchestration lock.",
+    "reviewTrigger": "Concurrency, plan, approval, Alchemy state or provider readback change.",
+    "signal": "A Preview, Production or teardown mutation is requested."
+  },
+  {
+    "evidence": "bun run check:docs-deployment-automation",
+    "fixture": "tools/docs-deployment/automation.policy.test.ts",
+    "id": "docs-preview-teardown-safety",
+    "owner": "taxkit-docs-deployment-automation-owner",
+    "preventedFailure": "PR-close teardown executes unreviewed pull-request code or destroys a stage other than exact pr-N.",
+    "recovery": "Stop, retain the receipt and return to reviewed default-branch code plus manual exact-stage recovery.",
+    "retirementCondition": "A stronger accepted Preview lifecycle owner preserves default-branch and exact-stage proof.",
+    "reviewTrigger": "PR-close trigger, checkout, stage derivation, destroy or absence-readback change.",
+    "signal": "A same-repository pull request closes."
+  },
+  {
+    "evidence": "bun run check:docs-deployment-automation",
+    "fixture": "tools/docs-deployment/automation.policy.test.ts",
+    "id": "docs-orphan-report-only",
+    "owner": "taxkit-docs-deployment-automation-owner",
+    "preventedFailure": "A partial or stale orphan report gains provider mutation or automatic deletion authority.",
+    "recovery": "Retain the report as inconclusive and require separate exact teardown authority.",
+    "retirementCondition": "A separately accepted lifecycle owner replaces report-only classification without weakening non-mutation.",
+    "reviewTrigger": "Inventory source, schedule, credential, classification, teardown or retirement change.",
+    "signal": "Scheduled or manual orphan inventory runs."
+  }
+]
