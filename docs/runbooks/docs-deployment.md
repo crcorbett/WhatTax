@@ -353,6 +353,21 @@ credential into GitHub, or invent an unexecuted command merely to advance the
 task. Continue to use this manual runbook under an exact authority envelope
 until those external conditions can be established and tested.
 
+The 2026-08-01 successor readback at draft-PR head `8f49e7e…` confirmed
+repository-admin capability but still found zero GitHub environments, zero
+Actions secrets, zero repository variables, no Cloudflare/Alchemy process
+inputs and no authenticated Wrangler principal. The smallest prerequisite is
+an independently provisioned narrow Cloudflare principal whose concrete values
+can be stored without disclosure as `CLOUDFLARE_ACCOUNT_ID` and
+`CLOUDFLARE_API_TOKEN` in `taxkit-docs-preview`,
+`taxkit-docs-production` and `taxkit-docs-preview-teardown`, plus a separately
+read-only `CLOUDFLARE_READ_API_TOKEN` in `github-actions-report-only`. Before
+storage, read back the account, allowed operation/resource set, duration and
+revocation owner against the matching automation record. Creating empty
+environments, substituting local OAuth/cache state or widening the principal
+is not recovery. PR-close teardown also remains gated on reviewed workflow code
+being present on the default branch; merge and PR-ready authority are separate.
+
 PR-close teardown must run reviewed default-branch implementation code, derive
 only exact `pr-N`, share that stage's non-cancellable mutation lock, and prove
 state/provider/URL absence. Scheduled orphan inventory is report-only: it may

@@ -883,3 +883,33 @@ report-only orphan owner remain the partial-retention candidate. DCD-004 stays
 GitHub-hosted credential principal or repeatable hosted workflow receipt has
 yet been established. The next boundary is a fresh readback of those external
 capabilities after this partial owner is committed.
+
+That readback was performed at exact local/remote draft-PR head
+`8f49e7eb8663d12b2e926a6226367a1618c770ca`. GitHub identified the executing
+repository principal as an administrator, but returned zero environments,
+zero Actions secrets and zero repository variables. The process exposed no
+Cloudflare, Alchemy or Wrangler credential inputs, and a bounded Wrangler
+identity preflight returned unauthenticated. Quality runs `30691041518` and
+`30691043070` both completed successfully for this exact head. They prove the
+hosted Quality graph for `8f49e7e…`; they do not establish a deployment
+workflow, provider mutation, hosted docs runtime or public availability.
+
+No environment, secret, workflow or provider resource was created. The exact
+minimal external prerequisite is a separately provisioned narrow Cloudflare
+principal with concrete `CLOUDFLARE_ACCOUNT_ID` and
+`CLOUDFLARE_API_TOKEN` values for the three named mutation environments, plus
+a separately read-only `CLOUDFLARE_READ_API_TOKEN` for
+`github-actions-report-only`. Each value must be attached through GitHub's
+secret boundary only after account, operation/resource scope, duration and
+revocation ownership readback. Local OAuth/cache state is not an acceptable CI
+credential. Even after credential provisioning, PR-close teardown cannot be
+proved until reviewed workflow code is on `main`; merge and PR-ready conversion
+remain outside current authority. DCD-005 stays dependency-blocked behind this
+DCD-004 external-state gate.
+
+Docs-maintainer impact for this successor is `Change required` only for this
+active capability record and the deployment runbook. Application/package code,
+provider resources, automation external-state records, historical receipts,
+public availability, DNS/domain, release and publication are `Preserve` or
+`N/A`. No Changeset is required because the update is repository-private
+operational evidence and exposes no public package behavior.
