@@ -22,6 +22,7 @@ const expectedConcurrencyGroup = [
   `${workflowExpressionPrefix}{{ github.ref }}`,
 ].join("");
 const allowedRunSteps = new Set([
+  "git show-ref --verify --quiet refs/heads/main || git branch --track main origin/main",
   "bun install --frozen-lockfile",
   "apps/docs/node_modules/.bin/playwright install --with-deps chromium",
   "bun run check:quality-workflow",
@@ -187,18 +188,27 @@ const inspectSteps = (steps: unknown): readonly QualityWorkflowFinding[] => {
     runSteps.length === allowedRunSteps.size &&
     runSteps.every((step) => allowedRunSteps.has(step));
   const checkoutStep = asRecord(steps[0]);
-  const setupStep = asRecord(steps[1]);
+  const checkoutWith = asRecord(checkoutStep?.with);
+  const historyStep = asRecord(steps[1]);
+  const setupStep = asRecord(steps[2]);
   const setupWith = asRecord(setupStep?.with);
-  const installStep = asRecord(steps[2]);
-  const browserStep = asRecord(steps[3]);
-  const policyStep = asRecord(steps[4]);
-  const releaseStep = asRecord(steps[5]);
+  const installStep = asRecord(steps[3]);
+  const browserStep = asRecord(steps[4]);
+  const policyStep = asRecord(steps[5]);
+  const releaseStep = asRecord(steps[6]);
   const exactSteps =
-    steps.length === 6 &&
+    steps.length === 7 &&
     checkoutStep !== null &&
-    hasOnly(checkoutStep, ["uses"]) &&
+    hasOnly(checkoutStep, ["uses", "with"]) &&
     checkoutStep.uses ===
       "actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5" &&
+    checkoutWith !== null &&
+    hasOnly(checkoutWith, ["fetch-depth"]) &&
+    checkoutWith["fetch-depth"] === 0 &&
+    historyStep !== null &&
+    hasOnly(historyStep, ["run"]) &&
+    historyStep.run ===
+      "git show-ref --verify --quiet refs/heads/main || git branch --track main origin/main" &&
     setupStep !== null &&
     hasOnly(setupStep, ["uses", "with"]) &&
     setupStep.uses ===

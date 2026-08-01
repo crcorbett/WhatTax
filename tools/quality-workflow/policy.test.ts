@@ -32,6 +32,9 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        with:
+          fetch-depth: 0
+      - run: git show-ref --verify --quiet refs/heads/main || git branch --track main origin/main
       - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6
         with:
           bun-version-file: .bun-version
@@ -47,6 +50,20 @@ const findingsFor = (text: string) =>
 describe("quality workflow policy", () => {
   test("accepts the decoded bounded read-only canonical release graph", () => {
     expect(findingsFor(acceptedWorkflow)).toEqual([]);
+  });
+
+  test("rejects shallow or ambiguous release-history setup", () => {
+    for (const workflow of [
+      acceptedWorkflow.replace("fetch-depth: 0", "fetch-depth: 1"),
+      acceptedWorkflow.replace(
+        "git show-ref --verify --quiet refs/heads/main || git branch --track main origin/main",
+        "git fetch origin main"
+      ),
+    ]) {
+      expect(findingsFor(workflow).map((item) => item.invariant)).toContain(
+        "workflow-mutation-step"
+      );
+    }
   });
 
   test("rejects a changed or omitted browser bootstrap command", () => {
