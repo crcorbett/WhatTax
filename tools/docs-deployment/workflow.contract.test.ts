@@ -1,17 +1,23 @@
 import { describe, expect, test } from "bun:test";
+import { readFile } from "node:fs/promises";
 
-const workflows = {
+const workflowPaths = {
+  orphan: ".github/workflows/docs-orphan-inventory.yml",
   preview: ".github/workflows/docs-preview.yml",
   production: ".github/workflows/docs-production.yml",
   teardown: ".github/workflows/docs-preview-teardown.yml",
-  orphan: ".github/workflows/docs-orphan-inventory.yml",
 } as const;
 
-const readWorkflow = async (path: string) => Bun.file(path).text();
+const readWorkflow = (path: string) => readFile(path, "utf-8");
 
 describe("docs deployment workflow admission", () => {
   test("keeps every deployment workflow exact-SHA and pinned", async () => {
-    for (const path of Object.values(workflows)) {
+    for (const path of [
+      workflowPaths.orphan,
+      workflowPaths.preview,
+      workflowPaths.production,
+      workflowPaths.teardown,
+    ]) {
       const source = await readWorkflow(path);
       expect(source).not.toContain("pull_request_target");
       expect(source).toContain(
@@ -29,19 +35,21 @@ describe("docs deployment workflow admission", () => {
   });
 
   test("keeps mutation locks non-cancellable and report-only work cancellable", async () => {
-    for (const path of [workflows.preview, workflows.production]) {
+    for (const path of [workflowPaths.preview, workflowPaths.production]) {
       const source = await readWorkflow(path);
       expect(source).toContain("cancel-in-progress: false");
       expect(source).toContain("CLOUDFLARE_ACCOUNT_ID");
       expect(source).toContain("CLOUDFLARE_API_TOKEN");
-      expect(source).toContain('test "$ACCEPTED_PLAN_SHA256" = "$replan_sha256"');
+      expect(source).toContain(
+        'test "$ACCEPTED_PLAN_SHA256" = "$replan_sha256"'
+      );
       expect(source).toContain("replanSha256");
     }
-    const teardown = await readWorkflow(workflows.teardown);
+    const teardown = await readWorkflow(workflowPaths.teardown);
     expect(teardown).toContain("cancel-in-progress: false");
     expect(teardown).toContain("CLOUDFLARE_ACCOUNT_ID");
     expect(teardown).toContain("CLOUDFLARE_API_TOKEN");
-    const orphan = await readWorkflow(workflows.orphan);
+    const orphan = await readWorkflow(workflowPaths.orphan);
     expect(orphan).toContain("cancel-in-progress: true");
     expect(orphan).toContain("CLOUDFLARE_READ_API_TOKEN");
     expect(orphan).not.toContain("alchemy deploy");
@@ -49,9 +57,12 @@ describe("docs deployment workflow admission", () => {
   });
 
   test("uses the four exact protected environment identities", async () => {
-    const [preview, production, teardown, orphan] = await Promise.all(
-      Object.values(workflows).map(readWorkflow)
-    );
+    const [preview, production, teardown, orphan] = await Promise.all([
+      readWorkflow(workflowPaths.preview),
+      readWorkflow(workflowPaths.production),
+      readWorkflow(workflowPaths.teardown),
+      readWorkflow(workflowPaths.orphan),
+    ]);
     expect(preview).toContain("environment: taxkit-docs-preview");
     expect(production).toContain("environment: taxkit-docs-production");
     expect(teardown).toContain("environment: taxkit-docs-preview-teardown");

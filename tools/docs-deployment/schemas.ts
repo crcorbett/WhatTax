@@ -832,12 +832,12 @@ export type DeploymentAuthorityPreflightReceipt =
 export const DeploymentAuthorityCapabilityReceipt = Schema.Struct({
   approval: Schema.Struct({
     approvedAtLocal: Schema.Literal("2026-08-02 Australia/Melbourne"),
-    approvingPrincipal: Schema.Literal(
-      "Cooper, TaxKit repository/product owner"
-    ),
     approvedEnvironments: Schema.NonEmptyArray(Schema.NonEmptyString),
     approvedOperations: Schema.NonEmptyArray(Schema.NonEmptyString),
     approvedResources: Schema.NonEmptyArray(Schema.NonEmptyString),
+    approvingPrincipal: Schema.Literal(
+      "Cooper, TaxKit repository/product owner"
+    ),
     durationOrRevocation: Schema.NonEmptyString,
     exclusions: Schema.NonEmptyArray(Schema.NonEmptyString),
     executingPrincipal: Schema.Literal(
@@ -879,9 +879,7 @@ export const DeploymentAuthorityCapabilityReceipt = Schema.Struct({
     Schema.isPattern(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/u)
   ),
   owner: Schema.Literal("taxkit-docs-deployment-operation-owner"),
-  postcondition: Schema.Literal(
-    "github-environments-and-secrets-not-mutated"
-  ),
+  postcondition: Schema.Literal("github-environments-and-secrets-not-mutated"),
   receiptId: Schema.String.check(
     Schema.isPattern(/^DCD-004-authority-capability-[0-9a-f-]+$/u)
   ),
