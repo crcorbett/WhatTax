@@ -3,7 +3,7 @@
   "spec": "docs/product-specs/docs-cloudflare-alchemy-deployment.md",
   "title": "Docs Cloudflare and Alchemy Deployment Tasks",
   "status": "active",
-  "last_reviewed": "2026-07-30",
+  "last_reviewed": "2026-08-02",
   "principles": [
     "Deliver one complete consumer/operator outcome in each vertical slice; do not build a horizontal infrastructure or governance platform first.",
     "Upgrade Effect/Platform and Alchemy together to exact 4.0.0-beta.100 and 2.0.0-beta.64 pins in the first slice; do not propose beta.63 or latest.",
@@ -290,7 +290,7 @@
         "regenerate bun.lock and verify peer constraints and package integrity without unrelated dependency upgrades",
         "correct affected Effect API usage at existing owners and prove the whole repository graph without compatibility wrappers",
         "add root alchemy.run.ts with Cloudflare providers, Cloudflare remote state, one Command.Build and one prebuilt DocsWebsite Worker resource using only public Alchemy APIs",
-        "use the app-owned Schema-decoded TAXKIT_DOCS_BUILD_TARGET signal and exact @cloudflare/vite-plugin@1.47.0 for the Cloudflare build, with no Site argv heuristic, Alchemy private import or duplicate Cloudflare plugin",
+        "use the app-owned Schema-decoded TAXKIT_DOCS_BUILD_TARGET signal and exact @cloudflare/vite-plugin@1.47.0 for the Cloudflare build, with no reference-specific argv heuristic, Alchemy private import or duplicate Cloudflare plugin",
         "keep compatibility date, nodejs_compat, default asset-first full-stack routing and the explicit bounded built-in invocation-log policy in root Worker composition; qualify its exact option, persistence and cost semantics locally, then leave provider readback to DCD-002",
         "preserve apps/docs/src/server.ts and route/React/ManagedRuntime architecture",
         "prove that exact @cloudflare/vite-plugin@1.47.0 and wrangler@4.114.0 emit and execute the same Worker/assets passed through Alchemy Command.Build to Cloudflare.Worker bundle:false without provider or state access",
@@ -645,6 +645,7 @@
         "create deployment-only Schemas, policy and negative fixtures under tools/docs-deployment while preserving Quality's independent read-only/cancellable authority; any narrow quality-workflow prerequisite correction requires exact hosted failure and green successor receipts",
         "allow same-repository trusted PR candidates only; never run candidate code through pull_request_target, and make PR-close teardown check out reviewed default-branch implementation code rather than PR head",
         "retain a bounded receipt on success, failure, cancellation or provider disagreement",
+        "retain the dated manual Preview/Production/rollback receipts as provider evidence only; they do not satisfy the repeatable protected-workflow acceptance gate",
         "document cancellation, idempotence/convergence, stopping, recovery, escalation, carrying cost, review triggers and retirement in each control",
         "backfill every new exact workflow-owned command invocation after it is executed successfully"
       ],

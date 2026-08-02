@@ -3,7 +3,7 @@ document_type: standard
 lifecycle: current
 authority: canonical
 owner: taxkit-ci-release-maintainer
-last_reviewed: 2026-07-30
+last_reviewed: 2026-08-02
 review_trigger: public boundary, workflow, action, release graph, or repeated-review finding change
 ---
 
@@ -50,6 +50,13 @@ cross-field invariants only. It currently reports zero externally established
 deployment automations. Workflow YAML, protected environments, credential
 storage and hosted receipts remain required before the controls can claim
 operational enforcement.
+
+The dated manual Preview/Production/rollback receipts under
+`docs/evidence/deployments/` prove the same candidate, plan, provider/state and
+hosted contracts for an authorized operator epoch, but they do not change
+`externalState.status` or establish GitHub workflow enforcement. A protected
+environment and a concrete narrow credential identity must be read back before
+any automation record moves to `established`.
 
 The separate provider-bound `bun run check:docs-deployment-orphans` command
 executes only the admitted open-PR, state and Worker reads. Its receipt Schema

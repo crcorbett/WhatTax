@@ -3,7 +3,7 @@ document_type: runbook
 lifecycle: current
 authority: canonical
 owner: taxkit-docs-deployment-operation-owner
-last_reviewed: 2026-07-30
+last_reviewed: 2026-08-02
 review_trigger: docs deployment candidate, Cloudflare or Alchemy identity/state, stage, plan, provider readback, teardown, rollback, credential or authority change
 ---
 
@@ -82,6 +82,28 @@ workflow proof until the named token identities are supplied and read back.
 
 Run `bun run check:docs-deployment` before an admitted operation. It validates
 only current repository owners and executes no provider operation.
+
+The current authorized local Preview observation was bound to draft PR `#1`,
+candidate `aabe7b69de164906699fb4646a8ecc5058d46178`, stage `pr-1`, and the
+equal sanitized plan receipt
+`docs/evidence/deployments/2026-08-02-preview-pr-1/plan-aabe7b6.json`. Its
+projection admits only `DocsBuild` and `DocsWebsite` creation, with plan
+digest `bfcc34f06f954564e4e1d2576495516c47a8ff26ff8d1334bb57491966279239`.
+The local workerd candidate proof passed before planning. The candidate then
+passed provider readback, hosted HTTP/browser/accessibility/console/cache
+proof, reviewed desktop/mobile screenshots, two equal destroy dry-runs and
+exact-stage absence readback. The retained receipts are in
+`docs/evidence/deployments/2026-08-02-preview-pr-1/`; they are dated evidence
+only and do not establish Preview availability after teardown.
+
+The same candidate was then read back at fixed `prod`, hosted-verified and
+screen-captured using the receipts under
+`docs/evidence/deployments/2026-07-30-production-prod/`. A normal source-bound
+rollback to `d9cb894…` was subsequently hosted-verified and read back under
+`rollback-aabe7b6-to-d9cb894/`. The final provider observation is the restored
+d9 Worker identity. These manual receipts do not establish repeatable hosted
+workflow execution; the protected environment and narrow CI-token gate below
+still controls DCD-004/DCD-005 workflow claims.
 
 ### Provider inventory
 
@@ -367,7 +389,7 @@ to use this manual runbook under the exact authority envelope for local
 Alchemy/provider operations while CI token provisioning and protected
 workflow readback remain unresolved.
 
-The 2026-08-02 successor readback at draft-PR head `ed02b62…` confirmed
+The 2026-08-02 successor readback at draft-PR head `aabe7b6…` confirmed
 repository-admin capability but still found zero GitHub environments, zero
 Actions secrets, zero repository variables, no Cloudflare/Alchemy process
 inputs and no authenticated Wrangler principal. A valid local Alchemy OAuth

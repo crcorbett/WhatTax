@@ -3,7 +3,7 @@ document_type: product-spec
 lifecycle: proposed
 authority: supporting
 owner: taxkit-product-owner
-last_reviewed: 2026-07-30
+last_reviewed: 2026-08-02
 review_trigger: accepted TK-CF finding, dependency constraint, Cloudflare or Alchemy contract, deployment authority, proof boundary, or implementation discovery
 successor: null
 tombstone: false
@@ -41,6 +41,19 @@ Implementation began from reviewed commit
 [active execution plan](../exec-plans/active/docs-cloudflare-alchemy-deployment.md)
 records current progress and authority stops.
 
+The 2026-08-02 manual evidence epoch supersedes those earlier non-claims for
+its own dated candidate only: candidate `aabe7b6…` was Preview-deployed,
+hosted-verified, screenshot-reviewed and safely torn down; the same source
+was updated at fixed Production, hosted-verified and screenshot-reviewed; and
+a normal source-bound rollback restored `d9cb894…` with changed provider
+deployment/version identity. The claim-matched receipts are routed through
+`docs/evidence/deployments/`; they do not establish repeatable GitHub workflow
+execution, current availability after teardown, custom-domain/DNS routing,
+paid-plan/cost facts, release or publication. DCD-004 remains in progress
+because protected environments and narrow CI credential identities remain
+unestablished, and DCD-005 remains pending for workflow parity and bridge
+retirement.
+
 ## Target and comparative evidence
 
 TaxKit planning target:
@@ -58,10 +71,10 @@ candidate uses the coordinated graph below plus
 `@cloudflare/vite-plugin@1.47.0`, `wrangler@4.114.0`, and the plugin's exact
 `workerd@1.20260722.1` dependency.
 
-Site comparative target:
+Reference implementation comparative target:
 
 - `origin/main`:
-  `1fe3f7fc3182e3305542ceac8bd97a6dcd2df42e`;
+  `0bdf6cd3e2c405b6ab1ce97a665b6fc26f20cc4c`;
 - Alchemy `2.0.0-beta.64`;
 - Effect, `@effect/platform-bun`, `@effect/platform-node`, and
   `@effect/vitest` `4.0.0-beta.100`; and
@@ -70,8 +83,8 @@ Site comparative target:
   Cloudflare remote state, and separate Preview/Production deployment
   composition.
 
-Site is trajectory evidence, not TaxKit policy. TaxKit must not copy Site
-names, domains, provider identifiers, AOX/Axiom resources, credentials,
+The reference implementation is trajectory evidence, not TaxKit policy. TaxKit
+must not copy its names, domains, provider identifiers, AOX/Axiom resources, credentials,
 bindings, historical receipts, hard-coded proof inputs, or custom-domain
 assumptions.
 
@@ -129,7 +142,7 @@ by Cooper's dependency decision.
 | `TK-CF-009` | Upgrade Effect/Platform and Alchemy together to the exact beta.100/beta.64 graph in the first Cloudflare slice and prove the whole affected repository.                                                                  | `DCD-002`                                  | `DCD-001`                       |
 | `TK-CF-010` | Add the minimum deployment runbook, authority/control owners and separate small deployment-evidence route without rewriting historical evidence.                                                                         | `DCD-008`, `DCD-010`, `DCD-012`            | `DCD-002`, `DCD-004`, `DCD-005` |
 | `TK-CF-011` | Keep custom domain/DNS/certificate work deferred; later attachment preserves the Production Worker identity.                                                                                                             | `DCD-001`, `DCD-007`, `DCD-011`            | `DCD-003`, `DCD-005`            |
-| `TK-CF-012` | Reuse Site's exact-source, state, Worker/assets and proof principles while rejecting its private Website/Vite implementation detail, AOX, hard-coded provider identities, custom-domain coupling and unsafe concurrency. | `DCD-003`, `DCD-008`, `DCD-010`            | `DCD-001`, `DCD-004`, `DCD-005` |
+| `TK-CF-012` | Reuse the reference implementation's exact-source, state, Worker/assets and proof principles while rejecting its private Website/Vite implementation detail, AOX, hard-coded provider identities, custom-domain coupling and unsafe concurrency. | `DCD-003`, `DCD-008`, `DCD-010`            | `DCD-001`, `DCD-004`, `DCD-005` |
 
 Applicable harness invariants are `HC-OUTCOME-001`, `HC-CTX-001`,
 `HC-BOUNDARY-001`, `HC-DOC-001`, `HC-PROOF-001`, `HC-AUTH-001`,
@@ -210,7 +223,7 @@ prerequisites.
 - Multi-account, multi-region or multi-cloud design.
 - Gradual rollout, traffic splitting or version aliases.
 - A generic infrastructure/provider package or helper framework.
-- Third-party observability or Site AOX/Axiom machinery.
+- Third-party observability or reference-specific AOX/Axiom machinery.
 - Application KV, D1, R2, Durable Objects, Queues, Hyperdrive or Cron.
 - Automatic orphan deletion.
 - Speculative application secrets or public runtime configuration.
@@ -284,10 +297,10 @@ Root `alchemy.run.ts` owns:
 The app Schema-decodes `TAXKIT_DOCS_BUILD_TARGET`, defaulting to `nitro`, and
 selects the exact official `@cloudflare/vite-plugin@1.47.0` only for the
 `cloudflare` target. The root `Command.Build` supplies that semantic signal.
-TaxKit does not use Site's command-line heuristic, Alchemy's private Distilled
+TaxKit does not use the reference implementation's command-line heuristic, Alchemy's private Distilled
 plugin, or the unsupported injected Website signal. The compatibility date is
-a TaxKit candidate pin only after DCD-001 proves it under workerd; Site's use
-is comparative evidence, not acceptance.
+a TaxKit candidate pin only after DCD-001 proves it under workerd; the reference
+use is comparative evidence, not acceptance.
 
 Initial observability uses only Cloudflare's built-in invocation logs, with
 traces disabled, no custom fields, no request body, header, cookie, credential

@@ -3,7 +3,7 @@ document_type: deployment-evidence-index
 lifecycle: current
 authority: canonical
 owner: taxkit-docs-deployment-proof-owner
-last_reviewed: 2026-07-30
+last_reviewed: 2026-08-02
 review_trigger: docs deployment candidate, provider, stage, URL, proof, screenshot, teardown or rollback receipt change
 ---
 
@@ -54,6 +54,21 @@ and `pr-1` stage resources absent. The failed apply, superseded plans and the
 insufficient `0d714e6…` observation remain disconfirming history; none
 describes current provider state.
 
+The resumed 2026-08-02 candidate
+`aabe7b69de164906699fb4646a8ecc5058d46178` was deployed to the isolated
+`pr-1` stage after two equal create plans. Its provider readback, hosted
+HTTP/browser proof and reviewed desktop/mobile screenshots are retained in
+`2026-08-02-preview-pr-1/provider-aabe7b6.json`,
+`2026-08-02-preview-pr-1/hosted-proof-aabe7b6.json`,
+`2026-08-02-preview-pr-1/screenshot-desktop-aabe7b6.json` and
+`2026-08-02-preview-pr-1/screenshot-mobile-aabe7b6.json`. The candidate then
+passed two equal delete dry-runs and exact-stage teardown; the matching Worker,
+hosted URL and state resources were absent in the postcondition readback. The
+destroy plan and teardown receipt remain candidate-bound in the same directory.
+This is a dated Preview observation and does not establish current availability
+after teardown, Production, rollback, custom-domain, DNS, release or
+publication behavior.
+
 ## Production
 
 `2026-07-30-production-prod/` binds Preview-accepted source `d9cb894…` to
@@ -63,6 +78,18 @@ screenshots. It also retains the separately Preview-qualified `c99984c…`
 successor, that Preview's teardown/absence, its Production update, and the
 restored d9 readback. The latest dated provider observation served restored d9;
 historical receipts do not establish current availability.
+
+The resumed aabe candidate has a separate dated chain in the same directory:
+`plan-aabe7b6.json`, `predeploy-aabe7b6.json`, `provider-aabe7b6.json`,
+`hosted-proof-aabe7b6.json` and the two screenshot manifests. It proved a
+same-source Production update against the fixed Worker URL. The subsequent
+`rollback-aabe7b6-to-d9cb894/` hosted and screenshot receipts, together with
+`rollback-plan-aabe7b6-to-d9cb894.json`,
+`rollback-predeploy-aabe7b6-to-d9cb894.json` and
+`rollback-provider-aabe7b6-to-d9cb894.json`, prove a normal source-bound
+redeploy to d9 and a changed provider deployment/version with the same Worker
+identity. The final dated provider observation is restored d9; neither chain
+establishes current public availability or repeatable GitHub workflow proof.
 
 ## Rollback
 
@@ -74,6 +101,13 @@ target share deployment-critical configuration and lock identity while their
 path-bearing clean outputs differ. This is normal source-bound rollback proof,
 not byte promotion, direct provider-version rollback or recovery from
 deliberately broken content.
+
+The resumed two-transition rehearsal is intentionally retained as a separate
+current-epoch evidence set rather than being inserted into the immutable
+historical rollback receipt. Its preflight, equal plan, provider readback,
+hosted proof and screenshot manifests are claim-matched and validated by the
+deployment checker, while the historical three-transition receipt remains
+unchanged.
 
 Secrets, raw tokens, request bodies, credential values and unsanitized provider
 output are forbidden. Historical release and harness evidence remains

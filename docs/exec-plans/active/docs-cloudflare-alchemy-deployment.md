@@ -3,7 +3,7 @@ document_type: execution-plan
 lifecycle: current
 authority: supporting
 owner: taxkit-docs-deployment-implementation-owner
-last_reviewed: 2026-07-30
+last_reviewed: 2026-08-02
 review_trigger: DCD task transition, implementation discovery, proof result, authority stop, or rollback
 successor: null
 tombstone: false
@@ -702,12 +702,12 @@ establishes neither credential absence outside GitHub nor authority to create
 environment resources; it means no hosted mutation workflow can yet claim a
 protected environment or GitHub-hosted credential identity.
 
-Current Site comparative implementation was read from its `origin/main`
-`7504112d7133a4dac95ef4b26a0dbfca7ca75649`, not the stale local checkout.
-TaxKit adapts only exact-SHA checkout, frozen installation, digest-bound
-two-phase mutation, non-cancellable mutation concurrency and retained receipt
-principles. It rejects Site-specific stack, domain, Axiom, AOX, secret,
-hard-coded URL/version and package-script machinery.
+The current reference implementation was read from its remote `origin/main`
+revision `0bdf6cd3e2c405b6ab1ce97a665b6fc26f20cc4c`, not a stale local
+checkout. TaxKit adapts only exact-SHA checkout, frozen installation,
+digest-bound two-phase mutation, non-cancellable mutation concurrency and
+retained receipt principles. It rejects reference-specific stack, domain,
+Axiom, AOX, secret, hard-coded URL/version and package-script machinery.
 
 The local DCD-004 owner and negative workflow policy can proceed. Hosted
 workflow execution remains a capability gate until the workflow exists on the
@@ -925,8 +925,8 @@ does not widen the exclusions for custom-domain/DNS, unrelated resources,
 credential disclosure/rotation/scope expansion, publication, merge or
 pull-request-ready conversion.
 
-The exact remote candidate remains
-`ed02b6236f95ded3d57c56ca59f16a315613826f` on the open draft PR `#1`.
+The exact remote candidate is
+`aabe7b69de164906699fb4646a8ecc5058d46178` on the open draft PR `#1`.
 GitHub readback still reports no protected environment, Actions secret or
 repository variable. A local Alchemy `default` OAuth profile is currently
 authenticated for account identity `f9f94270a4a5af8af7010d891020922d`, with
@@ -947,3 +947,51 @@ environment or broad OAuth secret is created as a substitute. Local workflow
 owners may proceed, and authorized manual provider operations may use the
 existing Alchemy profile only after fresh candidate, state, plan, lock and
 readback checks.
+
+### 2026-08-02 — Preview plan bound to aabe7b6
+
+Fresh readback bound the remote branch and open draft PR `#1` to candidate
+`aabe7b69de164906699fb4646a8ecc5058d46178`; both Quality check runs for that
+candidate completed successfully. GitHub still has zero protected environments,
+Actions secrets and repository variables. The local Alchemy `default` profile
+read-only inventory agreed on account and existing fixed `prod` resources, with
+no `pr-1` stage. The exact Cloudflare build/workerd proof passed, and two
+sanitized `pr-1` plans were equal: only `DocsBuild` and `DocsWebsite` create,
+projection digest
+`bfcc34f06f954564e4e1d2576495516c47a8ff26ff8d1334bb57491966279239`. The
+receipt is `docs/evidence/deployments/2026-08-02-preview-pr-1/plan-aabe7b6.json`.
+The earlier “no Preview mutation” sentence is superseded by the dated
+successor below; the plan receipt remains unchanged as the pre-mutation
+identity.
+
+### 2026-08-02 — current manual Preview, Production and rollback successor
+
+After fresh candidate, account, state/provider and scope readback, the aabe
+candidate was applied to isolated `pr-1`. Provider readback is retained at
+`docs/evidence/deployments/2026-08-02-preview-pr-1/provider-aabe7b6.json` and
+binds Worker
+`taxkitdocscloudflare-docswebsite-pr-1-nd6tdg4svxvqz3ma`, its `workers.dev`
+URL, deployment/version, Alchemy instance and assets. Hosted proof and the
+candidate-bound desktop/mobile screenshot manifests passed all nine required
+oracles. Two equal destroy dry-runs then removed only `DocsBuild` and
+`DocsWebsite`; the teardown receipt proves Worker settings, hosted URL and
+stage-resource absence.
+
+The same accepted source was applied to fixed `prod` after two equal update
+plans. Its provider readback, hosted proof and desktop/mobile screenshots are
+retained under `docs/evidence/deployments/2026-07-30-production-prod/` with
+the aabe suffix. A normal source-bound rollback was then performed from the
+qualified d9 source in a fresh two-plan/equal-replan window. The rollback
+provider/deployment/version and hosted/browser/screenshot proof are under
+`rollback-aabe7b6-to-d9cb894/`; the final observed Worker identity is the
+restored d9 source. This is a manual dated provider observation, not a claim
+that the GitHub deployment workflows are established.
+
+The deployment checker now decodes and validates these current-epoch receipts
+in addition to preserving the immutable historical rollback chain. The
+GitHub capability receipt still records zero protected environments, Actions
+secrets and repository variables. DCD-004 therefore remains `in_progress` and
+DCD-005 remains pending for repeatable workflow admission: the exact external
+prerequisite is the two narrow token identities and protected-environment
+readback named by the runbook. No empty environment or broad local OAuth
+profile was stored as a substitute.

@@ -3,7 +3,7 @@ document_type: authority-model
 lifecycle: current
 authority: canonical
 owner: taxkit-authority-model-owner
-last_reviewed: 2026-07-30
+last_reviewed: 2026-08-02
 review_trigger: identity, release, Git, registry, deployment, provider, credential, or recovery change
 ---
 
@@ -94,3 +94,18 @@ Production destroy, direct provider-version selection, custom-domain/DNS work,
 credential disclosure or scope expansion remain outside that consumed
 envelope. The broad existing OAuth grant remains a capability limitation, not
 broader authority.
+
+The resumed 2026-08-02 authority readback is retained at
+`docs/evidence/deployments/2026-08-02-authority-capability/receipt.json` and
+binds the same approving and executing principals to the named TaxKit docs
+resources. It permitted the dated manual Preview, teardown, Production and
+source-bound rollback observations retained under the deployment-evidence
+route. The readback still found no protected GitHub environment, Actions
+secret or repository variable, and no narrow CI token identity. Therefore the
+four workflow records remain `not-established`; manual provider receipts do
+not substitute for protected workflow proof. The smallest later capability
+gate is one account-scoped mutation credential for the three mutation
+environments and one read-only credential for report-only inventory, each
+with account/resource scope, expiry and revocation-owner readback before
+secret attachment. No empty environment or broad OAuth profile may be stored
+as a substitute.

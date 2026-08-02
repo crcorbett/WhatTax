@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "receiptId": "DCD-004-authority-capability-2026-08-02",
   "owner": "taxkit-docs-deployment-operation-owner",
-  "observedAt": "2026-08-02T12:36:06Z",
+  "observedAt": "2026-08-02T13:01:39Z",
   "approval": {
     "approvingPrincipal": "Cooper, TaxKit repository/product owner",
     "executingPrincipal": "authorized TaxKit docs deployment implementation thread",
@@ -43,7 +43,7 @@
   },
   "candidate": {
     "branch": "codex/docs-cloudflare-alchemy-deployment",
-    "exactCommit": "ed02b6236f95ded3d57c56ca59f16a315613826f",
+    "exactCommit": "aabe7b69de164906699fb4646a8ecc5058d46178",
     "pullRequestNumber": 1,
     "pullRequestState": "OPEN_DRAFT"
   },
