@@ -995,3 +995,20 @@ DCD-005 remains pending for repeatable workflow admission: the exact external
 prerequisite is the two narrow token identities and protected-environment
 readback named by the runbook. No empty environment or broad local OAuth
 profile was stored as a substitute.
+
+### 2026-08-02 — current branch and capability recheck
+
+The repository-only evidence/checker successor is now exact remote head
+`9f234041d37aa062b1d33cad30ecab2fb08b57fc` on draft PR `#1`; the two hosted
+Quality runs for that head (`30750616385` and `30750618437`) passed. This
+successor does not change the deployment build, runtime or provider-input
+graph, so the provider receipts above remain explicitly bound to candidate
+`aabe7b6…` rather than being relabelled as current hosted proof.
+
+Fresh read-only inventory at this head agrees on the fixed `prod` stage and
+the restored Worker/state identity, and the report-only orphan read finds the
+open trusted PR without a Preview stage. GitHub still has zero protected
+environments, Actions secrets and repository variables; the required narrow
+CI token identities remain unavailable. DCD-004 and DCD-005 therefore retain
+their existing statuses and non-claims. No new provider or GitHub mutation was
+performed in this recheck.
