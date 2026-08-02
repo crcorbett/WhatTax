@@ -65,6 +65,19 @@ branch. Merge, force-push, branch deletion, conversion from draft to ready,
 release/tag/publication, custom-domain/DNS and unrelated mutation remain
 outside the envelope.
 
+The resumed 2026-08-02 authority epoch is recorded in
+`docs/evidence/deployments/2026-08-02-authority-capability/receipt.json`.
+It extends the same named TaxKit resources to protected GitHub environment
+creation, narrow secret attachment, Preview/Production/teardown workflow
+execution and rollback, while preserving the exclusions above. The readback
+found the authenticated GitHub administrator and local Alchemy `default`
+profile, but no protected environment, Actions secret or repository variable;
+the local OAuth scope set is retained only as a digest and is not copied into
+CI. Wrangler CLI authentication and concrete narrow CI token values remain
+unavailable. This is a capability stop, not a missing-approval stop: do not
+create empty environments, attach a broad OAuth value, or claim hosted
+workflow proof until the named token identities are supplied and read back.
+
 ## Procedure
 
 Run `bun run check:docs-deployment` before an admitted operation. It validates
@@ -346,20 +359,23 @@ Before marking its `externalState` as `established`, require all of:
 7. a retained dated receipt named in `externalState.receipt`.
 
 The current register intentionally records all four entries as
-`not-established`. GitHub readback found no repository environments or Actions
-secrets, and the reviewed workflow implementation is not on the default
-branch. Do not create an unprotected workflow, copy the broad local OAuth
-credential into GitHub, or invent an unexecuted command merely to advance the
-task. Continue to use this manual runbook under an exact authority envelope
-until those external conditions can be established and tested.
+`not-established`. The resumed capability receipt records the exact desired
+environment identities and their observed absence. Do not create an
+unprotected or empty environment, copy the broad local OAuth credential into
+GitHub, or invent an unexecuted command merely to advance the task. Continue
+to use this manual runbook under the exact authority envelope for local
+Alchemy/provider operations while CI token provisioning and protected
+workflow readback remain unresolved.
 
-The 2026-08-01 successor readback at draft-PR head `8f49e7e…` confirmed
+The 2026-08-02 successor readback at draft-PR head `ed02b62…` confirmed
 repository-admin capability but still found zero GitHub environments, zero
 Actions secrets, zero repository variables, no Cloudflare/Alchemy process
-inputs and no authenticated Wrangler principal. The smallest prerequisite is
-an independently provisioned narrow Cloudflare principal whose concrete values
-can be stored without disclosure as `CLOUDFLARE_ACCOUNT_ID` and
-`CLOUDFLARE_API_TOKEN` in `taxkit-docs-preview`,
+inputs and no authenticated Wrangler principal. A valid local Alchemy OAuth
+profile was read back separately for the exact account and state/provider
+inventory; it is broader than a CI token and must not be reused as a GitHub
+secret. The smallest CI prerequisite is an independently provisioned narrow
+Cloudflare principal whose concrete values can be stored without disclosure as
+`CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_API_TOKEN` in `taxkit-docs-preview`,
 `taxkit-docs-production` and `taxkit-docs-preview-teardown`, plus a separately
 read-only `CLOUDFLARE_READ_API_TOKEN` in `github-actions-report-only`. Before
 storage, read back the account, allowed operation/resource set, duration and

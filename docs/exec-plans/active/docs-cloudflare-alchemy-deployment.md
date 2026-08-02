@@ -34,7 +34,7 @@ the milestone and acceptance owner.
 | `DCD-001` | completed   | Accepted at `669a8f3…` after exact dependency/integrity readback, both built-app oracles, docs-maintainer reconciliation, focused Changeset, independent closure, and all change-owned gates. |
 | `DCD-002` | completed   | Accepted candidate `d9cb894…` passed fresh pre-deploy and pre-destroy state/provider readback, equal plans, Preview apply, the complete hosted/browser/screenshot contract, exact-stage teardown/absence, all gates and corrected-boundary independent review. |
 | `DCD-003` | completed   | Accepted after fixed Production, separately Preview-qualified successor, successor Production, restored-source rollback, provider/hosted/screenshot readback, owner reconciliation, full verification and corrected-boundary independent review. |
-| `DCD-004` | in_progress | Local automation/control and report-only inventory owners are ready for partial retention; hosted workflows, protected environments and CI credential identities remain capability-gated.                         |
+| `DCD-004` | in_progress | The four workflow owners and local automation/control/report-only inventory contracts are present on this candidate; default-branch workflows, protected environments, CI credential identities and hosted receipts remain capability-gated. |
 | `DCD-005` | pending     | Waits for accepted automation and complete parity evidence.                                                                                                                                                          |
 
 ## Baseline
@@ -913,3 +913,37 @@ provider resources, automation external-state records, historical receipts,
 public availability, DNS/domain, release and publication are `Preserve` or
 `N/A`. No Changeset is required because the update is repository-private
 operational evidence and exposes no public package behavior.
+
+### 2026-08-02 — resumed authority and capability audit
+
+Cooper resumed the blocked whole-SPEC goal and authorized the remaining
+TaxKit-only GitHub environment/secret, Alchemy/Cloudflare, Preview, Production,
+teardown and rollback operations for this implementation goal. The renewed
+authority is recorded at
+`docs/evidence/deployments/2026-08-02-authority-capability/receipt.json` and
+does not widen the exclusions for custom-domain/DNS, unrelated resources,
+credential disclosure/rotation/scope expansion, publication, merge or
+pull-request-ready conversion.
+
+The exact remote candidate remains
+`ed02b6236f95ded3d57c56ca59f16a315613826f` on the open draft PR `#1`.
+GitHub readback still reports no protected environment, Actions secret or
+repository variable. A local Alchemy `default` OAuth profile is currently
+authenticated for account identity `f9f94270a4a5af8af7010d891020922d`, with
+scope-set digest
+`de63872ab5516eb3389bd082782df3743676528eb289a9f99486a1de9c8892a2` and
+expiry `2026-08-02T13:32:26.734Z`; only the digest is retained and the broad
+profile is not copied into CI. Wrangler remains unauthenticated and concrete
+narrow CI token values are unavailable. The runbook and automation register
+therefore remain `not-established` for external workflow state, while local
+Alchemy inventory is available under its separate read-only authority.
+
+This is a capability stop for GitHub secret attachment and hosted workflow
+execution, not a missing-approval stop. The smallest external prerequisite is
+one account-scoped mutation token for the three named mutation environments
+and one read-only token for `github-actions-report-only`, with account,
+operation/resource scope, expiry and revocation owner readback. No empty
+environment or broad OAuth secret is created as a substitute. Local workflow
+owners may proceed, and authorized manual provider operations may use the
+existing Alchemy profile only after fresh candidate, state, plan, lock and
+readback checks.

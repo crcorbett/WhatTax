@@ -1,0 +1,180 @@
+name: Docs Preview Deployment
+
+on:
+  workflow_dispatch:
+    inputs:
+      operation:
+        description: Plan or deploy one trusted same-repository PR candidate
+        required: true
+        type: choice
+        options:
+          - plan
+          - deploy
+      candidate_sha:
+        description: Exact trusted pull-request head SHA
+        required: true
+        type: string
+      pr_number:
+        description: Open same-repository pull-request number
+        required: true
+        type: string
+      accepted_plan_sha256:
+        description: Accepted canonical plan digest for deploy
+        required: false
+        type: string
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: taxkit-docs-preview-pr-${{ inputs.pr_number }}
+  cancel-in-progress: false
+
+jobs:
+  preview:
+    name: ${{ inputs.operation }} trusted Preview
+    if: github.repository == 'crcorbett/taxkit'
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    environment: taxkit-docs-preview
+    env:
+      ALCHEMY_PROFILE: default
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CANDIDATE_SHA: ${{ inputs.candidate_sha }}
+      PR_NUMBER: ${{ inputs.pr_number }}
+      OPERATION: ${{ inputs.operation }}
+      ACCEPTED_PLAN_SHA256: ${{ inputs.accepted_plan_sha256 }}
+    steps:
+      - name: Check trusted same-repository PR and exact Quality result
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          pr_json="$(gh api "repos/${GITHUB_REPOSITORY}/pulls/${PR_NUMBER}")"
+          test "$(jq -r .base.ref <<<"$pr_json")" = "main"
+          test "$(jq -r .state <<<"$pr_json")" = "open"
+          test "$(jq -r .draft <<<"$pr_json")" = "true"
+          test "$(jq -r .head.repo.full_name <<<"$pr_json")" = "$GITHUB_REPOSITORY"
+          test "$(jq -r .head.sha <<<"$pr_json")" = "$CANDIDATE_SHA"
+          checks="$(gh api "repos/${GITHUB_REPOSITORY}/commits/${CANDIDATE_SHA}/check-runs?per_page=100")"
+          jq -e '[.check_runs[] | select((.name | test("quality"; "i"))) | .conclusion] | length > 0 and all(. == "success")' <<<"$checks" >/dev/null
+
+      - name: Check out exact candidate
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.2.0
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+          ref: ${{ inputs.candidate_sha }}
+
+      - name: Verify checkout identity
+        run: test "$(git rev-parse HEAD)" = "$CANDIDATE_SHA"
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.0.2
+        with:
+          bun-version-file: .bun-version
+
+      - name: Install frozen dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Validate deployment owners
+        run: bun run check:docs-deployment
+
+      - name: Plan exact Preview candidate
+        id: plan
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/docs-deployment"
+          stage="pr-${PR_NUMBER}"
+          ALCHEMY_PLAIN=1 CI=1 bunx alchemy plan --stage "$stage" --profile "$ALCHEMY_PROFILE" > "$RUNNER_TEMP/docs-deployment/alchemy-plan.txt"
+          sed -E $'s/\\033\\[[0-9;]*m//g' "$RUNNER_TEMP/docs-deployment/alchemy-plan.txt" > "$RUNNER_TEMP/docs-deployment/alchemy-plan.clean.txt"
+          mapfile -t resources < <(grep -E '^\\[(DocsBuild|DocsWebsite)\\] (create|update|noop|delete)$' "$RUNNER_TEMP/docs-deployment/alchemy-plan.clean.txt" || true)
+          test "${#resources[@]}" -eq 2
+          test "${resources[0]%%]*}" = "[DocsBuild"
+          test "${resources[1]%%]*}" = "[DocsWebsite"
+          if grep -Eq '^\\[[^]]+\\] (create|update|noop|delete)$' "$RUNNER_TEMP/docs-deployment/alchemy-plan.clean.txt" && grep -Ev '^\\[(DocsBuild|DocsWebsite)\\] (create|update|noop|delete)$' "$RUNNER_TEMP/docs-deployment/alchemy-plan.clean.txt" | grep -q .; then
+            echo "Unexpected resource in Alchemy plan" >&2
+            exit 1
+          fi
+          build_action="${resources[0]##*] }"
+          website_action="${resources[1]##*] }"
+          lockfile_sha256="$(shasum -a 256 bun.lock | cut -d ' ' -f1)"
+          config_sha256="$(for file in alchemy.run.ts apps/docs/package.json apps/docs/vite.config.ts apps/docs/src/lib/build/cloudflare-stack.ts apps/docs/src/lib/build/docs-deployment-stage.ts apps/docs/public/_headers; do shasum -a 256 "$file"; done | shasum -a 256 | cut -d ' ' -f1)"
+          deployment_input_sha256="$(find apps/docs/dist -type f -print | LC_ALL=C sort | while IFS= read -r file; do shasum -a 256 "$file"; done | shasum -a 256 | cut -d ' ' -f1)"
+          jq -nS \
+            --arg commit "$CANDIDATE_SHA" \
+            --arg lockfile "$lockfile_sha256" \
+            --arg deployment "$deployment_input_sha256" \
+            --arg config "$config_sha256" \
+            --arg stage "$stage" \
+            --arg build_action "$build_action" \
+            --arg website_action "$website_action" \
+            '{candidate:{deploymentInputSha256:$deployment,exactCommit:$commit,lockfileSha256:$lockfile},configSha256:$config,logicalResources:[{action:$build_action,logicalId:"DocsBuild",resourceType:"Command.Build"},{action:$website_action,logicalId:"DocsWebsite",resourceType:"Cloudflare.Worker"}],redaction:{ansiRemoved:true,secretValuesIncluded:false,timestampsExcludedFromDigest:true},schemaVersion:1,stack:"TaxKitDocsCloudflare",stage:$stage}' \
+            > "$RUNNER_TEMP/docs-deployment/projection.json"
+          plan_sha256="$(jq -cS . "$RUNNER_TEMP/docs-deployment/projection.json" | tr -d '\n' | shasum -a 256 | cut -d ' ' -f1)"
+          jq -nS \
+            --arg acceptedBy "$GITHUB_ACTOR" \
+            --arg acceptedPlanSha256 "$plan_sha256" \
+            --arg operation "preview-plan" \
+            --arg receiptPath "docs/evidence/deployments/workflow-${GITHUB_RUN_ID}/plan.json" \
+            --arg observedAt "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+            --slurpfile projection "$RUNNER_TEMP/docs-deployment/projection.json" \
+            '{acceptedBy:$acceptedBy,acceptedPlanSha256:$acceptedPlanSha256,observedAt:$observedAt,operation:$operation,projection:$projection[0],receiptPath:$receiptPath,replanSha256:null,schemaVersion:1}' \
+            > "$RUNNER_TEMP/docs-deployment/plan.json"
+          echo "plan_sha256=$plan_sha256" >> "$GITHUB_OUTPUT"
+
+      - name: Upload sanitized Preview plan
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: taxkit-docs-preview-${{ github.run_id }}
+          path: ${{ runner.temp }}/docs-deployment
+          retention-days: 30
+          if-no-files-found: error
+
+      - name: Replan and deploy accepted Preview candidate
+        if: inputs.operation == 'deploy'
+        run: |
+          set -euo pipefail
+          test -n "$ACCEPTED_PLAN_SHA256"
+          test "$ACCEPTED_PLAN_SHA256" = "${{ steps.plan.outputs.plan_sha256 }}"
+          stage="pr-${PR_NUMBER}"
+          ALCHEMY_PLAIN=1 CI=1 bunx alchemy plan --stage "$stage" --profile "$ALCHEMY_PROFILE" > "$RUNNER_TEMP/docs-deployment/alchemy-replan.txt"
+          sed -E $'s/\\033\\[[0-9;]*m//g' "$RUNNER_TEMP/docs-deployment/alchemy-replan.txt" > "$RUNNER_TEMP/docs-deployment/alchemy-replan.clean.txt"
+          mapfile -t replan_resources < <(grep -E '^\\[(DocsBuild|DocsWebsite)\\] (create|update|noop|delete)$' "$RUNNER_TEMP/docs-deployment/alchemy-replan.clean.txt" || true)
+          test "${#replan_resources[@]}" -eq 2
+          test "${replan_resources[0]%%]*}" = "[DocsBuild"
+          test "${replan_resources[1]%%]*}" = "[DocsWebsite"
+          replan_build_action="${replan_resources[0]##*] }"
+          replan_website_action="${replan_resources[1]##*] }"
+          replan_lockfile_sha256="$(shasum -a 256 bun.lock | cut -d ' ' -f1)"
+          replan_config_sha256="$(for file in alchemy.run.ts apps/docs/package.json apps/docs/vite.config.ts apps/docs/src/lib/build/cloudflare-stack.ts apps/docs/src/lib/build/docs-deployment-stage.ts apps/docs/public/_headers; do shasum -a 256 "$file"; done | shasum -a 256 | cut -d ' ' -f1)"
+          replan_deployment_input_sha256="$(find apps/docs/dist -type f -print | LC_ALL=C sort | while IFS= read -r file; do shasum -a 256 "$file"; done | shasum -a 256 | cut -d ' ' -f1)"
+          jq -nS \
+            --arg commit "$CANDIDATE_SHA" \
+            --arg lockfile "$replan_lockfile_sha256" \
+            --arg deployment "$replan_deployment_input_sha256" \
+            --arg config "$replan_config_sha256" \
+            --arg stage "$stage" \
+            --arg build_action "$replan_build_action" \
+            --arg website_action "$replan_website_action" \
+            '{candidate:{deploymentInputSha256:$deployment,exactCommit:$commit,lockfileSha256:$lockfile},configSha256:$config,logicalResources:[{action:$build_action,logicalId:"DocsBuild",resourceType:"Command.Build"},{action:$website_action,logicalId:"DocsWebsite",resourceType:"Cloudflare.Worker"}],redaction:{ansiRemoved:true,secretValuesIncluded:false,timestampsExcludedFromDigest:true},schemaVersion:1,stack:"TaxKitDocsCloudflare",stage:$stage}' \
+            > "$RUNNER_TEMP/docs-deployment/replan-projection.json"
+          replan_sha256="$(jq -cS . "$RUNNER_TEMP/docs-deployment/replan-projection.json" | tr -d '\n' | shasum -a 256 | cut -d ' ' -f1)"
+          test "$ACCEPTED_PLAN_SHA256" = "${{ steps.plan.outputs.plan_sha256 }}"
+          test "$ACCEPTED_PLAN_SHA256" = "$replan_sha256"
+          jq --arg replan "$replan_sha256" '.replanSha256=$replan' "$RUNNER_TEMP/docs-deployment/plan.json" > "$RUNNER_TEMP/docs-deployment/plan.with-replan.json"
+          mv "$RUNNER_TEMP/docs-deployment/plan.with-replan.json" "$RUNNER_TEMP/docs-deployment/plan.json"
+          ALCHEMY_PLAIN=1 CI=1 bunx alchemy deploy --stage "$stage" --profile "$ALCHEMY_PROFILE" --yes
+          ALCHEMY_PROFILE="$ALCHEMY_PROFILE" CI=1 bun run check:docs-deployment-inventory > "$RUNNER_TEMP/docs-deployment/provider-inventory.json"
+
+      - name: Upload Preview provider readback
+        if: inputs.operation == 'deploy' && always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: taxkit-docs-preview-provider-${{ github.run_id }}
+          path: ${{ runner.temp }}/docs-deployment/provider-inventory.json
+          retention-days: 30
+          if-no-files-found: error

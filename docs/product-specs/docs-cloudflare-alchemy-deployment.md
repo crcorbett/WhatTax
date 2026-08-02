@@ -171,15 +171,18 @@ one provider-bound Preview/teardown chain. DCD-003 has now observed fixed
 Production, a separately Preview-qualified successor, and normal source-bound
 rollback to the accepted source with bounded screenshots and provider/state
 readback. Owner reconciliation, broad verification and corrected-boundary
-independent review accepted DCD-003. Repeatable workflows remain absent and are
-owned by DCD-004. DCD-004 has admitted the deployment-only Schema/control
-desired state for three mutating classes and one report-only orphan inventory,
-with every external-state entry still `not-established`. No workflow file,
-protected GitHub environment, credential identity or hosted workflow receipt
-is claimed. Quality's authority remains read-only and independently
-cancellable; its exact runner bootstrap was corrected during DCD-004 to use
-the frozen app-local Playwright executable and complete `main` comparison
-history after hosted failures exposed those missing prerequisites.
+independent review accepted DCD-003. Repeatable workflows remain
+capability-gated and are owned by DCD-004. The candidate branch now contains
+the four deployment workflow owners and their focused admission test: three
+mutation workflows plus one cancellable, read-only orphan inventory. DCD-004
+has admitted the deployment-only Schema/control desired state, but every
+external-state entry remains `not-established`: the workflows are not yet on
+the default branch, no protected GitHub environment or credential identity
+exists, and no hosted workflow receipt exists. Quality's authority remains
+read-only and independently cancellable; its exact runner bootstrap was
+corrected during DCD-004 to use the frozen app-local Playwright executable and
+complete `main` comparison history after hosted failures exposed those missing
+prerequisites.
 
 ## Goals
 

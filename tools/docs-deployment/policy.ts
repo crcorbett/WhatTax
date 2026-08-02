@@ -2,6 +2,7 @@ import { Array, HashSet } from "effect";
 
 import type {
   DeploymentAuthorityPreflightReceipt,
+  DeploymentAuthorityCapabilityReceipt,
   DeploymentGitAuthorityReceipt,
   DeploymentGitReadbackReceipt,
   DeploymentHostedProofReceipt,
@@ -18,6 +19,57 @@ import type {
   DeploymentResumePreflightReceipt,
   DeploymentScreenshotManifest,
 } from "./schemas.js";
+
+export const inspectAuthorityCapabilityReceipt = (
+  receipt: DeploymentAuthorityCapabilityReceipt
+): readonly string[] => {
+  const expectedEnvironmentIds = new Set([
+    "taxkit-docs-preview",
+    "taxkit-docs-production",
+    "taxkit-docs-preview-teardown",
+    "github-actions-report-only",
+  ]);
+  const findings: string[] = [];
+  if (
+    receipt.candidate.pullRequestState !== "OPEN_DRAFT" ||
+    receipt.candidate.pullRequestNumber !== 1
+  ) {
+    findings.push(
+      "authority-capability-candidate: the capability epoch must bind the open draft PR candidate"
+    );
+  }
+  if (
+    receipt.github.environments.length !== expectedEnvironmentIds.size ||
+    receipt.github.environments.some(
+      (environment) =>
+        !expectedEnvironmentIds.has(environment.id) ||
+        environment.status !== "absent"
+    )
+  ) {
+    findings.push(
+      "authority-capability-environments: the receipt must retain the four exact desired environment identities and their observed absence"
+    );
+  }
+  if (
+    receipt.github.repositoryActionsSecrets.length !== 0 ||
+    receipt.github.repositoryVariables.length !== 0 ||
+    receipt.ciCredentialStatus !== "unavailable" ||
+    receipt.localProvider.wranglerStatus !== "unauthenticated"
+  ) {
+    findings.push(
+      "authority-capability-secrets: no CI secret value or authenticated Wrangler credential may be claimed in this capability stop"
+    );
+  }
+  if (
+    receipt.stop.reason !== "narrow-ci-credential-values-unavailable" ||
+    receipt.postcondition !== "github-environments-and-secrets-not-mutated"
+  ) {
+    findings.push(
+      "authority-capability-stop: retain the exact narrow-credential capability stop and no-mutation postcondition"
+    );
+  }
+  return findings;
+};
 
 const expectedJourneyIds = [
   "taxkit-docs-workerd",

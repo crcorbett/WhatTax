@@ -8,6 +8,7 @@ import { DocsDeploymentOrphanInventoryReceipt } from "./orphan-inventory.schemas
 import { inspectDocsDeploymentOrphanInventoryReceipt } from "./orphan-inventory.service.js";
 import {
   inspectDeploymentOwners,
+  inspectAuthorityCapabilityReceipt,
   inspectGitAuthorityReceipt,
   inspectGitReadbackReceipt,
   inspectDeploymentPlanReceipt,
@@ -24,6 +25,7 @@ import {
 } from "./policy.js";
 import {
   DeploymentAuthorityPreflightReceipt,
+  DeploymentAuthorityCapabilityReceipt,
   DeploymentApplyFailureReceipt,
   DeploymentGitAuthorityReceipt,
   DeploymentGitReadbackReceipt,
@@ -50,6 +52,7 @@ export const checkDocsDeployment = (repositoryRoot: string) =>
     const [
       inventory,
       receipt,
+      capabilityReceipt,
       gitAuthority,
       gitReadback,
       providerPreflight,
@@ -87,6 +90,11 @@ export const checkDocsDeployment = (repositoryRoot: string) =>
         repositoryRoot,
         "docs/evidence/deployments/2026-07-30-preview-preflight/authority-preflight.json",
         DeploymentAuthorityPreflightReceipt
+      ),
+      readDeploymentJson(
+        repositoryRoot,
+        "docs/evidence/deployments/2026-08-02-authority-capability/receipt.json",
+        DeploymentAuthorityCapabilityReceipt
       ),
       readDeploymentJson(
         repositoryRoot,
@@ -443,6 +451,7 @@ export const checkDocsDeployment = (repositoryRoot: string) =>
     });
     return [
       ...inspectDeploymentOwners(inventory, receipt),
+      ...inspectAuthorityCapabilityReceipt(capabilityReceipt),
       ...inspectGitAuthorityReceipt(gitAuthority),
       ...inspectGitReadbackReceipt(gitReadback),
       ...inspectProviderPreflightReceipt(providerPreflight, gitReadback),

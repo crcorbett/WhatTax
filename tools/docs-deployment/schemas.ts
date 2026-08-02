@@ -824,6 +824,78 @@ export const DeploymentAuthorityPreflightReceipt = Schema.Struct({
 export type DeploymentAuthorityPreflightReceipt =
   typeof DeploymentAuthorityPreflightReceipt.Type;
 
+/**
+ * Records a later authority/capability epoch without rewriting the original
+ * DCD-002 preflight.  This receipt deliberately carries identities and
+ * digests only; credential values never enter the repository.
+ */
+export const DeploymentAuthorityCapabilityReceipt = Schema.Struct({
+  approval: Schema.Struct({
+    approvedAtLocal: Schema.Literal("2026-08-02 Australia/Melbourne"),
+    approvingPrincipal: Schema.Literal(
+      "Cooper, TaxKit repository/product owner"
+    ),
+    approvedEnvironments: Schema.NonEmptyArray(Schema.NonEmptyString),
+    approvedOperations: Schema.NonEmptyArray(Schema.NonEmptyString),
+    approvedResources: Schema.NonEmptyArray(Schema.NonEmptyString),
+    durationOrRevocation: Schema.NonEmptyString,
+    exclusions: Schema.NonEmptyArray(Schema.NonEmptyString),
+    executingPrincipal: Schema.Literal(
+      "authorized TaxKit docs deployment implementation thread"
+    ),
+  }),
+  candidate: Schema.Struct({
+    branch: Schema.Literal("codex/docs-cloudflare-alchemy-deployment"),
+    exactCommit: CommitSha,
+    pullRequestNumber: Schema.Literal(1),
+    pullRequestState: Schema.Literal("OPEN_DRAFT"),
+  }),
+  ciCredentialStatus: Schema.Literal("unavailable"),
+  github: Schema.Struct({
+    authenticatedPrincipal: Schema.Literal("crcorbett"),
+    environments: Schema.Array(
+      Schema.Struct({
+        id: Schema.NonEmptyString,
+        status: Schema.Literal("absent"),
+      })
+    ),
+    repository: Schema.Literal("crcorbett/taxkit"),
+    repositoryActionsSecrets: Schema.Array(Schema.NonEmptyString),
+    repositoryVariables: Schema.Array(Schema.NonEmptyString),
+  }),
+  limitations: Schema.NonEmptyArray(Schema.NonEmptyString),
+  localProvider: Schema.Struct({
+    accountId: CloudflareAccountId,
+    alchemyProfile: Schema.Literal("default"),
+    credentialType: Schema.Literal("oauth"),
+    expiresAt: Schema.String.check(
+      Schema.isPattern(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/u)
+    ),
+    scopeCount: Schema.Int.check(Schema.isGreaterThan(0)),
+    scopeSetSha256: Sha256,
+    wranglerStatus: Schema.Literal("unauthenticated"),
+  }),
+  observedAt: Schema.String.check(
+    Schema.isPattern(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/u)
+  ),
+  owner: Schema.Literal("taxkit-docs-deployment-operation-owner"),
+  postcondition: Schema.Literal(
+    "github-environments-and-secrets-not-mutated"
+  ),
+  receiptId: Schema.String.check(
+    Schema.isPattern(/^DCD-004-authority-capability-[0-9a-f-]+$/u)
+  ),
+  rollback: Schema.Literal("none-required-no-mutation"),
+  schemaVersion: Schema.Literal(1),
+  stop: Schema.Struct({
+    operation: Schema.Literal("github-environment-secret-setup"),
+    reason: Schema.Literal("narrow-ci-credential-values-unavailable"),
+    recovery: Schema.NonEmptyString,
+  }),
+});
+export type DeploymentAuthorityCapabilityReceipt =
+  typeof DeploymentAuthorityCapabilityReceipt.Type;
+
 export const DeploymentGitAuthorityReceipt = Schema.Struct({
   approval: Schema.Struct({
     approvedAtLocal: Schema.Literal("2026-07-30 Australia/Melbourne"),

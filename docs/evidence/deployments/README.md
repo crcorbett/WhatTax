@@ -19,6 +19,13 @@ exact commit and deployment-input digests. It proves no provider state.
 
 ## Preview
 
+The resumed 2026-08-02 capability epoch is retained at
+`2026-08-02-authority-capability/receipt.json`. It records Cooper's renewed
+TaxKit-only authority, the exact draft candidate, GitHub environment/secret
+absence, the local Alchemy profile identity and scope digest, and the narrow
+CI-token capability stop. It contains no credential value and does not
+establish a workflow, Preview, Production, teardown or rollback outcome.
+
 Each Preview directory binds one trusted PR head, stage, accepted plan digest,
 provider Worker/deployment/version/assets/URL readback, hosted behavioral proof,
 bounded desktop/mobile screenshot manifests, teardown or explicit stop, and

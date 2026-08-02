@@ -53,12 +53,14 @@ GitHub automation class or grant teardown authority.
 
 All four deployment records currently have `externalState.status` set to
 `not-established` and no receipt. That is executable desired-state admission,
-not evidence that the GitHub environments, secret identities, workflow files
-or hosted executions exist. Establishment requires a dated receipt after the
-exact workflow is available on the default branch and its protected
-environment and credential principal are independently configured. Until
-then, the accepted manual deployment runbook remains the operation owner;
-Quality remains independently cancellable and without provider credentials or
-provider mutation authority. Its runner bootstrap was narrowly corrected on
-2026-08-01 to use frozen Playwright and complete `main` comparison history;
-that does not admit a deployment automation class.
+not evidence that the GitHub environments, secret identities or hosted
+executions exist. The four workflow owners are present on the candidate branch
+and are covered by a focused contract test, but establishment requires a dated
+receipt after those workflows are available on the default branch, their
+protected environments and credential principals are independently configured,
+and a claim-matched run has produced provider/readback evidence. Until then,
+the accepted manual deployment runbook remains the operation owner; Quality
+remains independently cancellable and without provider credentials or provider
+mutation authority. Its runner bootstrap was narrowly corrected on 2026-08-01
+to use frozen Playwright and complete `main` comparison history; that does not
+establish hosted deployment automation.

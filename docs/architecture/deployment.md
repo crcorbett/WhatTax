@@ -46,8 +46,10 @@ intent and task state belong in the active SPEC and execution plan.
 - `tools/docs-deployment/automation-register.json` and `controls.json` own the
   Schema-decoded desired state for three mutating workflow classes and one
   report-only orphan inventory. Their validator reports zero externally
-  established automations. They neither create GitHub environments/secrets nor
-  replace the accepted manual operation path.
+  established automations. The four workflow owners are present on the current
+  candidate branch, but they neither create GitHub environments/secrets nor
+  replace the accepted manual operation path until protected-environment,
+  credential and hosted-receipt conditions are read back.
 - `@taxkit/api-http` builds as a package and exposes health, generated docs,
   OpenAPI JSON, metadata and public calculation route contracts.
 - `@taxkit/sdk` builds as a private package for local and downstream
