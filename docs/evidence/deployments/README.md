@@ -3,7 +3,7 @@ document_type: deployment-evidence-index
 lifecycle: current
 authority: canonical
 owner: taxkit-docs-deployment-proof-owner
-last_reviewed: 2026-08-02
+last_reviewed: 2026-08-03
 review_trigger: docs deployment candidate, provider, stage, URL, proof, screenshot, teardown or rollback receipt change
 ---
 
@@ -11,6 +11,19 @@ review_trigger: docs deployment candidate, provider, stage, URL, proof, screensh
 
 This route owns dated, sanitized observations for the docs Worker deployment.
 It never turns an earlier observation into current provider truth.
+
+## 2026-08-03 capability probe
+
+The installed token-administration command was invoked with closed standard
+input solely to test capability. It stopped at the supported Global API Key
+prompt and exited `130` when interrupted; no credential value was supplied and
+no provider mutation occurred. The current Alchemy OAuth profile lacks
+API-token-write capability, and GitHub readback still reports no protected
+environment, Actions secret or repository variable. The required provider-admin
+action and secure token-custody contract are recorded in the
+[docs deployment runbook](../../runbooks/docs-deployment.md) and active plan.
+This observation is a capability stop, not workflow, Preview, Production,
+teardown or rollback proof.
 
 ## Local workerd
 

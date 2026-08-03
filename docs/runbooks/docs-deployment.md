@@ -3,7 +3,7 @@ document_type: runbook
 lifecycle: current
 authority: canonical
 owner: taxkit-docs-deployment-operation-owner
-last_reviewed: 2026-08-02
+last_reviewed: 2026-08-03
 review_trigger: docs deployment candidate, Cloudflare or Alchemy identity/state, stage, plan, provider readback, teardown, rollback, credential or authority change
 ---
 
@@ -77,6 +77,40 @@ CI. Wrangler CLI authentication and concrete narrow CI token values remain
 unavailable. This is a capability stop, not a missing-approval stop: do not
 create empty environments, attach a broad OAuth value, or claim hosted
 workflow proof until the named token identities are supplied and read back.
+
+### 2026-08-03 — token-administration capability stop
+
+A bounded capability probe invoked the installed Alchemy Cloudflare token
+administration command with its standard input closed. The command reached its
+supported Global API Key prompt and exited with status `130` when interrupted;
+no key, email or token value was supplied and no provider mutation occurred.
+The installed command is a user-token path that requires a Global API Key and
+email; it does not consume the authenticated Alchemy OAuth profile. The
+profile's redacted scope readback contains no Cloudflare API-token write
+capability, so it cannot create the account-owned CI credentials.
+
+The smallest provider-side prerequisite is an account administrator operating
+through a secure, non-chat custody channel with Cloudflare's `API Tokens >
+Write` account permission (preferred account-owned route), or the separately
+custodied Global API Key and email required by the user-token route. That
+administrator must create two distinct credentials: a mutation credential
+limited to the exact TaxKit Worker/assets and Alchemy state/control-plane
+operations, and a read-only inventory credential limited to the exact state
+and Worker inventory reads. Resolve the live permission groups against the
+actual supported API calls and account catalog; do not guess a scope set or
+use an all-permissions option.
+
+Only after creation may the operator provide the credential values through the
+authorized secret-custody path. Read back and retain only redacted token
+identity/name or digest, account and resource restrictions, expiry and
+revocation owner. Then create and protect exactly
+`taxkit-docs-preview`, `taxkit-docs-production`,
+`taxkit-docs-preview-teardown` and `github-actions-report-only`, attaching the
+mutation values only to the first three and the read-only value only to the
+last. Empty environments, placeholder secrets and the broad local OAuth
+profile are not valid substitutes. The current approval permits later
+ready/merge operations, but those remain gated on this credential readback,
+workflow execution, hosted receipts and final branch checks.
 
 ## Procedure
 

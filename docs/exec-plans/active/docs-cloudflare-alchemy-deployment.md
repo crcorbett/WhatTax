@@ -3,7 +3,7 @@ document_type: execution-plan
 lifecycle: current
 authority: supporting
 owner: taxkit-docs-deployment-implementation-owner
-last_reviewed: 2026-08-02
+last_reviewed: 2026-08-03
 review_trigger: DCD task transition, implementation discovery, proof result, authority stop, or rollback
 successor: null
 tombstone: false
@@ -1012,3 +1012,29 @@ environments, Actions secrets and repository variables; the required narrow
 CI token identities remain unavailable. DCD-004 and DCD-005 therefore retain
 their existing statuses and non-claims. No new provider or GitHub mutation was
 performed in this recheck.
+
+### 2026-08-03 — token-administration capability stop
+
+The current branch remains `861eeff5d327df8903ed5e12f42663866cd6a371` with
+both remote Quality checks green. A non-mutating invocation of the installed
+Alchemy token-administration command, with standard input closed, reached its
+Global API Key prompt and was interrupted with exit `130`; no secret was
+entered and no token or provider resource was created. The authenticated
+Alchemy OAuth profile has no API-token-write scope, and the supported command
+does not use that profile. GitHub readback remains zero environments, Actions
+secrets and repository variables.
+
+This is a capability stop rather than an approval stop. The exact remaining
+input is a securely custodied provider-admin action with Cloudflare account
+`API Tokens > Write` permission (preferred account-owned route), or the
+Global API Key/email required by the supported user-token route. The admin
+must create one least-privilege mutation credential for the named TaxKit
+Worker/assets and Alchemy state/control-plane operations and one separate
+read-only inventory credential for the named state/Worker reads. Live API
+permission groups must be resolved before creation; no all-permissions or
+copied OAuth profile is acceptable. Retain only redacted identity/digest,
+account/resource scope, expiry and revocation owner, then attach values to the
+four exact protected environments named by the runbook. No placeholder
+environment or secret was created. DCD-004 remains `in_progress` and DCD-005
+remains `pending`; the manual Preview/Production/rollback receipts retain
+their original candidate identities and are not relabelled as workflow proof.
