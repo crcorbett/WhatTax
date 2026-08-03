@@ -112,6 +112,26 @@ profile are not valid substitutes. The current approval permits later
 ready/merge operations, but those remain gated on this credential readback,
 workflow execution, hosted receipts and final branch checks.
 
+### 2026-08-03 — Executor Cloudflare re-auth capability stop
+
+Executor Personal exposed a configured Cloudflare connector, but the first
+live account-owned permission-group read was rejected before any token
+operation. The connector returned `connection_rejected` with upstream HTTP
+`403`; this is the reported provider 403/9109 token-administration condition.
+No permission-group result, credential value or provider mutation was accepted
+from that call. Do not treat the saved connection's presence as proof of
+usable authentication and do not retry token creation through the rejected
+connection.
+
+The smallest next action is completion of the secure Executor re-auth handoff
+in the Executor UI, followed by a fresh account-owned permission-group read.
+After that read succeeds, resolve the live least-privilege groups for the
+named Worker/assets and Alchemy state/control-plane operations, create the
+separate mutation and read-only credentials, and continue with protected
+environment attachment. Until the re-authenticated connection and group
+readback agree, DCD-004 remains capability-gated and no GitHub environment,
+secret, Preview or Production workflow claim may advance.
+
 ## Procedure
 
 Run `bun run check:docs-deployment` before an admitted operation. It validates

@@ -25,6 +25,16 @@ action and secure token-custody contract are recorded in the
 This observation is a capability stop, not workflow, Preview, Production,
 teardown or rollback proof.
 
+## 2026-08-03 Executor connector re-auth stop
+
+The configured Executor Cloudflare connector was present but rejected the
+first account-owned permission-group read with `connection_rejected` and
+upstream HTTP `403` (reported 403/9109). No permission-group data, token value
+or provider mutation was retained. The secure re-auth handoff must be
+completed in the Executor UI before any live permission resolution or token
+creation can proceed. This is not workflow, Preview, Production, teardown or
+rollback proof.
+
 ## Local workerd
 
 The DCD-001 command-owned ignored receipt is local-only and is bound to its

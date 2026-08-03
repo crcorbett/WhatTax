@@ -1015,7 +1015,7 @@ performed in this recheck.
 
 ### 2026-08-03 — token-administration capability stop
 
-The current branch remains `861eeff5d327df8903ed5e12f42663866cd6a371` with
+The current branch remains `35eeff77ac034c62d0d8f2fa8d319e2bd1f166ce` with
 both remote Quality checks green. A non-mutating invocation of the installed
 Alchemy token-administration command, with standard input closed, reached its
 Global API Key prompt and was interrupted with exit `130`; no secret was
@@ -1038,3 +1038,21 @@ four exact protected environments named by the runbook. No placeholder
 environment or secret was created. DCD-004 remains `in_progress` and DCD-005
 remains `pending`; the manual Preview/Production/rollback receipts retain
 their original candidate identities and are not relabelled as workflow proof.
+
+### 2026-08-03 — Executor Cloudflare re-auth capability stop
+
+The configured Executor Cloudflare connector was present, but its first live
+account-owned permission-group read returned `connection_rejected` with
+upstream HTTP `403` (the reported 403/9109 token-administration failure).
+The call produced no accepted permission groups and no credential or provider
+mutation. A configured connector is not an authenticated principal for this
+operation; no retry or token creation was attempted.
+
+The exact remaining prerequisite is completion of the secure Executor re-auth
+handoff in the Executor UI. Once the refreshed connection is read back,
+repeat the account-owned permission-group query, resolve least-privilege
+groups against the actual Worker/assets and Alchemy state/control-plane calls,
+then create and read back the two redacted credential identities before
+touching GitHub environments. DCD-004 remains `in_progress` and DCD-005
+remains `pending`; no current-head workflow, Preview or Production claim is
+added by this capability read.
