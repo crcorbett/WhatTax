@@ -1015,8 +1015,9 @@ performed in this recheck.
 
 ### 2026-08-03 — token-administration capability stop
 
-The current branch remains `35eeff77ac034c62d0d8f2fa8d319e2bd1f166ce` with
-both remote Quality checks green. A non-mutating invocation of the installed
+The preceding capability probe was recorded at branch
+`35eeff77ac034c62d0d8f2fa8d319e2bd1f166ce`, with both remote Quality checks
+green. A non-mutating invocation of the installed
 Alchemy token-administration command, with standard input closed, reached its
 Global API Key prompt and was interrupted with exit `130`; no secret was
 entered and no token or provider resource was created. The authenticated
