@@ -646,6 +646,8 @@
         "allow same-repository trusted PR candidates only; never run candidate code through pull_request_target, and make PR-close teardown check out reviewed default-branch implementation code rather than PR head",
         "retain a bounded receipt on success, failure, cancellation or provider disagreement",
         "retain the dated manual Preview/Production/rollback receipts as provider evidence only; they do not satisfy the repeatable protected-workflow acceptance gate",
+        "allow one source-bound default-branch bootstrap dispatch after the reviewed workflow lands on main because GitHub cannot dispatch a workflow file that exists only on a pull-request branch; bind the merged PR head and deterministic pr-N stage exactly, then require an open trusted draft PR for every later Preview dispatch",
+        "make PR-close teardown convergent: an absent exact stage produces an equal noop projection and no destroy, while an existing stage requires equal delete plans and exact absence readback",
         "document cancellation, idempotence/convergence, stopping, recovery, escalation, carrying cost, review triggers and retirement in each control",
         "backfill every new exact workflow-owned command invocation after it is executed successfully"
       ],
@@ -718,6 +720,7 @@
         "Each target stage has one non-cancellable mutation lock.",
         "Quality has no provider credential or mutation authority.",
         "PR-close teardown is exact-stage and fail-closed.",
+        "The first default-branch bootstrap is source-bound to the reviewed merged PR head; later Preview dispatches reject non-open trusted draft PRs, and absent-stage teardown records a safe no-op.",
         "Orphan detection is read-only and report-only.",
         "The primary owner accepts the slice before DCD-005."
       ],

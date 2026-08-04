@@ -34,7 +34,7 @@ the milestone and acceptance owner.
 | `DCD-001` | completed   | Accepted at `669a8f3…` after exact dependency/integrity readback, both built-app oracles, docs-maintainer reconciliation, focused Changeset, independent closure, and all change-owned gates. |
 | `DCD-002` | completed   | Accepted candidate `d9cb894…` passed fresh pre-deploy and pre-destroy state/provider readback, equal plans, Preview apply, the complete hosted/browser/screenshot contract, exact-stage teardown/absence, all gates and corrected-boundary independent review. |
 | `DCD-003` | completed   | Accepted after fixed Production, separately Preview-qualified successor, successor Production, restored-source rollback, provider/hosted/screenshot readback, owner reconciliation, full verification and corrected-boundary independent review. |
-| `DCD-004` | in_progress | The four workflow owners and local automation/control/report-only inventory contracts are present on this candidate; default-branch workflows, protected environments, CI credential identities and hosted receipts remain capability-gated. |
+| `DCD-004` | in_progress | The four workflow owners, protected environments and narrow CI credential identities are present; default-branch workflow execution and hosted receipts remain pending. The first Preview dispatch uses only the bounded merged-candidate bootstrap, then later Preview runs require an open trusted draft PR. |
 | `DCD-005` | pending     | Waits for accepted automation and complete parity evidence.                                                                                                                                                          |
 
 ## Baseline
@@ -1086,3 +1086,13 @@ on the default branch and a fresh run retains exact-candidate provider/state,
 hosted, screenshot, teardown and rollback receipts. DCD-004 remains
 `in_progress`; DCD-005 remains `pending`. Merge/ready, custom-domain/DNS,
 publication, release and unrelated resources remain separately bounded.
+
+The first default-branch workflow dispatch has one platform-specific bootstrap
+exception: because GitHub does not dispatch workflow files that exist only on a
+PR branch, Preview may bind the already reviewed merged PR head and `pr-1` after
+the workflow lands on `main`. Exact repository/head/Quality/account/stage/plan
+checks remain mandatory, and every later Preview dispatch must be an open,
+trusted draft PR. PR-close teardown is idempotent: an absent stage yields an
+equal `noop` projection and no destroy; an existing exact stage requires equal
+delete plans and exact absence readback. This does not advance any external
+state entry without fresh workflow receipts.

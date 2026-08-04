@@ -78,10 +78,17 @@ jobs:
           stage="pr-${PR_NUMBER}"
           for attempt in one two; do
             ALCHEMY_PLAIN=1 CI=1 bunx alchemy destroy --dry-run --stage "$stage" --profile "$ALCHEMY_PROFILE" --yes > "$RUNNER_TEMP/docs-deployment/destroy-${attempt}.txt"
-            sed -E $'s/\\033\\[[0-9;]*m//g' "$RUNNER_TEMP/docs-deployment/destroy-${attempt}.txt" | grep -E '^\\[(DocsBuild|DocsWebsite)\\] delete$' > "$RUNNER_TEMP/docs-deployment/destroy-${attempt}.resources.txt"
-            test "$(wc -l < "$RUNNER_TEMP/docs-deployment/destroy-${attempt}.resources.txt" | tr -d ' ')" -eq 2
+            sed -E $'s/\\033\\[[0-9;]*m//g' "$RUNNER_TEMP/docs-deployment/destroy-${attempt}.txt" | grep -E '^\\[(DocsBuild|DocsWebsite)\\] delete$' > "$RUNNER_TEMP/docs-deployment/destroy-${attempt}.resources.txt" || true
+            resource_count="$(wc -l < "$RUNNER_TEMP/docs-deployment/destroy-${attempt}.resources.txt" | tr -d ' ')"
+            test "$resource_count" -eq 0 || test "$resource_count" -eq 2
           done
           cmp "$RUNNER_TEMP/docs-deployment/destroy-one.resources.txt" "$RUNNER_TEMP/docs-deployment/destroy-two.resources.txt"
+          resource_count="$(wc -l < "$RUNNER_TEMP/docs-deployment/destroy-one.resources.txt" | tr -d ' ')"
+          if [ "$resource_count" -eq 2 ]; then
+            destroy_action="delete"
+          else
+            destroy_action="noop"
+          fi
           lockfile_sha256="$(shasum -a 256 bun.lock | cut -d ' ' -f1)"
           config_sha256="$(for file in alchemy.run.ts apps/docs/package.json apps/docs/vite.config.ts apps/docs/src/lib/build/cloudflare-stack.ts apps/docs/src/lib/build/docs-deployment-stage.ts apps/docs/public/_headers; do shasum -a 256 "$file"; done | shasum -a 256 | cut -d ' ' -f1)"
           deployment_input_sha256="$(find apps/docs/dist -type f -print | LC_ALL=C sort | while IFS= read -r file; do shasum -a 256 "$file"; done | shasum -a 256 | cut -d ' ' -f1)"
@@ -91,10 +98,13 @@ jobs:
             --arg deployment "$deployment_input_sha256" \
             --arg config "$config_sha256" \
             --arg stage "$stage" \
-            '{candidate:{deploymentInputSha256:$deployment,exactCommit:$commit,lockfileSha256:$lockfile},configSha256:$config,logicalResources:[{action:"delete",logicalId:"DocsBuild",resourceType:"Command.Build"},{action:"delete",logicalId:"DocsWebsite",resourceType:"Cloudflare.Worker"}],redaction:{ansiRemoved:true,secretValuesIncluded:false,timestampsExcludedFromDigest:true},schemaVersion:1,stack:"TaxKitDocsCloudflare",stage:$stage}' \
+            --arg action "$destroy_action" \
+            '{candidate:{deploymentInputSha256:$deployment,exactCommit:$commit,lockfileSha256:$lockfile},configSha256:$config,logicalResources:[{action:$action,logicalId:"DocsBuild",resourceType:"Command.Build"},{action:$action,logicalId:"DocsWebsite",resourceType:"Cloudflare.Worker"}],redaction:{ansiRemoved:true,secretValuesIncluded:false,timestampsExcludedFromDigest:true},schemaVersion:1,stack:"TaxKitDocsCloudflare",stage:$stage}' \
             > "$RUNNER_TEMP/docs-deployment/projection.json"
           destroy_sha256="$(jq -cS . "$RUNNER_TEMP/docs-deployment/projection.json" | tr -d '\n' | shasum -a 256 | cut -d ' ' -f1)"
-          ALCHEMY_PLAIN=1 CI=1 bunx alchemy destroy --stage "$stage" --profile "$ALCHEMY_PROFILE" --yes
+          if [ "$resource_count" -eq 2 ]; then
+            ALCHEMY_PLAIN=1 CI=1 bunx alchemy destroy --stage "$stage" --profile "$ALCHEMY_PROFILE" --yes
+          fi
           ALCHEMY_PROFILE="$ALCHEMY_PROFILE" CI=1 bun run check:docs-deployment-inventory > "$RUNNER_TEMP/docs-deployment/provider-inventory.json"
           jq -nS \
             --arg acceptedBy "$GITHUB_ACTOR" \

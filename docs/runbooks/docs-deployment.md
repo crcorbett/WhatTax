@@ -172,6 +172,25 @@ candidate-bound provider, hosted, screenshot, teardown and rollback receipts.
 The environment deployment branch policy is intentionally unset; the
 workflow's exact trusted-source and commit checks remain mandatory.
 
+### 2026-08-04 — default-branch workflow bootstrap boundary
+
+GitHub will not dispatch a workflow file that exists only on a pull-request
+branch. The first Preview workflow dispatch is therefore a bounded bootstrap
+exception: after the reviewed workflow lands on the default branch, it may bind
+the already reviewed merged PR head and its deterministic `pr-N` stage. The
+workflow still checks the exact repository, head SHA, Quality result, account,
+stage and plan identities. Every later Preview dispatch must use an open,
+trusted draft PR; a merged PR is not a general Preview admission path.
+
+PR-close teardown is convergent and safe when no stage exists. Its equal dry-run
+projection records `noop` for both logical resources and performs no destroy;
+when both exact `DocsBuild` and `DocsWebsite` resources exist, it records equal
+`delete` actions, destroys only that `pr-N` stage, and requires absence readback.
+This bootstrap exception and no-op postcondition do not establish workflow,
+hosted or teardown success until a default-branch run retains its dated,
+candidate-bound receipts. The current automation register remains
+`not-established`.
+
 ## Procedure
 
 Run `bun run check:docs-deployment` before an admitted operation. It validates
@@ -475,13 +494,13 @@ Before marking its `externalState` as `established`, require all of:
 7. a retained dated receipt named in `externalState.receipt`.
 
 The current register intentionally records all four entries as
-`not-established`. The resumed capability receipt records the exact desired
-environment identities and their observed absence. Do not create an
-unprotected or empty environment, copy the broad local OAuth credential into
-GitHub, or invent an unexecuted command merely to advance the task. Continue
-to use this manual runbook under the exact authority envelope for local
-Alchemy/provider operations while CI token provisioning and protected
-workflow readback remain unresolved.
+`not-established` until workflow receipts exist. The 2026-08-04 capability
+receipt now records the exact protected environment identities and redacted
+narrow credential readback; its earlier absence observation remains historical.
+Do not create an unprotected or empty environment, copy the broad local OAuth
+credential into GitHub, or invent an unexecuted command merely to advance the
+task. Continue to use this manual runbook under the exact authority envelope
+until default-branch workflow, hosted and rollback readback is retained.
 
 The 2026-08-02 successor readback at draft-PR head `aabe7b6…` confirmed
 repository-admin capability but still found zero GitHub environments, zero

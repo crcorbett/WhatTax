@@ -3,7 +3,7 @@ document_type: product-spec
 lifecycle: proposed
 authority: supporting
 owner: taxkit-product-owner
-last_reviewed: 2026-08-02
+last_reviewed: 2026-08-04
 review_trigger: accepted TK-CF finding, dependency constraint, Cloudflare or Alchemy contract, deployment authority, proof boundary, or implementation discovery
 successor: null
 tombstone: false
@@ -49,10 +49,12 @@ a normal source-bound rollback restored `d9cb894…` with changed provider
 deployment/version identity. The claim-matched receipts are routed through
 `docs/evidence/deployments/`; they do not establish repeatable GitHub workflow
 execution, current availability after teardown, custom-domain/DNS routing,
-paid-plan/cost facts, release or publication. DCD-004 remains in progress
-because protected environments and narrow CI credential identities remain
-unestablished, and DCD-005 remains pending for workflow parity and bridge
-retirement.
+paid-plan/cost facts, release or publication. The older paragraph's
+credential/environment non-claim is superseded by the dated 2026-08-04
+capability receipt: the four protected environments and two narrow credential
+identities now exist, while workflow execution and hosted receipts remain
+unestablished. DCD-004 remains in progress and DCD-005 remains pending for
+default-branch workflow parity and bridge retirement.
 
 ## Target and comparative evidence
 
@@ -188,10 +190,11 @@ independent review accepted DCD-003. Repeatable workflows remain
 capability-gated and are owned by DCD-004. The candidate branch now contains
 the four deployment workflow owners and their focused admission test: three
 mutation workflows plus one cancellable, read-only orphan inventory. DCD-004
-has admitted the deployment-only Schema/control desired state, but every
-external-state entry remains `not-established`: the workflows are not yet on
-the default branch, no protected GitHub environment or credential identity
-exists, and no hosted workflow receipt exists. Quality's authority remains
+has admitted the deployment-only Schema/control desired state, and the
+2026-08-04 capability receipt now establishes the four protected GitHub
+environments and separate narrow credential identities. The external-state
+entries remain `not-established` because the workflows are not yet on the
+default branch and no hosted workflow receipt exists. Quality's authority remains
 read-only and independently cancellable; its exact runner bootstrap was
 corrected during DCD-004 to use the frozen app-local Playwright executable and
 complete `main` comparison history after hosted failures exposed those missing

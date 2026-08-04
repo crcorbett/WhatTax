@@ -68,4 +68,13 @@ describe("docs deployment workflow admission", () => {
     expect(teardown).toContain("environment: taxkit-docs-preview-teardown");
     expect(orphan).toContain("environment: github-actions-report-only");
   });
+
+  test("keeps the first default-branch bootstrap source-bound", async () => {
+    const preview = await readWorkflow(workflowPaths.preview);
+    expect(preview).toContain(
+      'test "$(jq -r .head.sha <<<"$pr_json")" = "$CANDIDATE_SHA"'
+    );
+    expect(preview).toContain('test "$(jq -r .merged <<<"$pr_json")" = "true"');
+    expect(preview).toContain('test "$(jq -r .draft <<<"$pr_json")" = "true"');
+  });
 });

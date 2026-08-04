@@ -54,8 +54,16 @@ jobs:
           set -euo pipefail
           pr_json="$(gh api "repos/${GITHUB_REPOSITORY}/pulls/${PR_NUMBER}")"
           test "$(jq -r .base.ref <<<"$pr_json")" = "main"
-          test "$(jq -r .state <<<"$pr_json")" = "open"
-          test "$(jq -r .draft <<<"$pr_json")" = "true"
+          pr_state="$(jq -r .state <<<"$pr_json")"
+          if [ "$pr_state" = "open" ]; then
+            test "$(jq -r .draft <<<"$pr_json")" = "true"
+          else
+            # The first dispatch can only happen after this workflow lands on
+            # the default branch. A merged PR head remains source-bound and
+            # exact, while later Preview dispatches use an open draft PR.
+            test "$pr_state" = "closed"
+            test "$(jq -r .merged <<<"$pr_json")" = "true"
+          fi
           test "$(jq -r .head.repo.full_name <<<"$pr_json")" = "$GITHUB_REPOSITORY"
           test "$(jq -r .head.sha <<<"$pr_json")" = "$CANDIDATE_SHA"
           checks="$(gh api "repos/${GITHUB_REPOSITORY}/commits/${CANDIDATE_SHA}/check-runs?per_page=100")"

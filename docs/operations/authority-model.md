@@ -135,3 +135,16 @@ automation register stays `not-established` until the workflow files are on
 the default branch and a fresh exact-candidate run supplies provider/state,
 hosted, screenshot, teardown and rollback receipts. Merge, custom-domain/DNS,
 publication and unrelated resources remain separate exclusions.
+
+### 2026-08-04 — successor implementation authority
+
+Cooper's current approval extends this implementation goal to the named
+workflow and provider operations, PR-ready conversion and merge of PR `#1`,
+provided every operation remains bound to the exact TaxKit candidate, account,
+stage, resource, protected environment and receipt contract. The first
+default-branch Preview dispatch may use the merged PR head only as the bounded
+workflow-registration bootstrap required by GitHub; later Preview dispatches
+remain open trusted draft-PR operations. Teardown may record a no-op when the
+exact stage is absent. Custom-domain/DNS, unrelated resources, publication,
+release and credential disclosure or scope expansion remain outside this
+approval. Existing historical authority receipts are unchanged.
