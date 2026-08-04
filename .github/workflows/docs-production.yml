@@ -105,10 +105,10 @@ jobs:
           ALCHEMY_PLAIN=1 CI=1 bunx alchemy plan --stage prod --profile "$ALCHEMY_PROFILE" > "$RUNNER_TEMP/docs-deployment/alchemy-plan.txt"
           sed -E $'s/\\033\\[[0-9;]*m//g' "$RUNNER_TEMP/docs-deployment/alchemy-plan.txt" > "$RUNNER_TEMP/docs-deployment/alchemy-plan.clean.txt"
           resources="$(grep -E '^\\[(DocsBuild|DocsWebsite)\\] (create|update|noop|delete)$' "$RUNNER_TEMP/docs-deployment/alchemy-plan.clean.txt" || true)"
-          resource_count="$(printf '%s\\n' "$resources" | sed '/^$/d' | wc -l | tr -d ' ')"
+          resource_count="$(printf '%s\n' "$resources" | sed '/^$/d' | wc -l | tr -d ' ')"
           test "$resource_count" -eq 2
-          first_resource="$(printf '%s\\n' "$resources" | sed -n '1p')"
-          second_resource="$(printf '%s\\n' "$resources" | sed -n '2p')"
+          first_resource="$(printf '%s\n' "$resources" | sed -n '1p')"
+          second_resource="$(printf '%s\n' "$resources" | sed -n '2p')"
           case "$first_resource" in "[DocsBuild] "*) ;; *) echo "Unexpected first resource: $first_resource" >&2; exit 1 ;; esac
           case "$second_resource" in "[DocsWebsite] "*) ;; *) echo "Unexpected second resource: $second_resource" >&2; exit 1 ;; esac
           if grep -Eq '^\\[[^]]+\\] (create|update|noop|delete)$' "$RUNNER_TEMP/docs-deployment/alchemy-plan.clean.txt" && grep -Ev '^\\[(DocsBuild|DocsWebsite)\\] (create|update|noop|delete)$' "$RUNNER_TEMP/docs-deployment/alchemy-plan.clean.txt" | grep -q .; then
@@ -159,10 +159,10 @@ jobs:
           ALCHEMY_PLAIN=1 CI=1 bunx alchemy plan --stage prod --profile "$ALCHEMY_PROFILE" > "$RUNNER_TEMP/docs-deployment/alchemy-replan.txt"
           sed -E $'s/\\033\\[[0-9;]*m//g' "$RUNNER_TEMP/docs-deployment/alchemy-replan.txt" > "$RUNNER_TEMP/docs-deployment/alchemy-replan.clean.txt"
           replan_resources="$(grep -E '^\\[(DocsBuild|DocsWebsite)\\] (create|update|noop|delete)$' "$RUNNER_TEMP/docs-deployment/alchemy-replan.clean.txt" || true)"
-          replan_resource_count="$(printf '%s\\n' "$replan_resources" | sed '/^$/d' | wc -l | tr -d ' ')"
+          replan_resource_count="$(printf '%s\n' "$replan_resources" | sed '/^$/d' | wc -l | tr -d ' ')"
           test "$replan_resource_count" -eq 2
-          replan_first_resource="$(printf '%s\\n' "$replan_resources" | sed -n '1p')"
-          replan_second_resource="$(printf '%s\\n' "$replan_resources" | sed -n '2p')"
+          replan_first_resource="$(printf '%s\n' "$replan_resources" | sed -n '1p')"
+          replan_second_resource="$(printf '%s\n' "$replan_resources" | sed -n '2p')"
           case "$replan_first_resource" in "[DocsBuild] "*) ;; *) echo "Unexpected first replan resource: $replan_first_resource" >&2; exit 1 ;; esac
           case "$replan_second_resource" in "[DocsWebsite] "*) ;; *) echo "Unexpected second replan resource: $replan_second_resource" >&2; exit 1 ;; esac
           replan_build_action="$(printf '%s\n' "$replan_first_resource" | sed -E 's/^\[[^]]+\] //')"
