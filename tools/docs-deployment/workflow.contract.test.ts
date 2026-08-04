@@ -73,6 +73,7 @@ describe("docs deployment workflow admission", () => {
   test("keeps mutation locks non-cancellable and report-only work cancellable", async () => {
     for (const path of [workflowPaths.preview, workflowPaths.production]) {
       const source = await readWorkflow(path);
+      expect(source).toContain("checks: read");
       expect(source).toContain("cancel-in-progress: false");
       expect(source).toContain("CLOUDFLARE_ACCOUNT_ID");
       expect(source).toContain("CLOUDFLARE_API_TOKEN");

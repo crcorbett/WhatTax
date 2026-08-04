@@ -26,6 +26,7 @@ on:
 permissions:
   contents: read
   actions: read
+  checks: read
 
 concurrency:
   group: taxkit-docs-preview-pr-${{ inputs.pr_number }}
