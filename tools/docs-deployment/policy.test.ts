@@ -34,8 +34,8 @@ import successorProductionPreflightJson from "../../docs/evidence/deployments/20
 import successorProductionProviderJson from "../../docs/evidence/deployments/2026-07-30-production-prod/rollback-successor-production-provider-c99984c.json";
 import initialProductionDesktopJson from "../../docs/evidence/deployments/2026-07-30-production-prod/screenshot-desktop-d9cb894.json";
 import initialProductionMobileJson from "../../docs/evidence/deployments/2026-07-30-production-prod/screenshot-mobile-d9cb894.json";
-import inventoryJson from "../../docs/verification/docs-deployment-journeys.json";
 import credentialCapabilityJson from "../../docs/evidence/deployments/2026-08-04-ci-capability/receipt.json";
+import inventoryJson from "../../docs/verification/docs-deployment-journeys.json";
 import {
   deploymentRecordDigest,
   inspectDeploymentOwners,

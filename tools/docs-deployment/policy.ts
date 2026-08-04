@@ -154,8 +154,7 @@ export const inspectCredentialCapabilityReceipt = (
   const readGroups = receipt.cloudflare.readOnly.permissionGroups.map(
     (group) => group.name
   );
-  const expectedResourceScope =
-    `com.cloudflare.api.account.${receipt.cloudflare.accountId}:*`;
+  const expectedResourceScope = `com.cloudflare.api.account.${receipt.cloudflare.accountId}:*`;
   if (
     !hasExactStrings(mutationGroups, expectedMutationGroups) ||
     !hasExactStrings(readGroups, expectedReadGroups) ||
@@ -165,7 +164,8 @@ export const inspectCredentialCapabilityReceipt = (
     receipt.cloudflare.readOnly.tokenValuesIncluded ||
     receipt.cloudflare.mutation.status !== "active" ||
     receipt.cloudflare.readOnly.status !== "active" ||
-    receipt.cloudflare.mutation.expiresAt !== receipt.cloudflare.readOnly.expiresAt
+    receipt.cloudflare.mutation.expiresAt !==
+      receipt.cloudflare.readOnly.expiresAt
   ) {
     findings.push(
       "credential-capability-provider: mutation/read-only tokens must be active, equally time-bounded, account-scoped and limited to the exact Worker/observability/Secrets Store group sets"
