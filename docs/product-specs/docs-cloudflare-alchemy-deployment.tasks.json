@@ -649,7 +649,7 @@
         "allow one source-bound default-branch bootstrap dispatch after the reviewed workflow lands on main because GitHub cannot dispatch a workflow file that exists only on a pull-request branch; bind the merged PR head and deterministic pr-N stage exactly, then require an open trusted draft PR for every later Preview dispatch",
         "make PR-close teardown convergent: an absent exact stage produces an equal noop projection and no destroy, while an existing stage requires equal delete plans and exact absence readback",
         "install the pinned Playwright browser in every provider workflow and build the exact Cloudflare deployment input before teardown hashes apps/docs/dist; a missing build output is a workflow failure, never an absence oracle",
-        "materialize the account-matched Alchemy cloudflare-state-store credential cache with the installed supported bootstrap command on each ephemeral mutation runner before plan or teardown inventory; keep report-only inventory on its separate read-only boundary",
+        "initialize only Alchemy's environment-method profile selector, then materialize the account-matched cloudflare-state-store credential cache with the installed supported bootstrap command on each ephemeral mutation runner before plan or teardown inventory; keep report-only inventory on its separate read-only boundary",
         "document cancellation, idempotence/convergence, stopping, recovery, escalation, carrying cost, review triggers and retirement in each control",
         "backfill every new exact workflow-owned command invocation after it is executed successfully"
       ],

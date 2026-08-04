@@ -1115,7 +1115,9 @@ setup, docs validation, exact build and equal destroy dry-runs, then stopped at
 `cloudflare-state-store` credential. They executed no destroy or provider
 mutation. The next candidate adds the installed supported
 `alchemy cloudflare bootstrap` command with `CI=0` to the three mutation
-workflows immediately before plan/teardown, so the account-matched cache is
-materialized only for that runner before the inventory command is rerun under
-`CI=1`. The report-only workflow remains separately credentialed and
-`not-established`; this correction does not make a stronger claim.
+workflows immediately before plan/teardown. Each step first runs the
+supported `alchemy login` command with `CI=1`, which persists only the
+environment-method selector; bootstrap then materializes the account-matched
+cache only for that runner before the inventory command is rerun under `CI=1`.
+The report-only workflow remains separately credentialed and `not-established`;
+this correction does not make a stronger claim.
