@@ -894,6 +894,108 @@ export const DeploymentAuthorityCapabilityReceipt = Schema.Struct({
 export type DeploymentAuthorityCapabilityReceipt =
   typeof DeploymentAuthorityCapabilityReceipt.Type;
 
+const CredentialPermissionGroup = Schema.Struct({
+  id: Schema.String.check(Schema.isPattern(/^[a-f0-9]{32}$/u)),
+  name: Schema.NonEmptyString,
+});
+
+const CredentialTokenReadback = Schema.Struct({
+  expiresAt: Schema.String.check(
+    Schema.isPattern(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/u)
+  ),
+  name: Schema.NonEmptyString,
+  permissionGroups: Schema.NonEmptyArray(CredentialPermissionGroup),
+  resourceScope: Schema.NonEmptyString,
+  status: Schema.Literal("active"),
+  tokenIdPrefix: Schema.String.check(Schema.isPattern(/^[a-f0-9]{8}$/u)),
+  tokenIdSha256: Sha256,
+  tokenValuesIncluded: Schema.Literal(false),
+});
+
+const ProtectedEnvironmentReadback = Schema.Struct({
+  deploymentBranchPolicy: Schema.Literal("none"),
+  id: Schema.Literals([
+    "taxkit-docs-preview",
+    "taxkit-docs-production",
+    "taxkit-docs-preview-teardown",
+    "github-actions-report-only",
+  ]),
+  reviewerLogin: Schema.Literal("crcorbett"),
+  reviewerUserId: Schema.Literal(45_161_689),
+  secretNames: Schema.NonEmptyArray(Schema.NonEmptyString),
+  status: Schema.Literal("protected"),
+});
+
+/**
+ * Records the successful 2026-08-04 credential and protected-environment
+ * capability epoch without rewriting the earlier capability stop. Secret
+ * values are intentionally unrepresentable in this receipt.
+ */
+export const DeploymentCredentialCapabilityReceipt = Schema.Struct({
+  approval: Schema.Struct({
+    approvedAtLocal: Schema.Literal("2026-08-04 Australia/Melbourne"),
+    approvedEnvironments: Schema.Tuple([
+      Schema.Literal("taxkit-docs-preview"),
+      Schema.Literal("taxkit-docs-production"),
+      Schema.Literal("taxkit-docs-preview-teardown"),
+      Schema.Literal("github-actions-report-only"),
+    ]),
+    approvedOperations: Schema.NonEmptyArray(Schema.NonEmptyString),
+    approvedResources: Schema.NonEmptyArray(Schema.NonEmptyString),
+    approvingPrincipal: Schema.Literal(
+      "Cooper, TaxKit repository/product owner"
+    ),
+    durationOrRevocation: Schema.NonEmptyString,
+    exclusions: Schema.NonEmptyArray(Schema.NonEmptyString),
+    executingPrincipal: Schema.Literal(
+      "authorized TaxKit docs deployment implementation thread"
+    ),
+  }),
+  candidate: Schema.Struct({
+    branch: Schema.Literal("codex/docs-cloudflare-alchemy-deployment"),
+    exactCommit: CommitSha,
+    pullRequestNumber: Schema.Literal(1),
+    pullRequestState: Schema.Literal("OPEN_DRAFT"),
+  }),
+  ciCredentialStatus: Schema.Literal("established"),
+  cloudflare: Schema.Struct({
+    accountId: CloudflareAccountId,
+    mutation: CredentialTokenReadback,
+    readOnly: CredentialTokenReadback,
+    stateResources: Schema.Tuple([
+      Schema.Literal("alchemy-state-store Worker"),
+      Schema.Literal("StateStoreSecrets Secrets Store"),
+    ]),
+  }),
+  github: Schema.Struct({
+    authenticatedPrincipal: Schema.Literal("crcorbett"),
+    connectorEnvironmentSecretAdmin: Schema.Literal("not-supported"),
+    environments: Schema.Tuple([
+      ProtectedEnvironmentReadback,
+      ProtectedEnvironmentReadback,
+      ProtectedEnvironmentReadback,
+      ProtectedEnvironmentReadback,
+    ]),
+    repository: Schema.Literal("crcorbett/taxkit"),
+    secretValuesIncluded: Schema.Literal(false),
+  }),
+  limitations: Schema.NonEmptyArray(Schema.NonEmptyString),
+  nonClaims: Schema.NonEmptyArray(Schema.NonEmptyString),
+  observedAt: Schema.String.check(
+    Schema.isPattern(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/u)
+  ),
+  operationsExecuted: Schema.NonEmptyArray(Schema.NonEmptyString),
+  owner: Schema.Literal("taxkit-docs-deployment-operation-owner"),
+  postcondition: Schema.Literal(
+    "protected-environments-and-narrow-credentials-attached"
+  ),
+  receiptId: Schema.Literal("DCD-004-ci-capability-2026-08-04"),
+  rollback: Schema.NonEmptyString,
+  schemaVersion: Schema.Literal(1),
+});
+export type DeploymentCredentialCapabilityReceipt =
+  typeof DeploymentCredentialCapabilityReceipt.Type;
+
 export const DeploymentGitAuthorityReceipt = Schema.Struct({
   approval: Schema.Struct({
     approvedAtLocal: Schema.Literal("2026-07-30 Australia/Melbourne"),

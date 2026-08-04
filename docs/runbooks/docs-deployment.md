@@ -3,7 +3,7 @@ document_type: runbook
 lifecycle: current
 authority: canonical
 owner: taxkit-docs-deployment-operation-owner
-last_reviewed: 2026-08-03
+last_reviewed: 2026-08-04
 review_trigger: docs deployment candidate, Cloudflare or Alchemy identity/state, stage, plan, provider readback, teardown, rollback, credential or authority change
 ---
 
@@ -77,6 +77,9 @@ CI. Wrangler CLI authentication and concrete narrow CI token values remain
 unavailable. This is a capability stop, not a missing-approval stop: do not
 create empty environments, attach a broad OAuth value, or claim hosted
 workflow proof until the named token identities are supplied and read back.
+That paragraph describes the 2026-08-02 epoch and is superseded for
+credential/environment capability by the dated 2026-08-04 receipt below;
+workflow proof remains separately gated.
 
 ### 2026-08-03 — token-administration capability stop
 
@@ -131,6 +134,43 @@ separate mutation and read-only credentials, and continue with protected
 environment attachment. Until the re-authenticated connection and group
 readback agree, DCD-004 remains capability-gated and no GitHub environment,
 secret, Preview or Production workflow claim may advance.
+
+### 2026-08-04 — CI credential and protected-environment capability established
+
+The secure provider connection was refreshed and an account-owned permission
+group read succeeded for account `f9f94270a4a5af8af7010d891020922d`. The
+successful, redacted readback is
+`docs/evidence/deployments/2026-08-04-ci-capability/receipt.json`; the earlier
+2026-08-02 capability stop remains immutable history. The mutation credential
+`taxkit-docs-ci-mutation-20260804` is active through `2026-09-03T23:59:59Z`
+with Workers Scripts Write, Workers Observability Write and Secrets Store
+Write. The separate inventory credential
+`taxkit-docs-ci-inventory-20260804` has the matching expiry and only the
+corresponding Read groups. Both are recorded by redacted ID prefix and digest;
+no value is present in the repository or receipt.
+
+The provider resource scope read back as the account resource
+`com.cloudflare.api.account.f9f94270a4a5af8af7010d891020922d:*`. The installed
+`Cloudflare.state()` implementation uses the account `alchemy-state-store`
+Worker and `StateStoreSecrets` Secrets Store; no R2 bucket, route or DNS
+permission was added. Cloudflare exposes these permission groups at account
+scope, so this receipt makes no unsupported per-Worker restriction claim.
+
+The four exact GitHub environments are now reviewer-protected and contain
+only their direction-specific secret names: mutation names in Preview,
+Production and Preview teardown, and the read-only inventory name in
+`github-actions-report-only`. The Executor GitHub connector has no
+environment-secret administration operation, so the authenticated repository
+administrator path performed the write and names-only readback. Values were
+handed directly through the secret boundary and were not written to the
+checkout or `.env.local`; the broad local OAuth profile was not copied.
+
+This establishes credential capability and protected environment identity, not
+workflow execution. `tools/docs-deployment/automation-register.json` remains
+`not-established` until the workflows run from the default branch and retain
+candidate-bound provider, hosted, screenshot, teardown and rollback receipts.
+The environment deployment branch policy is intentionally unset; the
+workflow's exact trusted-source and commit checks remain mandatory.
 
 ## Procedure
 

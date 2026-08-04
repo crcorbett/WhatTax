@@ -3,6 +3,7 @@ import { Array, HashSet } from "effect";
 import type {
   DeploymentAuthorityPreflightReceipt,
   DeploymentAuthorityCapabilityReceipt,
+  DeploymentCredentialCapabilityReceipt,
   DeploymentGitAuthorityReceipt,
   DeploymentGitReadbackReceipt,
   DeploymentHostedProofReceipt,
@@ -19,6 +20,14 @@ import type {
   DeploymentResumePreflightReceipt,
   DeploymentScreenshotManifest,
 } from "./schemas.js";
+
+const hasExactStrings = (
+  actual: readonly string[],
+  expected: readonly string[]
+): boolean =>
+  actual.length === expected.length &&
+  new Set(actual).size === expected.length &&
+  expected.every((value) => actual.includes(value));
 
 export const inspectAuthorityCapabilityReceipt = (
   receipt: DeploymentAuthorityCapabilityReceipt
@@ -66,6 +75,112 @@ export const inspectAuthorityCapabilityReceipt = (
   ) {
     findings.push(
       "authority-capability-stop: retain the exact narrow-credential capability stop and no-mutation postcondition"
+    );
+  }
+  return findings;
+};
+
+// oxlint-disable-next-line eslint/complexity -- one bounded credential capability policy keeps the exact provider and GitHub graph together
+export const inspectCredentialCapabilityReceipt = (
+  receipt: DeploymentCredentialCapabilityReceipt
+): readonly string[] => {
+  const expectedEnvironmentIds = [
+    "taxkit-docs-preview",
+    "taxkit-docs-production",
+    "taxkit-docs-preview-teardown",
+    "github-actions-report-only",
+  ] as const;
+  const expectedMutationGroups = [
+    "Workers Scripts Write",
+    "Workers Observability Write",
+    "Secrets Store Write",
+  ] as const;
+  const expectedReadGroups = [
+    "Workers Scripts Read",
+    "Workers Observability Read",
+    "Secrets Store Read",
+  ] as const;
+  const findings: string[] = [];
+  const environmentIds = receipt.github.environments.map(
+    (environment) => environment.id
+  );
+  if (
+    environmentIds.length !== expectedEnvironmentIds.length ||
+    expectedEnvironmentIds.some((id) => !environmentIds.includes(id)) ||
+    receipt.github.environments.some(
+      (environment) =>
+        environment.status !== "protected" ||
+        environment.reviewerLogin !== "crcorbett" ||
+        environment.reviewerUserId !== 45_161_689 ||
+        environment.deploymentBranchPolicy !== "none"
+    )
+  ) {
+    findings.push(
+      "credential-capability-environments: the four exact environments must be reviewer-protected with no branch-policy claim"
+    );
+  }
+  const previewSecretNames = receipt.github.environments.find(
+    (environment) => environment.id === "taxkit-docs-preview"
+  )?.secretNames;
+  const productionSecretNames = receipt.github.environments.find(
+    (environment) => environment.id === "taxkit-docs-production"
+  )?.secretNames;
+  const teardownSecretNames = receipt.github.environments.find(
+    (environment) => environment.id === "taxkit-docs-preview-teardown"
+  )?.secretNames;
+  const reportSecretNames = receipt.github.environments.find(
+    (environment) => environment.id === "github-actions-report-only"
+  )?.secretNames;
+  const hasMutationSecrets = (names: readonly string[] | undefined) =>
+    names !== undefined &&
+    hasExactStrings(names, ["CLOUDFLARE_ACCOUNT_ID", "CLOUDFLARE_API_TOKEN"]);
+  if (
+    !hasMutationSecrets(previewSecretNames) ||
+    !hasMutationSecrets(productionSecretNames) ||
+    !hasMutationSecrets(teardownSecretNames) ||
+    !hasExactStrings(reportSecretNames ?? [], [
+      "CLOUDFLARE_ACCOUNT_ID",
+      "CLOUDFLARE_READ_API_TOKEN",
+    ]) ||
+    receipt.github.secretValuesIncluded
+  ) {
+    findings.push(
+      "credential-capability-secrets: protected environment inventories must contain only the named, direction-specific secret names and no values"
+    );
+  }
+  const mutationGroups = receipt.cloudflare.mutation.permissionGroups.map(
+    (group) => group.name
+  );
+  const readGroups = receipt.cloudflare.readOnly.permissionGroups.map(
+    (group) => group.name
+  );
+  const expectedResourceScope =
+    `com.cloudflare.api.account.${receipt.cloudflare.accountId}:*`;
+  if (
+    !hasExactStrings(mutationGroups, expectedMutationGroups) ||
+    !hasExactStrings(readGroups, expectedReadGroups) ||
+    receipt.cloudflare.mutation.resourceScope !== expectedResourceScope ||
+    receipt.cloudflare.readOnly.resourceScope !== expectedResourceScope ||
+    receipt.cloudflare.mutation.tokenValuesIncluded ||
+    receipt.cloudflare.readOnly.tokenValuesIncluded ||
+    receipt.cloudflare.mutation.status !== "active" ||
+    receipt.cloudflare.readOnly.status !== "active" ||
+    receipt.cloudflare.mutation.expiresAt !== receipt.cloudflare.readOnly.expiresAt
+  ) {
+    findings.push(
+      "credential-capability-provider: mutation/read-only tokens must be active, equally time-bounded, account-scoped and limited to the exact Worker/observability/Secrets Store group sets"
+    );
+  }
+  if (
+    receipt.candidate.pullRequestNumber !== 1 ||
+    receipt.candidate.pullRequestState !== "OPEN_DRAFT" ||
+    receipt.ciCredentialStatus !== "established" ||
+    receipt.github.connectorEnvironmentSecretAdmin !== "not-supported" ||
+    receipt.postcondition !==
+      "protected-environments-and-narrow-credentials-attached"
+  ) {
+    findings.push(
+      "credential-capability-identity: capability must retain the draft candidate, successful status and the actual GitHub administration path"
     );
   }
   return findings;

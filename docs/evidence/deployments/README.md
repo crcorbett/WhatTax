@@ -3,7 +3,7 @@ document_type: deployment-evidence-index
 lifecycle: current
 authority: canonical
 owner: taxkit-docs-deployment-proof-owner
-last_reviewed: 2026-08-03
+last_reviewed: 2026-08-04
 review_trigger: docs deployment candidate, provider, stage, URL, proof, screenshot, teardown or rollback receipt change
 ---
 
@@ -34,6 +34,29 @@ or provider mutation was retained. The secure re-auth handoff must be
 completed in the Executor UI before any live permission resolution or token
 creation can proceed. This is not workflow, Preview, Production, teardown or
 rollback proof.
+
+## 2026-08-04 CI credential and environment capability
+
+The secure provider connection successfully resolved account-owned permission
+groups and created separate, expiring mutation and report-only credentials for
+the TaxKit docs Worker and Alchemy Cloudflare state boundary. The sanitized
+receipt is `2026-08-04-ci-capability/receipt.json`. It retains token names,
+redacted ID prefixes/digests, account resource scope, exact permission groups,
+expiry and revocation owner; no token value or request body is retained. The
+state resources are the account `alchemy-state-store` Worker and
+`StateStoreSecrets` Secrets Store. The provider readback required no R2, route
+or DNS permission.
+
+GitHub readback found exactly four reviewer-protected environments with only
+direction-specific secret names. The Executor GitHub connector lacks an
+environment-secret administration operation, so the authenticated repository
+administrator path performed the attachment and names-only readback. Secret
+values were not written to the checkout or any `.env.local` file.
+
+This is a capability receipt only. It does not establish that a workflow has
+run from the default branch, that Preview or Production is currently serving,
+or that teardown, rollback, custom-domain/DNS, publication or release proof
+exists. The earlier failed capability and re-auth receipts remain unchanged.
 
 ## Local workerd
 

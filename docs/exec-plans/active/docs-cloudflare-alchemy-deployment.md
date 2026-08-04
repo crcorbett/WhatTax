@@ -3,7 +3,7 @@ document_type: execution-plan
 lifecycle: current
 authority: supporting
 owner: taxkit-docs-deployment-implementation-owner
-last_reviewed: 2026-08-03
+last_reviewed: 2026-08-04
 review_trigger: DCD task transition, implementation discovery, proof result, authority stop, or rollback
 successor: null
 tombstone: false
@@ -1057,3 +1057,32 @@ then create and read back the two redacted credential identities before
 touching GitHub environments. DCD-004 remains `in_progress` and DCD-005
 remains `pending`; no current-head workflow, Preview or Production claim is
 added by this capability read.
+
+### 2026-08-04 — CI credential and protected-environment capability established
+
+The refreshed secure provider connection returned account-owned permission
+groups for account `f9f94270a4a5af8af7010d891020922d`. The successful
+capability epoch is decoded from
+`docs/evidence/deployments/2026-08-04-ci-capability/receipt.json`; the earlier
+capability and re-auth stops remain immutable history. It created two active
+credentials expiring `2026-09-03T23:59:59Z`: a mutation identity with Workers
+Scripts Write, Workers Observability Write and Secrets Store Write, and a
+separate inventory identity with only the corresponding Read groups. The
+account resource scope and redacted ID digests are retained; secret values are
+not. The current Alchemy state boundary is the account `alchemy-state-store`
+Worker plus `StateStoreSecrets` Secrets Store, so no R2 permission is needed.
+
+The four exact GitHub environments are reviewer-protected and their
+names-only secret inventories match the workflow direction: mutation names in
+Preview, Production and Preview teardown, and the read-only inventory name in
+`github-actions-report-only`. The Executor GitHub connector lacks environment
+secret administration, so the authenticated repository-admin path was used
+and read back. No secret was written to this checkout or `.env.local`, and the
+broad local OAuth profile remains outside CI.
+
+This clears the credential/environment capability gate only. The automation
+register deliberately remains `not-established` until the workflow files are
+on the default branch and a fresh run retains exact-candidate provider/state,
+hosted, screenshot, teardown and rollback receipts. DCD-004 remains
+`in_progress`; DCD-005 remains `pending`. Merge/ready, custom-domain/DNS,
+publication, release and unrelated resources remain separately bounded.

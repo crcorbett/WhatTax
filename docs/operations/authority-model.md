@@ -3,7 +3,7 @@ document_type: authority-model
 lifecycle: current
 authority: canonical
 owner: taxkit-authority-model-owner
-last_reviewed: 2026-08-02
+last_reviewed: 2026-08-04
 review_trigger: identity, release, Git, registry, deployment, provider, credential, or recovery change
 ---
 
@@ -109,3 +109,29 @@ environments and one read-only credential for report-only inventory, each
 with account/resource scope, expiry and revocation-owner readback before
 secret attachment. No empty environment or broad OAuth profile may be stored
 as a substitute.
+
+### 2026-08-04 — CI credential capability readback
+
+The secure provider connection now resolves account-owned permission groups and
+has produced two distinct, time-bounded credentials for this TaxKit-only
+implementation goal. The redacted success receipt is
+`docs/evidence/deployments/2026-08-04-ci-capability/receipt.json`; it records
+the account, resource scope, permission-group identities, expiry and Cooper's
+revocation ownership without a token value. The mutation credential is limited
+to Workers Scripts Write, Workers Observability Write and Secrets Store Write;
+the report-only credential has only the corresponding Read groups. R2, route,
+DNS, domain and unrelated provider permissions are not present.
+
+The same receipt records reviewer protection and names-only secret readback for
+`taxkit-docs-preview`, `taxkit-docs-production`,
+`taxkit-docs-preview-teardown` and `github-actions-report-only`. The Executor
+GitHub connector did not expose environment-secret administration, so the
+authenticated repository-admin path was used; this is an implementation
+observation, not a new standing authority. Secret values remain outside the
+repository and the broad local OAuth profile remains excluded from CI.
+
+This capability epoch clears only the credential/environment gate. The
+automation register stays `not-established` until the workflow files are on
+the default branch and a fresh exact-candidate run supplies provider/state,
+hosted, screenshot, teardown and rollback receipts. Merge, custom-domain/DNS,
+publication and unrelated resources remain separate exclusions.

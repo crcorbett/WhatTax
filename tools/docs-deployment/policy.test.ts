@@ -35,10 +35,12 @@ import successorProductionProviderJson from "../../docs/evidence/deployments/202
 import initialProductionDesktopJson from "../../docs/evidence/deployments/2026-07-30-production-prod/screenshot-desktop-d9cb894.json";
 import initialProductionMobileJson from "../../docs/evidence/deployments/2026-07-30-production-prod/screenshot-mobile-d9cb894.json";
 import inventoryJson from "../../docs/verification/docs-deployment-journeys.json";
+import credentialCapabilityJson from "../../docs/evidence/deployments/2026-08-04-ci-capability/receipt.json";
 import {
   deploymentRecordDigest,
   inspectDeploymentOwners,
   inspectDeploymentPlanActions,
+  inspectCredentialCapabilityReceipt,
   inspectGitAuthorityReceipt,
   inspectGitReadbackReceipt,
   inspectDeploymentPlanReceipt,
@@ -56,6 +58,7 @@ import {
 } from "./policy.js";
 import {
   DeploymentAuthorityPreflightReceipt,
+  DeploymentCredentialCapabilityReceipt,
   DeploymentGitAuthorityReceipt,
   DeploymentGitReadbackReceipt,
   DeploymentHostedProofReceipt,
@@ -122,6 +125,15 @@ describe("docs deployment policy", () => {
   test("accepts the exact trusted draft-PR readback", async () => {
     const receipt = await Effect.runPromise(decodeGitReadback());
     expect(inspectGitReadbackReceipt(receipt)).toEqual([]);
+  });
+
+  test("accepts the redacted CI credential and protected-environment capability epoch", async () => {
+    const receipt = await Effect.runPromise(
+      Schema.decodeUnknownEffect(DeploymentCredentialCapabilityReceipt, {
+        onExcessProperty: "error",
+      })(credentialCapabilityJson)
+    );
+    expect(inspectCredentialCapabilityReceipt(receipt)).toEqual([]);
   });
 
   test("binds provider and state preflight to the trusted candidate", async () => {
