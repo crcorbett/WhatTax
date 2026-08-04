@@ -64,7 +64,7 @@ jobs:
           jq -e '[.check_runs[] | select((.name | test("quality"; "i"))) | .conclusion] | length > 0 and all(. == "success")' <<<"$checks" >/dev/null
 
       - name: Check out exact candidate
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d # v4.2.0
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.2.0
         with:
           fetch-depth: 0
           persist-credentials: false
