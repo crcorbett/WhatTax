@@ -55,7 +55,7 @@ describe("docs deployment workflow admission", () => {
     ]) {
       const source = await readWorkflow(path);
       expect(source).toContain(
-        "ALCHEMY_PLAIN=1 CI=0 bunx alchemy cloudflare bootstrap --profile \"$ALCHEMY_PROFILE\" --worker-name alchemy-state-store"
+        'ALCHEMY_PLAIN=1 CI=0 bunx alchemy cloudflare bootstrap --profile "$ALCHEMY_PROFILE" --worker-name alchemy-state-store'
       );
     }
   });
