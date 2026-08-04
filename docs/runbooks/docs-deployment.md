@@ -191,6 +191,17 @@ hosted or teardown success until a default-branch run retains its dated,
 candidate-bound receipts. The current automation register remains
 `not-established`.
 
+The first post-merge observations are retained as failure evidence: run
+`30894963411` stopped before any provider step because the checkout action ref
+was abbreviated; the full ref correction is `4fb8ea3…`, merged to `main` as
+`ed94f8c…`. The automatic close event for PR `#2` (`30895606322`) also stopped
+before provider access because the event's pre-merge `base.sha` was stale. The
+teardown owner now binds pull-request events to the current default-branch
+`github.sha` (or the explicitly supplied reviewed SHA for manual dispatch),
+then rechecks the live `main` ref. A later teardown attempt must also install
+the pinned browser and build the exact deployment input before hashing it;
+absence of `apps/docs/dist` is a build failure, not a safe no-op.
+
 ## Procedure
 
 Run `bun run check:docs-deployment` before an admitted operation. It validates

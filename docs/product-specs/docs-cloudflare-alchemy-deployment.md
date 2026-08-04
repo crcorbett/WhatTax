@@ -193,12 +193,20 @@ mutation workflows plus one cancellable, read-only orphan inventory. DCD-004
 has admitted the deployment-only Schema/control desired state, and the
 2026-08-04 capability receipt now establishes the four protected GitHub
 environments and separate narrow credential identities. The external-state
-entries remain `not-established` because the workflows are not yet on the
-default branch and no hosted workflow receipt exists. Quality's authority remains
+entries remain `not-established` because no candidate-bound hosted workflow
+receipt exists yet. Quality's authority remains
 read-only and independently cancellable; its exact runner bootstrap was
 corrected during DCD-004 to use the frozen app-local Playwright executable and
 complete `main` comparison history after hosted failures exposed those missing
 prerequisites.
+
+The first default-branch workflow observations are part of the DCD-004
+qualification boundary: action refs must be full immutable SHAs; PR-close
+teardown must use the current default-branch implementation rather than a
+stale pre-merge base SHA; and the workflow must install the pinned Playwright
+browser and build the Cloudflare deployment input before hashing `dist`.
+These corrections preserve the no-op-versus-delete teardown contract and add
+no provider resource or authority.
 
 ## Goals
 

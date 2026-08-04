@@ -1096,3 +1096,14 @@ trusted draft PR. PR-close teardown is idempotent: an absent stage yields an
 equal `noop` projection and no destroy; an existing exact stage requires equal
 delete plans and exact absence readback. This does not advance any external
 state entry without fresh workflow receipts.
+
+The first default-branch teardown attempts are retained as bounded failure
+observations. Run `30894963411` stopped at GitHub action resolution because an
+action ref was one character short; run `30895606322` stopped before provider
+access because pull-request `base.sha` was the pre-merge default-branch SHA.
+The full action refs and current-default-branch source binding are corrected
+in the successor candidate. Run `30895614894` reached the exact-stage dry-run
+and then exposed a missing build prerequisite (`apps/docs/dist` was absent),
+so no destroy or provider mutation occurred. The next workflow candidate must
+install the pinned browser and build the exact Cloudflare input before the
+equal dry-run; these failures do not establish any automation external state.
