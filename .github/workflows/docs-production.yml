@@ -87,6 +87,9 @@ jobs:
       - name: Validate deployment owners
         run: bun run check:docs-deployment
 
+      - name: Build exact deployment input
+        run: bun run --filter=docs build:cloudflare
+
       - name: Materialize ephemeral Alchemy state-store credential cache
         run: |
           set -euo pipefail
