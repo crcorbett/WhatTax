@@ -87,6 +87,11 @@ jobs:
       - name: Validate deployment owners
         run: bun run check:docs-deployment
 
+      - name: Materialize ephemeral Alchemy state-store credential cache
+        run: |
+          set -euo pipefail
+          ALCHEMY_PLAIN=1 CI=0 bunx alchemy cloudflare bootstrap --profile "$ALCHEMY_PROFILE" --worker-name alchemy-state-store
+
       - name: Plan exact fixed Production candidate
         id: plan
         run: |

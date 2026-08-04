@@ -81,6 +81,14 @@ Alchemy APIs, fails on disagreement and emits only sanitized identities and
 non-claims. It is deliberately outside root verification and does not build,
 plan, apply, destroy or prove hosted behavior.
 
+Ephemeral GitHub runners do not retain Alchemy's derived
+`cloudflare-state-store` credential after a plan or apply. The three mutation
+workflows therefore run the supported `alchemy cloudflare bootstrap` operation
+with `CI=0` immediately before planning or teardown, which refreshes only the
+account-matched state-store cache for that runner; the inventory command then
+reads the cache under `CI=1`. This does not grant the report-only workflow
+mutation authority and does not copy the local OAuth profile into CI.
+
 `bun run check:docs-deployment-orphans` composes that readback with an exact
 read-only GitHub open-PR query. Its Schema-decoded receipt classifies each
 `pr-N` stage as trusted-active, untrusted or an orphan candidate and separately
