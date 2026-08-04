@@ -35,7 +35,7 @@ jobs:
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       PR_NUMBER: ${{ github.event.pull_request.number || inputs.pr_number }}
-      REVIEWED_WORKFLOW_SHA: ${{ github.event.pull_request.base.sha || inputs.reviewed_workflow_sha }}
+      REVIEWED_WORKFLOW_SHA: ${{ inputs.reviewed_workflow_sha || github.sha }}
     steps:
       - name: Check exact closed PR and reviewed default-branch source
         env:
@@ -68,8 +68,14 @@ jobs:
       - name: Install frozen dependencies
         run: bun install --frozen-lockfile
 
+      - name: Install pinned Playwright browser
+        run: apps/docs/node_modules/.bin/playwright install --with-deps chromium
+
       - name: Validate deployment owners
         run: bun run check:docs-deployment
+
+      - name: Build exact deployment input
+        run: bun run --filter=docs build:cloudflare
 
       - name: Equal dry-run and destroy exact Preview stage
         run: |

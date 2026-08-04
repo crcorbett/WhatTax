@@ -34,6 +34,19 @@ describe("docs deployment workflow admission", () => {
     }
   });
 
+  test("installs the browser needed by the docs build before provider mutation", async () => {
+    for (const path of [
+      workflowPaths.preview,
+      workflowPaths.production,
+      workflowPaths.teardown,
+    ]) {
+      const source = await readWorkflow(path);
+      expect(source).toContain(
+        "apps/docs/node_modules/.bin/playwright install --with-deps chromium"
+      );
+    }
+  });
+
   test("keeps mutation locks non-cancellable and report-only work cancellable", async () => {
     for (const path of [workflowPaths.preview, workflowPaths.production]) {
       const source = await readWorkflow(path);
@@ -76,5 +89,15 @@ describe("docs deployment workflow admission", () => {
     );
     expect(preview).toContain('test "$(jq -r .merged <<<"$pr_json")" = "true"');
     expect(preview).toContain('test "$(jq -r .draft <<<"$pr_json")" = "true"');
+  });
+
+  test("binds PR-close teardown to the current default-branch source", async () => {
+    const teardown = await readWorkflow(workflowPaths.teardown);
+    const githubExpression = [
+      "$",
+      "{{ inputs.reviewed_workflow_sha || github.sha }}",
+    ].join("");
+    expect(teardown).toContain(`REVIEWED_WORKFLOW_SHA: ${githubExpression}`);
+    expect(teardown).not.toContain("github.event.pull_request.base.sha");
   });
 });
