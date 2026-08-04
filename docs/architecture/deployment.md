@@ -84,10 +84,12 @@ plan, apply, destroy or prove hosted behavior.
 Ephemeral GitHub runners do not retain Alchemy's derived
 `cloudflare-state-store` credential after a plan or apply. The three mutation
 workflows therefore run the supported `alchemy cloudflare bootstrap` operation
-with `CI=0` immediately before planning or teardown, which refreshes only the
-account-matched state-store cache for that runner; the inventory command then
-reads the cache under `CI=1`. This does not grant the report-only workflow
-mutation authority and does not copy the local OAuth profile into CI.
+with `CI=0` immediately before planning or teardown. A preceding supported
+`alchemy login` with `CI=1` writes only the `method: "env"` profile selector;
+bootstrap then refreshes only the account-matched state-store cache for that
+runner, and the inventory command reads the cache under `CI=1`. This does not
+grant the report-only workflow mutation authority and does not copy the local
+OAuth profile into CI.
 
 `bun run check:docs-deployment-orphans` composes that readback with an exact
 read-only GitHub open-PR query. Its Schema-decoded receipt classifies each

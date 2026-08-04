@@ -131,7 +131,8 @@ observation, not a new standing authority. Secret values remain outside the
 repository and the broad local OAuth profile remains excluded from CI.
 
 The mutation workflows use the same narrow mutation identity for one explicit
-control-plane preparation: the installed Alchemy Cloudflare bootstrap command
+control-plane preparation: the supported Alchemy login command persists only
+the environment-method selector, then the Cloudflare bootstrap command
 refreshes the account-matched `cloudflare-state-store` cache on the ephemeral
 runner before plan or teardown readback. This is bounded state bootstrap/
 adoption authority, not an additional application resource or a report-only

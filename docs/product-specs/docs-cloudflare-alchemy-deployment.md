@@ -214,9 +214,10 @@ setup, docs validation, exact build and equal destroy dry-runs, then stopped at
 `check:docs-deployment-inventory` because the ephemeral runner had no cached
 `cloudflare-state-store` credential. They executed no destroy or provider
 mutation. The mutation workflows now materialize that account-matched cache
-with the installed Alchemy Cloudflare bootstrap command under `CI=0` before
-planning or teardown, then run inventory under `CI=1`; this keeps the
-postcondition readback read-only and does not copy the local OAuth profile.
+with the installed Alchemy `login` environment selector followed by the
+Cloudflare bootstrap command under `CI=0` before planning or teardown, then run
+inventory under `CI=1`; this keeps the postcondition readback read-only and
+does not copy the local OAuth profile.
 The report-only workflow remains separately credentialed and unestablished.
 
 ## Goals

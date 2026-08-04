@@ -210,8 +210,10 @@ no cached `cloudflare-state-store` credential. Neither run destroyed a stage or
 mutated a provider resource. The mutation workflows now run the installed
 supported `ALCHEMY_PLAIN=1 CI=0 bunx alchemy cloudflare bootstrap --profile
 "$ALCHEMY_PROFILE" --worker-name alchemy-state-store` command immediately before
-planning or teardown; this materializes the account-matched state credential
-cache only in the runner and keeps the subsequent inventory command
+planning or teardown. It first runs the supported `alchemy login` command with
+`CI=1` to persist only the `method: "env"` profile selector; the token remains
+an environment secret. Bootstrap then materializes the account-matched state
+credential cache only in the runner and keeps the subsequent inventory command
 read-only. The report-only workflow remains separately credentialed and is not
 established by this correction.
 
