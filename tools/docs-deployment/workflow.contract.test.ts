@@ -93,9 +93,11 @@ describe("docs deployment workflow admission", () => {
 
   test("binds PR-close teardown to the current default-branch source", async () => {
     const teardown = await readWorkflow(workflowPaths.teardown);
-    expect(teardown).toContain(
-      "REVIEWED_WORKFLOW_SHA: ${{ inputs.reviewed_workflow_sha || github.sha }}"
-    );
+    const githubExpression = [
+      "$",
+      "{{ inputs.reviewed_workflow_sha || github.sha }}",
+    ].join("");
+    expect(teardown).toContain(`REVIEWED_WORKFLOW_SHA: ${githubExpression}`);
     expect(teardown).not.toContain("github.event.pull_request.base.sha");
   });
 });
