@@ -130,6 +130,14 @@ authenticated repository-admin path was used; this is an implementation
 observation, not a new standing authority. Secret values remain outside the
 repository and the broad local OAuth profile remains excluded from CI.
 
+The mutation workflows use the same narrow mutation identity for one explicit
+control-plane preparation: the installed Alchemy Cloudflare bootstrap command
+refreshes the account-matched `cloudflare-state-store` cache on the ephemeral
+runner before plan or teardown readback. This is bounded state bootstrap/
+adoption authority, not an additional application resource or a report-only
+permission. The report-only workflow cannot call that command and remains
+unestablished until its independent state/provider read boundary is proven.
+
 This capability epoch clears only the credential/environment gate. The
 automation register stays `not-established` until the workflow files are on
 the default branch and a fresh exact-candidate run supplies provider/state,

@@ -47,6 +47,19 @@ describe("docs deployment workflow admission", () => {
     }
   });
 
+  test("materializes only the ephemeral Alchemy state-store cache before inventory", async () => {
+    for (const path of [
+      workflowPaths.preview,
+      workflowPaths.production,
+      workflowPaths.teardown,
+    ]) {
+      const source = await readWorkflow(path);
+      expect(source).toContain(
+        'ALCHEMY_PLAIN=1 CI=0 bunx alchemy cloudflare bootstrap --profile "$ALCHEMY_PROFILE" --worker-name alchemy-state-store'
+      );
+    }
+  });
+
   test("keeps mutation locks non-cancellable and report-only work cancellable", async () => {
     for (const path of [workflowPaths.preview, workflowPaths.production]) {
       const source = await readWorkflow(path);

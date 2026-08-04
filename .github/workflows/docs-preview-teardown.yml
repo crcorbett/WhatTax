@@ -77,6 +77,11 @@ jobs:
       - name: Build exact deployment input
         run: bun run --filter=docs build:cloudflare
 
+      - name: Materialize ephemeral Alchemy state-store credential cache
+        run: |
+          set -euo pipefail
+          ALCHEMY_PLAIN=1 CI=0 bunx alchemy cloudflare bootstrap --profile "$ALCHEMY_PROFILE" --worker-name alchemy-state-store
+
       - name: Equal dry-run and destroy exact Preview stage
         run: |
           set -euo pipefail

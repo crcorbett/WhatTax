@@ -1107,3 +1107,15 @@ and then exposed a missing build prerequisite (`apps/docs/dist` was absent),
 so no destroy or provider mutation occurred. The next workflow candidate must
 install the pinned browser and build the exact Cloudflare input before the
 equal dry-run; these failures do not establish any automation external state.
+
+The successor teardown runs `30896950134` (automatic PR-close) and
+`30896963746` (manual `pr-1`) passed source checkout, frozen install, browser
+setup, docs validation, exact build and equal destroy dry-runs, then stopped at
+`check:docs-deployment-inventory` because the ephemeral runner had no cached
+`cloudflare-state-store` credential. They executed no destroy or provider
+mutation. The next candidate adds the installed supported
+`alchemy cloudflare bootstrap` command with `CI=0` to the three mutation
+workflows immediately before plan/teardown, so the account-matched cache is
+materialized only for that runner before the inventory command is rerun under
+`CI=1`. The report-only workflow remains separately credentialed and
+`not-established`; this correction does not make a stronger claim.

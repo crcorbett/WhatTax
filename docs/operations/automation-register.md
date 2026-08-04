@@ -44,6 +44,13 @@ bounded receipts and fail-closed recovery. Teardown executes reviewed
 default-branch code rather than pull-request-head code. Orphan inventory is
 cancellable, separately read-only credentialed and unable to delete.
 
+Because GitHub runners are ephemeral, each mutation workflow refreshes the
+account-matched Alchemy `cloudflare-state-store` cache with the installed
+`alchemy cloudflare bootstrap` command before it reads provider/state
+postconditions. That preparation is bounded to the named state-store control
+plane and is not available to report-only inventory; no local OAuth profile is
+copied into CI.
+
 The local operator command `bun run check:docs-deployment-orphans` now proves
 the report-only data path against one dated observation. It compared the exact
 open PR set with Schema-decoded Alchemy/Worker inventory, found no Preview

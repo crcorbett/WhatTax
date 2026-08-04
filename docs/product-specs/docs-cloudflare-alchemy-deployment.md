@@ -208,6 +208,17 @@ browser and build the Cloudflare deployment input before hashing `dist`.
 These corrections preserve the no-op-versus-delete teardown contract and add
 no provider resource or authority.
 
+The successor teardown runs `30896950134` (automatic PR-close) and
+`30896963746` (manual `pr-1`) passed source checkout, frozen install, browser
+setup, docs validation, exact build and equal destroy dry-runs, then stopped at
+`check:docs-deployment-inventory` because the ephemeral runner had no cached
+`cloudflare-state-store` credential. They executed no destroy or provider
+mutation. The mutation workflows now materialize that account-matched cache
+with the installed Alchemy Cloudflare bootstrap command under `CI=0` before
+planning or teardown, then run inventory under `CI=1`; this keeps the
+postcondition readback read-only and does not copy the local OAuth profile.
+The report-only workflow remains separately credentialed and unestablished.
+
 ## Goals
 
 - Upgrade the complete Effect/Platform baseline and add Alchemy at the exact

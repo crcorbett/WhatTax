@@ -202,6 +202,19 @@ then rechecks the live `main` ref. A later teardown attempt must also install
 the pinned browser and build the exact deployment input before hashing it;
 absence of `apps/docs/dist` is a build failure, not a safe no-op.
 
+The next default-branch teardown attempts (`30896950134` for the automatic
+PR-close event and `30896963746` for the manual `pr-1` dispatch) passed checkout,
+frozen install, browser setup, docs validation, exact build and equal destroy
+dry-runs, then stopped at the inventory command because an ephemeral runner had
+no cached `cloudflare-state-store` credential. Neither run destroyed a stage or
+mutated a provider resource. The mutation workflows now run the installed
+supported `ALCHEMY_PLAIN=1 CI=0 bunx alchemy cloudflare bootstrap --profile
+"$ALCHEMY_PROFILE" --worker-name alchemy-state-store` command immediately before
+planning or teardown; this materializes the account-matched state credential
+cache only in the runner and keeps the subsequent inventory command
+read-only. The report-only workflow remains separately credentialed and is not
+established by this correction.
+
 ## Procedure
 
 Run `bun run check:docs-deployment` before an admitted operation. It validates
@@ -251,6 +264,13 @@ and fails on state/Worker disagreement. It prints no account ID, token or raw
 provider response. Do not place it in root verification: it is a
 credentialed, provider-bound observation whose exact execution belongs in an
 authorized operation or report-only workflow.
+
+Mutation workflows must first materialize the ephemeral cache with the
+installed Alchemy Cloudflare bootstrap command recorded above. The command is
+account/stage control-plane preparation, not application deployment; it must
+run with the mutation credential, retain no credential file beyond the runner,
+and stop on account, state-store or version disagreement. The report-only
+workflow may not reuse that mutation step or the local OAuth profile.
 
 ### Alchemy state bootstrap, adoption and recovery
 
