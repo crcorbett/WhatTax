@@ -21,7 +21,7 @@ describe("docs deployment workflow admission", () => {
       const source = await readWorkflow(path);
       expect(source).not.toContain("pull_request_target");
       expect(source).toContain(
-        "actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d"
+        "actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5"
       );
       expect(source).toContain(
         "oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6"
