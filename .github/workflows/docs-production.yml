@@ -104,16 +104,19 @@ jobs:
           mkdir -p "$RUNNER_TEMP/docs-deployment"
           ALCHEMY_PLAIN=1 CI=1 bunx alchemy plan --stage prod --profile "$ALCHEMY_PROFILE" > "$RUNNER_TEMP/docs-deployment/alchemy-plan.txt"
           sed -E $'s/\\033\\[[0-9;]*m//g' "$RUNNER_TEMP/docs-deployment/alchemy-plan.txt" > "$RUNNER_TEMP/docs-deployment/alchemy-plan.clean.txt"
-          mapfile -t resources < <(grep -E '^\\[(DocsBuild|DocsWebsite)\\] (create|update|noop|delete)$' "$RUNNER_TEMP/docs-deployment/alchemy-plan.clean.txt" || true)
-          test "${#resources[@]}" -eq 2
-          test "${resources[0]%%]*}" = "[DocsBuild"
-          test "${resources[1]%%]*}" = "[DocsWebsite"
+          resources="$(grep -E '^\\[(DocsBuild|DocsWebsite)\\] (create|update|noop|delete)$' "$RUNNER_TEMP/docs-deployment/alchemy-plan.clean.txt" || true)"
+          resource_count="$(printf '%s\\n' "$resources" | sed '/^$/d' | wc -l | tr -d ' ')"
+          test "$resource_count" -eq 2
+          first_resource="$(printf '%s\\n' "$resources" | sed -n '1p')"
+          second_resource="$(printf '%s\\n' "$resources" | sed -n '2p')"
+          case "$first_resource" in "[DocsBuild] "*) ;; *) echo "Unexpected first resource: $first_resource" >&2; exit 1 ;; esac
+          case "$second_resource" in "[DocsWebsite] "*) ;; *) echo "Unexpected second resource: $second_resource" >&2; exit 1 ;; esac
           if grep -Eq '^\\[[^]]+\\] (create|update|noop|delete)$' "$RUNNER_TEMP/docs-deployment/alchemy-plan.clean.txt" && grep -Ev '^\\[(DocsBuild|DocsWebsite)\\] (create|update|noop|delete)$' "$RUNNER_TEMP/docs-deployment/alchemy-plan.clean.txt" | grep -q .; then
             echo "Unexpected resource in Alchemy plan" >&2
             exit 1
           fi
-          build_action="${resources[0]##*] }"
-          website_action="${resources[1]##*] }"
+          build_action="$(printf '%s\n' "$first_resource" | sed -E 's/^\[[^]]+\] //')"
+          website_action="$(printf '%s\n' "$second_resource" | sed -E 's/^\[[^]]+\] //')"
           lockfile_sha256="$(shasum -a 256 bun.lock | cut -d ' ' -f1)"
           config_sha256="$(for file in alchemy.run.ts apps/docs/package.json apps/docs/vite.config.ts apps/docs/src/lib/build/cloudflare-stack.ts apps/docs/src/lib/build/docs-deployment-stage.ts apps/docs/public/_headers; do shasum -a 256 "$file"; done | shasum -a 256 | cut -d ' ' -f1)"
           deployment_input_sha256="$(find apps/docs/dist -type f -print | LC_ALL=C sort | while IFS= read -r file; do shasum -a 256 "$file"; done | shasum -a 256 | cut -d ' ' -f1)"
@@ -155,12 +158,15 @@ jobs:
           test "$ACCEPTED_PLAN_SHA256" = "${{ steps.plan.outputs.plan_sha256 }}"
           ALCHEMY_PLAIN=1 CI=1 bunx alchemy plan --stage prod --profile "$ALCHEMY_PROFILE" > "$RUNNER_TEMP/docs-deployment/alchemy-replan.txt"
           sed -E $'s/\\033\\[[0-9;]*m//g' "$RUNNER_TEMP/docs-deployment/alchemy-replan.txt" > "$RUNNER_TEMP/docs-deployment/alchemy-replan.clean.txt"
-          mapfile -t replan_resources < <(grep -E '^\\[(DocsBuild|DocsWebsite)\\] (create|update|noop|delete)$' "$RUNNER_TEMP/docs-deployment/alchemy-replan.clean.txt" || true)
-          test "${#replan_resources[@]}" -eq 2
-          test "${replan_resources[0]%%]*}" = "[DocsBuild"
-          test "${replan_resources[1]%%]*}" = "[DocsWebsite"
-          replan_build_action="${replan_resources[0]##*] }"
-          replan_website_action="${replan_resources[1]##*] }"
+          replan_resources="$(grep -E '^\\[(DocsBuild|DocsWebsite)\\] (create|update|noop|delete)$' "$RUNNER_TEMP/docs-deployment/alchemy-replan.clean.txt" || true)"
+          replan_resource_count="$(printf '%s\\n' "$replan_resources" | sed '/^$/d' | wc -l | tr -d ' ')"
+          test "$replan_resource_count" -eq 2
+          replan_first_resource="$(printf '%s\\n' "$replan_resources" | sed -n '1p')"
+          replan_second_resource="$(printf '%s\\n' "$replan_resources" | sed -n '2p')"
+          case "$replan_first_resource" in "[DocsBuild] "*) ;; *) echo "Unexpected first replan resource: $replan_first_resource" >&2; exit 1 ;; esac
+          case "$replan_second_resource" in "[DocsWebsite] "*) ;; *) echo "Unexpected second replan resource: $replan_second_resource" >&2; exit 1 ;; esac
+          replan_build_action="$(printf '%s\n' "$replan_first_resource" | sed -E 's/^\[[^]]+\] //')"
+          replan_website_action="$(printf '%s\n' "$replan_second_resource" | sed -E 's/^\[[^]]+\] //')"
           replan_lockfile_sha256="$(shasum -a 256 bun.lock | cut -d ' ' -f1)"
           replan_config_sha256="$(for file in alchemy.run.ts apps/docs/package.json apps/docs/vite.config.ts apps/docs/src/lib/build/cloudflare-stack.ts apps/docs/src/lib/build/docs-deployment-stage.ts apps/docs/public/_headers; do shasum -a 256 "$file"; done | shasum -a 256 | cut -d ' ' -f1)"
           replan_deployment_input_sha256="$(find apps/docs/dist -type f -print | LC_ALL=C sort | while IFS= read -r file; do shasum -a 256 "$file"; done | shasum -a 256 | cut -d ' ' -f1)"
