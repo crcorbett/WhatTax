@@ -1,8 +1,10 @@
 ---
-status: canonical
-last_reviewed: 2026-07-25
-source_of_truth: docs
-confidence: high
+document_type: architecture
+lifecycle: current
+authority: canonical
+owner: taxkit-architecture-owner
+last_reviewed: 2026-07-30
+review_trigger: frontend runtime, transport, rendering, build adapter, or composition change
 ---
 
 # Frontend

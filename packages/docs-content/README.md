@@ -29,8 +29,11 @@ Those belong in the `apps/docs` runtime.
 - `src/errors.ts`: tagged docs source and lookup errors.
 - `src/server.ts`: server-only generated Fumadocs source loader export for the
   content collection.
-- `src/live.layer.ts`: Effect service layer that serves navigation, validation
-  and renderable Fumadocs page data.
+- `src/navigation.ts`: deployment-neutral decoding of the bundled navigation
+  representation without importing Node filesystem policy.
+- `src/live.layer.ts`: Effect service layer that serves navigation and
+  renderable Fumadocs page data and loads validation policy only when its
+  explicit validation operation runs.
 - `src/test.layer.ts`: deterministic `DocsContentService` composition over the
   generic Fumadocs test Layer.
 - `.source/`: generated Fumadocs output. Regenerate it instead of editing it by
@@ -51,8 +54,9 @@ Generic source failures are mapped once into safe TaxKit content errors; raw
 provider causes and fixture content do not cross the package boundary.
 
 The authored `navigation.json` representation is decoded through
-`DocsNavigation`. This keeps TaxKit navigation and content policy at the same
-earliest semantic owner.
+`DocsNavigation` in `src/navigation.ts`. This keeps TaxKit navigation at its
+earliest semantic owner without initializing the Node-only validation module
+inside an app Worker.
 
 This package is intentionally private and source-only. It is not a publishable
 runtime package because its server and client exports wrap generated
@@ -66,6 +70,13 @@ frontmatter, navigation coverage, local links, allowed MDX component usage,
 examples and OpenAPI references. App routes should consume the service boundary
 instead of importing `.source/*` files directly. Browser modules must not
 import `@taxkit/docs-content/server`.
+
+The generated Fumadocs loader retains a `getText("raw")` filesystem branch,
+but the runtime adapter requests only `getText("processed")`. The validation
+policy remains Node-only and is dynamically imported only by
+`validateContent`. Normal docs requests must not initialize either filesystem
+operation; `apps/docs` owns the isolated workerd failure oracle for that
+boundary.
 
 ## Frontmatter contract
 

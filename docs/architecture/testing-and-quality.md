@@ -1,8 +1,10 @@
 ---
-status: canonical
-last_reviewed: 2026-07-25
-source_of_truth: docs
-confidence: high
+document_type: architecture
+lifecycle: current
+authority: canonical
+owner: taxkit-quality-owner
+last_reviewed: 2026-07-30
+review_trigger: verification graph, proof boundary, CI, deployment, or test-owner change
 ---
 
 # Testing and quality
@@ -88,6 +90,7 @@ bun run test:docs-boundaries
 bun run --filter=docs test
 bun run --filter=docs test:browser
 bun run --filter=docs test:built
+bun run --filter=docs test:cloudflare-built
 bun run --filter=@taxkit/docs-content test
 ```
 
@@ -137,6 +140,63 @@ evidence only: a visually correct image does not prove SSR content, hydration,
 request resource type, HTTP status, keyboard or focus behavior, contrast,
 motion suppression or console cleanliness.
 
+`bun run --filter=docs test:cloudflare-built` independently builds the official
+Cloudflare target, verifies Wrangler's no-bundle dry-run without credentials or
+bindings, and copies only `dist/server` and `dist/client` to an isolated
+temporary directory before starting Wrangler/workerd. It proves initial SSR,
+static assets and immutable cache headers, direct and client not-found
+behavior, hydration, server-function transport, no-document client navigation,
+sequential/concurrent request isolation, representative accessibility and
+console/page cleanliness. It also checks the gzip upload against the 3 MiB
+Workers Free limit and records local process-to-first-response and
+first-response-request timing. Those timings are readiness observations, not
+Cloudflare CPU-startup-limit validation. The provider must establish the
+account plan, upload acceptance, deployment/runtime identity and applicable
+startup-limit readback.
+
+The separate
+`docs/verification/docs-deployment-journeys.json` inventory owns only four
+deployment-supporting claims: local workerd, hosted Preview, hosted Production
+and Production rollback/operator proof. `bun run check:docs-deployment`
+Schema-decodes that owner and the admitted dated receipts. It does not join the
+five local release journeys. The accepted DCD-002 requalification chain binds
+exact candidate `d9cb8945529fb72158e59ca0daf02a98e1e4de1a`, exact
+pre-deploy and pre-destroy state/provider readback, equal plans, provider
+Worker/deployment/version/assets/URL readback, hosted HTTP/browser proof,
+reviewed desktop/mobile screenshots and exact-stage teardown/absence. It is a
+dated Preview-and-teardown observation, not current Preview availability.
+
+The accepted DCD-003 chain separately validates the first fixed `prod`
+deployment, the successor's trusted Preview and exact-stage absence, the
+successor Production update, and the normal source-bound redeploy of
+`d9cb894…`. Executable cross-receipt checks require two viewport classes,
+provider/hosted/screenshot identity equality, distinct deployment/version IDs,
+stable Worker/URL/state instance, and restoration of the initial d9 state
+bundle. A negative test changes the restored bundle hash and must fail. These
+dated observations establish no custom domain, DNS, byte promotion,
+known-bad-content recovery, paid-plan or release claim.
+
+The retained `0d714e6…` observation is disconfirming history: it did not
+establish the same pre-mutation, isolate-equality, mobile-request, public-cache,
+state-detail or screenshot-input contract.
+
+The built graph retains Node filesystem code in two qualified, non-normal-route
+branches: generated Fumadocs `getText("raw")`, while the runtime adapter calls
+`getText("processed")`, and the lazily imported validation policy. The harness
+executes normal requests from a temporary working tree containing only emitted
+output; it also rejects checkout-absolute paths in the filesystem-bearing
+modules. It fails if these branches spread, bindings appear, credential names
+enter output, the Worker constructs per request, or output-only execution
+fails.
+
+The Worker entry exposes temporary migration instrumentation only when a
+request opts in with `x-taxkit-docs-runtime-proof: construction-count`. The
+returned construction count and random isolate identifier contain no
+configuration or user data and are not a public API guarantee. This channel is
+owned by the deployment migration, reviewed on runtime/entry/privacy changes,
+and retired after an equally strong non-public provider oracle exists;
+otherwise its bounded carrying cost remains explicit.
+
 Public API route work should also capture contract evidence from the standalone
 API app:
 
@@ -181,11 +241,16 @@ The Quality workflow invokes `bun run release:check -- --ci` for every
 configured pull request and push rather than relying on path filters. The
 explicit CI mode runs the same nine ordered checks without consuming or
 rewriting an HGI-203 candidate packet; it returns bounded local command detail
-only. A non-CI `release:check` remains the authority-bound new-candidate
+only. Its exact read-only runner bootstrap fetches complete Git history,
+materialises the configured `main` comparison ref and installs Chromium through
+the frozen app-local Playwright executable before the canonical graph. This
+keeps Changesets and docs build/browser proof bound to the checked-out graph;
+floating `bunx` resolution is rejected. A non-CI `release:check` remains the authority-bound new-candidate
 operation in the release-readiness runbook. Its static contract is owned by
 [`../../tools/quality-workflow/check.runtime.ts`](../../tools/quality-workflow/check.runtime.ts): it rejects missing read-only permissions, timeout or concurrency
-limits, floating action references, absent canonical graph invocation, and
-additional workflow-local release steps. Its fixtures name public exports,
+limits, floating action or browser-tool resolution, shallow/ambiguous release
+history, absent canonical graph invocation, and additional workflow-local
+release steps. Its fixtures name public exports,
 packed SDK, API, docs, manifests, workflows, and release scripts as
 release-relevant boundaries. This is local workflow-configuration proof only;
 it does not prove a hosted run, publication, deployment, registry state, or
@@ -194,6 +259,29 @@ external consumer behaviour.
 The harness gate is not a separate Quality workflow step. The existing
 `release:check -- --ci` graph begins with root verification and therefore
 inherits it without duplicating execution or widening workflow authority.
+
+Deployment automation is intentionally outside Quality. The local
+`check:docs-deployment-automation` command Schema-decodes four target-owned
+automation records plus four controls and runs focused negative fixtures for
+candidate trust, mutation locking, equal replans, teardown safety,
+credential/environment denial and report-only orphan handling. This proves
+repository desired state only. A hosted workflow claim additionally requires
+default-branch workflow identity, protected-environment and credential
+readback, exact-candidate execution, provider/state agreement and a dated
+receipt. Quality retains `contents: read`, cancellable concurrency and no
+provider credential or mutation edge.
+
+The credentialed `check:docs-deployment-inventory` command is also excluded
+from root verification and Quality. Its focused service fixtures prove
+state/provider agreement and disagreement behavior without a provider; an
+authorized live invocation separately checks exact TaxKit state and Workers.
+Neither fixture nor live inventory proves hosted application behavior.
+
+The provider-bound `check:docs-deployment-orphans` command adds one exact
+read-only GitHub query and classifies the resulting open-PR/state/Worker graph.
+Focused fixtures retain trusted, cross-repository and missing-PR stage cases
+plus a false-green classification attack. Root deployment validation decodes
+the retained dated report, but does not rerun either credentialed source.
 
 The five consumer-visible release journeys are maintained in
 [`../verification/critical-journeys.json`](../verification/critical-journeys.json):
@@ -368,8 +456,8 @@ supporting gate and cannot replace semantic ownership or call-graph review.
   values from neutral fragments so the checker and its tests remain inside the
   policy they prove. Reports must never include matched text, usernames,
   process stderr or surrounding content.
-- Repo-owned skill changes must pass the skill validator and `bun run
-  test:skills`. Canonical baseline or repository-profile changes must also pass
+- Repo-owned skill changes must pass `bun run test:skills` and the skill
+  validator. Canonical baseline or repository-profile changes must also pass
   `bun run check:harness-governance`, which compares only repository-local
   paths with the content-addressed receipt and never reads a user home or
   installed global skill collection. Epoch requalification must additionally

@@ -3,6 +3,7 @@ import { FumadocsSource } from "@taxkit/docs-fumadocs/service";
 import { Array, Effect, Layer, Schema } from "effect";
 
 import { DocsPageNotFoundError, DocsSourceError } from "./errors.js";
+import { getNavigation } from "./navigation.js";
 import {
   DocsPageFrontmatter,
   DocsPagePath,
@@ -11,7 +12,6 @@ import {
 } from "./schemas.js";
 import type { DocsContentPage } from "./schemas.js";
 import { DocsContentService } from "./service.js";
-import { getNavigation, validateContent } from "./validation/policy.js";
 
 const slugsFromPath = (path: DocsPagePath) =>
   Array.filter(path.split("/"), (segment) => segment.length > 0);
@@ -82,7 +82,10 @@ export const DocsContentServiceLive = Layer.effect(
             )
           )
         ),
-      validateContent: () => validateContent,
+      validateContent: () =>
+        Effect.promise(() => import("./validation/policy.js")).pipe(
+          Effect.flatMap(({ validateContent }) => validateContent)
+        ),
     });
   })
 );

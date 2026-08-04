@@ -1,0 +1,11 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "declaration": false,
+    "declarationMap": false,
+    "noEmit": true,
+    "sourceMap": false,
+    "types": ["bun"]
+  },
+  "include": ["alchemy.run.ts", "apps/docs/src/lib/build/cloudflare-stack.ts"]
+}

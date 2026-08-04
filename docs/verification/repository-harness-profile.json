@@ -18,6 +18,8 @@
     "runbooks": ["docs/runbooks/README.md", "docs/runbooks/"],
     "proof": [
       "docs/verification/critical-journeys.json",
+      "docs/verification/docs-deployment-journeys.json",
+      "docs/evidence/deployments/",
       "docs/evidence/releases/"
     ],
     "evidence": [
@@ -39,6 +41,7 @@
     "documentation": [
       "bun run check:docs",
       "bun run check:runbooks",
+      "bun run check:docs-deployment",
       "bun run check:repository-paths"
     ],
     "skills": ["bun run test:skills"],
@@ -107,18 +110,19 @@
     "Package, API, SDK, app, and public documentation behavior remains owned by code, Schemas, manifests, exports, and direct READMEs.",
     "The local release-readiness graph grants no versioning, Git, registry, release, deployment, provider, public-site, or recovery authority.",
     "The existing Quality workflow invokes bun run release:check -- --ci; that graph begins with root verification and remains the sole hosted CI route.",
-    "Exactly four operational runbooks and docs/operations/authority-model.md remain the repeatable operation and authority owners.",
+    "Exactly five operational runbooks and docs/operations/authority-model.md remain the repeatable operation and authority owners.",
+    "The separate four-entry docs deployment journey owner and dated deployment receipts never alter the five local release journeys or historical HGI/HFI evidence.",
     "Repository-local skills and validators must work from a clean clone without reading a user home or global skill installation."
   ],
   "exclusions": [
     "Dependency, build, cache, generated route, temporary, binary, and vendored trees are excluded from readable corpus accounting.",
-    "Website design, public MDX copy, navigation, package/API/SDK/runtime behavior, provider access, and external mutation are outside this migration.",
+    "Website design, public MDX copy, navigation and package/API/SDK behavior are outside this profile/runbook migration; provider mutation remains limited to the separately authorized TaxKit docs deployment receipts.",
     "HGI-203 through HGI-206 evidence is preserved and not rewritten."
   ],
   "nonClaims": [
     "Repository-local validation does not establish hosted CI success.",
     "Local Git commits do not establish push, remote branch, tag, or release state.",
-    "No registry publication, package versioning, external consumer behavior, provider state, deployment, production behavior, or public-site availability is established.",
+    "The DCD-002 requalification chain establishes one dated Preview deployment/hosted/teardown observation; it establishes no current Preview availability, Production, rollback, public-domain behavior, release or publication.",
     "A target-specific harness epoch does not establish general causal effectiveness for other workers, repositories, or future skill states."
   ],
   "exceptions": []

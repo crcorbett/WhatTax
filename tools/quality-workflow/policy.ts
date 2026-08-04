@@ -22,7 +22,9 @@ const expectedConcurrencyGroup = [
   `${workflowExpressionPrefix}{{ github.ref }}`,
 ].join("");
 const allowedRunSteps = new Set([
+  "git show-ref --verify --quiet refs/heads/main || git branch --track main origin/main",
   "bun install --frozen-lockfile",
+  "apps/docs/node_modules/.bin/playwright install --with-deps chromium",
   "bun run check:quality-workflow",
   "bun run release:check -- --ci",
 ]);
@@ -186,17 +188,27 @@ const inspectSteps = (steps: unknown): readonly QualityWorkflowFinding[] => {
     runSteps.length === allowedRunSteps.size &&
     runSteps.every((step) => allowedRunSteps.has(step));
   const checkoutStep = asRecord(steps[0]);
-  const setupStep = asRecord(steps[1]);
+  const checkoutWith = asRecord(checkoutStep?.with);
+  const historyStep = asRecord(steps[1]);
+  const setupStep = asRecord(steps[2]);
   const setupWith = asRecord(setupStep?.with);
-  const installStep = asRecord(steps[2]);
-  const policyStep = asRecord(steps[3]);
-  const releaseStep = asRecord(steps[4]);
+  const installStep = asRecord(steps[3]);
+  const browserStep = asRecord(steps[4]);
+  const policyStep = asRecord(steps[5]);
+  const releaseStep = asRecord(steps[6]);
   const exactSteps =
-    steps.length === 5 &&
+    steps.length === 7 &&
     checkoutStep !== null &&
-    hasOnly(checkoutStep, ["uses"]) &&
+    hasOnly(checkoutStep, ["uses", "with"]) &&
     checkoutStep.uses ===
       "actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5" &&
+    checkoutWith !== null &&
+    hasOnly(checkoutWith, ["fetch-depth"]) &&
+    checkoutWith["fetch-depth"] === 0 &&
+    historyStep !== null &&
+    hasOnly(historyStep, ["run"]) &&
+    historyStep.run ===
+      "git show-ref --verify --quiet refs/heads/main || git branch --track main origin/main" &&
     setupStep !== null &&
     hasOnly(setupStep, ["uses", "with"]) &&
     setupStep.uses ===
@@ -207,6 +219,10 @@ const inspectSteps = (steps: unknown): readonly QualityWorkflowFinding[] => {
     installStep !== null &&
     hasOnly(installStep, ["run"]) &&
     installStep.run === "bun install --frozen-lockfile" &&
+    browserStep !== null &&
+    hasOnly(browserStep, ["run"]) &&
+    browserStep.run ===
+      "apps/docs/node_modules/.bin/playwright install --with-deps chromium" &&
     policyStep !== null &&
     hasOnly(policyStep, ["run"]) &&
     policyStep.run === "bun run check:quality-workflow" &&
@@ -238,7 +254,7 @@ const inspectSteps = (steps: unknown): readonly QualityWorkflowFinding[] => {
           finding(
             "workflow-mutation-step",
             ".github/workflows/quality.yml:jobs.quality.steps",
-            "Remove extra mutation, release, build, test or verification steps; the canonical release graph owns those checks."
+            "Retain only the exact runner bootstrap steps and canonical release graph owned by this policy."
           ),
         ]),
   ];

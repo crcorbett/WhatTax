@@ -9,7 +9,6 @@ const generatedConsumer = join(
   "tools/oxlint/fixtures/.generated-route-transport-consumer.tsx"
 );
 const temporaryFiles: string[] = [];
-
 const runOxlint = (
   paths: readonly string[],
   extraArgs: readonly string[] = []
@@ -21,6 +20,7 @@ const runOxlint = (
       "oxlint.config.ts",
       "--disable-nested-config",
       "--no-error-on-unmatched-pattern",
+      "--format=unix",
       ...extraArgs,
       ...paths,
     ],
@@ -55,12 +55,15 @@ const writeUnconfiguredFixture = async (source: string, extension = "tsx") => {
 };
 
 const diagnosticsFor = (output: string, messageId: string) =>
-  output.match(
-    new RegExp(
-      `taxkit\\(no-route-transport-restore-outside-consumers\\): ${messageId}`,
-      "gu"
-    )
-  ) ?? [];
+  output
+    .split("\n")
+    .filter(
+      (line) =>
+        line.includes(messageId) &&
+        line.includes(
+          "[Error/taxkit(no-route-transport-restore-outside-consumers)]"
+        )
+    );
 
 afterEach(async () => {
   await Promise.all(

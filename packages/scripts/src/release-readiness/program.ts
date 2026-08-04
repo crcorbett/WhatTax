@@ -192,6 +192,8 @@ export const runCiReleaseReadiness = (checks: readonly ReleaseCheck[]) =>
                   failedCheck: check.id,
                   lastSuccessfulCheck: lastSuccessfulCheck(priorOutcomes),
                   observedExitCode: error.observedExitCode,
+                  stderrExcerpt: "",
+                  stdoutExcerpt: "",
                   target,
                   terminalState: error.terminalState,
                 })
@@ -203,6 +205,8 @@ export const runCiReleaseReadiness = (checks: readonly ReleaseCheck[]) =>
               failedCheck: check.id,
               lastSuccessfulCheck: lastSuccessfulCheck(priorOutcomes),
               observedExitCode: outcome.exitCode,
+              stderrExcerpt: outcome.stderrExcerpt,
+              stdoutExcerpt: outcome.stdoutExcerpt,
               target,
               terminalState: outcome.terminalState,
             });

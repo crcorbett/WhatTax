@@ -54,5 +54,25 @@ Failed, rejected, deferred and inconclusive material remains under
 `docs/documentation-audit/` and is not acceptance proof. Reversal of the
 current epoch is limited to reverting its task-scoped evidence/owner commits,
 retaining HGI-206 as the previous route, and preserving every terminal receipt.
+
+## DCD-002 proportional profile/runbook candidate — 2026-07-30
+
+DCD-002 intentionally changes the docs-maintainer repository-profile overlay,
+repository harness profile, runbook inventory and deployment proof route. The
+current overlay digest in `tools/skills/canonical-skill-baseline.json` is
+refreshed together with the exact current six-skill tree readback. That
+readback also reconciles the repository's previously unreceipted
+`prd-implementer` goal-language change; prior HFI receipts and HGI evidence
+remain unchanged.
+
+The initial provider preflight stopped because exact commit `669a8f3…` was not
+a trusted GitHub PR head; that receipt remains historical. The successor chain
+binds exact candidate `d9cb894…` to pre-deploy and pre-destroy
+provider/state readback, equal plans, hosted behavior, bounded byte-bound
+screenshots and exact-stage teardown/absence. The earlier `0d714e6…`
+observation remains disconfirming history because it lacked the final
+false-green contract. DCD-002's full gates and corrected-boundary independent
+review accepted this proportional profile/runbook requalification. It is not
+a successor HFI epoch: HFI-004 remains the accepted current harness epoch.
 Any worker, host, tool, runtime, skill receipt, repository profile, validator,
 journey, target or authority change requires requalification.

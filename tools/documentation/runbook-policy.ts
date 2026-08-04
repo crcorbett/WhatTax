@@ -32,6 +32,7 @@ const requiredRunbooks = [
   ["versioning", "docs/runbooks/versioning.md"],
   ["packed-consumer-proof", "docs/runbooks/packed-consumer-proof.md"],
   ["recovery", "docs/runbooks/recovery.md"],
+  ["docs-deployment", "docs/runbooks/docs-deployment.md"],
 ] as const;
 
 const requiredSections = [
@@ -111,7 +112,7 @@ export const inspectRunbookContract = (
         "exact-inventory",
         contract.owner,
         "docs/runbooks/",
-        "retain exactly README.md and the four canonical runbook Markdown files"
+        "retain exactly README.md and the five canonical runbook Markdown files"
       )
     );
   }
@@ -136,7 +137,7 @@ export const inspectRunbookContract = (
         "exact-inventory",
         contract.owner,
         "tools/documentation/runbook-contract.json#runbooks",
-        "declare exactly the four canonical runbook IDs and paths"
+        "declare exactly the five canonical runbook IDs and paths"
       )
     );
   }
@@ -361,7 +362,7 @@ export const inspectRunbookContract = (
         "exact-inventory",
         contract.owner,
         "docs/runbooks/README.md#canonical-inventory",
-        "render exactly four canonical runbook table rows and no extra route"
+        "render exactly five canonical runbook table rows and no extra route"
       )
     );
   }

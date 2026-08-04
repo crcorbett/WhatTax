@@ -8,13 +8,17 @@
   "scripts": {
     "dev": "portless run --name docs.taxkit vite dev",
     "build": "bun run --filter=@taxkit/docs-fumadocs build && vite build",
+    "build:cloudflare": "bun run --filter=@taxkit/docs-fumadocs build && TAXKIT_DOCS_BUILD_TARGET=cloudflare vite build",
     "check-types": "bun run --filter=@taxkit/docs-fumadocs build && tsc --noEmit",
-    "clean": "rm -rf .output .tanstack .turbo .vercel/output node_modules/.vite",
+    "clean": "rm -rf .output .tanstack .turbo .vercel/output .wrangler dist node_modules/.vite",
     "check-import-boundaries": "bun run ./scripts/check-import-boundaries.ts",
     "preview": "portless run --name docs.taxkit vite preview",
+    "preview:cloudflare": "TAXKIT_DOCS_BUILD_TARGET=cloudflare vite preview",
     "test": "vitest run --config vitest.server.config.ts",
     "test:browser": "vitest run --config vitest.browser.config.ts",
-    "test:built": "bun run build && bun run ./scripts/test-built.tsx"
+    "test:built": "bun run build && bun run ./scripts/test-built.tsx",
+    "test:cloudflare-built": "bun run ./scripts/test-cloudflare-built.tsx",
+    "test:cloudflare-hosted": "bun run ./scripts/test-cloudflare-hosted.tsx"
   },
   "dependencies": {
     "@tanstack/react-router": "catalog:",
@@ -27,6 +31,7 @@
     "react-dom": "catalog:"
   },
   "devDependencies": {
+    "@cloudflare/vite-plugin": "catalog:",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
@@ -36,6 +41,7 @@
     "playwright": "^1.60.0",
     "typescript": "catalog:",
     "vite": "catalog:",
-    "vitest": "catalog:"
+    "vitest": "catalog:",
+    "wrangler": "catalog:"
   }
 }

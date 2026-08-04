@@ -1,8 +1,10 @@
 ---
-status: canonical
-last_reviewed: 2026-07-25
-source_of_truth: docs
-confidence: high
+document_type: architecture
+lifecycle: current
+authority: canonical
+owner: taxkit-architecture-owner
+last_reviewed: 2026-07-30
+review_trigger: package, app, root composition, or semantic ownership change
 ---
 
 # Package ownership
@@ -113,11 +115,25 @@ while a future product workflow is still unscoped.
 `apps/docs`
 : Implemented public documentation app. It owns TanStack Start routes, the
   docs app shell, route loaders, navigation presentation and app-local
-  MDX component composition. It consumes package-owned content and Fumadocs
-  helpers, but does not own canonical frontmatter, navigation, generated source
-  or reusable Fumadocs integration contracts. It composes and executes one
+  MDX component composition, Schema-decoded build target, Cloudflare Vite
+  configuration, static-asset headers and local built-Worker proof. It
+  consumes package-owned content and Fumadocs helpers, but does not own
+  canonical frontmatter, navigation, generated source or reusable Fumadocs
+  integration contracts. It composes and executes one module-scoped
   server-only managed runtime; browser code restores encoded route transport
   and does not own an Effect runtime.
+
+Root `alchemy.run.ts`
+: Repository deployment composition for the docs app. It owns one stack,
+  stage admission, Cloudflare providers and remote state, one build resource
+  and one prebuilt Worker resource. It is not a package, reusable provider
+  facade or application runtime owner.
+
+`tools/docs-deployment`
+: Repository-local Schema, policy and command boundary for docs deployment
+  authority, stable journey inventory and sanitized dated receipts. It owns no
+  provider-generic framework, raw client, app runtime or reusable package. The
+  current validator performs no provider operation.
 
 `apps/api`
 : Current standalone Bun API runtime. It owns process config, startup,
@@ -127,9 +143,11 @@ shutdown and platform serving for the implemented API app.
 : Implemented private source-only content package. It owns TaxKit docs
   authored MDX, navigation, examples, frontmatter, meta, validation issues,
   tagged docs errors, `DocsContentService`, the Fumadocs `source.config.ts`
-  and the generated `.source/*` boundary. It can read raw MDX source text for
-  validation policy, but app routes should use its service and client exports
-  instead of importing source files directly.
+  and the generated `.source/*` boundary. Navigation decoding is independent
+  of the Node-only validation module. Validation and generated raw-text access
+  may read MDX files only through their explicit non-runtime operations; app
+  routes use processed generated content through the service and client
+  exports.
 
 `packages/docs-fumadocs`
 : Implemented private reusable package for generic Fumadocs integration. It

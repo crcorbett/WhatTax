@@ -3,7 +3,7 @@ document_type: runbook
 lifecycle: current
 authority: canonical
 owner: taxkit-recovery-operation-owner
-last_reviewed: 2026-07-22
+last_reviewed: 2026-07-30
 review_trigger: release evidence, recovery target, Git/provider topology, or authority change
 ---
 
@@ -44,7 +44,8 @@ rollback precondition and escalation owner.
    execute it while authority is unknown.
 5. After separately granted authority, execute only the approved target
    operation and capture pre/post readback. A provider recovery needs that
-   provider's own runbook; this local runbook is insufficient.
+   provider's own runbook; TaxKit docs Cloudflare recovery is routed through
+   `docs/runbooks/docs-deployment.md`, and this local runbook is insufficient.
 
 ## Evidence and postcondition
 

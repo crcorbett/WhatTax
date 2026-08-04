@@ -32,11 +32,17 @@ const readEvidenceTexts = Effect.gen(function* readEvidenceFixtureTexts() {
   const inventoryText = yield* fileSystem.readFileString(
     path.join(workspaceRoot, "docs/verification/critical-journeys.json")
   );
+  const historicalInventoryText = yield* fileSystem.readFileString(
+    path.join(
+      workspaceRoot,
+      "docs/evidence/releases/HGI-203-critical-journeys.json"
+    )
+  );
   const packetText = yield* fileSystem.readFileString(
     path.join(workspaceRoot, "docs/evidence/releases/HGI-203-local.json")
   );
 
-  return { inventoryText, packetText, workspaceRoot };
+  return { historicalInventoryText, inventoryText, packetText, workspaceRoot };
 });
 
 const makeTempWorkspace = Effect.acquireRelease(
@@ -213,7 +219,7 @@ describe("release evidence boundary", () => {
 
   it.effect("rejects escaping paths and mismatched retained digests", () =>
     Effect.gen(function* testReleaseEvidenceIntegrityFailures() {
-      const { inventoryText, packetText, workspaceRoot } =
+      const { historicalInventoryText, packetText, workspaceRoot } =
         yield* readEvidenceTexts;
       const packet = yield* decodeReleaseProofPacket(packetText);
       const escapingPacket = packetText.replace(
@@ -242,14 +248,14 @@ describe("release evidence boundary", () => {
         (yield* verifyReleaseEvidence(
           workspaceRoot,
           corruptCandidate,
-          inventoryText
+          historicalInventoryText
         ).pipe(Effect.flip)).operation
       ).toBe("verify-retained-artifact-digest");
       expect(
         (yield* verifyReleaseEvidence(
           workspaceRoot,
           corruptDetail,
-          inventoryText
+          historicalInventoryText
         ).pipe(Effect.flip)).operation
       ).toBe("verify-retained-artifact-digest");
     }).pipe(Effect.provide(BunServices.layer))

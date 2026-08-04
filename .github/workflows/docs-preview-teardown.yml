@@ -1,0 +1,124 @@
+name: Docs Preview Teardown
+
+on:
+  pull_request:
+    types: [closed]
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: Closed same-repository pull-request number
+        required: true
+        type: string
+      reviewed_workflow_sha:
+        description: Reviewed default-branch implementation SHA
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: taxkit-docs-preview-${{ github.event.pull_request.number || inputs.pr_number }}
+  cancel-in-progress: false
+
+jobs:
+  teardown:
+    name: Teardown exact Preview stage
+    if: github.repository == 'crcorbett/taxkit' && (github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository)
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    environment: taxkit-docs-preview-teardown
+    env:
+      ALCHEMY_PROFILE: default
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      PR_NUMBER: ${{ github.event.pull_request.number || inputs.pr_number }}
+      REVIEWED_WORKFLOW_SHA: ${{ github.event.pull_request.base.sha || inputs.reviewed_workflow_sha }}
+    steps:
+      - name: Check exact closed PR and reviewed default-branch source
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          test "$PR_NUMBER" -gt 0
+          if [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
+            test "$(jq -r .pull_request.base.ref "$GITHUB_EVENT_PATH")" = "main"
+            test "$(jq -r .pull_request.state "$GITHUB_EVENT_PATH")" = "closed"
+            test "$(jq -r .pull_request.head.repo.full_name "$GITHUB_EVENT_PATH")" = "$GITHUB_REPOSITORY"
+          fi
+          test "$REVIEWED_WORKFLOW_SHA" = "$(gh api "repos/${GITHUB_REPOSITORY}/git/ref/heads/main" --jq .object.sha)"
+
+      - name: Check out reviewed default-branch implementation
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d # v4.2.0
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+          ref: ${{ env.REVIEWED_WORKFLOW_SHA }}
+
+      - name: Verify checkout identity
+        run: test "$(git rev-parse HEAD)" = "$REVIEWED_WORKFLOW_SHA"
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.0.2
+        with:
+          bun-version-file: .bun-version
+
+      - name: Install frozen dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Validate deployment owners
+        run: bun run check:docs-deployment
+
+      - name: Equal dry-run and destroy exact Preview stage
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/docs-deployment"
+          stage="pr-${PR_NUMBER}"
+          for attempt in one two; do
+            ALCHEMY_PLAIN=1 CI=1 bunx alchemy destroy --dry-run --stage "$stage" --profile "$ALCHEMY_PROFILE" --yes > "$RUNNER_TEMP/docs-deployment/destroy-${attempt}.txt"
+            sed -E $'s/\\033\\[[0-9;]*m//g' "$RUNNER_TEMP/docs-deployment/destroy-${attempt}.txt" | grep -E '^\\[(DocsBuild|DocsWebsite)\\] delete$' > "$RUNNER_TEMP/docs-deployment/destroy-${attempt}.resources.txt" || true
+            resource_count="$(wc -l < "$RUNNER_TEMP/docs-deployment/destroy-${attempt}.resources.txt" | tr -d ' ')"
+            test "$resource_count" -eq 0 || test "$resource_count" -eq 2
+          done
+          cmp "$RUNNER_TEMP/docs-deployment/destroy-one.resources.txt" "$RUNNER_TEMP/docs-deployment/destroy-two.resources.txt"
+          resource_count="$(wc -l < "$RUNNER_TEMP/docs-deployment/destroy-one.resources.txt" | tr -d ' ')"
+          if [ "$resource_count" -eq 2 ]; then
+            destroy_action="delete"
+          else
+            destroy_action="noop"
+          fi
+          lockfile_sha256="$(shasum -a 256 bun.lock | cut -d ' ' -f1)"
+          config_sha256="$(for file in alchemy.run.ts apps/docs/package.json apps/docs/vite.config.ts apps/docs/src/lib/build/cloudflare-stack.ts apps/docs/src/lib/build/docs-deployment-stage.ts apps/docs/public/_headers; do shasum -a 256 "$file"; done | shasum -a 256 | cut -d ' ' -f1)"
+          deployment_input_sha256="$(find apps/docs/dist -type f -print | LC_ALL=C sort | while IFS= read -r file; do shasum -a 256 "$file"; done | shasum -a 256 | cut -d ' ' -f1)"
+          jq -nS \
+            --arg commit "$REVIEWED_WORKFLOW_SHA" \
+            --arg lockfile "$lockfile_sha256" \
+            --arg deployment "$deployment_input_sha256" \
+            --arg config "$config_sha256" \
+            --arg stage "$stage" \
+            --arg action "$destroy_action" \
+            '{candidate:{deploymentInputSha256:$deployment,exactCommit:$commit,lockfileSha256:$lockfile},configSha256:$config,logicalResources:[{action:$action,logicalId:"DocsBuild",resourceType:"Command.Build"},{action:$action,logicalId:"DocsWebsite",resourceType:"Cloudflare.Worker"}],redaction:{ansiRemoved:true,secretValuesIncluded:false,timestampsExcludedFromDigest:true},schemaVersion:1,stack:"TaxKitDocsCloudflare",stage:$stage}' \
+            > "$RUNNER_TEMP/docs-deployment/projection.json"
+          destroy_sha256="$(jq -cS . "$RUNNER_TEMP/docs-deployment/projection.json" | tr -d '\n' | shasum -a 256 | cut -d ' ' -f1)"
+          if [ "$resource_count" -eq 2 ]; then
+            ALCHEMY_PLAIN=1 CI=1 bunx alchemy destroy --stage "$stage" --profile "$ALCHEMY_PROFILE" --yes
+          fi
+          ALCHEMY_PROFILE="$ALCHEMY_PROFILE" CI=1 bun run check:docs-deployment-inventory > "$RUNNER_TEMP/docs-deployment/provider-inventory.json"
+          jq -nS \
+            --arg acceptedBy "$GITHUB_ACTOR" \
+            --arg acceptedPlanSha256 "$destroy_sha256" \
+            --arg observedAt "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+            --slurpfile projection "$RUNNER_TEMP/docs-deployment/projection.json" \
+            '{acceptedBy:$acceptedBy,acceptedPlanSha256:$acceptedPlanSha256,observedAt:$observedAt,operation:"preview-destroy",projection:$projection[0],receiptPath:("docs/evidence/deployments/workflow-" + env.GITHUB_RUN_ID + "/destroy-plan.json"),replanSha256:$acceptedPlanSha256,schemaVersion:1}' \
+            > "$RUNNER_TEMP/docs-deployment/destroy-plan.json"
+
+      - name: Upload sanitized Preview teardown evidence
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: taxkit-docs-preview-teardown-${{ github.run_id }}
+          path: ${{ runner.temp }}/docs-deployment
+          retention-days: 30
+          if-no-files-found: error

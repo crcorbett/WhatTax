@@ -1,0 +1,56 @@
+name: Docs Orphan Inventory (Report Only)
+
+on:
+  schedule:
+    - cron: "17 3 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: taxkit-docs-orphan-inventory
+  cancel-in-progress: true
+
+jobs:
+  inventory:
+    name: Report exact TaxKit stage candidates
+    if: github.repository == 'crcorbett/taxkit'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: github-actions-report-only
+    permissions:
+      contents: read
+    env:
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_READ_API_TOKEN }}
+    steps:
+      - name: Check out reviewed default branch
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d # v4.2.0
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+          ref: ${{ github.sha }}
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.0.2
+        with:
+          bun-version-file: .bun-version
+
+      - name: Install frozen dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Run report-only orphan inventory
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/docs-deployment"
+          bun run check:docs-deployment-orphans > "$RUNNER_TEMP/docs-deployment/orphan-report.json"
+
+      - name: Upload report-only receipt
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: taxkit-docs-orphan-inventory-${{ github.run_id }}
+          path: ${{ runner.temp }}/docs-deployment/orphan-report.json
+          retention-days: 30
+          if-no-files-found: error

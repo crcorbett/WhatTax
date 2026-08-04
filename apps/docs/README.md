@@ -1,8 +1,10 @@
 ---
-status: canonical
-last_reviewed: 2026-07-25
-source_of_truth: app-root
-confidence: high
+document_type: app-readme
+lifecycle: current
+authority: canonical
+owner: taxkit-docs-app-owner
+last_reviewed: 2026-07-30
+review_trigger: docs route, content boundary, build target, runtime, proof or deployment ownership change
 ---
 
 # Docs app
@@ -82,6 +84,9 @@ bun run --filter=docs check-import-boundaries
 bun run --filter=docs test
 bun run --filter=docs test:browser
 bun run --filter=docs test:built
+bun run --filter=docs test:cloudflare-built
+bun run --filter=docs test:cloudflare-hosted
+bun run --filter=docs build:cloudflare
 bun run --filter=docs check-types
 bun run --filter=docs build
 bun run --filter=docs preview
@@ -119,6 +124,51 @@ final evidence additionally supplies the exact candidate with
 behavioral assertions and cannot prove request type, focus behavior, contrast,
 motion suppression, HTTP status, hydration or console cleanliness.
 
+`build:cloudflare` selects the exact official Cloudflare Vite adapter and emits
+the deployable no-bundle Worker at `dist/server/index.js` plus `dist/client`
+assets. `test:cloudflare-built` rebuilds that target, strips provider
+credentials from the child environment, performs a Wrangler dry-run, and runs
+an isolated output-only copy under real workerd. It reuses the built-app
+behavioral contract for SSR, assets, server functions, 404, hydration,
+no-document navigation, accessibility and console cleanliness, and adds
+concurrent-isolate, filesystem, binding, compressed-upload-size, local
+readiness-timing and immutable asset-header oracles. The local timing is not a
+Cloudflare CPU-startup-limit receipt. The exact verified invocation is:
+
+```sh
+bun run --filter=docs test:cloudflare-built
+```
+
+This is local workerd evidence only. It does not prove Alchemy state, a
+Cloudflare deployment, a `workers.dev` URL, Preview, Production or rollback.
+The Nitro `test:built` path remains an independent migration oracle until the
+accepted deployment SPEC retires it.
+
+Root `alchemy.run.ts` composes the same output through public Alchemy
+`Command.Build` and `Cloudflare.Worker({ bundle: false })`. `apps/docs` owns
+the build target and asset headers; root owns provider composition and
+Alchemy owns the physical Worker name. `.wrangler/**` and `dist/**` are
+ignored generated proof/build output and are never deployment receipts.
+
+Exact Preview, Production, teardown, rollback and Alchemy-state operations
+belong to `docs/runbooks/docs-deployment.md`; dated sanitized observations
+belong below `docs/evidence/deployments/`. The hosted harness requires the
+read-back URL, candidate, stage, environment, plan/config/lock/deployment-input
+digests, Worker/deployment/version identities, evidence directory and rollback
+identity. It writes candidate-qualified desktop/mobile PNGs and emits the
+behavioral observation used to build Schema-decoded receipts. The first dated
+Preview observation was torn down but did not meet the final evidence contract,
+so it remains disconfirming history. Fresh candidate `d9cb894…` passed the
+corrected hosted, screenshot and pre-mutation contracts, independent
+adversarial review and full repository gates and was then torn down; DCD-002
+is accepted. DCD-003 then deployed that source to fixed `prod`, qualified
+`c99984c…` through Preview and Production, removed the successor Preview, and
+restored `d9cb894…` through the same normal Alchemy graph. The current
+dated Production readback observed one stable Worker URL and restored
+source-bound state; it does not establish timeless availability. This does not
+claim byte promotion, recovery from known broken content, a custom domain/DNS
+route, a paid plan or release/publication.
+
 `check-import-boundaries` rejects server-only content, service, generated-source
 and runtime imports from browser-reachable app modules. The docs app has no
 browser Effect runtime. Its `.server.ts` loader module is the only route edge
@@ -126,6 +176,15 @@ that acquires `DocsContentService`, and the module-scoped server runtime is
 reused for the server isolate. The runtime factory exposes disposal so focused
 tests and future host lifecycle integration can release its Layer; the current
 hosting adapter does not provide an application shutdown hook.
+
+The Worker entry accepts the exact
+`x-taxkit-docs-runtime-proof: construction-count` opt-in header and returns a
+non-secret construction count plus random isolate identifier. This temporary
+deployment-migration channel proves reuse across requests; it is not a public
+API. Review it when the runtime, Worker entry, privacy boundary or proof
+channel changes. Retire it after an equally strong non-public provider oracle
+exists; otherwise retain its bounded one-identifier/two-header carrying cost
+explicitly through migration parity.
 
 The app-local MDX adapter classifies root-relative, query-only and authored
 relative `.mdx` destinations as TanStack routes while keeping external,

@@ -3,13 +3,13 @@ document_type: automation-register
 lifecycle: current
 authority: canonical
 owner: taxkit-ci-release-maintainer
-last_reviewed: 2026-07-22
+last_reviewed: 2026-07-30
 review_trigger: workflow, signal, authority, proof, stopping, escalation, rollback, or retirement change
 ---
 
-# TaxKit automation register
+# TaxKit automation registers
 
-The Schema-decoded register is
+The read-only Quality and context-candidate register is
 [`tools/quality-workflow/automation-register.json`](../../tools/quality-workflow/automation-register.json).
 It is validated by `bun run check:quality-workflow`; each entry has structured
 signal and immutable-revision state, a named principal bound to one resource and
@@ -31,3 +31,36 @@ Neither entry grants release, publication, deployment, provider, credential, or
 external-state authority. A green local or hosted result does not establish
 that GitHub ran, nor any tag, registry, deployment, provider or public
 availability consequence.
+
+The distinct docs deployment owner is
+[`tools/docs-deployment/automation-register.json`](../../tools/docs-deployment/automation-register.json).
+It is decoded and cross-checked with the deployment-only control register by
+`bun run check:docs-deployment-automation`. It admits exactly four desired
+classes: trusted Preview delivery, fixed Production delivery, exact-stage
+Preview teardown, and report-only orphan inventory. The three mutation records
+require separately protected environments, non-cancellable stage locks,
+accepted/equal replans, narrow credential identities, provider/state readback,
+bounded receipts and fail-closed recovery. Teardown executes reviewed
+default-branch code rather than pull-request-head code. Orphan inventory is
+cancellable, separately read-only credentialed and unable to delete.
+
+The local operator command `bun run check:docs-deployment-orphans` now proves
+the report-only data path against one dated observation. It compared the exact
+open PR set with Schema-decoded Alchemy/Worker inventory, found no Preview
+stage and therefore no orphan candidate, and retained PR `#1` as an open
+trusted PR without a stage. This does not establish the scheduled/manual
+GitHub automation class or grant teardown authority.
+
+All four deployment records currently have `externalState.status` set to
+`not-established` and no receipt. That is executable desired-state admission,
+not evidence that the GitHub environments, secret identities or hosted
+executions exist. The four workflow owners are present on the candidate branch
+and are covered by a focused contract test, but establishment requires a dated
+receipt after those workflows are available on the default branch, their
+protected environments and credential principals are independently configured,
+and a claim-matched run has produced provider/readback evidence. Until then,
+the accepted manual deployment runbook remains the operation owner; Quality
+remains independently cancellable and without provider credentials or provider
+mutation authority. Its runner bootstrap was narrowly corrected on 2026-08-01
+to use frozen Playwright and complete `main` comparison history; that does not
+establish hosted deployment automation.

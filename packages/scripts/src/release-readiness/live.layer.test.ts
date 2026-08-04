@@ -41,7 +41,7 @@ describe("release readiness live layer", () => {
         const diagnosticLinuxHome = `path:${linuxHome}`;
         const diagnosticWindowsHome = `path:${windowsHome}`;
         const diagnosticUncHome = `path:${uncHome}`;
-        const stdoutFixture = `safe token = visible-secret ${macHome} ${linuxHome} ${windowsHome} ${uncHome} ${fileUrlMacHome} ${fileUrlLinuxHome} ${diagnosticMacHome} ${diagnosticLinuxHome} ${diagnosticWindowsHome} ${diagnosticUncHome}\n`;
+        const stdoutFixture = `safe token = visible-secret ${macHome} ${linuxHome} ${windowsHome} ${uncHome} ${fileUrlMacHome} ${fileUrlLinuxHome} ${diagnosticMacHome} ${diagnosticLinuxHome} ${diagnosticWindowsHome} ${diagnosticUncHome}\n${"bounded-padding-".repeat(128)}tail-marker\n`;
         const outcome = yield* runner.execute(
           new ReleaseCheck({
             args: [
@@ -56,8 +56,9 @@ describe("release readiness live layer", () => {
         );
 
         expect(outcome.terminalState).toBe("success");
-        expect(outcome.stdoutExcerpt.length).toBeLessThanOrEqual(1024);
-        expect(outcome.stderrExcerpt.length).toBeLessThanOrEqual(1024);
+        expect(outcome.stdoutExcerpt.length).toBeLessThanOrEqual(4096);
+        expect(outcome.stderrExcerpt.length).toBeLessThanOrEqual(4096);
+        expect(outcome.stdoutExcerpt).toContain("tail-marker");
         expect(outcome.stdoutDetail).not.toBeNull();
         expect(outcome.stderrDetail).not.toBeNull();
 

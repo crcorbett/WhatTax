@@ -217,7 +217,7 @@ export const ReleaseCommandRunnerLive = Layer.effect(
                         .pipe(
                           Effect.andThen(
                             Ref.update(excerpt, (current) =>
-                              `${current}${text}`.slice(0, releaseExcerptLimit)
+                              `${current}${text}`.slice(-releaseExcerptLimit)
                             )
                           )
                         );

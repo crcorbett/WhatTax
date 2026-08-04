@@ -1,12 +1,16 @@
 {
   "$schema": "./node_modules/knip/schema.json",
-  "ignoreWorkspaces": [".", "apps/web", "packages/tsconfig"],
+  "ignoreWorkspaces": ["apps/web", "packages/tsconfig"],
   "ignoreIssues": {
     "packages/api/http/src/client/service.ts": ["duplicates"],
     "packages/scripts/src/release-readiness/evidence.boundary.ts": ["exports"],
     "packages/scripts/src/release-readiness/live.layer.ts": ["exports"]
   },
   "workspaces": {
+    ".": {
+      "entry": ["alchemy.run.ts!"],
+      "project": ["alchemy.run.ts!"]
+    },
     "apps/docs": {
       "entry": [
         "src/router.tsx!",
@@ -16,6 +20,7 @@
       ],
       "project": [
         "src/**/*.{ts,tsx}!",
+        "!src/**/*.test.ts!",
         "!src/**/*.type-test.ts!",
         "vite.config.ts!"
       ],
