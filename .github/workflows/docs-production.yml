@@ -141,15 +141,6 @@ jobs:
             > "$RUNNER_TEMP/docs-deployment/plan.json"
           echo "plan_sha256=$plan_sha256" >> "$GITHUB_OUTPUT"
 
-      - name: Upload sanitized Production plan
-        if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
-        with:
-          name: taxkit-docs-production-${{ github.run_id }}
-          path: ${{ runner.temp }}/docs-deployment
-          retention-days: 30
-          if-no-files-found: error
-
       - name: Replan and deploy fixed Production candidate
         if: inputs.operation == 'deploy' || inputs.operation == 'rollback'
         run: |
@@ -185,6 +176,15 @@ jobs:
           mv "$RUNNER_TEMP/docs-deployment/plan.with-replan.json" "$RUNNER_TEMP/docs-deployment/plan.json"
           ALCHEMY_PLAIN=1 CI=1 bunx alchemy deploy --stage prod --profile "$ALCHEMY_PROFILE" --yes
           ALCHEMY_PROFILE="$ALCHEMY_PROFILE" CI=1 bun run check:docs-deployment-inventory > "$RUNNER_TEMP/docs-deployment/provider-inventory.json"
+
+      - name: Upload sanitized Production plan and replan evidence
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: taxkit-docs-production-${{ github.run_id }}
+          path: ${{ runner.temp }}/docs-deployment
+          retention-days: 30
+          if-no-files-found: error
 
       - name: Upload Production provider readback
         if: (inputs.operation == 'deploy' || inputs.operation == 'rollback') && always()
