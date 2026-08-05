@@ -75,6 +75,13 @@ without the mutation bootstrap path. DCD-004 therefore remains in progress
 with an explicit report-only capability stop; DCD-005 remains pending for the
 remaining parity, evidence and Nitro-bridge retirement requirements.
 
+The merge-era PR-close run `30968741396` independently converged absent
+`pr-13` at default-branch candidate
+`936f3326a6100582ecd8ffb88b299985bc8db875`; its equal no-op digest and
+state/provider postcondition are retained under
+`docs/evidence/deployments/2026-08-05-preview-pr-13/`. This does not change the
+report-only stop or close either DCD task.
+
 ## Target and comparative evidence
 
 TaxKit planning target:

@@ -586,6 +586,11 @@ The corrected teardown runs `30964380634` (`pr-10`) and `30964525980`
 (`pr-9`) performed exact delete/absence readback; `30962555585` remains a
 false-noop disconfirming receipt. PR-close run `30966977503` derived `pr-12`
 from the closed draft and safely converged to an absent-stage no-op.
+After the reviewed slice merged, run `30968741396` repeated the PR-close
+teardown against default-branch candidate
+`936f3326a6100582ecd8ffb88b299985bc8db875`; its equal `pr-13` no-op and
+state/provider postcondition are retained under
+`docs/evidence/deployments/2026-08-05-preview-pr-13/`.
 
 Production plan/deploy runs `30964647432`/`30964781776` deployed the
 Preview-qualified source to fixed `prod`. Runs `30965270740`/`30965398455`

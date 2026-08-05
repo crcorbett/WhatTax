@@ -1133,6 +1133,10 @@ Corrected exact-stage teardown runs `30964380634` (`pr-10`) and
 `30964525980` (`pr-9`) proved provider/state absence; `30962555585` remains
 the false-noop disconfirming observation. PR-close teardown
 `30966977503` safely converged absent `pr-12` at the merged PR-12 head.
+The merge-era PR-close run `30968741396` repeated the exact `pr-13` no-op at
+default-branch candidate `936f3326a6100582ecd8ffb88b299985bc8db875`; its
+equal digest and state/provider postcondition are retained under
+`docs/evidence/deployments/2026-08-05-preview-pr-13/`.
 
 Production plan/deploy pairs `30964647432`/`30964781776` and
 `30965270740`/`30965398455` supplied fixed-stage deployment/provider/hosted
