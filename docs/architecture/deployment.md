@@ -153,6 +153,12 @@ screenshot and source-bound restore evidence. These are dated workflow
 observations; they do not change the provider-neutral architecture or imply a
 custom domain, DNS, publication or byte-promotion claim.
 
+Merge-era PR-close run `30968741396` repeated the exact-stage no-op for `pr-13`
+at default-branch candidate `936f3326a6100582ecd8ffb88b299985bc8db875` and
+read back state/provider agreement with no matching Preview Worker. Its
+sanitized receipt is retained under
+`docs/evidence/deployments/2026-08-05-preview-pr-13/`.
+
 The report-only orphan workflow has a separate unresolved boundary. Run
 `30966300887` stopped before inventory because `GH_TOKEN` was missing; after
 that owner correction, `30967000841` reached deployment inventory but could not

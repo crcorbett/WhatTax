@@ -172,6 +172,11 @@ hosted HTTP/browser and screenshot manifests are retained under
 provider Worker and state absence. The earlier `30962555585` false no-op is
 retained as disconfirming evidence. PR-close teardown `30966977503` safely
 recorded an absent-stage no-op for `pr-12` at the merged PR-12 head.
+The merge-era PR-close run `30968741396` independently converged absent
+`pr-13` at default-branch candidate
+`936f3326a6100582ecd8ffb88b299985bc8db875`; its equal no-op digest and
+state/provider postcondition are retained in
+`2026-08-05-preview-pr-13/teardown-noop-30968741396.json`.
 
 Production plan/deploy runs `30964647432` and `30964781776` deployed the
 Preview-qualified `eafeaad6…` source to fixed stage `prod`. Successor plan and
