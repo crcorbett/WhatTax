@@ -90,7 +90,7 @@ jobs:
           stage="pr-${PR_NUMBER}"
           for attempt in one two; do
             ALCHEMY_PLAIN=1 CI=1 bunx alchemy destroy --dry-run --stage "$stage" --profile "$ALCHEMY_PROFILE" --yes > "$RUNNER_TEMP/docs-deployment/destroy-${attempt}.txt"
-            sed -E $'s/\\033\\[[0-9;]*m//g' "$RUNNER_TEMP/docs-deployment/destroy-${attempt}.txt" | grep -E '^\\[(DocsBuild|DocsWebsite)\\] delete$' > "$RUNNER_TEMP/docs-deployment/destroy-${attempt}.resources.txt" || true
+            sed -E $'s/\\033\\[[0-9;]*m//g' "$RUNNER_TEMP/docs-deployment/destroy-${attempt}.txt" | grep -E '^\[(DocsBuild|DocsWebsite)\] delete$' > "$RUNNER_TEMP/docs-deployment/destroy-${attempt}.resources.txt" || true
             resource_count="$(wc -l < "$RUNNER_TEMP/docs-deployment/destroy-${attempt}.resources.txt" | tr -d ' ')"
             test "$resource_count" -eq 0 || test "$resource_count" -eq 2
           done
