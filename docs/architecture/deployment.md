@@ -3,7 +3,7 @@ document_type: architecture
 lifecycle: current
 authority: canonical
 owner: taxkit-architecture-owner
-last_reviewed: 2026-07-30
+last_reviewed: 2026-08-05
 review_trigger: deployment target, runtime adapter, provider resource, state, domain, or rollback change
 ---
 
@@ -45,11 +45,12 @@ intent and task state belong in the active SPEC and execution plan.
   domains, DNS and third-party observability are absent.
 - `tools/docs-deployment/automation-register.json` and `controls.json` own the
   Schema-decoded desired state for three mutating workflow classes and one
-  report-only orphan inventory. Their validator reports zero externally
-  established automations. The four workflow owners are present on the current
-  candidate branch, but they neither create GitHub environments/secrets nor
-  replace the accepted manual operation path until protected-environment,
-  credential and hosted-receipt conditions are read back.
+  report-only orphan inventory. Their validator still reports zero externally
+  established automations because the aggregate register is fail-closed. The
+  four workflow owners are on the reviewed default branch and the three
+  mutation classes have dated provider/hosted receipts; the report-only
+  state-boundary stop prevents the register from claiming complete external
+  establishment.
 - `@taxkit/api-http` builds as a package and exposes health, generated docs,
   OpenAPI JSON, metadata and public calculation route contracts.
 - `@taxkit/sdk` builds as a private package for local and downstream
@@ -137,6 +138,29 @@ provider URL. The latest dated readback observed restored `d9cb894…`; it is no
 a timeless availability claim.
 Custom-domain attachment is a future successor and must preserve the
 Production Worker identity and deployment contract.
+
+## 2026-08-05 workflow observation
+
+The reviewed deployment workflows are on default branch
+`1b6d36b765a5953f79b0932c127f01088603930f`. The Preview plan/deploy pair
+`30962576035`/`30962743727` and corrected exact-stage teardowns
+`30964380634`/`30964525980` supplied claim-matched state/provider receipts for
+the `pr-10`/`pr-9` stages. The PR-close teardown `30966977503` safely produced
+an absent-stage no-op for `pr-12`. Production plan/deploy pairs
+`30964647432`/`30964781776` and `30965270740`/`30965398455` plus rollback
+`30965691430`/`30965797032` supplied fixed-stage deployment, hosted,
+screenshot and source-bound restore evidence. These are dated workflow
+observations; they do not change the provider-neutral architecture or imply a
+custom domain, DNS, publication or byte-promotion claim.
+
+The report-only orphan workflow has a separate unresolved boundary. Run
+`30966300887` stopped before inventory because `GH_TOKEN` was missing; after
+that owner correction, `30967000841` reached deployment inventory but could not
+derive Alchemy beta.64's HTTP state-store bearer with the read-only Cloudflare
+token. The mutation bootstrap path is not permitted for report-only inventory.
+Therefore the deployment register remains `not-established` as an aggregate
+state claim, and scheduled orphan detection remains an inconclusive,
+non-mutating report rather than an absence or teardown signal.
 
 ## Local runtime shape
 

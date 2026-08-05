@@ -3,7 +3,7 @@ document_type: automation-register
 lifecycle: current
 authority: canonical
 owner: taxkit-ci-release-maintainer
-last_reviewed: 2026-07-30
+last_reviewed: 2026-08-05
 review_trigger: workflow, signal, authority, proof, stopping, escalation, rollback, or retirement change
 ---
 
@@ -59,16 +59,17 @@ stage and therefore no orphan candidate, and retained PR `#1` as an open
 trusted PR without a stage. This does not establish the scheduled/manual
 GitHub automation class or grant teardown authority.
 
-All four deployment records currently have `externalState.status` set to
-`not-established` and no receipt. That is executable desired-state admission,
-not evidence that the GitHub environments, secret identities or hosted
-executions exist. The four workflow owners are present on the candidate branch
-and are covered by a focused contract test, but establishment requires a dated
-receipt after those workflows are available on the default branch, their
-protected environments and credential principals are independently configured,
-and a claim-matched run has produced provider/readback evidence. Until then,
-the accepted manual deployment runbook remains the operation owner; Quality
-remains independently cancellable and without provider credentials or provider
-mutation authority. Its runner bootstrap was narrowly corrected on 2026-08-01
-to use frozen Playwright and complete `main` comparison history; that does not
-establish hosted deployment automation.
+The four deployment records still intentionally have
+`externalState.status: "not-established"`. This is executable desired-state
+admission, not a claim that no workflow has run. The current default-branch
+epoch retained under
+`docs/evidence/deployments/2026-08-05-*` supplies successful Preview,
+Production, rollback and teardown observations for the three mutation classes,
+but the report-only run `30967000841` remains inconclusive because its
+read-only Cloudflare credential cannot derive Alchemy beta.64's HTTP
+state-store bearer without mutation-capable bootstrap. The first report-only
+failure `30966300887` (missing `GH_TOKEN`) and the corrected failure are both
+retained. Until a separately reviewed non-mutating state boundary exists, the
+aggregate register must remain `not-established`; the report-only workflow has
+no teardown or deletion authority. Quality remains independently cancellable
+and without provider credentials or provider mutation authority.

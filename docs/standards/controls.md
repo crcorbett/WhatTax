@@ -3,7 +3,7 @@ document_type: standard
 lifecycle: current
 authority: canonical
 owner: taxkit-ci-release-maintainer
-last_reviewed: 2026-08-02
+last_reviewed: 2026-08-05
 review_trigger: public boundary, workflow, action, release graph, or repeated-review finding change
 ---
 
@@ -63,3 +63,14 @@ executes only the admitted open-PR, state and Worker reads. Its receipt Schema
 fixes `mutationCapability` to `none` and `automaticDeletion` to `prohibited`;
 the policy recomputes classifications from the embedded source inventories so
 a false active/orphan label fails validation.
+
+The 2026-08-05 default-branch workflow epoch provides dated receipts for the
+three mutation control classes: Preview plan/deploy and exact-stage teardown,
+fixed Production deploy, and source-bound rollback. Those receipts are
+retained under `docs/evidence/deployments/2026-08-05-*` and remain separate
+from local control validation. Report-only run `30967000841` reached inventory
+but stopped because its read-only Cloudflare credential cannot derive the
+Alchemy beta.64 state-store bearer without the mutation bootstrap path; no
+provider mutation occurred. Consequently the aggregate deployment register
+remains `not-established`, and orphan detection remains an inconclusive
+report-only signal rather than deletion or teardown authority.

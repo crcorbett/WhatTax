@@ -3,7 +3,7 @@ document_type: product-spec
 lifecycle: proposed
 authority: supporting
 owner: taxkit-product-owner
-last_reviewed: 2026-08-04
+last_reviewed: 2026-08-05
 review_trigger: accepted TK-CF finding, dependency constraint, Cloudflare or Alchemy contract, deployment authority, proof boundary, or implementation discovery
 successor: null
 tombstone: false
@@ -52,9 +52,28 @@ execution, current availability after teardown, custom-domain/DNS routing,
 paid-plan/cost facts, release or publication. The older paragraph's
 credential/environment non-claim is superseded by the dated 2026-08-04
 capability receipt: the four protected environments and two narrow credential
-identities now exist, while workflow execution and hosted receipts remain
-unestablished. DCD-004 remains in progress and DCD-005 remains pending for
-default-branch workflow parity and bridge retirement.
+identities now exist. At that earlier capability epoch workflow execution and
+hosted receipts were still unestablished; the current default-branch workflow
+epoch is recorded below. DCD-004 remains in progress and DCD-005 remains
+pending for the report-only state boundary, final parity and bridge
+retirement.
+
+The 2026-08-05 default-branch workflow epoch now proves the mutation path
+under the protected environments: Preview plan/deploy runs
+`30962576035`/`30962743727`, corrected exact-stage teardowns
+`30964380634`/`30964525980`, PR-close absent-stage teardown `30966977503`,
+Production plan/deploy runs `30964647432`/`30964781776` and
+`30965270740`/`30965398455`, and normal rollback plan/execution
+`30965691430`/`30965797032`. Candidate, stage, plan, provider/state, hosted
+and bounded screenshot receipts are retained under
+`docs/evidence/deployments/2026-08-05-*`. This advances the Preview,
+Production and teardown observations but does not establish the report-only
+orphan class: `30966300887` stopped before inventory because `GH_TOKEN` was
+missing, and corrected run `30967000841` stopped because the read-only
+Cloudflare credential cannot derive Alchemy beta.64's HTTP state-store bearer
+without the mutation bootstrap path. DCD-004 therefore remains in progress
+with an explicit report-only capability stop; DCD-005 remains pending for the
+remaining parity, evidence and Nitro-bridge retirement requirements.
 
 ## Target and comparative evidence
 

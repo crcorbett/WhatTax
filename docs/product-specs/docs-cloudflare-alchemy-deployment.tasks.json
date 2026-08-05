@@ -3,7 +3,7 @@
   "spec": "docs/product-specs/docs-cloudflare-alchemy-deployment.md",
   "title": "Docs Cloudflare and Alchemy Deployment Tasks",
   "status": "active",
-  "last_reviewed": "2026-08-02",
+  "last_reviewed": "2026-08-05",
   "principles": [
     "Deliver one complete consumer/operator outcome in each vertical slice; do not build a horizontal infrastructure or governance platform first.",
     "Upgrade Effect/Platform and Alchemy together to exact 4.0.0-beta.100 and 2.0.0-beta.64 pins in the first slice; do not propose beta.63 or latest.",
@@ -674,7 +674,8 @@
           "a mutation lock is cancellable or keyed more narrowly than the target stage",
           "a newer run cannot detect a stale candidate after acquiring the lock",
           "plan equality, protected approval or provider readback can be bypassed",
-          "orphan inventory can mutate or destroy resources"
+          "orphan inventory can mutate or destroy resources",
+          "report-only inventory cannot read the exact Alchemy state boundary without a separately reviewed non-mutating credential path"
         ],
         "rollback": "Disable or revert the affected workflow/control while retaining the accepted manual runbook path and provider state; do not remove resources without exact teardown authority.",
         "recovery": "Repair the named Schema/policy/fixture finding and rerun the workflow only for a new exact authorized attempt."
@@ -697,7 +698,7 @@
         "bun run check:repository-paths",
         "execute the installed Alchemy Cloudflare bootstrap command with CI=0 in each mutation workflow and retain no runner credential cache beyond the job",
         "execute one authorized exact-candidate workflow path for each admitted mutating class and backfill its exact owned invocation before completion",
-        "execute the orphan inventory in report-only mode and prove no mutation capability",
+        "execute the orphan inventory in report-only mode and prove no mutation capability; if the exact state boundary is unavailable, retain the claim-matched inconclusive receipt and keep externalState not-established",
         "Schema-decode all workflow receipts and reconcile them with provider/state readback",
         "bun run verification",
         "git diff --check",
