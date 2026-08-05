@@ -3,7 +3,7 @@ document_type: deployment-evidence-index
 lifecycle: current
 authority: canonical
 owner: taxkit-docs-deployment-proof-owner
-last_reviewed: 2026-08-04
+last_reviewed: 2026-08-05
 review_trigger: docs deployment candidate, provider, stage, URL, proof, screenshot, teardown or rollback receipt change
 ---
 
@@ -154,6 +154,48 @@ historical rollback receipt. Its preflight, equal plan, provider readback,
 hosted proof and screenshot manifests are claim-matched and validated by the
 deployment checker, while the historical three-transition receipt remains
 unchanged.
+
+## 2026-08-05 default-branch workflow epoch
+
+The merged implementation revision is
+`1b6d36b765a5953f79b0932c127f01088603930f`. Default-branch Preview plan and
+deploy runs `30962576035` and `30962743727` used candidate
+`eafeaad6c283ae6949ccf67636f39bec199b4e94`, stage `pr-10` and accepted plan
+digest `acb4f2eb005b68c5d2c1ad1d491cda8119010b92f558c0d05ee68b25ee62e437`.
+The workflow's provider readback is retained with the `pr-10` evidence; the
+hosted HTTP/browser and screenshot manifests are retained under
+`2026-08-05-preview-pr-10/`. Corrected exact-stage teardown runs
+`30964380634` (`pr-10`, digest
+`f6eab33a87f5011c46fd24cd689872271ba4d0ac2c7e2fdf11010b188d21dd11`) and
+`30964525980` (`pr-9`, digest
+`42d417acbcb28da0d1e4fd9dbe4a7e04285c95f2963859ee8c9e4a105e2a1bc3`) prove
+provider Worker and state absence. The earlier `30962555585` false no-op is
+retained as disconfirming evidence. PR-close teardown `30966977503` safely
+recorded an absent-stage no-op for `pr-12` at the merged PR-12 head.
+
+Production plan/deploy runs `30964647432` and `30964781776` deployed the
+Preview-qualified `eafeaad6…` source to fixed stage `prod`. Successor plan and
+deploy runs `30965270740` and `30965398455` qualified `aabe7b69…`; rollback
+plan and execution runs `30965691430` and `30965797032` restored the
+`eafeaad6…` source through the normal source-bound graph. The current
+Production Worker, deployment/version and Alchemy state identities are bound
+by `2026-08-05-production-prod-eafeaad/` and
+`2026-08-05-production-prod-aabe7b6/`; hosted proof, rollback proof and the
+bounded desktop/mobile screenshot manifests are retained there. These are
+claim-matched dated observations, not custom-domain, DNS, publication or
+byte-promotion claims.
+
+The first report-only orphan run `30966300887` stopped before inventory because
+`GH_TOKEN` was not bound. The corrected run `30967000841` reached
+`deployment-inventory` and stopped because the separate read-only Cloudflare
+token cannot derive Alchemy beta.64's HTTP state-store bearer without the
+mutation-capable bootstrap path. The two inconclusive receipts are
+`2026-08-05-orphan-inventory/failed-30966300887.json` and
+`2026-08-05-orphan-inventory/failed-30967000841.json`. No provider mutation or
+secret disclosure occurred; scheduled orphan detection remains report-only and
+inconclusive. The deployment automation register therefore remains
+`not-established` even though the three mutation workflow classes have dated
+success receipts.
 
 Secrets, raw tokens, request bodies, credential values and unsanitized provider
 output are forbidden. Historical release and harness evidence remains

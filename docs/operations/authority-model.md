@@ -3,7 +3,7 @@ document_type: authority-model
 lifecycle: current
 authority: canonical
 owner: taxkit-authority-model-owner
-last_reviewed: 2026-08-04
+last_reviewed: 2026-08-05
 review_trigger: identity, release, Git, registry, deployment, provider, credential, or recovery change
 ---
 
@@ -157,3 +157,26 @@ remain open trusted draft-PR operations. Teardown may record a no-op when the
 exact stage is absent. Custom-domain/DNS, unrelated resources, publication,
 release and credential disclosure or scope expansion remain outside this
 approval. Existing historical authority receipts are unchanged.
+
+### 2026-08-05 — default-branch workflow readback and report-only boundary
+
+The reviewed workflow files are now on default branch
+`1b6d36b765a5953f79b0932c127f01088603930f`. Under the already recorded
+Cooper envelope, Preview plan/deploy (`30962576035`/`30962743727`), corrected
+exact-stage teardown (`30964380634`/`30964525980`), PR-close absent-stage
+teardown (`30966977503`), Production plan/deploy pairs
+(`30964647432`/`30964781776`, `30965270740`/`30965398455`) and normal
+rollback (`30965691430`/`30965797032`) read back only the named TaxKit docs
+stages/resources. Their sanitized provider, state, hosted and screenshot
+receipts are routed under `docs/evidence/deployments/2026-08-05-*`.
+
+The report-only class has not crossed its authority boundary. Run
+`30966300887` stopped before inventory because `GH_TOKEN` was not bound; after
+the owner correction, `30967000841` reached deployment inventory but a
+read-only Cloudflare credential could not derive Alchemy beta.64's HTTP
+state-store bearer without the mutation-capable bootstrap path. No mutation or
+secret disclosure occurred. The report-only workflow therefore remains an
+inconclusive, read-only observation and cannot establish absence, teardown or
+deletion. The deployment register remains `not-established` as an aggregate
+claim until a separately reviewed non-mutating state boundary exists; this is
+a capability stop, not a license to widen the credential envelope.

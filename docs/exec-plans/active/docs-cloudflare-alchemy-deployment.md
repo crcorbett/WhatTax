@@ -3,7 +3,7 @@ document_type: execution-plan
 lifecycle: current
 authority: supporting
 owner: taxkit-docs-deployment-implementation-owner
-last_reviewed: 2026-08-04
+last_reviewed: 2026-08-05
 review_trigger: DCD task transition, implementation discovery, proof result, authority stop, or rollback
 successor: null
 tombstone: false
@@ -34,8 +34,8 @@ the milestone and acceptance owner.
 | `DCD-001` | completed   | Accepted at `669a8f3…` after exact dependency/integrity readback, both built-app oracles, docs-maintainer reconciliation, focused Changeset, independent closure, and all change-owned gates. |
 | `DCD-002` | completed   | Accepted candidate `d9cb894…` passed fresh pre-deploy and pre-destroy state/provider readback, equal plans, Preview apply, the complete hosted/browser/screenshot contract, exact-stage teardown/absence, all gates and corrected-boundary independent review. |
 | `DCD-003` | completed   | Accepted after fixed Production, separately Preview-qualified successor, successor Production, restored-source rollback, provider/hosted/screenshot readback, owner reconciliation, full verification and corrected-boundary independent review. |
-| `DCD-004` | in_progress | The four workflow owners, protected environments and narrow CI credential identities are present; default-branch workflow execution and hosted receipts remain pending. The first Preview dispatch uses only the bounded merged-candidate bootstrap, then later Preview runs require an open trusted draft PR. |
-| `DCD-005` | pending     | Waits for accepted automation and complete parity evidence.                                                                                                                                                          |
+| `DCD-004` | in_progress | Mutation workflow plan/deploy/teardown receipts now pass on the default branch, including Preview, fixed Production, rollback and PR-close no-op; report-only inventory remains an explicit capability stop because the read-only token cannot derive Alchemy's state-store bearer. The automation register remains `not-established` as an aggregate claim. |
+| `DCD-005` | pending     | Waits for the report-only state boundary, final parity/retirement proof, fresh independent review and complete closeout evidence. |
 
 ## Baseline
 
@@ -1121,3 +1121,33 @@ environment-method selector; bootstrap then materializes the account-matched
 cache only for that runner before the inventory command is rerun under `CI=1`.
 The report-only workflow remains separately credentialed and `not-established`;
 this correction does not make a stronger claim.
+
+### 2026-08-05 — default-branch workflow receipts and report-only stop
+
+The reviewed workflow files are present on default branch
+`1b6d36b765a5953f79b0932c127f01088603930f`. Preview plan/deploy runs
+`30962576035`/`30962743727` used candidate
+`eafeaad6c283ae6949ccf67636f39bec199b4e94`, stage `pr-10` and equal plan
+digest `acb4f2eb005b68c5d2c1ad1d491cda8119010b92f558c0d05ee68b25ee62e437`.
+Corrected exact-stage teardown runs `30964380634` (`pr-10`) and
+`30964525980` (`pr-9`) proved provider/state absence; `30962555585` remains
+the false-noop disconfirming observation. PR-close teardown
+`30966977503` safely converged absent `pr-12` at the merged PR-12 head.
+
+Production plan/deploy pairs `30964647432`/`30964781776` and
+`30965270740`/`30965398455` supplied fixed-stage deployment/provider/hosted
+and screenshot evidence. Normal rollback plan/execution
+`30965691430`/`30965797032` restored the prior source through a new
+source-bound deployment/version. The claim-matched manifests are retained in
+the two 2026-08-05 Production evidence directories.
+
+Report-only run `30966300887` stopped before inventory because `GH_TOKEN` was
+missing. After the workflow owner correction, `30967000841` reached
+`deployment-inventory` but stopped because a read-only Cloudflare credential
+cannot derive the installed Alchemy beta.64 HTTP state-store bearer without
+the mutation-capable bootstrap path. The failure receipts are retained under
+`docs/evidence/deployments/2026-08-05-orphan-inventory/`. No mutation or secret
+disclosure occurred. Scheduled orphan detection remains an inconclusive
+report-only path; the deployment register stays `not-established`, DCD-004
+stays `in_progress`, and DCD-005 stays `pending` until this boundary and the
+remaining parity/retirement proof are resolved.

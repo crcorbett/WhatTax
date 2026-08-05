@@ -3,7 +3,7 @@ document_type: runbook
 lifecycle: current
 authority: canonical
 owner: taxkit-docs-deployment-operation-owner
-last_reviewed: 2026-08-04
+last_reviewed: 2026-08-05
 review_trigger: docs deployment candidate, Cloudflare or Alchemy identity/state, stage, plan, provider readback, teardown, rollback, credential or authority change
 ---
 
@@ -527,13 +527,15 @@ Before marking its `externalState` as `established`, require all of:
 7. a retained dated receipt named in `externalState.receipt`.
 
 The current register intentionally records all four entries as
-`not-established` until workflow receipts exist. The 2026-08-04 capability
-receipt now records the exact protected environment identities and redacted
-narrow credential readback; its earlier absence observation remains historical.
-Do not create an unprotected or empty environment, copy the broad local OAuth
-credential into GitHub, or invent an unexecuted command merely to advance the
-task. Continue to use this manual runbook under the exact authority envelope
-until default-branch workflow, hosted and rollback readback is retained.
+`not-established` until each record's complete receipt contract is satisfied.
+The 2026-08-04 capability receipt records the exact protected environment
+identities and redacted narrow credential readback; the current workflow epoch
+below records successful mutation-class runs, while the report-only state
+boundary remains unresolved. Do not create an unprotected or empty
+environment, copy the broad local OAuth credential into GitHub, or invent an
+unexecuted command merely to advance the task. Continue to use this manual
+runbook under the exact authority envelope until every required workflow
+receipt and read-only state boundary is retained.
 
 The 2026-08-02 successor readback at draft-PR head `aabe7b6…` confirmed
 repository-admin capability but still found zero GitHub environments, zero
@@ -572,6 +574,41 @@ deployment-evidence route. The 2026-07-30 receipt observed only fixed
 Production, no Preview stage or orphan candidate, and one trusted open PR
 without a stage. Do not turn that observation into deletion or absence proof
 for a later provider epoch.
+
+## 2026-08-05 workflow execution epoch
+
+The reviewed workflow files are now on the default branch at
+`1b6d36b765a5953f79b0932c127f01088603930f`. The bounded default-branch
+bootstrap ran Preview plan/deploy as `30962576035`/`30962743727` for candidate
+`eafeaad6c283ae6949ccf67636f39bec199b4e94`, stage `pr-10`, with equal plan
+digest `acb4f2eb005b68c5d2c1ad1d491cda8119010b92f558c0d05ee68b25ee62e437`.
+The corrected teardown runs `30964380634` (`pr-10`) and `30964525980`
+(`pr-9`) performed exact delete/absence readback; `30962555585` remains a
+false-noop disconfirming receipt. PR-close run `30966977503` derived `pr-12`
+from the closed draft and safely converged to an absent-stage no-op.
+
+Production plan/deploy runs `30964647432`/`30964781776` deployed the
+Preview-qualified source to fixed `prod`. Runs `30965270740`/`30965398455`
+qualified the successor, and rollback plan/execution
+`30965691430`/`30965797032` restored the prior source through a new
+source-bound deployment/version. Provider, state, hosted, screenshot and
+rollback receipts are routed under
+`docs/evidence/deployments/2026-08-05-production-prod-eafeaad/` and
+`2026-08-05-production-prod-aabe7b6/`.
+
+The first report-only run `30966300887` stopped before the GitHub open-PR read
+because `GH_TOKEN` was not bound. The correction bound the GitHub-provided
+token, but run `30967000841` then stopped at `deployment-inventory`: a
+read-only Cloudflare token cannot derive Alchemy beta.64's HTTP state-store
+bearer without the mutation-capable bootstrap path. The two failed receipts
+are retained under
+`docs/evidence/deployments/2026-08-05-orphan-inventory/`. Do not copy a
+mutation token, local OAuth profile or state cache into report-only inventory;
+until a separately reviewed read-only state boundary exists, the scheduled
+inventory is an inconclusive report-only report and grants no teardown or
+deletion authority. The executable deployment register therefore remains
+`not-established` as an aggregate claim despite the dated mutation workflow
+successes.
 
 ## Stop conditions
 
