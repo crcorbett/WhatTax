@@ -796,7 +796,10 @@ requests through a protected environment. Forks and untrusted candidates stop,
 and no candidate code runs through `pull_request_target`. PR-close teardown
 may use that event only if it checks out a reviewed default-branch
 implementation commit, never the pull-request head, derives only the numeric
-PR stage, and performs exact state/provider readback before destroy.
+PR stage, and performs exact state/provider readback before destroy. A manual
+teardown dispatch must first prove `GITHUB_REF=refs/heads/main` and the live
+default-branch SHA; its Cloudflare credentials are step-scoped only after the
+reviewed checkout, never job-scoped before source validation.
 
 The equal replan applies the same exact-resource projection as the initial
 plan and rejects every action/resource outside `DocsBuild` and `DocsWebsite`.

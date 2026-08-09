@@ -201,6 +201,10 @@ describe("docs deployment workflow admission", () => {
     ].join("");
     expect(teardown).toContain(`REVIEWED_WORKFLOW_SHA: ${githubExpression}`);
     expect(teardown).not.toContain("github.event.pull_request.base.sha");
+    expect(teardown).toContain('test "$GITHUB_REF" = "refs/heads/main"');
+    expect(teardown).not.toContain(
+      "CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}\n      PR_NUMBER:"
+    );
   });
 
   test("binds Production mutation to a Schema-checked Preview workflow receipt", async () => {

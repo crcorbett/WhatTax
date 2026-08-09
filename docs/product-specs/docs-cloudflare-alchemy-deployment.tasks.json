@@ -643,7 +643,7 @@
         "admit separate Schema-decoded automation entries for Preview, Production and teardown with exact principals/resources/environments",
         "add one report-only orphan inventory that compares open PRs, Alchemy stages and Cloudflare resources without destroying anything",
         "create deployment-only Schemas, policy and negative fixtures under tools/docs-deployment while preserving Quality's independent read-only/cancellable authority; any narrow quality-workflow prerequisite correction requires exact hosted failure and green successor receipts",
-        "allow same-repository trusted PR candidates only; never run candidate code through pull_request_target, and make PR-close teardown check out reviewed default-branch implementation code rather than PR head",
+        "allow same-repository trusted PR candidates only; never run candidate code through pull_request_target, make PR-close teardown check out reviewed default-branch implementation code rather than PR head, reject manual teardown dispatch from any ref other than refs/heads/main before provider credential use, and scope teardown credentials only to post-checkout provider steps",
         "retain a bounded receipt on success, failure, cancellation or provider disagreement",
         "Schema-decode the workflow provider and hosted artifacts before retaining a mutation proof; bind candidate, stage, accepted/equal plan, config, lockfile, deployment input, Worker, URL, deployment/version and zero diagnostics",
         "retain raw hosted diagnostics separately from a strict promoted receipt, copy the desktop/mobile PNG bytes into the owned artifact route and recompute every image digest before workflow success or external-state admission",

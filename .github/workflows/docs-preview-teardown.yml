@@ -32,8 +32,6 @@ jobs:
     environment: taxkit-docs-preview-teardown
     env:
       ALCHEMY_PROFILE: default
-      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       PR_NUMBER: ${{ github.event.pull_request.number || inputs.pr_number }}
       REVIEWED_WORKFLOW_SHA: ${{ inputs.reviewed_workflow_sha || github.sha }}
     steps:
@@ -51,6 +49,8 @@ jobs:
             test "$(jq -r .pull_request.base.ref "$GITHUB_EVENT_PATH")" = "main"
             test "$(jq -r .pull_request.state "$GITHUB_EVENT_PATH")" = "closed"
             test "$(jq -r .pull_request.head.repo.full_name "$GITHUB_EVENT_PATH")" = "$GITHUB_REPOSITORY"
+          else
+            test "$GITHUB_REF" = "refs/heads/main"
           fi
           test "$REVIEWED_WORKFLOW_SHA" = "$(gh api "repos/${GITHUB_REPOSITORY}/git/ref/heads/main" --jq .object.sha)"
           mkdir -p "$RUNNER_TEMP/docs-deployment"
@@ -101,12 +101,18 @@ jobs:
         run: bun run --filter=docs build:cloudflare
 
       - name: Materialize ephemeral Alchemy state-store credential cache
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
         run: |
           set -euo pipefail
           ALCHEMY_PLAIN=1 CI=1 bunx alchemy login --profile "$ALCHEMY_PROFILE" > /dev/null
           ALCHEMY_PLAIN=1 CI=0 bunx alchemy cloudflare bootstrap --profile "$ALCHEMY_PROFILE" --worker-name alchemy-state-store
 
       - name: Equal dry-run and destroy exact Preview stage
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
         run: |
           set -euo pipefail
           mkdir -p "$RUNNER_TEMP/docs-deployment"

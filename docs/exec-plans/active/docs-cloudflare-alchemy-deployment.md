@@ -1355,6 +1355,9 @@ pull-request API head separately from its reviewed `workflowCommit` and accepts
 it only when that commit is an ancestor of current `main`. Failed or cancelled
 runs, artifact mismatch or schema/provider disagreement retain bounded failure
 metadata and cannot establish external state. The
+manual teardown dispatch rejects a selected ref other than
+`refs/heads/main` before provider credentials are exposed, and credentials are
+step-scoped after the reviewed checkout rather than job-scoped. The
 Preview and Production plan shells also reject every resource-like line outside
 the two owned resources and reject `delete` before a deploy apply. Teardown
 performs a final state/Worker identity readback after equal dry-runs and before

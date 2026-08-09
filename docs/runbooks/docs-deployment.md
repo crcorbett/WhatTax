@@ -648,7 +648,10 @@ authority are separate.
 
 PR-close teardown must run reviewed default-branch implementation code, derive
 only exact `pr-N`, share that stage's non-cancellable mutation lock, and prove
-state/provider/URL absence. Scheduled orphan inventory is report-only: it may
+state/provider/URL absence. Manual teardown dispatch must reject any selected
+ref other than `refs/heads/main` before any provider credential is available;
+Cloudflare credentials are scoped to the post-checkout provider steps. Scheduled
+orphan inventory is report-only: it may
 compare open pull requests, exact TaxKit stages and exact TaxKit Workers, but
 has no provider-write, state-write or automatic-deletion authority. An
 incomplete inventory is an inconclusive report, not destroy permission.
