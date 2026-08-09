@@ -246,6 +246,8 @@ describe("docs deployment workflow admission", () => {
     expect(receipts).toContain("TAXKIT_WORKFLOW_RUN_HEAD_SHA");
     expect(receipts).toContain("TAXKIT_WORKFLOW_CHECKOUT_SHA");
     expect(receipts).toContain("git checkout --detach");
+    expect(receipts).toContain("workflow-run-candidate.json");
+    expect(receipts).toContain("Promote the validated workflow receipt");
     expect(receipts).toContain(
       "always() && github.event.workflow_run.conclusion"
     );

@@ -141,7 +141,7 @@ jobs:
             --arg workflowCommit "$workflow_commit" \
             --arg workflowName "$(jq -er .name "$RUNNER_TEMP/docs-deployment/workflow-run-api.json")" \
             '{candidateCommit:$candidate,conclusion:$conclusion,event:$event,headBranch:$headBranch,headSha:$headSha,path:$path,ref:"refs/heads/main",status:$status,workflowCommit:$workflowCommit,workflowName:$workflowName,workflowRunId:$run}' \
-            > "$RUNNER_TEMP/docs-deployment/workflow-run.json"
+            > "$RUNNER_TEMP/docs-deployment/workflow-run-candidate.json"
 
       - name: Check out the reviewed implementation commit for receipt schemas
         if: github.event.workflow_run.conclusion == 'success'
@@ -174,7 +174,7 @@ jobs:
         env:
           TAXKIT_WORKFLOW_INPUT_RECEIPT: ${{ runner.temp }}/docs-deployment/workflow-input.json
           TAXKIT_WORKFLOW_INPUT_RUN_ID: ${{ github.event.workflow_run.id }}
-          TAXKIT_WORKFLOW_RUN_RECEIPT: ${{ runner.temp }}/docs-deployment/workflow-run.json
+          TAXKIT_WORKFLOW_RUN_RECEIPT: ${{ runner.temp }}/docs-deployment/workflow-run-candidate.json
           TAXKIT_WORKFLOW_RUN_ID: ${{ github.event.workflow_run.id }}
         run: |
           set -euo pipefail
@@ -194,11 +194,19 @@ jobs:
           bun run check:docs-deployment-workflow-input
           bun run check:docs-deployment-workflow-run
 
+      - name: Promote the validated workflow receipt
+        if: success()
+        run: |
+          set -euo pipefail
+          mv "$RUNNER_TEMP/docs-deployment/workflow-run-candidate.json" \
+            "$RUNNER_TEMP/docs-deployment/workflow-run.json"
+
       - name: Retain bounded reconciliation stop when positive proof is unavailable
         if: always()
         run: |
           set -euo pipefail
           if [ ! -f "$RUNNER_TEMP/docs-deployment/workflow-run.json" ] && [ ! -f "$RUNNER_TEMP/docs-deployment/workflow-run-failure.json" ]; then
+            rm -f "$RUNNER_TEMP/docs-deployment/workflow-run-candidate.json"
             jq -nS \
               --arg conclusion "$SOURCE_RUN_CONCLUSION" \
               --arg run "$SOURCE_RUN_ID" \
