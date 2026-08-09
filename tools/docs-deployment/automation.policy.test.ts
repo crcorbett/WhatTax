@@ -9,6 +9,7 @@ import {
   DeploymentControlRegister,
 } from "./automation.schemas.js";
 import controlsJson from "./controls.json";
+import { DeploymentWorkflowExternalReceipt } from "./workflow-receipts.schemas.js";
 
 const decodeAutomations = (input: unknown) =>
   Effect.runPromise(
@@ -182,6 +183,58 @@ describe("docs deployment automation admission", () => {
       firstControl,
     ]).map((item) => item.invariant);
     expect(findings).toEqual(["control-register", "external-proof"]);
+  });
+
+  test("accepts an established entry only with the decoded matching workflow receipt", async () => {
+    const [automations, controls] = await decodeRegisters();
+    const preview = automations.find(
+      (entry) => entry.id === "docs-preview-delivery"
+    );
+    expect(preview).toBeDefined();
+    if (preview === undefined) {
+      return;
+    }
+    const receipt = await Effect.runPromise(
+      Schema.decodeUnknownEffect(DeploymentWorkflowExternalReceipt)({
+        acceptedPlanSha256: "a".repeat(64),
+        automationId: preview.id,
+        candidateCommit: "b".repeat(40),
+        environment: preview.environment.id,
+        hostedProofPath: "docs/evidence/deployments/workflow-hosted.json",
+        lockGroup: preview.lock.group,
+        nonClaims: ["This fixture is not provider proof."],
+        observedAt: "2026-08-10T00:00:00Z",
+        planPath: "docs/evidence/deployments/workflow-plan.json",
+        postcondition: "provider and hosted identities agree",
+        principal: preview.authority.principal,
+        providerReadbackPath:
+          "docs/evidence/deployments/workflow-provider.json",
+        schemaVersion: 1,
+        stage: "pr-15",
+        workflowCommit: "c".repeat(40),
+        workflowPath: ".github/workflows/docs-preview.yml",
+        workflowReceiptPath: "docs/evidence/deployments/workflow-preview.json",
+        workflowRunId: "123",
+      })
+    );
+    const established = automations.map((entry) =>
+      entry.id === preview.id
+        ? {
+            ...entry,
+            externalState: {
+              receipt: receipt.workflowReceiptPath,
+              status: "established" as const,
+            },
+          }
+        : entry
+    );
+    expect(
+      inspectDeploymentAutomationRegisters(
+        established,
+        controls,
+        new Map([[preview.id, receipt]])
+      )
+    ).toEqual([]);
   });
 
   test("rejects additive denials and orphan ownership expansion", async () => {

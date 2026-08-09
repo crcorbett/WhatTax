@@ -201,6 +201,20 @@ workflow's branch-bound state/provider receipt remains separate from hosted
 application proof and does not advance the automation register until a
 reviewed default-branch source readback exists.
 
+The workflow contract is intentionally narrower than the application graph:
+Preview and Production derive a canonical plan projection, reject unexpected
+Alchemy resources on both the initial plan and equal replan, then read back the
+exact stage, Worker, deployment and version before running the shared hosted
+proof owner. Production consumes a successful, Schema-decoded Preview
+workflow receipt rather than trusting caller-supplied source or plan fields.
+Teardown has a target-specific preflight and exact state/Worker absence
+postcondition, including a distinct Schema-decoded absence receipt for a safe
+no-op. The scheduled orphan workflow is reviewer-protected and remains a
+report-only/manual signal; its 1,000-row pull-request bound fails closed when
+inventory completeness is unknown. These controls are desired-state and
+dated-receipt owners, not claims that the current branch or public domain is
+available.
+
 ## Local runtime shape
 
 Run the API, web app and docs app as separate local processes:

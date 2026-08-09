@@ -4,6 +4,8 @@ import { DocsDeploymentStage } from "../../apps/docs/src/lib/build/docs-deployme
 import { DocsDeploymentInventoryReport } from "./inventory.schemas.js";
 
 export const docsDeploymentOpenPullRequestsCommand =
+  "gh pr list --repo crcorbett/taxkit --state open --limit 1000 --json headRefOid,isCrossRepository,number,state,url" as const;
+const docsDeploymentOpenPullRequestsLegacyCommand =
   "gh pr list --repo crcorbett/taxkit --state open --limit 100 --json headRefOid,isCrossRepository,number,state,url" as const;
 export const docsDeploymentStateProviderInventoryCommand =
   "bun run check:docs-deployment-inventory" as const;
@@ -49,7 +51,10 @@ export const DocsDeploymentOrphanInventoryReceipt = Schema.Struct({
       report: DocsDeploymentInventoryReport,
     }),
     github: Schema.Struct({
-      command: Schema.Literal(docsDeploymentOpenPullRequestsCommand),
+      command: Schema.Literals([
+        docsDeploymentOpenPullRequestsCommand,
+        docsDeploymentOpenPullRequestsLegacyCommand,
+      ]),
       openPullRequests: Schema.Array(GitHubOpenPullRequest),
     }),
   }),

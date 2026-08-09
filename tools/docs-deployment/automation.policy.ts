@@ -5,6 +5,7 @@ import type {
   DeploymentControl,
 } from "./automation.schemas.js";
 import { DeploymentAutomationFinding } from "./automation.schemas.js";
+import type { DeploymentWorkflowExternalReceipt } from "./workflow-receipts.schemas.js";
 
 const expectedAutomationIds = [
   "docs-preview-delivery",
@@ -178,7 +179,11 @@ const inspectMutation = (
 // oxlint-disable-next-line eslint/complexity -- one bounded cross-register policy keeps the exact automation graph visible
 export const inspectDeploymentAutomationRegisters = (
   automations: readonly DeploymentAutomation[],
-  controls: readonly DeploymentControl[]
+  controls: readonly DeploymentControl[],
+  externalReceipts: ReadonlyMap<
+    DeploymentAutomation["id"],
+    DeploymentWorkflowExternalReceipt
+  > = new Map()
 ): readonly DeploymentAutomationFinding[] => {
   const findings: DeploymentAutomationFinding[] = [];
   if (
@@ -212,13 +217,47 @@ export const inspectDeploymentAutomationRegisters = (
   for (const automation of automations) {
     findings.push(...inspectMutation(automation));
     if (automation.externalState.status === "established") {
-      findings.push(
-        finding(
-          "external-proof",
-          `tools/docs-deployment/automation-register.json:${automation.id}.externalState`,
-          "Keep external state not-established until a Schema-decoded hosted receipt owner verifies the exact workflow, environment, principal, candidate, lock, plan and provider identities."
-        )
-      );
+      const receipt =
+        automation.externalState.receipt === null
+          ? undefined
+          : externalReceipts.get(automation.id);
+      const receiptMismatch =
+        receipt === undefined ||
+        automation.externalState.receipt !== receipt?.workflowReceiptPath ||
+        receipt.automationId !== automation.id ||
+        receipt.environment !== automation.environment.id ||
+        receipt.principal !== automation.authority.principal ||
+        receipt.lockGroup !== automation.lock.group ||
+        receipt.workflowPath !==
+          (
+            {
+              "docs-orphan-inventory":
+                ".github/workflows/docs-orphan-inventory.yml",
+              "docs-preview-delivery": ".github/workflows/docs-preview.yml",
+              "docs-preview-teardown":
+                ".github/workflows/docs-preview-teardown.yml",
+              "docs-production-delivery":
+                ".github/workflows/docs-production.yml",
+            } as const
+          )[automation.id] ||
+        (automation.id === "docs-orphan-inventory"
+          ? receipt.acceptedPlanSha256 !== null ||
+            receipt.planPath !== null ||
+            receipt.hostedProofPath !== null
+          : receipt.acceptedPlanSha256 === null ||
+            receipt.planPath === null ||
+            receipt.providerReadbackPath === null ||
+            (automation.id !== "docs-preview-teardown" &&
+              receipt.hostedProofPath === null));
+      if (receiptMismatch) {
+        findings.push(
+          finding(
+            "external-proof",
+            `tools/docs-deployment/automation-register.json:${automation.id}.externalState`,
+            "Decode the named workflow receipt and verify exact workflow, environment, principal, stage lock, candidate, plan and provider/hosted postconditions before establishing external state."
+          )
+        );
+      }
     }
   }
   const teardown = automations.find(

@@ -11,6 +11,12 @@ import {
   DeploymentAutomationRegister,
   DeploymentControlRegister,
 } from "./automation.schemas.js";
+import {
+  DeploymentWorkflowExternalReceipt,
+  DeploymentWorkflowHostedProbe,
+  DeploymentWorkflowProviderReadback,
+  DeploymentWorkflowTeardownReadback,
+} from "./workflow-receipts.schemas.js";
 
 const repositoryRootUrl = new URL("../..", import.meta.url);
 
@@ -52,9 +58,47 @@ export const checkDocsDeploymentAutomation = (repositoryRoot: string) =>
         DeploymentControlRegister
       ),
     ]);
+    const externalReceipts = new Map();
+    for (const automation of automations) {
+      if (
+        automation.externalState.status === "established" &&
+        automation.externalState.receipt !== null
+      ) {
+        const receipt = yield* readJson(
+          repositoryRoot,
+          automation.externalState.receipt,
+          DeploymentWorkflowExternalReceipt
+        );
+        if (receipt.providerReadbackPath !== null) {
+          // oxlint-disable-next-line unicorn/prefer-ternary -- decoder selection preserves the distinct teardown absence schema
+          if (automation.id === "docs-preview-teardown") {
+            yield* readJson(
+              repositoryRoot,
+              receipt.providerReadbackPath,
+              DeploymentWorkflowTeardownReadback
+            );
+          } else {
+            yield* readJson(
+              repositoryRoot,
+              receipt.providerReadbackPath,
+              DeploymentWorkflowProviderReadback
+            );
+          }
+        }
+        if (receipt.hostedProofPath !== null) {
+          yield* readJson(
+            repositoryRoot,
+            receipt.hostedProofPath,
+            DeploymentWorkflowHostedProbe
+          );
+        }
+        externalReceipts.set(automation.id, receipt);
+      }
+    }
     const findings = inspectDeploymentAutomationRegisters(
       automations,
-      controls
+      controls,
+      externalReceipts
     );
     const [firstFinding, ...remainingFindings] = findings;
     if (firstFinding !== undefined) {

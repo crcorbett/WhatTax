@@ -80,12 +80,25 @@ describe("docs deployment workflow admission", () => {
       expect(source).toContain(
         'test "$ACCEPTED_PLAN_SHA256" = "$replan_sha256"'
       );
+      expect(source).toContain("unexpected_replan_resources");
+      expect(source).toContain("wrangler deployments list");
+      expect(source).toContain("test:cloudflare-hosted");
+      expect(source).toContain("check:docs-deployment-workflow-proof");
+      expect(source).toContain("configSha256");
+      expect(source).toContain("deploymentInputSha256");
+      expect(source).toContain("lockfileSha256");
       expect(source).toContain("replanSha256");
     }
     const teardown = await readWorkflow(workflowPaths.teardown);
     expect(teardown).toContain("cancel-in-progress: false");
     expect(teardown).toContain("CLOUDFLARE_ACCOUNT_ID");
     expect(teardown).toContain("CLOUDFLARE_API_TOKEN");
+    expect(teardown).toContain("provider-inventory-before.json");
+    expect(teardown).toContain("stage_count_before");
+    expect(teardown).toContain("unexpected_destroy_resources");
+    expect(teardown).toContain("providerWorkers");
+    expect(teardown).toContain("provider-readback.json");
+    expect(teardown).toContain("providerWorkerAbsent:true");
     const orphan = await readWorkflow(workflowPaths.orphan);
     expect(orphan).toContain("cancel-in-progress: true");
     expect(orphan).toContain("CLOUDFLARE_READ_API_TOKEN");
@@ -139,5 +152,13 @@ describe("docs deployment workflow admission", () => {
     ].join("");
     expect(teardown).toContain(`REVIEWED_WORKFLOW_SHA: ${githubExpression}`);
     expect(teardown).not.toContain("github.event.pull_request.base.sha");
+  });
+
+  test("binds Production mutation to a Schema-checked Preview workflow receipt", async () => {
+    const production = await readWorkflow(workflowPaths.production);
+    expect(production).toContain("accepted_preview_run_id");
+    expect(production).toContain("gh run download");
+    expect(production).toContain("check:docs-deployment-workflow-proof");
+    expect(production).toContain("accepted_preview_readback");
   });
 });

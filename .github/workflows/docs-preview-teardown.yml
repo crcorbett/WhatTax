@@ -88,9 +88,17 @@ jobs:
           set -euo pipefail
           mkdir -p "$RUNNER_TEMP/docs-deployment"
           stage="pr-${PR_NUMBER}"
+          ALCHEMY_PROFILE="$ALCHEMY_PROFILE" CI=1 bun run check:docs-deployment-inventory > "$RUNNER_TEMP/docs-deployment/provider-inventory-before.json"
+          stage_count_before="$(jq --arg stage "$stage" '[.stages[] | select(.stage == $stage)] | length' "$RUNNER_TEMP/docs-deployment/provider-inventory-before.json")"
+          test "$stage_count_before" -eq 0 || test "$stage_count_before" -eq 1
+          if [ "$stage_count_before" -eq 1 ]; then
+            jq -e --arg stage "$stage" '([.stages[] | select(.stage == $stage) | .resources | map(.logicalId) | sort] == [["DocsBuild", "DocsWebsite"]]) and ([.providerWorkers[] | select(.stage == $stage and .logicalId == "DocsWebsite")] | length == 1)' "$RUNNER_TEMP/docs-deployment/provider-inventory-before.json" > /dev/null
+          fi
           for attempt in one two; do
             ALCHEMY_PLAIN=1 CI=1 bunx alchemy destroy --dry-run --stage "$stage" --profile "$ALCHEMY_PROFILE" --yes > "$RUNNER_TEMP/docs-deployment/destroy-${attempt}.txt"
             sed -E $'s/\\033\\[[0-9;]*m//g' "$RUNNER_TEMP/docs-deployment/destroy-${attempt}.txt" | grep -E '^\[(DocsBuild|DocsWebsite)\] delete$' > "$RUNNER_TEMP/docs-deployment/destroy-${attempt}.resources.txt" || true
+            unexpected_destroy_resources="$(sed -E $'s/\\033\\[[0-9;]*m//g' "$RUNNER_TEMP/docs-deployment/destroy-${attempt}.txt" | grep -E '^\\[[^]]+\\] (delete|noop)$' | grep -Ev '^\\[(DocsBuild|DocsWebsite)\\] (delete|noop)$' || true)"
+            test -z "$unexpected_destroy_resources"
             resource_count="$(wc -l < "$RUNNER_TEMP/docs-deployment/destroy-${attempt}.resources.txt" | tr -d ' ')"
             test "$resource_count" -eq 0 || test "$resource_count" -eq 2
           done
@@ -118,6 +126,19 @@ jobs:
             ALCHEMY_PLAIN=1 CI=1 bunx alchemy destroy --stage "$stage" --profile "$ALCHEMY_PROFILE" --yes
           fi
           ALCHEMY_PROFILE="$ALCHEMY_PROFILE" CI=1 bun run check:docs-deployment-inventory > "$RUNNER_TEMP/docs-deployment/provider-inventory.json"
+          jq -e --arg stage "$stage" '(.agreement == "state-provider-agree") and ([.stages[] | select(.stage == $stage)] | length == 0) and ([.providerWorkers[] | select(.stage == $stage and .logicalId == "DocsWebsite")] | length == 0)' "$RUNNER_TEMP/docs-deployment/provider-inventory.json" > /dev/null
+          if [ "$stage_count_before" -eq 1 ]; then
+            worker_url_before="$(jq -er --arg stage "$stage" '.stages[] | select(.stage == $stage) | .resources[] | select(.logicalId == "DocsWebsite") | .workerUrl' "$RUNNER_TEMP/docs-deployment/provider-inventory-before.json")"
+            test "$(curl --silent --show-error --output /dev/null --write-out '%{http_code}' "$worker_url_before")" = "404"
+          fi
+          jq -nS \
+            --arg candidate "$REVIEWED_WORKFLOW_SHA" \
+            --arg config "$config_sha256" \
+            --arg deployment "$deployment_input_sha256" \
+            --arg lockfile "$lockfile_sha256" \
+            --arg stage "$stage" \
+            '{candidateCommit:$candidate,configSha256:$config,deploymentInputSha256:$deployment,lockfileSha256:$lockfile,providerWorkerAbsent:true,schemaVersion:1,stage:$stage,stateStageAbsent:true}' \
+            > "$RUNNER_TEMP/docs-deployment/provider-readback.json"
           jq -nS \
             --arg acceptedBy "$GITHUB_ACTOR" \
             --arg acceptedPlanSha256 "$destroy_sha256" \

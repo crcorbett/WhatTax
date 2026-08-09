@@ -23,6 +23,10 @@ on:
         description: Preview receipt digest accepted for this candidate
         required: true
         type: string
+      accepted_preview_run_id:
+        description: Successful Preview workflow run whose receipt is accepted
+        required: true
+        type: string
       accepted_plan_sha256:
         description: Accepted canonical Production plan digest for deploy
         required: false
@@ -51,6 +55,7 @@ jobs:
       CANDIDATE_SHA: ${{ inputs.candidate_sha }}
       ACCEPTED_PREVIEW_COMMIT: ${{ inputs.accepted_preview_commit }}
       ACCEPTED_PREVIEW_PLAN_SHA256: ${{ inputs.accepted_preview_plan_sha256 }}
+      ACCEPTED_PREVIEW_RUN_ID: ${{ inputs.accepted_preview_run_id }}
       ACCEPTED_PLAN_SHA256: ${{ inputs.accepted_plan_sha256 }}
       OPERATION: ${{ inputs.operation }}
     steps:
@@ -61,6 +66,28 @@ jobs:
           set -euo pipefail
           test "$CANDIDATE_SHA" = "$ACCEPTED_PREVIEW_COMMIT"
           test -n "$ACCEPTED_PREVIEW_PLAN_SHA256"
+          preview_run="$(gh run view "$ACCEPTED_PREVIEW_RUN_ID" --json workflowName,headBranch,headSha,status,conclusion,event)"
+          test "$(jq -r .workflowName <<<"$preview_run")" = "Docs Preview Deployment"
+          test "$(jq -r .headBranch <<<"$preview_run")" = "main"
+          test "$(jq -r .headSha <<<"$preview_run")" = "$CANDIDATE_SHA"
+          test "$(jq -r .status <<<"$preview_run")" = "completed"
+          test "$(jq -r .conclusion <<<"$preview_run")" = "success"
+          mkdir -p "$RUNNER_TEMP/accepted-preview"
+          gh run download "$ACCEPTED_PREVIEW_RUN_ID" --name "taxkit-docs-preview-provider-$ACCEPTED_PREVIEW_RUN_ID" --dir "$RUNNER_TEMP/accepted-preview"
+          accepted_preview_readback="$(find "$RUNNER_TEMP/accepted-preview" -name provider-readback.json -print -quit)"
+          accepted_preview_hosted="$(find "$RUNNER_TEMP/accepted-preview" -name hosted-proof.json -print -quit)"
+          test -n "$accepted_preview_readback"
+          test -n "$accepted_preview_hosted"
+          TAXKIT_WORKFLOW_PROVIDER_READBACK="$accepted_preview_readback" \
+          TAXKIT_WORKFLOW_HOSTED_PROBE="$accepted_preview_hosted" \
+          TAXKIT_WORKFLOW_CANDIDATE_COMMIT="$CANDIDATE_SHA" \
+          TAXKIT_WORKFLOW_STAGE="$(jq -er '.stage' "$accepted_preview_readback")" \
+          TAXKIT_WORKFLOW_PLAN_SHA256="$ACCEPTED_PREVIEW_PLAN_SHA256" \
+            bun run check:docs-deployment-workflow-proof
+          jq -e --arg candidate "$CANDIDATE_SHA" --arg plan "$ACCEPTED_PREVIEW_PLAN_SHA256" '(.candidateCommit == $candidate) and (.acceptedPlanSha256 == $plan) and (.stage | startswith("pr-"))' "$accepted_preview_readback" > /dev/null
+          jq -e --arg candidate "$CANDIDATE_SHA" --arg plan "$ACCEPTED_PREVIEW_PLAN_SHA256" '(.candidateCommit == $candidate) and (.acceptedPlanSha256 == $plan) and (.diagnostics | length == 0)' "$accepted_preview_hosted" > /dev/null
+          printf 'ACCEPTED_PREVIEW_READBACK=%s\n' "$accepted_preview_readback" >> "$GITHUB_ENV"
+          printf 'ACCEPTED_PREVIEW_HOSTED=%s\n' "$accepted_preview_hosted" >> "$GITHUB_ENV"
           checks="$(gh api "repos/${GITHUB_REPOSITORY}/commits/${CANDIDATE_SHA}/check-runs?per_page=100")"
           jq -e '[.check_runs[] | select((.name | test("quality"; "i"))) | .conclusion] | length > 0 and all(. == "success")' <<<"$checks" >/dev/null
 
@@ -149,7 +176,10 @@ jobs:
           test "$ACCEPTED_PLAN_SHA256" = "${{ steps.plan.outputs.plan_sha256 }}"
           ALCHEMY_PLAIN=1 CI=1 bunx alchemy plan --stage prod --profile "$ALCHEMY_PROFILE" > "$RUNNER_TEMP/docs-deployment/alchemy-replan.txt"
           sed -E $'s/\\033\\[[0-9;]*m//g' "$RUNNER_TEMP/docs-deployment/alchemy-replan.txt" > "$RUNNER_TEMP/docs-deployment/alchemy-replan.clean.txt"
-          replan_resources="$(grep -E '^\[(DocsBuild|DocsWebsite)\] (create|update|noop|delete)$' "$RUNNER_TEMP/docs-deployment/alchemy-replan.clean.txt" || true)"
+          all_replan_resources="$(grep -E '^\[[^]]+\] (create|update|noop|delete)$' "$RUNNER_TEMP/docs-deployment/alchemy-replan.clean.txt" || true)"
+          unexpected_replan_resources="$(printf '%s\n' "$all_replan_resources" | grep -Ev '^\[(DocsBuild|DocsWebsite)\] (create|update|noop|delete)$' || true)"
+          test -z "$unexpected_replan_resources"
+          replan_resources="$(printf '%s\n' "$all_replan_resources" | grep -E '^\[(DocsBuild|DocsWebsite)\] (create|update|noop|delete)$' || true)"
           replan_resource_count="$(printf '%s\n' "$replan_resources" | sed '/^$/d' | wc -l | tr -d ' ')"
           test "$replan_resource_count" -eq 2
           replan_first_resource="$(printf '%s\n' "$replan_resources" | sed -n '1p')"
@@ -176,6 +206,47 @@ jobs:
           mv "$RUNNER_TEMP/docs-deployment/plan.with-replan.json" "$RUNNER_TEMP/docs-deployment/plan.json"
           ALCHEMY_PLAIN=1 CI=1 bunx alchemy deploy --stage prod --profile "$ALCHEMY_PROFILE" --yes
           ALCHEMY_PROFILE="$ALCHEMY_PROFILE" CI=1 bun run check:docs-deployment-inventory > "$RUNNER_TEMP/docs-deployment/provider-inventory.json"
+          jq -e '
+            .agreement == "state-provider-agree" and
+            ([.stages[] | select(.stage == "prod")] | length == 1) and
+            ([.stages[] | select(.stage == "prod") | .resources | map(.logicalId) | sort] == [["DocsBuild", "DocsWebsite"]]) and
+            ([.providerWorkers[] | select(.stage == "prod" and .logicalId == "DocsWebsite")] | length == 1)
+          ' "$RUNNER_TEMP/docs-deployment/provider-inventory.json" > /dev/null
+          worker_name="$(jq -er '.stages[] | select(.stage == "prod") | .resources[] | select(.logicalId == "DocsWebsite") | .workerName' "$RUNNER_TEMP/docs-deployment/provider-inventory.json")"
+          worker_url="$(jq -er '.stages[] | select(.stage == "prod") | .resources[] | select(.logicalId == "DocsWebsite") | .workerUrl' "$RUNNER_TEMP/docs-deployment/provider-inventory.json")"
+          deployments="$(bunx wrangler deployments list --name "$worker_name" --json)"
+          deployment_id="$(jq -er '.[-1].id // .[-1].deployment_id' <<<"$deployments")"
+          version_id="$(jq -er '.[-1].versions[0].version_id' <<<"$deployments")"
+          jq -nS --arg workerName "$worker_name" --arg url "$worker_url" --arg deploymentId "$deployment_id" --arg versionId "$version_id" --arg candidate "$CANDIDATE_SHA" --arg plan "$ACCEPTED_PLAN_SHA256" --arg config "$replan_config_sha256" --arg deployment "$replan_deployment_input_sha256" --arg lockfile "$replan_lockfile_sha256" '{schemaVersion:1,stage:"prod",workerName:$workerName,url:$url,deploymentId:$deploymentId,versionId:$versionId,candidateCommit:$candidate,acceptedPlanSha256:$plan,configSha256:$config,deploymentInputSha256:$deployment,lockfileSha256:$lockfile}' > "$RUNNER_TEMP/docs-deployment/provider-readback.json"
+          printf 'TAXKIT_DOCS_HOSTED_URL=%s\n' "$worker_url" >> "$GITHUB_ENV"
+          printf 'TAXKIT_DOCS_DEPLOYMENT_ID=%s\n' "$deployment_id" >> "$GITHUB_ENV"
+          printf 'TAXKIT_DOCS_VERSION_ID=%s\n' "$version_id" >> "$GITHUB_ENV"
+          printf 'TAXKIT_DOCS_WORKER_NAME=%s\n' "$worker_name" >> "$GITHUB_ENV"
+          printf 'TAXKIT_DOCS_STAGE=prod\n' >> "$GITHUB_ENV"
+          printf 'TAXKIT_DOCS_PLAN_SHA256=%s\n' "$ACCEPTED_PLAN_SHA256" >> "$GITHUB_ENV"
+          printf 'TAXKIT_DOCS_CONFIG_SHA256=%s\n' "$replan_config_sha256" >> "$GITHUB_ENV"
+          printf 'TAXKIT_DOCS_DEPLOYMENT_INPUT_SHA256=%s\n' "$replan_deployment_input_sha256" >> "$GITHUB_ENV"
+          printf 'TAXKIT_DOCS_LOCKFILE_SHA256=%s\n' "$replan_lockfile_sha256" >> "$GITHUB_ENV"
+          printf 'TAXKIT_DOCS_ROLLBACK_RECOVERY_IDENTITY=production-%s\n' "$GITHUB_RUN_ID" >> "$GITHUB_ENV"
+          if [ "$OPERATION" = "rollback" ]; then
+            printf 'TAXKIT_DOCS_ENVIRONMENT=rollback\n' >> "$GITHUB_ENV"
+          else
+            printf 'TAXKIT_DOCS_ENVIRONMENT=production\n' >> "$GITHUB_ENV"
+          fi
+          printf 'TAXKIT_DOCS_EVIDENCE_DIRECTORY=docs/evidence/deployments/workflow-%s\n' "$GITHUB_RUN_ID" >> "$GITHUB_ENV"
+
+      - name: Run hosted Production HTTP/browser/screenshot proof
+        if: inputs.operation == 'deploy' || inputs.operation == 'rollback'
+        run: |
+          set -euo pipefail
+          mkdir -p "$TAXKIT_DOCS_EVIDENCE_DIRECTORY"
+          bun run --filter=docs test:cloudflare-hosted > "$RUNNER_TEMP/docs-deployment/hosted-proof.json"
+          TAXKIT_WORKFLOW_PROVIDER_READBACK="$RUNNER_TEMP/docs-deployment/provider-readback.json" \
+          TAXKIT_WORKFLOW_HOSTED_PROBE="$RUNNER_TEMP/docs-deployment/hosted-proof.json" \
+          TAXKIT_WORKFLOW_CANDIDATE_COMMIT="$CANDIDATE_SHA" \
+          TAXKIT_WORKFLOW_STAGE="$TAXKIT_DOCS_STAGE" \
+          TAXKIT_WORKFLOW_PLAN_SHA256="$TAXKIT_DOCS_PLAN_SHA256" \
+            bun run check:docs-deployment-workflow-proof
 
       - name: Upload sanitized Production plan and replan evidence
         if: always()

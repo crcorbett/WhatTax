@@ -191,6 +191,38 @@ hosted or teardown success until a default-branch run retains its dated,
 candidate-bound receipts. The current automation register remains
 `not-established`.
 
+### Workflow proof and receipt contract
+
+The protected Preview and Production workflows build the exact candidate, run
+the existing `test:cloudflare-hosted` owner (including HTTP, browser,
+accessibility, console, cache/header and bounded desktop/mobile screenshot
+proof), then run `bun run check:docs-deployment-workflow-proof` against the
+sanitized provider and hosted identities. They also read the latest Worker
+deployment and version with the pinned Wrangler CLI and upload the plan,
+provider, hosted and screenshot artifacts. A workflow observation is not a
+durable deployment claim until its exact candidate, run, environment, plan,
+provider, hosted and postcondition receipt is promoted under
+`docs/evidence/deployments/` and Schema-decoded by the automation owner.
+
+Production mutation additionally requires `accepted_preview_run_id`. That run
+must be a successful `Docs Preview Deployment` from `main` for the exact
+candidate; the downloaded provider and hosted receipts are Schema-checked and
+must agree on candidate, Preview stage, plan digest, Worker, URL, deployment,
+version and zero diagnostics before the Production plan is admitted. A caller
+supplied commit or digest without that receipt is not Preview acceptance.
+
+Teardown reads the exact `pr-N` stage and Worker before mutation, rejects any
+unexpected action/resource projection, and requires both Alchemy stage absence
+and provider Worker absence afterward. A zero-action projection is a valid
+convergent no-op only when the preflight already proved the exact stage absent;
+it is never inferred from an empty or malformed plan. The teardown provider
+readback is a separate absence Schema, not an application deployment receipt.
+
+The report-only inventory bounds the GitHub pull-request read to 1,000 rows and
+fails closed at that bound because completeness is then unknown. Its scheduled
+workflow remains reviewer-protected and therefore report-only/manual rather
+than unattended automation; no automatic orphan deletion is admitted.
+
 The first post-merge observations are retained as failure evidence: run
 `30894963411` stopped before any provider step because the checkout action ref
 was abbreviated; the full ref correction is `4fb8ea3…`, merged to `main` as
@@ -390,8 +422,10 @@ and physical Worker identity, run the normal build/plan/equal-replan/deploy
 path, then prove provider version and hosted postcondition. A prior version ID
 or successful API response alone is insufficient.
 
-The verified rollback used the same two invocations above with the restored
-source candidate and environment `rollback` for hosted proof. It required a
+The verified rollback uses the same two invocations above with the restored
+source candidate and `TAXKIT_DOCS_ENVIRONMENT=rollback` for hosted proof. The
+hosted harness explicitly accepts that bounded rollback environment and emits
+a rollback screenshot manifest; it required a
 distinct deployment/version after apply, the same Worker name, URL and Alchemy
 instance, and the target's expected state bundle. Requalify any successor in
 isolated Preview first and remove that Preview only after retaining its proof.

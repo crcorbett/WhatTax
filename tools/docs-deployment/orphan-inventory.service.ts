@@ -17,6 +17,7 @@ import {
 } from "./orphan-inventory.schemas.js";
 
 const repository = "crcorbett/taxkit" as const;
+const githubPullRequestResultLimit = 1000;
 const githubArgs = [
   "pr",
   "list",
@@ -25,7 +26,7 @@ const githubArgs = [
   "--state",
   "open",
   "--limit",
-  "100",
+  "1000",
   "--json",
   "headRefOid,isCrossRepository,number,state,url",
 ] as const;
@@ -168,6 +169,7 @@ export const DocsDeploymentOrphanSourcesLive = Layer.effect(
       | DocsDeploymentOrphanInventoryReadError,
       Scope.Scope
     > =>
+      // oxlint-disable-next-line eslint/complexity -- one bounded process ingress keeps command identity and safe failure decoding together
       Effect.gen(function* readJsonCommandOutput() {
         if ([command, ...args].join(" ") !== expectedCommand) {
           return yield* new DocsDeploymentOrphanInventoryInputError({
@@ -252,7 +254,7 @@ export const DocsDeploymentOrphanSourcesLive = Layer.effect(
               new TextEncoder().encode(stdoutText)
             ),
         });
-        return yield* Schema.decodeUnknownEffect(
+        const decoded = yield* Schema.decodeUnknownEffect(
           Schema.fromJsonString(schema),
           {
             onExcessProperty: "error",
@@ -265,6 +267,16 @@ export const DocsDeploymentOrphanSourcesLive = Layer.effect(
               })
           )
         );
+        if (
+          operation === "github-open-pull-requests" &&
+          Array.isArray(decoded) &&
+          decoded.length >= githubPullRequestResultLimit
+        ) {
+          return yield* new DocsDeploymentOrphanInventoryInputError({
+            target: "incomplete GitHub pull-request inventory",
+          });
+        }
+        return decoded;
       }).pipe(
         Effect.catchTag(
           "PlatformError",

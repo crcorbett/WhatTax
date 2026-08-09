@@ -645,6 +645,9 @@
         "create deployment-only Schemas, policy and negative fixtures under tools/docs-deployment while preserving Quality's independent read-only/cancellable authority; any narrow quality-workflow prerequisite correction requires exact hosted failure and green successor receipts",
         "allow same-repository trusted PR candidates only; never run candidate code through pull_request_target, and make PR-close teardown check out reviewed default-branch implementation code rather than PR head",
         "retain a bounded receipt on success, failure, cancellation or provider disagreement",
+        "Schema-decode the workflow provider and hosted artifacts before retaining a mutation proof; bind candidate, stage, accepted/equal plan, config, lockfile, deployment input, Worker, URL, deployment/version and zero diagnostics",
+        "require Production accepted_preview_run_id to identify a successful main-branch Preview run whose downloaded provider and hosted receipts pass the shared proof checker; caller-supplied commit or digest alone is insufficient",
+        "reject unexpected action/resource lines on every equal replan and emit a separate Schema-decoded teardown absence readback with exact stage and Worker postconditions",
         "retain the dated manual and current protected Preview/Production/rollback receipts as provider evidence; the current branch-bound report-only receipt does not satisfy default-branch automation establishment",
         "allow one source-bound default-branch bootstrap dispatch after the reviewed workflow lands on main because GitHub cannot dispatch a workflow file that exists only on a pull-request branch; bind the merged PR head and deterministic pr-N stage exactly, then require an open trusted draft PR for every later Preview dispatch",
         "make PR-close teardown convergent: an absent exact stage produces an equal noop projection and no destroy, while an existing stage requires equal delete plans and exact absence readback",
@@ -660,6 +663,7 @@
         "deployment-only automation/control Schema, policy, tests and negative fixtures under tools/docs-deployment plus routed controls and automation register entries",
         "updated docs/operations/automation-register.md and docs/standards/controls.md",
         "workflow/runbook/architecture/README pointers and accepted workflow receipts",
+        "workflow receipt schemas/checker plus provider identity and teardown-absence readbacks",
         "one report-only orphan inventory receipt, with the current branch-bound success retained at docs/evidence/deployments/2026-08-09-orphan-inventory/report-31319845724.json and default-branch source readback still required",
         "synchronized SPEC/tasks/active plan with exact invocations and observed concurrency semantics"
       ],
@@ -700,6 +704,8 @@
         "execute one authorized exact-candidate workflow path for each admitted mutating class and backfill its exact owned invocation before completion",
         "execute the orphan inventory in report-only mode with CLOUDFLARE_READ_API_TOKEN plus ALCHEMY_STATE_STORE_CREDENTIALS_JSON through the public Schema-decoded Alchemy HTTP state client, prove no provider/state write command is reachable, and retain the beta.64 bearer limitation as an explicit non-claim",
         "Schema-decode all workflow receipts and reconcile them with provider/state readback",
+        "Schema-check the accepted Preview artifact by run ID before any Production mutation and reject stale, detached or caller-only identity",
+        "prove every equal replan rejects unexpected resources/actions and teardown proves exact pre/post stage and Worker absence",
         "bun run verification",
         "git diff --check",
         "explicit no-Changeset rationale"

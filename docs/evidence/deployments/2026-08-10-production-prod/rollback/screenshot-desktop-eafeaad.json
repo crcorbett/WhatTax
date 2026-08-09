@@ -5,7 +5,7 @@
   "capturedAt": "2026-08-10T00:43:58Z",
   "deploymentId": "41ef66dc-c455-4818-8893-bc878ea0c365",
   "deploymentInputSha256": "6e8a0ca49c843ad561a5d24f50b996c12a2d7736eb0a269ea427b99de186ea65",
-  "environment": "production",
+  "environment": "rollback",
   "expectedState": "The representative guide renders its desktop documentation shell, navigation, heading, prose, lists and code examples without visible clipping or error UI after normal source-bound rollback.",
   "imagePath": "docs/evidence/deployments/2026-08-10-production-prod/rollback/production-desktop-eafeaad.png",
   "imageSha256": "2178f0005d757ff3fa6b3cd9cd54b00f4e255c105315ec17a1f3871bb36cb10f",

@@ -81,3 +81,14 @@ teardown, fixed Production and normal rollback receipts under
 automation register's external-state status. Report-only run `31319845724`
 passed on the open branch and proved only the separate state/provider read. A
 reviewed default-branch source readback remains the control admission gate.
+
+The workflow owners now fail closed on unexpected actions/resources in the
+equal replan, assert exact provider stage/Worker/deployment/version identity,
+run the shared hosted proof checker (including its candidate-bound screenshots)
+before retaining a mutation artifact, and require a successful Schema-decoded
+Preview artifact before Production mutation. Teardown requires exact
+preflight and post-destroy state/Worker absence and emits a separate absence
+readback. These are executable controls; a workflow artifact is still only a
+dated observation until its outer receipt is promoted and admitted by the
+positive external-state path. Report-only scheduling remains reviewer-gated,
+and the 1,000-row pull-request bound fails closed at incomplete inventory.

@@ -756,6 +756,19 @@ may use that event only if it checks out a reviewed default-branch
 implementation commit, never the pull-request head, derives only the numeric
 PR stage, and performs exact state/provider readback before destroy.
 
+The equal replan applies the same exact-resource projection as the initial
+plan and rejects every action/resource outside `DocsBuild` and `DocsWebsite`.
+After mutation, the workflow Schema-checks provider inventory and the latest
+Wrangler deployment/version against candidate, stage, plan, config, lockfile,
+deployment-input, Worker and URL identities, then runs the shared hosted
+HTTP/browser/screenshot proof owner. Production additionally requires a
+successful `accepted_preview_run_id` from the default branch and decodes its
+provider/hosted artifacts before its own plan or mutation. Teardown records a
+separate exact stage/Worker absence receipt; an empty action list is accepted
+only after target-specific preflight proves the stage was already absent. The
+report-only inventory remains reviewer-gated/manual and fails closed at the
+1,000-pull-request completeness bound.
+
 ### `DCD-009` — authority, state, config and secrets
 
 Use one new canonical target-owned runbook,
@@ -1047,10 +1060,14 @@ executing identity, account, plan, Workers subdomain, credential scope or
 revocation, state/resource identity, unsafe drift, secret-exposure risk,
 destroy scope beyond the named stage, or provider contradiction still stops
 mutation. Custom-domain/DNS, unrelated resources, third-party observability,
-package publication/release and merge remain outside the provider envelope.
-Cooper's successor Git envelope admits only the exact DCD-001 candidate branch,
-push, draft pull request/readback and later coherent accepted-slice pushes;
-force-push, branch deletion and conversion to ready remain excluded.
+package publication/release remains outside the provider envelope. Cooper's
+2026-08-10 approval admits PR-ready conversion and merge after all
+claim-matched gates pass; it does not waive exact identity or postcondition
+checks.
+Cooper's successor Git envelope admits only the exact candidate branch, push,
+draft pull request/readback and later coherent accepted-slice pushes. The
+2026-08-10 approval also admits PR-ready conversion and merge after every
+claim-matched gate passes; force-push and branch deletion remain excluded.
 Each DCD-002/DCD-003 receipt must restate and Schema-decode the applicable
 operation, principal, resource, environment, duration, revocation, readback,
 rollback and postconditions before mutation.

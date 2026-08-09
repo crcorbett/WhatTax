@@ -40,7 +40,7 @@ for (const digest of [
 assert.ok(
   rollbackRecoveryIdentity !== undefined && rollbackRecoveryIdentity.length > 0
 );
-assert.match(environment ?? "", /^(?:preview|production)$/u);
+assert.match(environment ?? "", /^(?:preview|production|rollback)$/u);
 assert.match(
   evidenceDirectory ?? "",
   /^docs\/evidence\/deployments\/[A-Za-z0-9._/-]+$/u

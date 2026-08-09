@@ -453,11 +453,16 @@ export const inspectProductionEvidenceChain = (
         screenshots.map((manifest) => manifest.viewport.kind)
       )
     ) !== 2 ||
-    Array.some(
-      screenshots,
-      (manifest) =>
-        manifest.environment !== "production" || manifest.stage !== "prod"
-    )
+    Array.some(screenshots, (manifest) => {
+      const validEnvironments =
+        environment === "rollback"
+          ? ["rollback", "production"]
+          : ["production"];
+      return (
+        !validEnvironments.includes(manifest.environment) ||
+        manifest.stage !== "prod"
+      );
+    })
   ) {
     findings.push(
       "production-evidence-chain: plan, provider, hosted and two-viewport screenshot receipts must bind one fixed Production candidate"

@@ -337,7 +337,7 @@ export const DeploymentScreenshotManifest = Schema.Struct({
   ),
   deploymentId: ProviderIdentity,
   deploymentInputSha256: Sha256,
-  environment: Schema.Literals(["preview", "production"]),
+  environment: Schema.Literals(["preview", "production", "rollback"]),
   expectedState: Schema.NonEmptyString,
   imagePath: RepositoryEvidencePath,
   imageSha256: Sha256,

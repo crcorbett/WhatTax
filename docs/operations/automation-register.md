@@ -90,3 +90,24 @@ This receipt is intentionally branch-bound. The four register entries remain
 `externalState.status: not-established` until the same workflow file and
 report-only owner are read back from the reviewed default branch; no provider
 mutation, state write, teardown or credential-scope expansion is inferred.
+
+Each admitted mutation workflow now enforces the remaining boundary in its
+own YAML: the equal replan rejects every action/resource outside `DocsBuild`
+and `DocsWebsite`; provider inventory and the latest Wrangler deployment are
+bound to the candidate, stage, plan, Worker, URL and version; and the shared
+hosted proof checker must pass before the provider artifact is accepted.
+Production downloads and Schema-checks a successful `main` Preview receipt
+identified by `accepted_preview_run_id`. Teardown records a separate
+Schema-decoded absence readback and rejects a false no-op. These workflow
+artifacts still require promotion into a dated repository receipt before an
+entry can move to `externalState.status: established`.
+
+The positive admission path is explicit: decode one outer
+`DeploymentWorkflowExternalReceipt`, then decode its plan/provider/hosted (or
+teardown absence) paths and cross-check workflow path, source SHA, environment,
+principal, stage lock, plan identity and postconditions. A stale branch-bound
+receipt remains historical and cannot establish the current default-branch
+automation class. The report-only schedule is protected by a reviewer gate;
+until that gate is intentionally removed, scheduled inventory is manual/report
+only and must not be described as unattended detection. The orphan reader
+requests at most 1,000 pull requests and fails closed at the bound.

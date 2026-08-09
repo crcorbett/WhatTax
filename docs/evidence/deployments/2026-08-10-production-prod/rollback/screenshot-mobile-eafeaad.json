@@ -5,7 +5,7 @@
   "capturedAt": "2026-08-10T00:43:59Z",
   "deploymentId": "41ef66dc-c455-4818-8893-bc878ea0c365",
   "deploymentInputSha256": "6e8a0ca49c843ad561a5d24f50b996c12a2d7736eb0a269ea427b99de186ea65",
-  "environment": "production",
+  "environment": "rollback",
   "expectedState": "The representative guide renders its mobile documentation shell and menu interaction without visible clipping or error UI after normal source-bound rollback.",
   "imagePath": "docs/evidence/deployments/2026-08-10-production-prod/rollback/production-mobile-eafeaad.png",
   "imageSha256": "86c685b85e2a016e96ca85ee94984ea4dd155094af66bbf6740dde41658eb9bd",
