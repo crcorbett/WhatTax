@@ -36,7 +36,7 @@ const decodeRegisters = () =>
   );
 
 describe("docs deployment automation admission", () => {
-  test("accepts the exact four deployment automations and controls before hosted establishment", async () => {
+  test("accepts the exact four deployment automations and five controls before hosted establishment", async () => {
     const [automations, controls] = await decodeRegisters();
     expect(inspectDeploymentAutomationRegisters(automations, controls)).toEqual(
       []
@@ -394,6 +394,7 @@ describe("docs deployment automation admission", () => {
       path: receipt.workflowPath,
       ref: "refs/heads/main" as const,
       status: "completed" as const,
+      workflowCommit: receipt.workflowCommit,
       workflowName: "Docs Preview Deployment",
       workflowRunId: receipt.workflowRunId,
     };
@@ -710,6 +711,7 @@ describe("docs deployment automation admission", () => {
               path: receipt.workflowPath,
               ref: "refs/heads/main" as const,
               status: "completed" as const,
+              workflowCommit,
               workflowName: "Docs Orphan Inventory (Report Only)",
               workflowRunId: receipt.workflowRunId,
             },
@@ -765,6 +767,7 @@ describe("docs deployment automation admission", () => {
               path: admittedReceipt.workflowPath,
               ref: "refs/heads/main" as const,
               status: "completed" as const,
+              workflowCommit,
               workflowName: "Docs Orphan Inventory (Report Only)",
               workflowRunId: admittedReceipt.workflowRunId,
             },

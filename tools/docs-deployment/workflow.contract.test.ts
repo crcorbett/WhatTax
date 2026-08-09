@@ -106,6 +106,7 @@ describe("docs deployment workflow admission", () => {
       expect(source).toContain("check:docs-deployment-workflow-input");
       expect(source).toContain("workflow-input.json");
       expect(source).not.toContain("Materialize successful");
+      expect(source).not.toContain("workflow-run.json");
       expect(source).toContain("all_replan_resources");
       expect(source).toContain("docs/evidence/deployments");
       expect(source).toContain("configSha256");
@@ -240,7 +241,15 @@ describe("docs deployment workflow admission", () => {
     const receipts = await readWorkflow(workflowPaths.receipts);
     expect(receipts).toContain("workflow_run:");
     expect(receipts).toContain("types: [completed]");
+    expect(receipts).not.toContain("branches: [main]");
     expect(receipts).toContain(workflowRunApiReadback);
+    expect(receipts).toContain("TAXKIT_WORKFLOW_RUN_HEAD_SHA");
+    expect(receipts).toContain("TAXKIT_WORKFLOW_CHECKOUT_SHA");
+    expect(receipts).toContain("git checkout --detach");
+    expect(receipts).toContain(
+      "always() && github.event.workflow_run.conclusion"
+    );
+    expect(receipts).toContain("workflowCommit:$workflowCommit");
     expect(receipts).toContain("gh run download");
     expect(receipts).toContain("check:docs-deployment-workflow-input");
     expect(receipts).toContain("check:docs-deployment-workflow-run");

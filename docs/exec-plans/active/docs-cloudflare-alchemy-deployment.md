@@ -1348,8 +1348,13 @@ default-branch source, run, operation and dispatch candidate input, while the
 latter is produced by the read-only `workflow_run` reconciler after GitHub marks
 the source run complete. Triggering workflows retain their input and provider/
 hosted artifacts; the reconciler fetches the completed Actions API run and the
-matching artifact before it emits `workflow-run.json`. Failed or cancelled runs
-retain bounded failure metadata and cannot establish external state. The
+matching artifact before it emits `workflow-run.json`, checking out the exact
+reviewed implementation commit used by the source workflow. Preview, Production
+and report-only API heads are `main`; automatic PR-close teardown records the
+pull-request API head separately from its reviewed `workflowCommit` and accepts
+it only when that commit is an ancestor of current `main`. Failed or cancelled
+runs, artifact mismatch or schema/provider disagreement retain bounded failure
+metadata and cannot establish external state. The
 Preview and Production plan shells also reject every resource-like line outside
 the two owned resources and reject `delete` before a deploy apply. Teardown
 performs a final state/Worker identity readback after equal dry-runs and before

@@ -8,7 +8,6 @@ on:
       - Docs Preview Teardown
       - Docs Orphan Inventory (Report Only)
     types: [completed]
-    branches: [main]
 
 permissions:
   contents: read
@@ -37,8 +36,10 @@ jobs:
           set -euo pipefail
           run_json="$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${SOURCE_RUN_ID}")"
           test "$(jq -r .status <<<"$run_json")" = "completed"
-          test "$(jq -r .head_branch <<<"$run_json")" = "main"
           test "$(jq -r .head_repository.full_name <<<"$run_json")" = "$GITHUB_REPOSITORY"
+          source_event="$(jq -er .event <<<"$run_json")"
+          source_head_branch="$(jq -er .head_branch <<<"$run_json")"
+          source_head_sha="$(jq -er .head_sha <<<"$run_json")"
           workflow_path="$(jq -er .path <<<"$run_json")"
           workflow_name="$(jq -er .name <<<"$run_json")"
           case "$workflow_path" in
@@ -64,6 +65,15 @@ jobs:
               ;;
           esac
           test "$workflow_name" = "$expected_name"
+          if [ "$workflow_path" = ".github/workflows/docs-preview-teardown.yml" ]; then
+            test "$source_event" = "pull_request" || test "$source_event" = "workflow_dispatch"
+          elif [ "$workflow_path" = ".github/workflows/docs-orphan-inventory.yml" ]; then
+            test "$source_event" = "schedule" || test "$source_event" = "workflow_dispatch"
+            test "$source_head_branch" = "main"
+          else
+            test "$source_event" = "workflow_dispatch"
+            test "$source_head_branch" = "main"
+          fi
           jq -nS \
             --argjson run "$run_json" \
             '{conclusion:$run.conclusion,event:$run.event,headBranch:$run.head_branch,headSha:$run.head_sha,id:$run.id,name:$run.name,path:$run.path,status:$run.status}' \
@@ -71,11 +81,14 @@ jobs:
           printf '%s' "$run_json" > "$RUNNER_TEMP/docs-deployment/workflow-run-api.raw.json"
           printf 'TAXKIT_WORKFLOW_RUN_PATH=%s\n' "$workflow_path" >> "$GITHUB_ENV"
           printf 'TAXKIT_WORKFLOW_RUN_NAME=%s\n' "$workflow_name" >> "$GITHUB_ENV"
+          printf 'TAXKIT_WORKFLOW_RUN_EVENT=%s\n' "$source_event" >> "$GITHUB_ENV"
+          printf 'TAXKIT_WORKFLOW_RUN_HEAD_BRANCH=%s\n' "$source_head_branch" >> "$GITHUB_ENV"
+          printf 'TAXKIT_WORKFLOW_RUN_HEAD_SHA=%s\n' "$source_head_sha" >> "$GITHUB_ENV"
           printf 'TAXKIT_WORKFLOW_ARTIFACT_NAME=%s\n' "$artifact_name" >> "$GITHUB_ENV"
           printf 'TAXKIT_WORKFLOW_RUN_CONCLUSION=%s\n' "$(jq -er .conclusion <<<"$run_json")" >> "$GITHUB_ENV"
 
       - name: Retain failed or cancelled run metadata without positive proof
-        if: github.event.workflow_run.conclusion != 'success'
+        if: ${{ always() && github.event.workflow_run.conclusion != 'success' }}
         run: |
           set -euo pipefail
           jq -nS \
@@ -83,24 +96,6 @@ jobs:
             --arg run "$SOURCE_RUN_ID" \
             '{conclusion:$conclusion,nonClaim:"This run is not a successful deployment receipt and cannot establish external state.",schemaVersion:1,workflowRunId:$run}' \
             > "$RUNNER_TEMP/docs-deployment/workflow-run-failure.json"
-
-      - name: Check out the reviewed default branch for receipt schemas
-        if: github.event.workflow_run.conclusion == 'success'
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.2.0
-        with:
-          fetch-depth: 1
-          persist-credentials: false
-          ref: main
-
-      - name: Set up Bun for receipt validation
-        if: github.event.workflow_run.conclusion == 'success'
-        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.0.2
-        with:
-          bun-version-file: .bun-version
-
-      - name: Install frozen dependencies for receipt validation
-        if: github.event.workflow_run.conclusion == 'success'
-        run: bun install --frozen-lockfile
 
       - name: Download the completed workflow artifact
         if: github.event.workflow_run.conclusion == 'success'
@@ -117,8 +112,23 @@ jobs:
           candidate_commit="$(jq -er .candidateCommit "$input_path")"
           workflow_commit="$(jq -er .workflowCommit "$input_path")"
           workflow_input_run_id="$(jq -er .workflowRunId "$input_path")"
+          workflow_input_path="$(jq -er .workflowPath "$input_path")"
+          workflow_input_name="$(jq -er .workflowName "$input_path")"
+          workflow_input_source_ref="$(jq -er .sourceRef "$input_path")"
           test "$workflow_input_run_id" = "$SOURCE_RUN_ID"
-          test "$workflow_commit" = "$(jq -er .headSha "$RUNNER_TEMP/docs-deployment/workflow-run-api.json")"
+          test "$workflow_input_path" = "$TAXKIT_WORKFLOW_RUN_PATH"
+          test "$workflow_input_name" = "$TAXKIT_WORKFLOW_RUN_NAME"
+          test "$workflow_input_source_ref" = "refs/heads/main"
+          printf '%s' "$workflow_commit" | grep -Eq '^[a-f0-9]{40}$'
+          main_sha="$(gh api "repos/${GITHUB_REPOSITORY}/git/ref/heads/main" --jq .object.sha)"
+          gh api "repos/${GITHUB_REPOSITORY}/git/commits/${workflow_commit}" --jq .sha | grep -Fx "$workflow_commit" > /dev/null
+          if [ "$TAXKIT_WORKFLOW_RUN_PATH" = ".github/workflows/docs-preview-teardown.yml" ]; then
+            compare_status="$(gh api "repos/${GITHUB_REPOSITORY}/compare/${workflow_commit}...${main_sha}" --jq .status)"
+            test "$compare_status" = "ahead" || test "$compare_status" = "identical"
+          else
+            test "$workflow_commit" = "$TAXKIT_WORKFLOW_RUN_HEAD_SHA"
+          fi
+          printf 'TAXKIT_WORKFLOW_CHECKOUT_SHA=%s\n' "$workflow_commit" >> "$GITHUB_ENV"
           jq -nS \
             --arg candidate "$candidate_commit" \
             --arg conclusion "$(jq -er .conclusion "$RUNNER_TEMP/docs-deployment/workflow-run-api.json")" \
@@ -128,9 +138,36 @@ jobs:
             --arg path "$(jq -er .path "$RUNNER_TEMP/docs-deployment/workflow-run-api.json")" \
             --arg run "$SOURCE_RUN_ID" \
             --arg status "$(jq -er .status "$RUNNER_TEMP/docs-deployment/workflow-run-api.json")" \
+            --arg workflowCommit "$workflow_commit" \
             --arg workflowName "$(jq -er .name "$RUNNER_TEMP/docs-deployment/workflow-run-api.json")" \
-            '{candidateCommit:$candidate,conclusion:$conclusion,event:$event,headBranch:$headBranch,headSha:$headSha,path:$path,ref:"refs/heads/main",status:$status,workflowName:$workflowName,workflowRunId:$run}' \
+            '{candidateCommit:$candidate,conclusion:$conclusion,event:$event,headBranch:$headBranch,headSha:$headSha,path:$path,ref:"refs/heads/main",status:$status,workflowCommit:$workflowCommit,workflowName:$workflowName,workflowRunId:$run}' \
             > "$RUNNER_TEMP/docs-deployment/workflow-run.json"
+
+      - name: Check out the reviewed implementation commit for receipt schemas
+        if: github.event.workflow_run.conclusion == 'success'
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.2.0
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+          ref: main
+
+      - name: Switch to the exact API-bound reviewed implementation commit
+        if: github.event.workflow_run.conclusion == 'success'
+        run: |
+          set -euo pipefail
+          git fetch --no-tags --depth=1 origin "$TAXKIT_WORKFLOW_CHECKOUT_SHA"
+          git checkout --detach "$TAXKIT_WORKFLOW_CHECKOUT_SHA"
+          test "$(git rev-parse HEAD)" = "$TAXKIT_WORKFLOW_CHECKOUT_SHA"
+
+      - name: Set up Bun for receipt validation
+        if: github.event.workflow_run.conclusion == 'success'
+        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.0.2
+        with:
+          bun-version-file: .bun-version
+
+      - name: Install frozen dependencies for receipt validation
+        if: github.event.workflow_run.conclusion == 'success'
+        run: bun install --frozen-lockfile
 
       - name: Validate completed workflow input and run identity
         if: github.event.workflow_run.conclusion == 'success'
@@ -151,8 +188,23 @@ jobs:
           export TAXKIT_WORKFLOW_RUN_WORKFLOW_COMMIT="$TAXKIT_WORKFLOW_INPUT_WORKFLOW_COMMIT"
           export TAXKIT_WORKFLOW_RUN_WORKFLOW_PATH="$TAXKIT_WORKFLOW_RUN_PATH"
           export TAXKIT_WORKFLOW_RUN_WORKFLOW_NAME="$TAXKIT_WORKFLOW_RUN_NAME"
+          export TAXKIT_WORKFLOW_RUN_EVENT="$TAXKIT_WORKFLOW_RUN_EVENT"
+          export TAXKIT_WORKFLOW_RUN_HEAD_BRANCH="$TAXKIT_WORKFLOW_RUN_HEAD_BRANCH"
+          export TAXKIT_WORKFLOW_RUN_HEAD_SHA="$TAXKIT_WORKFLOW_RUN_HEAD_SHA"
           bun run check:docs-deployment-workflow-input
           bun run check:docs-deployment-workflow-run
+
+      - name: Retain bounded reconciliation stop when positive proof is unavailable
+        if: always()
+        run: |
+          set -euo pipefail
+          if [ ! -f "$RUNNER_TEMP/docs-deployment/workflow-run.json" ] && [ ! -f "$RUNNER_TEMP/docs-deployment/workflow-run-failure.json" ]; then
+            jq -nS \
+              --arg conclusion "$SOURCE_RUN_CONCLUSION" \
+              --arg run "$SOURCE_RUN_ID" \
+              '{conclusion:$conclusion,nonClaim:"The completed source run could not be reconciled into a strict positive receipt; external state remains unestablished.",schemaVersion:1,workflowRunId:$run}' \
+              > "$RUNNER_TEMP/docs-deployment/workflow-run-failure.json"
+          fi
 
       - name: Upload reconciled workflow receipt
         if: always()

@@ -125,6 +125,7 @@ const DeploymentControl = Schema.Struct({
     "docs-workflow-mutation-lock",
     "docs-preview-teardown-safety",
     "docs-orphan-report-only",
+    "docs-workflow-receipt-reconciliation",
   ]),
   owner: Schema.Literal("taxkit-docs-deployment-automation-owner"),
   preventedFailure: Schema.NonEmptyString,

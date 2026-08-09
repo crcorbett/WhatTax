@@ -576,16 +576,22 @@ The receipt must also name Schema-decoded `workflowRunPath` and
 `Docs Deployment Workflow Receipts` workflow runs from the `workflow_run`
 completion event, fetches the source run through the Actions API and downloads
 the matching artifact; it must emit the strict readback only after the source
-run is completed and successful. That readback must show the expected workflow
-name, exact workflow path, `refs/heads/main`, `headBranch: main`, and a head SHA
-equal to the workflow source commit recorded by the outer receipt. The separate
+run is completed and successful. For Preview, Production and report-only runs,
+the API `headBranch`/`headSha` must be `main` and equal the workflow source
+commit recorded by the outer receipt. Automatic PR-close teardown is the
+intentional exception: its API head identifies the closed pull-request run,
+while the separately recorded `workflowCommit` and `refs/heads/main` identify
+the reviewed implementation that the teardown checked out; the reconciler
+must verify that reviewed commit exists and is an ancestor of the current
+default branch before validating the artifact. The separate
 workflow-input readback is emitted by the reviewed workflow from its dispatch
 inputs and must bind the same run/path/source commit, operation and exact
 deployment candidate input to the outer receipt. The source head and candidate
 are intentionally distinct when a reviewed default-branch workflow builds a PR
 head. Promotion rejects branch-only, synthetic or detached input metadata. The
-reconciler retains bounded failure metadata for failed or cancelled runs; those
-runs have no success readback and cannot be promoted. The
+reconciler retains bounded failure metadata for failed or cancelled runs,
+artifact mismatch or schema/provider disagreement; those runs have no success
+readback and cannot be promoted. The
 named plan receipt is decoded and its operation, projection
 digest, candidate, stage and equal-replan identity are checked again during
 external-state promotion; a teardown projection may contain only two deletes
@@ -596,6 +602,9 @@ retained PNG bytes hash to the manifest.
 
 The current register intentionally records all four entries as
 `not-established` until each record's complete receipt contract is satisfied.
+The read-only reconciler is governed by the separate
+`docs-workflow-receipt-reconciliation` control; it does not add provider
+authority or a fifth mutation automation.
 The 2026-08-04 capability receipt records the exact protected environment
 identities and redacted narrow credential readback; the current workflow epoch
 below records successful mutation-class runs, while the report-only state

@@ -316,13 +316,19 @@ operation-bound plan Schema checker before any apply or destroy. Plan-only recei
 `preview-equal-replan` or `production-equal-replan` before apply. Production
 downloads and checks the accepted Preview plan/replan
 artifact rather than trusting a caller-supplied digest. A promoted external
-receipt must also name Schema-decoded GitHub run and workflow-input readbacks
-whose successful completed run has the expected workflow name, exact workflow path,
-`refs/heads/main`, `headBranch: main`, and `headSha` equal to the recorded
-workflow source commit. The workflow-input readback binds the same run/path,
-source commit, operation and exact deployment candidate input; that input must
-equal the outer receipt's candidate. A default-branch run may build a reviewed
-PR head, so the two identities are intentionally distinct. Promotion rejects
+receipt must also name Schema-decoded GitHub run and workflow-input readbacks.
+Preview, Production and report-only runs require a successful completed run
+with the expected workflow name, exact workflow path, `refs/heads/main`,
+`headBranch: main`, and `headSha` equal to the recorded workflow source commit.
+Automatic PR-close teardown is the explicit source identity exception: its API
+`headBranch`/`headSha` identify the closed PR run, while its `workflowCommit` and
+`refs/heads/main` identify the reviewed implementation checked out by teardown;
+the read-only reconciler verifies that commit exists and is an ancestor of
+current `main` before it checks the artifact. The workflow-input readback binds
+the same run/path, source commit, operation and exact deployment candidate
+input; that input must equal the outer receipt's candidate. A default-branch
+run may build a reviewed PR head, so the two identities are intentionally
+distinct. Promotion rejects
 hosted environment/stage mismatches
 and any screenshot set other than exactly one desktop and one mobile image.
 Report-only dispatch verifies the reviewed
@@ -982,6 +988,7 @@ tools/docs-deployment/
   docs-preview.yml
   docs-production.yml
   docs-preview-teardown.yml
+  docs-deployment-workflow-receipts.yml # completed-run read-only reconciliation
 docs/runbooks/docs-deployment.md
 docs/verification/docs-deployment-journeys.json
 docs/evidence/deployments/

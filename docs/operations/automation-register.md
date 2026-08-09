@@ -131,12 +131,20 @@ hosted artifact and its canonical plan artifact. The separate read-only
 `workflow_run` receipt workflow fetches the completed source run and matching
 artifact after the triggering workflow ends; a triggering job cannot assert its
 own completed status. A future established receipt must name strict workflow-run
-and workflow-input readbacks proving the expected workflow name, a successful
-`main` ref/head and exact workflow path. The workflow-run source head must match
-the outer workflow commit; the workflow input must bind the same run/path/source,
-operation and exact deployment candidate input to the outer candidate. Synthetic
-workflow IDs or branch-bound output cannot establish external state. Promotion checks hosted environment/stage semantics,
+and workflow-input readbacks proving the expected workflow name and exact
+workflow path. Preview, Production and report-only API heads must be `main` and
+match the outer workflow commit; automatic PR-close teardown instead records the
+pull-request API head separately while its `workflowCommit` and
+`refs/heads/main` identify the reviewed implementation that was checked out.
+The reconciler must verify that reviewed commit exists and is an ancestor of
+current `main` before validating the artifact. The workflow input must bind the
+same run/path/source, operation and exact deployment candidate input to the
+outer candidate. Synthetic workflow IDs or branch-bound output cannot establish
+external state. Promotion checks hosted environment/stage semantics,
 one desktop and one mobile screenshot with retained bytes, positive numeric PR
 identity before Preview bootstrap, and a rollback identity sourced from the
 accepted Preview provider receipt. Report-only dispatch is rejected unless its
 ref and SHA are the reviewed default branch before bearer materialisation.
+The reconciler is governed by `docs-workflow-receipt-reconciliation` in the
+deployment control register; it adds no provider mutation or credential
+authority and does not create a fifth deployment automation entry.

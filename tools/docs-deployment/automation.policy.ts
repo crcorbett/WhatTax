@@ -29,6 +29,7 @@ const expectedControlIds = [
   "docs-workflow-mutation-lock",
   "docs-preview-teardown-safety",
   "docs-orphan-report-only",
+  "docs-workflow-receipt-reconciliation",
 ] as const;
 
 const finding = (
@@ -473,14 +474,18 @@ export const inspectDeploymentAutomationRegisters = (
         workflowRunMismatch =
           workflowRun.workflowRunId !== receipt.workflowRunId ||
           workflowRun.candidateCommit !== receipt.candidateCommit ||
-          workflowRun.headSha !== receipt.workflowCommit ||
+          workflowRun.workflowCommit !== receipt.workflowCommit ||
           workflowRun.path !== receipt.workflowPath ||
           workflowRun.workflowName !== workflowName ||
-          workflowRun.headBranch !== "main" ||
           workflowRun.ref !== "refs/heads/main" ||
           workflowRun.status !== "completed" ||
           workflowRun.conclusion !== "success" ||
-          !allowedEvents.includes(workflowRun.event);
+          !allowedEvents.includes(workflowRun.event) ||
+          (isTeardown
+            ? workflowRun.headBranch.length === 0 ||
+              workflowRun.headSha.length !== 40
+            : workflowRun.headBranch !== "main" ||
+              workflowRun.headSha !== receipt.workflowCommit);
       }
       let workflowInputMismatch =
         workflowInput === null || receipt === undefined;

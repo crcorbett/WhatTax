@@ -263,7 +263,8 @@ inherits it without duplicating execution or widening workflow authority.
 
 Deployment automation is intentionally outside Quality. The local
 `check:docs-deployment-automation` command Schema-decodes four target-owned
-automation records plus four controls and runs focused negative fixtures for
+automation records plus five controls (including the read-only completed-run
+receipt reconciler) and runs focused negative fixtures for
 candidate trust, mutation locking, equal replans, teardown safety,
 credential/environment denial and report-only orphan handling. This proves
 repository desired state only. A hosted workflow claim additionally requires

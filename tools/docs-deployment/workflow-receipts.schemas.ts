@@ -46,11 +46,12 @@ export const DeploymentWorkflowRunReadback = Schema.Struct({
   candidateCommit: CommitSha,
   conclusion: Schema.Literal("success"),
   event: Schema.NonEmptyString,
-  headBranch: Schema.Literal("main"),
+  headBranch: Schema.NonEmptyString,
   headSha: CommitSha,
   path: Schema.NonEmptyString,
   ref: Schema.Literal("refs/heads/main"),
   status: Schema.Literal("completed"),
+  workflowCommit: CommitSha,
   workflowName: Schema.NonEmptyString,
   workflowRunId: WorkflowRunId,
 });
