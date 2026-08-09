@@ -202,8 +202,16 @@ export const DocsDeploymentOrphanSourcesLive = Layer.effect(
               : operation,
           });
         }
-        const jsonStart = outputText.indexOf("{");
-        const jsonEnd = outputText.lastIndexOf("}");
+        const objectStart = outputText.indexOf("{");
+        const arrayStart = outputText.indexOf("[");
+        let jsonStart = objectStart;
+        if (jsonStart === -1 || (arrayStart !== -1 && arrayStart < jsonStart)) {
+          jsonStart = arrayStart;
+        }
+        const jsonEnd = Math.max(
+          outputText.lastIndexOf("}"),
+          outputText.lastIndexOf("]")
+        );
         const text = yield* Effect.try({
           catch: () =>
             new DocsDeploymentOrphanInventoryInputError({
