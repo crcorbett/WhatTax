@@ -106,6 +106,19 @@ receipt is retained under `docs/evidence/deployments/2026-08-09-orphan-inventory
 Hosted report-only state/provider agreement remains unestablished, so DCD-004
 and DCD-005 stay open and the automation register remains `not-established`.
 
+The corrected branch-bound successor `70be77e64c93d20cd82c5e02e33db9c92a94f0d7`
+passed the protected report-only workflow `31316752464`. It materialized and
+validated the state credential, decoded the account-matched report through the
+public Alchemy HTTP state client, returned state/provider agreement for one
+`prod` stage and one Worker, and found no Preview stages or orphan candidates.
+The receipt is retained at
+`docs/evidence/deployments/2026-08-09-orphan-inventory/report-31316752464.json`.
+This proves only the exact branch-bound report-only read and no mutation. The
+automation register remains `not-established` until the reviewed workflow runs
+from the default-branch source; hosted application behavior, deployment/version
+identity, teardown and rollback remain separate claims, so DCD-004 and DCD-005
+stay open.
+
 ## Target and comparative evidence
 
 TaxKit planning target:

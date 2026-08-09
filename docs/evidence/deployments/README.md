@@ -268,3 +268,20 @@ cancelled after the bounded wait. Its cancellation receipt is
 cache-ingress repair as the current implementation owner, but it does not
 establish hosted state/provider agreement; the report-only automation register
 remains `not-established` and scheduled orphan detection remains inconclusive.
+
+## 2026-08-09 report-only hosted successor
+
+Candidate `70be77e64c93d20cd82c5e02e33db9c92a94f0d7` passed the protected
+`github-actions-report-only` workflow in run `31316752464`. Cache materialization
+and its names-only shape check passed, and the nested inventory command used the
+bounded protected-JSON fallback when its process could not see the home-relative
+cache. The Schema-decoded report returned `state-provider-agree`, state-store
+version `7`, one `prod` stage, one matching Worker, no Preview stages and no
+orphan candidates; the read-only artifact was uploaded successfully.
+
+The claim-matched receipt is
+`2026-08-09-orphan-inventory/report-31316752464.json`. This proves the exact
+branch-bound report-only read and no mutation, not hosted application behavior,
+deployment/version identity, teardown, rollback or future availability. The
+automation register remains `not-established` until the reviewed workflow runs
+from the default branch source; DCD-004 and DCD-005 therefore remain open.

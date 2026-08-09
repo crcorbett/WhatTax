@@ -1246,3 +1246,20 @@ hosted state/provider agreement was produced. The automation register remains
 DCD-005 remains `pending`, and the next action is a fresh protected run when
 hosted runner admission is available. No provider mutation or secret
 disclosure occurred.
+
+### 2026-08-09 — report-only hosted successor
+
+Candidate `70be77e64c93d20cd82c5e02e33db9c92a94f0d7` passed the protected
+`github-actions-report-only` run `31316752464`. Cache materialization and its
+names-only shape check passed; the nested inventory command used the bounded
+protected-JSON fallback when its child process could not see the home-relative
+cache. The report returned state/provider agreement, state-store version `7`,
+one `prod` stage, one matching Worker, no Preview stages and no orphan
+candidates. The claim-matched receipt is
+`docs/evidence/deployments/2026-08-09-orphan-inventory/report-31316752464.json`.
+
+This proves the exact branch-bound report-only read and no mutation. The
+automation register remains `externalState.status: not-established` because
+the workflow source is not the reviewed default-branch commit; DCD-004 remains
+`in_progress`, DCD-005 remains `pending`, and no hosted application,
+deployment/version, teardown or rollback claim is made from this receipt.

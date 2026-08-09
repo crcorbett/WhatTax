@@ -52,9 +52,10 @@ intent and task state belong in the active SPEC and execution plan.
   report-only orphan inventory. Their validator still reports zero externally
   established automations because the aggregate register is fail-closed. The
   four workflow owners are on the reviewed default branch and the three
-  mutation classes have dated provider/hosted receipts; the report-only
-  state-boundary stop prevents the register from claiming complete external
-  establishment.
+  mutation classes have dated provider/hosted receipts. The report-only owner
+  has a dated branch-bound state/provider success, but its reviewed
+  default-branch source run is still required before the register can claim
+  complete external establishment.
 - `@taxkit/api-http` builds as a package and exposes health, generated docs,
   OpenAPI JSON, metadata and public calculation route contracts.
 - `@taxkit/sdk` builds as a private package for local and downstream

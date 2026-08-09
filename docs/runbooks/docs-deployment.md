@@ -684,6 +684,24 @@ the report-only automation register remains `not-established`, no orphan or
 teardown claim is made, and the next action is to retry the protected workflow
 when hosted runner admission is available.
 
+### 2026-08-09 — report-only hosted successor
+
+Candidate `70be77e64c93d20cd82c5e02e33db9c92a94f0d7` passed the protected
+`github-actions-report-only` workflow `31316752464`. Cache materialization and
+the names-only shape check passed; the nested inventory command then used the
+bounded protected-JSON fallback when its child process could not see the
+home-relative cache. The report returned state/provider agreement, state-store
+version `7`, one `prod` stage, one matching Worker, no Preview stages and no
+orphan candidates. The artifact was uploaded and the receipt is
+`docs/evidence/deployments/2026-08-09-orphan-inventory/report-31316752464.json`.
+
+This establishes the exact branch-bound report-only read and no mutation. It
+does not establish hosted application behavior, deployment/version identity,
+teardown, rollback or future availability. The automation register remains
+`not-established` until this workflow runs from the reviewed default-branch
+source; keep DCD-004 and DCD-005 open until that source-bound lifecycle is
+accepted.
+
 ## Stop conditions
 
 Stop before unrelated `versioning`, `commit`, `push`, `tag`, `release`,
