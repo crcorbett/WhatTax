@@ -120,6 +120,19 @@ describe("docs deployment workflow admission", () => {
       expect(source).toContain("lockfileSha256");
       expect(source).toContain("replanSha256");
     }
+    const production = await readWorkflow(workflowPaths.production);
+    expect(production).toContain(
+      'hosted_rollback_identity="$TAXKIT_DOCS_ROLLBACK_RECOVERY_IDENTITY"'
+    );
+    expect(production).toContain(
+      'hosted_rollback_identity="production-$GITHUB_RUN_ID"'
+    );
+    expect(production).toContain(
+      'test "$hosted_rollback_identity" = "$(jq -er \'.rollbackRecoveryIdentity\' "$RUNNER_TEMP/docs-deployment/provider-readback.json")"'
+    );
+    expect(production).toContain(
+      'TAXKIT_DOCS_ROLLBACK_RECOVERY_IDENTITY="$hosted_rollback_identity" \\\n            bun apps/docs/scripts/test-cloudflare-hosted.tsx'
+    );
     const teardown = await readWorkflow(workflowPaths.teardown);
     expect(teardown).toContain("cancel-in-progress: false");
     expect(teardown).toContain("CLOUDFLARE_ACCOUNT_ID");
