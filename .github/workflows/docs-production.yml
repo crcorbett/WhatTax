@@ -108,13 +108,6 @@ jobs:
           accepted_preview_hosted="$(find "$RUNNER_TEMP/accepted-preview-provider" -name hosted-proof.json -print -quit)"
           test -n "$accepted_preview_readback"
           test -n "$accepted_preview_hosted"
-          TAXKIT_WORKFLOW_PROVIDER_READBACK="$accepted_preview_readback" \
-          TAXKIT_WORKFLOW_HOSTED_PROBE="$accepted_preview_hosted" \
-          TAXKIT_WORKFLOW_CANDIDATE_COMMIT="$CANDIDATE_SHA" \
-          TAXKIT_WORKFLOW_STAGE="$(jq -er '.stage' "$accepted_preview_readback")" \
-          TAXKIT_WORKFLOW_PLAN_SHA256="$ACCEPTED_PREVIEW_PLAN_SHA256" \
-          TAXKIT_WORKFLOW_SCREENSHOT_ROOT="$RUNNER_TEMP/accepted-preview-provider" \
-            bun run check:docs-deployment-workflow-proof
           jq -e --arg candidate "$CANDIDATE_SHA" --arg plan "$ACCEPTED_PREVIEW_PLAN_SHA256" --arg pr "$ACCEPTED_PREVIEW_PR_NUMBER" '(.candidateCommit == $candidate) and (.acceptedPlanSha256 == $plan) and (.stage == ("pr-" + $pr))' "$accepted_preview_readback" > /dev/null
           jq -e --arg pr "$ACCEPTED_PREVIEW_PR_NUMBER" '(.previewPrNumber | tostring) == $pr and .stage == ("pr-" + $pr)' "$accepted_preview_readback" > /dev/null
           jq -e --arg candidate "$CANDIDATE_SHA" --arg plan "$ACCEPTED_PREVIEW_PLAN_SHA256" '(.candidateCommit == $candidate) and (.acceptedPlanSha256 == $plan) and (.diagnostics | length == 0)' "$accepted_preview_hosted" > /dev/null
@@ -191,6 +184,16 @@ jobs:
           test -n "$ACCEPTED_PREVIEW_PLAN"
           TAXKIT_WORKFLOW_PLAN_RECEIPT="$ACCEPTED_PREVIEW_PLAN" \
             bun run check:docs-deployment-workflow-plan
+
+      - name: Schema-check accepted Preview provider and hosted proof
+        env:
+          TAXKIT_WORKFLOW_PROVIDER_READBACK: ${{ env.ACCEPTED_PREVIEW_READBACK }}
+          TAXKIT_WORKFLOW_HOSTED_PROBE: ${{ env.ACCEPTED_PREVIEW_HOSTED }}
+          TAXKIT_WORKFLOW_CANDIDATE_COMMIT: ${{ inputs.candidate_sha }}
+          TAXKIT_WORKFLOW_STAGE: pr-${{ inputs.accepted_preview_pr_number }}
+          TAXKIT_WORKFLOW_PLAN_SHA256: ${{ inputs.accepted_preview_plan_sha256 }}
+          TAXKIT_WORKFLOW_SCREENSHOT_ROOT: ${{ runner.temp }}/accepted-preview-provider
+        run: bun run check:docs-deployment-workflow-proof
 
       - name: Validate deployment owners
         run: bun run check:docs-deployment
