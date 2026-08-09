@@ -178,6 +178,10 @@ export const DocsDeploymentOrphanSourcesLive = Layer.effect(
           .spawn(
             ChildProcess.make(command, args, {
               cwd: repositoryRoot,
+              env: {
+                ALCHEMY_PROFILE: process.env["ALCHEMY_PROFILE"],
+                HOME: process.env["HOME"],
+              },
               extendEnv: true,
               forceKillAfter: "2 seconds",
               stderr: "pipe",
