@@ -108,8 +108,7 @@ const program = Effect.gen(function* inventoryProgram() {
           try {
             const parsed: unknown = JSON.parse(contents);
             return {
-              fileJsonObject:
-                parsed !== null && typeof parsed === "object",
+              fileJsonObject: parsed !== null && typeof parsed === "object",
               fileVisible: true,
             };
           } catch {
