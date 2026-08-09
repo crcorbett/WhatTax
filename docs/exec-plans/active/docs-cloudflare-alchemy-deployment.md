@@ -1392,3 +1392,21 @@ The workflow contract test now pins this exact command in both Preview and
 Production. DCD-004 remains `in_progress`, DCD-005 remains `pending`, and a
 fresh default-branch deploy run is required to produce a positive reconciled
 receipt before the automation register can advance.
+
+### 2026-08-10 — hosted workflow nullable-version correction
+
+The first corrected default-branch deploy successor `31331206400` for
+candidate `abd0933655f797fbba4a8c93fbac618bef6366ad` reached provider readback
+and passed the complete hosted HTTP/browser/runtime/navigation/accessibility,
+cache, console and desktop/mobile screenshot assertions. The strict workflow
+proof checker then rejected the filtered receipt because the first-create
+hosted output represented `previousVersionId` as an empty string while the
+receipt Schema requires `null`; provider readback had the correct nullable
+shape. The provider and hosted artifacts remain retained as a failed,
+non-establishing attempt.
+
+Preview and Production now normalize only that first-create empty value to JSON
+`null` before Schema decoding; non-empty update/rollback version identities are
+preserved. DCD-004 remains `in_progress`, DCD-005 remains `pending`, and a
+fresh default-branch Preview deploy is required before any external-state
+promotion.

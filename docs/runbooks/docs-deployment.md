@@ -201,6 +201,9 @@ sanitized provider and hosted identities. The workflow invokes the source
 directly as `bun apps/docs/scripts/test-cloudflare-hosted.tsx` so the captured
 stdout is JSON; the package-level `bun run --filter=docs
 test:cloudflare-hosted` command remains the operator-facing local invocation.
+The workflow filter maps the first-create empty `previousVersionId` value to
+JSON `null` before the strict receipt Schema is decoded; an update or rollback
+must retain the non-empty provider version identity.
 The workflow retains the raw hosted output separately, filters a strict Schema
 receipt, copies the PNG bytes into the artifact-owned
 `docs/evidence/deployments/` subtree, and recomputes each image digest before

@@ -98,6 +98,9 @@ describe("docs deployment workflow admission", () => {
       expect(source).toContain(
         'bun apps/docs/scripts/test-cloudflare-hosted.tsx > "$RUNNER_TEMP/docs-deployment/hosted-proof.raw.json"'
       );
+      expect(source).toContain(
+        'previousVersionId:(if .previousVersionId == "" then null else .previousVersionId end)'
+      );
       expect(source).toContain("check:docs-deployment-workflow-proof");
       expect(source).toContain("check:docs-deployment-workflow-plan");
       expect(source).toContain("TAXKIT_WORKFLOW_PLAN_OPERATION");
