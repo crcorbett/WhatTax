@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: read
+  actions: read
 
 concurrency:
   group: taxkit-docs-orphan-inventory
@@ -21,6 +22,7 @@ jobs:
     environment: github-actions-report-only
     permissions:
       contents: read
+      actions: read
     env:
       ALCHEMY_PROFILE: default
       GH_TOKEN: ${{ github.token }}
@@ -93,13 +95,27 @@ jobs:
 
       - name: Materialize successful report-only workflow-run readback
         if: success()
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
+          run_json="$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}")"
+          test "$(jq -r .status <<<"$run_json")" = "completed"
+          test "$(jq -r .conclusion <<<"$run_json")" = "success"
+          test "$(jq -r .head_branch <<<"$run_json")" = "main"
+          test "$(jq -r .path <<<"$run_json")" = ".github/workflows/docs-orphan-inventory.yml"
+          candidate="$(jq -er .candidateCommit "$RUNNER_TEMP/docs-deployment/workflow-input.json")"
           jq -nS \
-            --arg event "$GITHUB_EVENT_NAME" \
-            --arg run "$GITHUB_RUN_ID" \
-            --arg source "$GITHUB_SHA" \
-            '{candidateCommit:$source,conclusion:"success",event:$event,headBranch:"main",headSha:$source,path:".github/workflows/docs-orphan-inventory.yml",ref:"refs/heads/main",status:"completed",workflowName:"Docs Orphan Inventory (Report Only)",workflowRunId:$run}' \
+            --arg candidate "$candidate" \
+            --arg conclusion "$(jq -er .conclusion <<<"$run_json")" \
+            --arg event "$(jq -er .event <<<"$run_json")" \
+            --arg headBranch "$(jq -er .head_branch <<<"$run_json")" \
+            --arg headSha "$(jq -er .head_sha <<<"$run_json")" \
+            --arg path "$(jq -er .path <<<"$run_json")" \
+            --arg run "$(jq -er '.id | tostring' <<<"$run_json")" \
+            --arg status "$(jq -er .status <<<"$run_json")" \
+            --arg workflowName "$(jq -er .name <<<"$run_json")" \
+            '{candidateCommit:$candidate,conclusion:$conclusion,event:$event,headBranch:$headBranch,headSha:$headSha,path:$path,ref:"refs/heads/main",status:$status,workflowName:$workflowName,workflowRunId:$run}' \
             > "$RUNNER_TEMP/docs-deployment/workflow-run.json"
 
       - name: Upload report-only receipt
