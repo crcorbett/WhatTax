@@ -36,7 +36,7 @@ the milestone and acceptance owner.
 | `DCD-001` | completed   | Accepted at `669a8f3…` after exact dependency/integrity readback, both built-app oracles, docs-maintainer reconciliation, focused Changeset, independent closure, and all change-owned gates. |
 | `DCD-002` | completed   | Accepted candidate `d9cb894…` passed fresh pre-deploy and pre-destroy state/provider readback, equal plans, Preview apply, the complete hosted/browser/screenshot contract, exact-stage teardown/absence, all gates and corrected-boundary independent review. |
 | `DCD-003` | completed   | Accepted after fixed Production, separately Preview-qualified successor, successor Production, restored-source rollback, provider/hosted/screenshot readback, owner reconciliation, full verification and corrected-boundary independent review. |
-| `DCD-004` | in_progress | Mutation workflows now reject unexpected equal-replan resources, Schema-check provider/hosted artifacts, require an accepted Preview run for Production, and prove exact teardown absence. Protected report-only run `31319845724` remains branch-bound; default-branch source readback and promoted outer receipts are still required before the aggregate register can advance from `not-established`. |
+| `DCD-004` | in_progress | Mutation workflows now reject unexpected equal-replan resources, Schema-check provider/hosted artifacts, require an accepted Preview run for Production, and prove exact teardown absence. Main-sourced Preview `31336358628` now has a successful reconciled provider/hosted receipt artifact; PR-close teardown `31335980866` remains a claim-matched failure at the pinned Alchemy beta.64 dry-run, so the aggregate register stays `not-established` and Production remains stopped. |
 | `DCD-005` | pending     | Docs-app bridge-retirement implementation is present and locally qualified at `d649a14…`; waits for exact-candidate hosted Preview/Production/rollback requalification through the corrected workflow receipt contract, the report-only state boundary, fresh independent review and complete closeout evidence. |
 
 ## Baseline
@@ -1479,3 +1479,38 @@ teardown or Production claim is established. Resume only after the pinned
 Alchemy runner is requalified on the hosted environment or a separately
 reviewed supported runner correction is available; do not treat the plan text
 as a successful destroy precondition.
+
+### 2026-08-10 — current main Preview success and PR-close teardown stop
+
+After PR 23 merged, reviewed default-branch SHA
+`94392cc57c7328525110a7e992c04d4dfc1eebff` planned candidate
+`c602593b4e23e784a6c9e2b912c3084dcfc9b9f3` for deterministic `pr-23`.
+Plan run `31336277416` produced the update digest
+`3968bb90e8fb9439957f7ec623517773c3028a6104b60ebfddd0cedb6064baba`.
+Deploy run `31336358628` then passed equal replan, provider/state readback and
+the full hosted HTTP/browser contract. Its sanitized provider readback binds
+the `pr-23` Worker, deployment `8c53e533-60c0-44c8-bc7c-8b61189473e2`,
+version `df969c13-8fa6-4504-9ec1-940aceee46bc`, prior version
+`964911d3-0ea3-4355-a5aa-dc307cf1ece2`, workers.dev URL, account/state,
+configuration, deployment-input and lockfile identities. Hosted diagnostics
+were empty and the retained desktop/mobile PNG digests were
+`128c8f300d1911111fd3fc22a89289efc6961df29582421a53bd77e9ff8c82cf` and
+`9ebc4108397d334eedff97d8ae79ddc103ee61a62bf87a995becf3715b32c945`.
+Reconciler run `31336453638` API-read the completed main workflow and uploaded
+the exact workflow-input/run/provider/hosted/screenshot artifact. The earlier
+deploy run `31336102494` is retained as a failed hosted-harness timeout and is
+not used as evidence.
+
+The automatic PR-close teardown run `31335980866` checked out reviewed main
+code, read back state/provider agreement for `pr-23`, and printed the exact
+two-resource delete plan. The pinned beta.64 direct entrypoint nevertheless
+returned exit 1 with empty stderr on the bounded dry-run; no destroy or absence
+readback occurred. Its reconciler run `31336548279` therefore failed closed,
+and the `pr-23` Worker remains present. The redundant manual teardown dispatch
+`31336476804` was cancelled before mutation. No Production plan, deploy or
+rollback was attempted after this stop. DCD-004 remains `in_progress`, DCD-005
+remains `pending`, and the four automation entries remain
+`externalState.status: not-established` until a repository-promoted complete
+workflow epoch exists. The next action is Alchemy beta.64 hosted-runner
+requalification or a separately reviewed supported correction; accepting the
+non-zero plan would violate the fail-closed teardown contract.
