@@ -402,8 +402,8 @@ ambiguous target.
 The verified `pr-1` destroy dry-run and apply invocations are:
 
 ```sh
-ALCHEMY_PLAIN=1 CI=1 bunx alchemy destroy --dry-run --stage pr-1 --profile default --yes
-ALCHEMY_PLAIN=1 CI=1 bunx alchemy destroy --stage pr-1 --profile default --yes
+ALCHEMY_PLAIN=1 CI=1 bunx --bun alchemy destroy --dry-run --stage pr-1 --profile default --yes
+ALCHEMY_PLAIN=1 CI=1 bunx --bun alchemy destroy --stage pr-1 --profile default --yes
 ```
 
 Run the dry-run twice and require the same sanitized digest before destroy. A

@@ -1439,3 +1439,19 @@ destroy after a final non-zero exit. DCD-004 remains `in_progress`, DCD-005
 remains `pending`, and the next action is a fresh reviewed-main teardown run
 after this correction lands; no teardown absence claim is made from the failed
 epoch.
+
+### 2026-08-10 — explicit-Bun teardown execution correction
+
+Reviewed-main teardown run `31333419371` for candidate
+`fa63a8f2ca15250301591fc3f19f73895c18ceeb` again read the exact `pr-18`
+stage/Worker inventory and emitted the expected two-resource delete plan, but
+the workflow's `bunx alchemy destroy --dry-run` process returned non-zero with
+empty stderr on the runner. No destroy was attempted; the retained artifact
+contains the pre-destroy inventory, plan stdout, redacted empty stderr and
+workflow input only. The same command exits zero locally under the pinned Bun
+and Alchemy graph. The workflow therefore now invokes the public Bun runner
+explicitly (`bunx --bun alchemy`) for both teardown dry-run and destroy, with
+the existing bounded retries and fail-closed exit handling unchanged. This is
+a runtime-resolution correction, not an acceptance of non-zero output as a
+successful plan. DCD-004 remains `in_progress`, DCD-005 remains `pending`,
+and a fresh reviewed-main teardown run is required before any absence claim.
