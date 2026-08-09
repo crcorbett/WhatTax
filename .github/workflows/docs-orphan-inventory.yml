@@ -54,6 +54,7 @@ jobs:
           printf 'HOME=%s\n' "$alchemy_home" >> "$GITHUB_ENV"
           printf 'alchemy-home=%s\n' "$alchemy_home"
           bun -e 'import os from "node:os"; import { existsSync } from "node:fs"; const path = `${os.homedir()}/.alchemy/credentials/${process.env.ALCHEMY_PROFILE}/cloudflare-state-store.json`; console.log(JSON.stringify({ bunHome: os.homedir(), cacheExists: existsSync(path) }));'
+          bun -e 'import * as BunRuntime from "@effect/platform-bun/BunRuntime"; import * as BunServices from "@effect/platform-bun/BunServices"; import { CredentialsStore, CredentialsStoreLive } from "alchemy/Auth/Credentials"; import { Effect, Layer, Console } from "effect"; const program = Effect.gen(function*(){ const store = yield* CredentialsStore; const value = yield* store.read("default", "cloudflare-state-store"); yield* Console.log(JSON.stringify({ cacheCredentialsDefined: value !== undefined, cacheKeys: value !== undefined && typeof value === "object" ? Object.keys(value).sort() : [] })); }).pipe(Effect.provide(CredentialsStoreLive.pipe(Layer.provide(BunServices.layer)))); BunRuntime.runMain(program);'
           jq -e '(.accountId | type == "string" and length > 0) and (.url | type == "string" and startswith("https://")) and (.authToken | type == "string" and length > 0)' \
             "$state_dir/cloudflare-state-store.json" > /dev/null
           jq -r '{keys:(keys | sort | join(",")), accountIdLength:(.accountId | length), urlHost:(.url | capture("https://(?<host>[^/]+)").host), authTokenLength:(.authToken | length)}' \
