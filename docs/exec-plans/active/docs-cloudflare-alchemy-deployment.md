@@ -1449,9 +1449,12 @@ the workflow's `bunx alchemy destroy --dry-run` process returned non-zero with
 empty stderr on the runner. No destroy was attempted; the retained artifact
 contains the pre-destroy inventory, plan stdout, redacted empty stderr and
 workflow input only. The same command exits zero locally under the pinned Bun
-and Alchemy graph. The workflow therefore now invokes the public Bun runner
-explicitly (`bunx --bun alchemy`) for both teardown dry-run and destroy, with
-the existing bounded retries and fail-closed exit handling unchanged. This is
-a runtime-resolution correction, not an acceptance of non-zero output as a
-successful plan. DCD-004 remains `in_progress`, DCD-005 remains `pending`,
-and a fresh reviewed-main teardown run is required before any absence claim.
+and Alchemy graph. The workflow therefore now invokes the pinned beta.64 Bun
+entrypoint directly (`bun node_modules/alchemy/bin/alchemy.ts`) for both
+teardown dry-run and destroy, with the existing bounded retries and fail-closed
+exit handling unchanged. This is a narrowly bounded runner-resolution
+correction, not an acceptance of non-zero output as a successful plan; the
+direct entrypoint must be retired when the published launcher is requalified
+on the hosted runner. DCD-004 remains `in_progress`, DCD-005 remains
+`pending`, and a fresh reviewed-main teardown run is required before any
+absence claim.
