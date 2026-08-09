@@ -188,10 +188,9 @@ export const DocsDeploymentOrphanSourcesLive = Layer.effect(
         const [stdout, [exitCode, stderr]] = yield* Effect.all(
           [
             Stream.runCollect(handle.stdout),
-            Effect.all(
-              [handle.exitCode, Stream.runCollect(handle.stderr)],
-              { concurrency: "unbounded" }
-            ),
+            Effect.all([handle.exitCode, Stream.runCollect(handle.stderr)], {
+              concurrency: "unbounded",
+            }),
           ],
           { concurrency: "unbounded" }
         );
