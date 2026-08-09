@@ -130,7 +130,7 @@ describe("docs deployment workflow admission", () => {
     expect(teardown).toContain("unexpected_destroy_resources");
     expect(teardown).toContain("dry_run_status");
     expect(teardown).toContain(
-      ["destroy-", "$", "{attempt}.stderr.txt"].join(""),
+      ["destroy-", "$", "{attempt}.stderr.txt"].join("")
     );
     expect(teardown).toContain("[REDACTED]");
     expect(teardown).toContain("sleep 5");
