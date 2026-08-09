@@ -51,6 +51,7 @@ jobs:
           state_dir="$alchemy_home/.alchemy/credentials/$ALCHEMY_PROFILE"
           mkdir -p "$state_dir"
           printf '%s' "$ALCHEMY_STATE_STORE_CREDENTIALS_JSON" > "$state_dir/cloudflare-state-store.json"
+          printf 'HOME=%s\n' "$alchemy_home" >> "$GITHUB_ENV"
           printf 'alchemy-home=%s\n' "$alchemy_home"
           jq -e '(.accountId | type == "string" and length > 0) and (.url | type == "string" and startswith("https://")) and (.authToken | type == "string" and length > 0)' \
             "$state_dir/cloudflare-state-store.json" > /dev/null
