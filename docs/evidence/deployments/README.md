@@ -229,3 +229,21 @@ cryptographically read-only, so this candidate carries an explicit
 operational-read-only limitation. A dated workflow receipt is required before
 the automation register can advance from `not-established`; no state,
 provider, absence or teardown claim is made by this candidate alone.
+
+## 2026-08-09 report-only cache-ingress stop
+
+The exact candidate `39f389c24f819046b2bd57e7cb3bd8674eed0941` passed Quality
+and the protected report-only materialization step. The job's names-only probe
+confirmed the expected home-relative cache file, keys, account-id length, URL
+host and bearer length without exposing a value. The inventory process then
+stopped at `deployment-inventory:missing-cache` because installed Alchemy
+beta.64 returned no value from `CredentialsStore.read`.
+
+The bounded failure receipt is
+`2026-08-09-orphan-inventory/failed-31313055223.json`; the full workflow log and
+artifact remain at run `31313055223`. This does not establish Alchemy state,
+Cloudflare/provider agreement, an orphan set, teardown, hosted behavior or any
+mutation. The report-only automation register therefore remains
+`not-established`. The next owner is the Alchemy beta.64 cache-ingress boundary:
+repair or replace it with a supported non-mutating state-read path, then rerun
+from a fresh candidate. The earlier failed receipts remain unchanged.

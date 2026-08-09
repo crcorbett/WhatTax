@@ -640,6 +640,27 @@ operational-read-only boundary because beta.64's bearer has no native read-only
 scope. The candidate remains unaccepted until a names-only environment
 readback and exact workflow receipt prove state/provider agreement.
 
+### 2026-08-09 — report-only Alchemy cache-ingress stop
+
+The protected job for exact candidate `39f389c24f819046b2bd57e7cb3bd8674eed0941`
+materialized `ALCHEMY_STATE_STORE_CREDENTIALS_JSON` under the runner's expected
+home-relative Alchemy cache. Its names-only preflight observed the expected
+keys, account-id length, URL host and bearer length, while retaining no secret
+value. The inventory command nevertheless stopped with
+`deployment-inventory:missing-cache`: installed Alchemy beta.64's
+`CredentialsStore.read` returned no cached value.
+
+Retain the bounded receipt at
+`docs/evidence/deployments/2026-08-09-orphan-inventory/failed-31313055223.json`
+and the full workflow log/artifact under run `31313055223`. This is a capability
+stop, not an approval stop. Do not broaden the report-only token, copy the local
+OAuth profile, invoke login/bootstrap, or infer an orphan, state, provider,
+teardown or deletion result. The report-only register remains
+`not-established`. The next operation is a supported non-mutating Alchemy
+beta.64 cache-ingress repair or replacement, followed by a fresh exact-candidate
+run and successor receipt; until then scheduled orphan detection stays
+report-only and inconclusive.
+
 ## Stop conditions
 
 Stop before unrelated `versioning`, `commit`, `push`, `tag`, `release`,

@@ -1200,3 +1200,26 @@ secret value is present in the repository. The candidate is not accepted until
 the secret names/configuration and exact report-only run retain a dated
 state/provider-agreement receipt; the automation register remains
 `not-established` until then.
+
+### 2026-08-09 — report-only cache-ingress stop
+
+The exact pushed candidate `39f389c24f819046b2bd57e7cb3bd8674eed0941` passed
+the hosted Quality check `31312829854`. The protected report-only run
+`31313055223` checked out that SHA, materialized the account-matched
+`ALCHEMY_STATE_STORE_CREDENTIALS_JSON` cache and emitted only the safe
+metadata `{bunHome, cacheExists}` plus the validated key/account/host/length
+shape. The inventory reader then returned
+`deployment-inventory:missing-cache` from installed Alchemy beta.64's
+`CredentialsStore.read`.
+
+The successor failure receipt is
+`docs/evidence/deployments/2026-08-09-orphan-inventory/failed-31313055223.json`.
+It preserves the earlier failed receipts and proves neither Alchemy state nor
+provider agreement. No mutation, teardown, deletion, hosted proof or secret
+disclosure occurred. DCD-004 remains `in_progress`, DCD-005 remains `pending`,
+and `tools/docs-deployment/automation-register.json` remains
+`externalState.status: not-established`. The capability gap is now narrowed to
+the installed beta.64 CI cache-ingress boundary, not token scope or approval.
+The next owner must provide a supported non-mutating state-read path or repair
+the cache ingress, then rerun from a fresh candidate; do not broaden credentials
+or copy the local OAuth profile. The active goal remains open.
