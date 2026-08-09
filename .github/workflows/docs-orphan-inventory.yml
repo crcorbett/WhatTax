@@ -47,7 +47,7 @@ jobs:
         run: |
           set -euo pipefail
           umask 077
-          alchemy_home="$(node -p 'require("node:os").homedir()')"
+          alchemy_home="$(bun -e 'import os from "node:os"; process.stdout.write(os.homedir())')"
           state_dir="$alchemy_home/.alchemy/credentials/$ALCHEMY_PROFILE"
           mkdir -p "$state_dir"
           printf '%s' "$ALCHEMY_STATE_STORE_CREDENTIALS_JSON" > "$state_dir/cloudflare-state-store.json"
