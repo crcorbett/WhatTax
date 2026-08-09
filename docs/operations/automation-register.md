@@ -148,3 +148,24 @@ ref and SHA are the reviewed default branch before bearer materialisation.
 The reconciler is governed by `docs-workflow-receipt-reconciliation` in the
 deployment control register; it adds no provider mutation or credential
 authority and does not create a fifth deployment automation entry.
+
+### 2026-08-10 main-sourced Preview readback and teardown stop
+
+The merged main workflow produced a successful, claim-matched Preview epoch:
+plan `31336277416`, deploy `31336358628`, and reconciler
+`31336453638` all bind reviewed main SHA
+`94392cc57c7328525110a7e992c04d4dfc1eebff`, candidate
+`c602593b4e23e784a6c9e2b912c3084dcfc9b9f3`, stage `pr-23`, provider/state
+identities and hosted/screenshot proof. The reconciler artifact is retained,
+but it is not promoted into a repository outer receipt while the aggregate
+mutation lifecycle remains incomplete.
+
+The PR-close teardown `31335980866` is the corresponding reviewed-main
+readback. It agreed on the `pr-23` state/provider inventory and exact delete
+projection, then stopped because the pinned Alchemy beta.64 dry-run returned
+exit 1 with empty stderr. No destroy or absence claim exists; reconciler run
+`31336548279` failed closed. All four deployment entries therefore remain
+`externalState.status: not-established`, and no Production or rollback run is
+admitted after this teardown stop. The next owner is hosted beta.64 runner
+requalification or a separately reviewed supported correction, not promotion
+of the non-zero plan output.

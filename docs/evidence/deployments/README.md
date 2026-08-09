@@ -311,3 +311,28 @@ orphan. The wrapper receipt is
 `2026-08-09-orphan-inventory/report-31319845724.json`; it remains branch-bound
 until the reviewed default-branch workflow source is read back. No secret value
 is retained in any evidence file.
+
+## 2026-08-10 current default-branch Preview epoch
+
+Reviewed default-branch SHA `94392cc57c7328525110a7e992c04d4dfc1eebff`
+planned and deployed candidate `c602593b4e23e784a6c9e2b912c3084dcfc9b9f3`
+for deterministic `pr-23`. Plan `31336277416` and deploy `31336358628` bound
+the accepted/equal-replan digest, account/state, configuration,
+deployment-input and lockfile identities. The successful deploy read back the
+Worker, deployment/version transition and workers.dev URL, then passed the
+hosted HTTP, SSR/assets, server-function, 404, hydration/navigation,
+accessibility, cache/header, console and desktop/mobile screenshot checks.
+The reconciler `31336453638` API-read the completed main workflow and retained
+the exact workflow input/run, provider, hosted and screenshot artifact at
+`https://github.com/crcorbett/taxkit/actions/runs/31336453638`. This is a
+current Preview observation; it is not a Production, teardown, rollback,
+custom-domain, DNS, publication or aggregate automation-establishment claim.
+
+The PR-close teardown `31335980866` read back state/provider agreement and the
+two expected delete actions for `pr-23`, but the pinned Alchemy beta.64
+`destroy --dry-run` returned exit 1 with empty stderr. No destroy was attempted
+and no absence receipt exists; the reconciler `31336548279` failed closed and
+the Worker remains present. The earlier hosted-harness failure
+`31336102494` and cancelled duplicate teardown dispatch `31336476804` remain
+disconfirming/non-mutating history. Production and rollback were not attempted
+after this stop. No secret value is retained in any evidence file.

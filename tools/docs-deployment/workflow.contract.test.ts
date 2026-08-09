@@ -239,6 +239,19 @@ describe("docs deployment workflow admission", () => {
     expect(production).toContain("rollback_expected_current_version_id");
     expect(production).toContain("rollback_recovery_identity");
     expect(production).toContain("actions/runs/");
+    expect(production).toContain(
+      [
+        'preview_run="$(gh api "repos/',
+        "$",
+        "{GITHUB_REPOSITORY}/actions/runs/",
+        "$",
+        '{ACCEPTED_PREVIEW_RUN_ID}")"',
+      ].join("")
+    );
+    expect(production).toContain(".head_sha");
+    expect(production).toContain(".head_branch");
+    expect(production).toContain(".name");
+    expect(production).not.toContain('gh run view "$ACCEPTED_PREVIEW_RUN_ID"');
     expect(production).toContain("gh run download");
     expect(production).toContain("check:docs-deployment-workflow-proof");
     expect(production).toContain("accepted_preview_readback");
