@@ -269,6 +269,9 @@ describe("docs deployment workflow admission", () => {
         "Schema-check accepted Preview provider and hosted proof"
       )
     );
+    expect(production.indexOf("Check out exact candidate")).toBeLessThan(
+      production.indexOf('gh run download "$ACCEPTED_PREVIEW_RUN_ID"')
+    );
   });
 
   test("keeps teardown promotion strict at the receipt decoder", async () => {
