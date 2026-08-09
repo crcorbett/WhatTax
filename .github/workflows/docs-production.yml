@@ -89,36 +89,12 @@ jobs:
           preview_path="$(jq -er .path <<<"$preview_run")"
           preview_source_sha="$(jq -er .head_sha <<<"$preview_run")"
           test "$preview_source_sha" = "$(gh api "repos/${GITHUB_REPOSITORY}/git/ref/heads/main" --jq .object.sha)"
+          printf 'ACCEPTED_PREVIEW_WORKFLOW_COMMIT=%s\n' "$preview_source_sha" >> "$GITHUB_ENV"
           test "$(jq -r .name <<<"$preview_run")" = "Docs Preview Deployment"
           test "$(jq -r .head_branch <<<"$preview_run")" = "main"
           test "$preview_path" = ".github/workflows/docs-preview.yml"
           test "$(jq -r .status <<<"$preview_run")" = "completed"
           test "$(jq -r .conclusion <<<"$preview_run")" = "success"
-          mkdir -p "$RUNNER_TEMP/accepted-preview-provider" "$RUNNER_TEMP/accepted-preview-plan"
-          gh run download "$ACCEPTED_PREVIEW_RUN_ID" --name "taxkit-docs-preview-$ACCEPTED_PREVIEW_RUN_ID" --dir "$RUNNER_TEMP/accepted-preview-plan"
-          accepted_preview_plan="$(find "$RUNNER_TEMP/accepted-preview-plan" -name plan.json -print -quit)"
-          test -n "$accepted_preview_plan"
-          accepted_preview_input="$(find "$RUNNER_TEMP/accepted-preview-plan" -name workflow-input.json -print -quit)"
-          test -n "$accepted_preview_input"
-          printf 'ACCEPTED_PREVIEW_PLAN=%s\n' "$accepted_preview_plan" >> "$GITHUB_ENV"
-          printf 'ACCEPTED_PREVIEW_INPUT=%s\n' "$accepted_preview_input" >> "$GITHUB_ENV"
-          printf 'ACCEPTED_PREVIEW_WORKFLOW_COMMIT=%s\n' "$preview_source_sha" >> "$GITHUB_ENV"
-          gh run download "$ACCEPTED_PREVIEW_RUN_ID" --name "taxkit-docs-preview-provider-$ACCEPTED_PREVIEW_RUN_ID" --dir "$RUNNER_TEMP/accepted-preview-provider"
-          accepted_preview_readback="$(find "$RUNNER_TEMP/accepted-preview-provider" -name provider-readback.json -print -quit)"
-          accepted_preview_hosted="$(find "$RUNNER_TEMP/accepted-preview-provider" -name hosted-proof.json -print -quit)"
-          test -n "$accepted_preview_readback"
-          test -n "$accepted_preview_hosted"
-          jq -e --arg candidate "$CANDIDATE_SHA" --arg plan "$ACCEPTED_PREVIEW_PLAN_SHA256" --arg pr "$ACCEPTED_PREVIEW_PR_NUMBER" '(.candidateCommit == $candidate) and (.acceptedPlanSha256 == $plan) and (.stage == ("pr-" + $pr))' "$accepted_preview_readback" > /dev/null
-          jq -e --arg pr "$ACCEPTED_PREVIEW_PR_NUMBER" '(.previewPrNumber | tostring) == $pr and .stage == ("pr-" + $pr)' "$accepted_preview_readback" > /dev/null
-          jq -e --arg candidate "$CANDIDATE_SHA" --arg plan "$ACCEPTED_PREVIEW_PLAN_SHA256" '(.candidateCommit == $candidate) and (.acceptedPlanSha256 == $plan) and (.diagnostics | length == 0)' "$accepted_preview_hosted" > /dev/null
-          test "$(jq -er '.previewPrNumber | tostring' "$accepted_preview_readback")" = "$ACCEPTED_PREVIEW_PR_NUMBER"
-          accepted_preview_recovery_identity="$(jq -er '.rollbackRecoveryIdentity | select(type == "string" and length > 0)' "$accepted_preview_readback")"
-          if [ "$OPERATION" = "rollback" ]; then
-            test -n "$ROLLBACK_RECOVERY_IDENTITY"
-            test "$ROLLBACK_RECOVERY_IDENTITY" = "$accepted_preview_recovery_identity"
-          fi
-          printf 'ACCEPTED_PREVIEW_READBACK=%s\n' "$accepted_preview_readback" >> "$GITHUB_ENV"
-          printf 'ACCEPTED_PREVIEW_HOSTED=%s\n' "$accepted_preview_hosted" >> "$GITHUB_ENV"
           checks="$(gh api "repos/${GITHUB_REPOSITORY}/commits/${CANDIDATE_SHA}/check-runs?per_page=100")"
           jq -e '[.check_runs[] | select((.name | test("quality"; "i"))) | .conclusion] | length > 0 and all(. == "success")' <<<"$checks" >/dev/null
           mkdir -p "$RUNNER_TEMP/docs-deployment"
@@ -139,6 +115,36 @@ jobs:
 
       - name: Verify checkout identity
         run: test "$(git rev-parse HEAD)" = "$CANDIDATE_SHA"
+
+      - name: Download and bind accepted Preview artifacts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/accepted-preview-provider" "$RUNNER_TEMP/accepted-preview-plan"
+          gh run download "$ACCEPTED_PREVIEW_RUN_ID" --name "taxkit-docs-preview-$ACCEPTED_PREVIEW_RUN_ID" --dir "$RUNNER_TEMP/accepted-preview-plan"
+          accepted_preview_plan="$(find "$RUNNER_TEMP/accepted-preview-plan" -name plan.json -print -quit)"
+          test -n "$accepted_preview_plan"
+          accepted_preview_input="$(find "$RUNNER_TEMP/accepted-preview-plan" -name workflow-input.json -print -quit)"
+          test -n "$accepted_preview_input"
+          printf 'ACCEPTED_PREVIEW_PLAN=%s\n' "$accepted_preview_plan" >> "$GITHUB_ENV"
+          printf 'ACCEPTED_PREVIEW_INPUT=%s\n' "$accepted_preview_input" >> "$GITHUB_ENV"
+          gh run download "$ACCEPTED_PREVIEW_RUN_ID" --name "taxkit-docs-preview-provider-$ACCEPTED_PREVIEW_RUN_ID" --dir "$RUNNER_TEMP/accepted-preview-provider"
+          accepted_preview_readback="$(find "$RUNNER_TEMP/accepted-preview-provider" -name provider-readback.json -print -quit)"
+          accepted_preview_hosted="$(find "$RUNNER_TEMP/accepted-preview-provider" -name hosted-proof.json -print -quit)"
+          test -n "$accepted_preview_readback"
+          test -n "$accepted_preview_hosted"
+          jq -e --arg candidate "$CANDIDATE_SHA" --arg plan "$ACCEPTED_PREVIEW_PLAN_SHA256" --arg pr "$ACCEPTED_PREVIEW_PR_NUMBER" '(.candidateCommit == $candidate) and (.acceptedPlanSha256 == $plan) and (.stage == ("pr-" + $pr))' "$accepted_preview_readback" > /dev/null
+          jq -e --arg pr "$ACCEPTED_PREVIEW_PR_NUMBER" '(.previewPrNumber | tostring) == $pr and .stage == ("pr-" + $pr)' "$accepted_preview_readback" > /dev/null
+          jq -e --arg candidate "$CANDIDATE_SHA" --arg plan "$ACCEPTED_PREVIEW_PLAN_SHA256" '(.candidateCommit == $candidate) and (.acceptedPlanSha256 == $plan) and (.diagnostics | length == 0)' "$accepted_preview_hosted" > /dev/null
+          test "$(jq -er '.previewPrNumber | tostring' "$accepted_preview_readback")" = "$ACCEPTED_PREVIEW_PR_NUMBER"
+          accepted_preview_recovery_identity="$(jq -er '.rollbackRecoveryIdentity | select(type == "string" and length > 0)' "$accepted_preview_readback")"
+          if [ "$OPERATION" = "rollback" ]; then
+            test -n "$ROLLBACK_RECOVERY_IDENTITY"
+            test "$ROLLBACK_RECOVERY_IDENTITY" = "$accepted_preview_recovery_identity"
+          fi
+          printf 'ACCEPTED_PREVIEW_READBACK=%s\n' "$accepted_preview_readback" >> "$GITHUB_ENV"
+          printf 'ACCEPTED_PREVIEW_HOSTED=%s\n' "$accepted_preview_hosted" >> "$GITHUB_ENV"
 
       - name: Set up Bun
         uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.0.2
