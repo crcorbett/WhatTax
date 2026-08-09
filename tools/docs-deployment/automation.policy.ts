@@ -5,6 +5,7 @@ import type {
   DeploymentControl,
 } from "./automation.schemas.js";
 import { DeploymentAutomationFinding } from "./automation.schemas.js";
+import { inspectDocsDeploymentOrphanInventoryReceipt } from "./orphan-inventory.service.js";
 import { inspectDeploymentPlanReceipt } from "./policy.js";
 import type {
   DeploymentWorkflowExternalEvidence,
@@ -234,6 +235,7 @@ export const inspectDeploymentAutomationRegisters = (
           : externalReceipts.get(automation.id);
       const evidence = externalEvidence.get(automation.id);
       const plan = evidence?.plan ?? null;
+      const orphanReport = evidence?.orphanReport ?? null;
       const provider = evidence?.provider ?? null;
       const hosted = evidence?.hosted ?? null;
       const workflowRun: DeploymentWorkflowRunReadback | null =
@@ -284,7 +286,17 @@ export const inspectDeploymentAutomationRegisters = (
       let providerIdentityMismatch = false;
       if (isOrphan) {
         providerIdentityMismatch =
-          provider !== null || hosted !== null || plan !== null;
+          provider !== null ||
+          hosted !== null ||
+          plan !== null ||
+          orphanReport === null ||
+          orphanReport.repository !== "crcorbett/taxkit" ||
+          orphanReport.mutationCapability !== "none" ||
+          orphanReport.automaticDeletion !== "prohibited" ||
+          orphanReport.sources.deploymentInventory.report.agreement !==
+            "state-provider-agree" ||
+          inspectDocsDeploymentOrphanInventoryReceipt(orphanReport).length !==
+            0;
       } else if (isTeardown) {
         providerIdentityMismatch =
           teardownProvider === null ||
@@ -379,6 +391,10 @@ export const inspectDeploymentAutomationRegisters = (
           hosted.previewPrNumber !== workflowProvider.previewPrNumber,
           hosted.rollbackRecoveryIdentity !==
             workflowProvider.rollbackRecoveryIdentity,
+          receipt.operation === "production-rollback" &&
+            (workflowProvider.previousVersionId === null ||
+              workflowProvider.versionId ===
+                workflowProvider.previousVersionId),
           hosted.deploymentId !== workflowProvider.deploymentId,
           hosted.versionId !== workflowProvider.versionId,
           hosted.workerName !== workflowProvider.workerName,
@@ -428,10 +444,13 @@ export const inspectDeploymentAutomationRegisters = (
         (isOrphan
           ? receipt.acceptedPlanSha256 !== null ||
             receipt.planPath !== null ||
-            receipt.hostedProofPath !== null
+            receipt.providerReadbackPath !== null ||
+            receipt.hostedProofPath !== null ||
+            receipt.reportPath === null
           : receipt.acceptedPlanSha256 === null ||
             receipt.planPath === null ||
             receipt.providerReadbackPath === null ||
+            receipt.reportPath !== null ||
             (isTeardown
               ? receipt.hostedProofPath !== null
               : receipt.hostedProofPath === null)) ||

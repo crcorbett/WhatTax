@@ -108,10 +108,12 @@ entry can move to `externalState.status: established`.
 
 The positive admission path is explicit: decode one outer
 `DeploymentWorkflowExternalReceipt`, then decode its plan/provider/hosted (or
-teardown absence) paths, recompute retained screenshot bytes and cross-check
-workflow path, source SHA, environment, principal, stage lock, plan/config/
-deployment/lockfile identity, account/state identity, deterministic PR stage,
-provider/hosted identity and postconditions. A stale branch-bound
+teardown absence) paths; for `docs-orphan-inventory`, decode its dedicated
+`reportPath` as `DocsDeploymentOrphanInventoryReceipt` rather than treating the
+report as a provider deployment receipt. Recompute retained screenshot bytes
+and cross-check workflow path, source SHA, environment, principal, stage lock,
+plan/config/deployment/lockfile identity, account/state identity, deterministic
+PR stage, provider/hosted identity and postconditions. A stale branch-bound
 receipt remains historical and cannot establish the current default-branch
 automation class. The report-only schedule is protected by a reviewer gate;
 until that gate is intentionally removed, scheduled inventory is manual/report

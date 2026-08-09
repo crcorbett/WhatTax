@@ -76,6 +76,10 @@ const program = Effect.gen(function* workflowProofCheck() {
     hosted.environment !== expectedEnvironment,
     provider.previousVersionId !== hosted.previousVersionId,
     provider.rollbackRecoveryIdentity !== hosted.rollbackRecoveryIdentity,
+    hosted.environment === "rollback" &&
+      (provider.previousVersionId === null ||
+        provider.versionId === provider.previousVersionId ||
+        hosted.versionId === hosted.previousVersionId),
     provider.acceptedPlanSha256 !== acceptedPlanSha256,
     hosted.acceptedPlanSha256 !== acceptedPlanSha256,
     provider.url !== hosted.url,

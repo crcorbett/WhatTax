@@ -9,6 +9,11 @@ import {
   DeploymentControlRegister,
 } from "./automation.schemas.js";
 import controlsJson from "./controls.json";
+import {
+  docsDeploymentOpenPullRequestsCommand,
+  DocsDeploymentOrphanInventoryReceipt,
+  docsDeploymentStateProviderInventoryCommand,
+} from "./orphan-inventory.schemas.js";
 import { deploymentRecordDigest } from "./policy.js";
 import { DeploymentPlanReceipt } from "./schemas.js";
 import {
@@ -257,6 +262,7 @@ describe("docs deployment automation admission", () => {
         principal: preview.authority.principal,
         providerReadbackPath:
           "docs/evidence/deployments/workflow-provider.json",
+        reportPath: null,
         rollbackRecoveryIdentity,
         schemaVersion: 1,
         stage,
@@ -363,7 +369,17 @@ describe("docs deployment automation admission", () => {
         controls,
         new Map([[preview.id, receipt]]),
         new Map([
-          [preview.id, { hosted, plan, provider, receipt, workflowRun }],
+          [
+            preview.id,
+            {
+              hosted,
+              orphanReport: null,
+              plan,
+              provider,
+              receipt,
+              workflowRun,
+            },
+          ],
         ])
       )
     ).toEqual([]);
@@ -378,6 +394,7 @@ describe("docs deployment automation admission", () => {
             preview.id,
             {
               hosted,
+              orphanReport: null,
               plan,
               provider,
               receipt,
@@ -398,6 +415,7 @@ describe("docs deployment automation admission", () => {
             preview.id,
             {
               hosted,
+              orphanReport: null,
               plan: { ...plan, replanSha256: null },
               provider,
               receipt,
@@ -418,6 +436,7 @@ describe("docs deployment automation admission", () => {
             preview.id,
             {
               hosted,
+              orphanReport: null,
               plan,
               provider,
               receipt,
@@ -445,6 +464,7 @@ describe("docs deployment automation admission", () => {
                 environment: "production",
                 screenshots: [hosted.screenshots[0], hosted.screenshots[0]],
               },
+              orphanReport: null,
               plan,
               provider,
               receipt,
@@ -454,6 +474,164 @@ describe("docs deployment automation admission", () => {
         ])
       ).map((item) => item.invariant)
     ).toContain("external-proof");
+  });
+
+  test("rejects orphan establishment without a dedicated decoded report path", async () => {
+    const [automations, controls] = await decodeRegisters();
+    const orphan = automations.find(
+      (entry) => entry.id === "docs-orphan-inventory"
+    );
+    expect(orphan).toBeDefined();
+    if (orphan === undefined) {
+      return;
+    }
+    const orphanReport = await Effect.runPromise(
+      Schema.decodeUnknownEffect(DocsDeploymentOrphanInventoryReceipt)({
+        automaticDeletion: "prohibited",
+        mutationCapability: "none",
+        nonClaims: ["This fixture is not provider proof."],
+        observedAt: "2026-08-10T00:00:00.000Z",
+        previewStages: [],
+        repository: "crcorbett/taxkit",
+        schemaVersion: 1,
+        sources: {
+          deploymentInventory: {
+            command: docsDeploymentStateProviderInventoryCommand,
+            report: {
+              agreement: "state-provider-agree",
+              nonClaims: ["This fixture is not provider proof."],
+              providerWorkers: [],
+              stack: "TaxKitDocsCloudflare",
+              stages: [],
+              stateStore: { id: "state-store", version: 1 },
+            },
+          },
+          github: {
+            command: docsDeploymentOpenPullRequestsCommand,
+            openPullRequests: [],
+          },
+        },
+        trustedPullRequestsWithoutStage: [],
+      })
+    );
+    const candidateCommit = "a".repeat(40);
+    const workflowCommit = "b".repeat(40);
+    const receipt = await Effect.runPromise(
+      Schema.decodeUnknownEffect(DeploymentWorkflowExternalReceipt)({
+        acceptedPlanSha256: null,
+        accountId: null,
+        automationId: orphan.id,
+        candidateCommit,
+        configSha256: null,
+        deploymentInputSha256: null,
+        environment: orphan.environment.id,
+        hostedProofPath: null,
+        lockGroup: orphan.lock.group,
+        lockfileSha256: null,
+        nonClaims: ["This fixture is not provider proof."],
+        observedAt: "2026-08-10T00:00:00Z",
+        operation: "orphan-inventory-read",
+        planPath: null,
+        postcondition: "state/provider report was decoded",
+        previousVersionId: null,
+        principal: orphan.authority.principal,
+        providerReadbackPath: null,
+        reportPath: null,
+        rollbackRecoveryIdentity: null,
+        schemaVersion: 1,
+        stage: "prod",
+        workflowCommit,
+        workflowPath: ".github/workflows/docs-orphan-inventory.yml",
+        workflowReceiptPath: "docs/evidence/deployments/workflow-orphan.json",
+        workflowRunId: "42",
+        workflowRunPath: "docs/evidence/deployments/workflow-orphan-run.json",
+      })
+    );
+    const findings = inspectDeploymentAutomationRegisters(
+      automations.map((entry) =>
+        entry.id === orphan.id
+          ? {
+              ...entry,
+              externalState: {
+                receipt: receipt.workflowReceiptPath,
+                status: "established" as const,
+              },
+            }
+          : entry
+      ),
+      controls,
+      new Map([[orphan.id, receipt]]),
+      new Map([
+        [
+          orphan.id,
+          {
+            hosted: null,
+            orphanReport,
+            plan: null,
+            provider: null,
+            receipt,
+            workflowRun: {
+              candidateCommit,
+              conclusion: "success" as const,
+              event: "schedule",
+              headBranch: "main" as const,
+              headSha: workflowCommit,
+              path: receipt.workflowPath,
+              ref: "refs/heads/main" as const,
+              status: "completed" as const,
+              workflowName: "Docs Orphan Inventory (Report Only)",
+              workflowRunId: receipt.workflowRunId,
+            },
+          },
+        ],
+      ])
+    ).map((item) => item.invariant);
+    expect(findings).toContain("external-proof");
+
+    const admittedReceipt = {
+      ...receipt,
+      reportPath: "docs/evidence/deployments/workflow-orphan-report.json",
+    };
+    const admittedFindings = inspectDeploymentAutomationRegisters(
+      automations.map((entry) =>
+        entry.id === orphan.id
+          ? {
+              ...entry,
+              externalState: {
+                receipt: admittedReceipt.workflowReceiptPath,
+                status: "established" as const,
+              },
+            }
+          : entry
+      ),
+      controls,
+      new Map([[orphan.id, admittedReceipt]]),
+      new Map([
+        [
+          orphan.id,
+          {
+            hosted: null,
+            orphanReport,
+            plan: null,
+            provider: null,
+            receipt: admittedReceipt,
+            workflowRun: {
+              candidateCommit,
+              conclusion: "success" as const,
+              event: "schedule",
+              headBranch: "main" as const,
+              headSha: workflowCommit,
+              path: admittedReceipt.workflowPath,
+              ref: "refs/heads/main" as const,
+              status: "completed" as const,
+              workflowName: "Docs Orphan Inventory (Report Only)",
+              workflowRunId: admittedReceipt.workflowRunId,
+            },
+          },
+        ],
+      ])
+    ).map((item) => item.invariant);
+    expect(admittedFindings).not.toContain("external-proof");
   });
 
   test("rejects additive denials and orphan ownership expansion", async () => {

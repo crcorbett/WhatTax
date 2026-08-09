@@ -598,6 +598,13 @@ unexecuted command merely to advance the task. Continue to use this manual
 runbook under the exact authority envelope until every required workflow
 receipt and read-only state boundary is retained.
 
+For a future positive report-only admission, the outer workflow receipt must
+name a dedicated `reportPath` decoded as
+`DocsDeploymentOrphanInventoryReceipt`. `providerReadbackPath` is reserved for
+mutation provider identity or teardown absence receipts and must remain null
+for orphan inventory; a report that is merely present in an artifact, or is
+decoded as a mutation provider receipt, is not state/provider proof.
+
 The 2026-08-02 successor readback at draft-PR head `aabe7b6…` confirmed
 repository-admin capability but still found zero GitHub environments, zero
 Actions secrets, zero repository variables, no Cloudflare/Alchemy process
@@ -637,7 +644,9 @@ branch is rejected before dependency installation or secret use. Preview and
 teardown reject a non-positive or non-numeric PR number before Alchemy cache
 bootstrap. A normal rollback must use the accepted Preview provider receipt's
 source-bound recovery identity; a caller-supplied identity or expected version
-alone is not a last-known-good proof.
+alone is not a last-known-good proof. The rollback provider/hosted receipt must
+also show a non-null pre-mutation version and a different resulting deployment
+version; a no-op version readback is not rollback proof.
 
 The exact authorized operator invocation is:
 

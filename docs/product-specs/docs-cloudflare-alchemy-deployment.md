@@ -802,7 +802,10 @@ provider/hosted artifacts before its own plan or mutation. Teardown records a
 separate exact stage/Worker absence receipt; an empty action list is accepted
 only after target-specific preflight proves the stage was already absent. The
 report-only inventory remains reviewer-gated/manual and fails closed at the
-1,000-pull-request completeness bound.
+1,000-pull-request completeness bound. A future positive report-only admission
+must name a dedicated `reportPath` decoded as
+`DocsDeploymentOrphanInventoryReceipt`; the mutation provider-readback path is
+not a substitute for that state/provider report.
 
 The initial plan, equal replan and teardown projection are Schema-decoded in
 the mutation job itself before the provider operation. Production preflight

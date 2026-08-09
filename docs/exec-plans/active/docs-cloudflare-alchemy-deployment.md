@@ -1329,6 +1329,10 @@ Report-only dispatch is forced to the reviewed default branch before dependency
 installation or state-bearer materialisation, and Preview PR numbers are
 validated as positive integers before provider bootstrap. Rollback identity is
 bound to the accepted Preview provider receipt rather than caller text alone.
+The report-only positive boundary also requires a dedicated `reportPath`
+decoded as `DocsDeploymentOrphanInventoryReceipt`; the mutation
+`providerReadbackPath` remains null for that class and cannot stand in for
+state/provider inventory proof.
 DCD-004 remains `in_progress`, DCD-005 remains `pending`, and no current
 provider or default-branch receipt is established until a fresh workflow epoch
 and dated promotion satisfy these checks.

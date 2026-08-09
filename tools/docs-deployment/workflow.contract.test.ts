@@ -197,4 +197,14 @@ describe("docs deployment workflow admission", () => {
       "TAXKIT_WORKFLOW_PLAN_OPERATION: preview-equal-replan"
     );
   });
+
+  test("keeps teardown promotion strict at the receipt decoder", async () => {
+    const checker = await readFile(
+      "tools/docs-deployment/workflow-teardown-proof-check.runtime.ts",
+      "utf-8"
+    );
+    expect(checker).toContain('{ onExcessProperty: "error" }');
+    expect(checker).toContain("providerWorkerAbsent");
+    expect(checker).toContain("stateStageAbsent");
+  });
 });

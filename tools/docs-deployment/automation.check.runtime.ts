@@ -12,6 +12,7 @@ import {
   DeploymentAutomationRegister,
   DeploymentControlRegister,
 } from "./automation.schemas.js";
+import { DocsDeploymentOrphanInventoryReceipt } from "./orphan-inventory.schemas.js";
 import { DeploymentPlanReceipt } from "./schemas.js";
 import {
   DeploymentWorkflowExternalReceipt,
@@ -104,6 +105,15 @@ export const checkDocsDeploymentAutomation = (repositoryRoot: string) =>
                 receipt.planPath,
                 DeploymentPlanReceipt
               );
+        const orphanReport =
+          automation.id === "docs-orphan-inventory" &&
+          receipt.reportPath !== null
+            ? yield* readJson(
+                repositoryRoot,
+                receipt.reportPath,
+                DocsDeploymentOrphanInventoryReceipt
+              )
+            : null;
         let provider: DeploymentWorkflowExternalEvidence["provider"] = null;
         if (receipt.providerReadbackPath !== null) {
           // oxlint-disable-next-line unicorn/prefer-ternary -- decoder selection preserves the distinct teardown absence schema
@@ -145,6 +155,7 @@ export const checkDocsDeploymentAutomation = (repositoryRoot: string) =>
         externalReceipts.set(automation.id, receipt);
         externalEvidence.set(automation.id, {
           hosted,
+          orphanReport,
           plan,
           provider,
           receipt,
