@@ -52,6 +52,8 @@ jobs:
           printf '%s' "$ALCHEMY_STATE_STORE_CREDENTIALS_JSON" > "$state_dir/cloudflare-state-store.json"
           jq -e '(.accountId | type == "string" and length > 0) and (.url | type == "string" and startswith("https://")) and (.authToken | type == "string" and length > 0)' \
             "$state_dir/cloudflare-state-store.json" > /dev/null
+          jq -r '{keys:(keys | sort | join(",")), accountIdLength:(.accountId | length), urlHost:(.url | capture("https://(?<host>[^/]+)").host), authTokenLength:(.authToken | length)}' \
+            "$state_dir/cloudflare-state-store.json"
 
       - name: Run report-only orphan inventory
         run: |
