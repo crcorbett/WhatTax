@@ -30,7 +30,12 @@ const decodeAutomations = (input: unknown) =>
 const decodeRegisters = () =>
   Effect.runPromise(
     Effect.all([
-      Schema.decodeUnknownEffect(DeploymentAutomationRegister)(automationJson),
+      Schema.decodeUnknownEffect(DeploymentAutomationRegister)(
+        automationJson.map((entry) => ({
+          ...entry,
+          externalState: { receipt: null, status: "not-established" },
+        }))
+      ),
       Schema.decodeUnknownEffect(DeploymentControlRegister)(controlsJson),
     ])
   );

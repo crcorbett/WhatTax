@@ -65,20 +65,21 @@ stage and therefore no orphan candidate, and retained PR `#1` as an open
 trusted PR without a stage. This does not establish the scheduled/manual
 GitHub automation class or grant teardown authority.
 
-The four deployment records still intentionally have
-`externalState.status: "not-established"`. This is executable desired-state
-admission, not a claim that no workflow has run. The current default-branch
-epoch retained under
-`docs/evidence/deployments/2026-08-05-*` supplies successful Preview,
-Production, rollback and teardown observations for the three mutation classes,
-but the report-only run `30967000841` remains inconclusive because its
-read-only Cloudflare credential cannot derive Alchemy beta.64's HTTP
-state-store bearer without mutation-capable bootstrap. The first report-only
-failure `30966300887` (missing `GH_TOKEN`) and the corrected failure are both
-retained. Until a separately reviewed non-mutating state boundary exists, the
-aggregate register must remain `not-established`; the report-only workflow has
-no teardown or deletion authority. Quality remains independently cancellable
-and without provider credentials or provider mutation authority.
+The current register has one positive external-state entry: the
+main-sourced Preview receipt for `pr-24` is established at the exact dated
+evidence route below. Production, Preview teardown and report-only remain
+`externalState.status: "not-established"`; each still requires its own
+complete receipt contract. This is executable desired-state admission, not a
+claim that an unestablished workflow has never run. Historical default-branch
+epochs under `docs/evidence/deployments/2026-08-05-*` and
+`2026-08-10-*` remain separate dated observations. The report-only run
+`30967000841` remains inconclusive because its read-only Cloudflare credential
+cannot derive Alchemy beta.64's HTTP state-store bearer without
+mutation-capable bootstrap. The first report-only failure `30966300887`
+(missing `GH_TOKEN`) and the corrected failure are both retained. The
+report-only workflow has no teardown or deletion authority. Quality remains
+independently cancellable and without provider credentials or provider
+mutation authority.
 
 ### 2026-08-10 current candidate readback
 
@@ -164,8 +165,26 @@ The PR-close teardown `31335980866` is the corresponding reviewed-main
 readback. It agreed on the `pr-23` state/provider inventory and exact delete
 projection, then stopped because the pinned Alchemy beta.64 dry-run returned
 exit 1 with empty stderr. No destroy or absence claim exists; reconciler run
-`31336548279` failed closed. All four deployment entries therefore remain
-`externalState.status: not-established`, and no Production or rollback run is
-admitted after this teardown stop. The next owner is hosted beta.64 runner
+`31336548279` failed closed. At that historical point all four deployment
+entries remained
+`externalState.status: not-established`; no Production or rollback run is
+admitted from that failed teardown epoch. The next owner is hosted beta.64 runner
 requalification or a separately reviewed supported correction, not promotion
 of the non-zero plan output.
+
+### 2026-08-10 main-sourced Preview promotion
+
+Default-branch SHA `bc2ac82f48cce67a6ee5b1b6caf9e8903bf9c182` planned candidate
+`cbcb86878379cc2a126a8e48bee256aa33096c79` for `pr-24` in run `31337945701`.
+The equal-replan/deploy run `31338052297` and completion reconciler
+`31338154055` produced a strict API-bound workflow receipt with matching
+candidate, source, plan/config/deployment/lockfile, account/state, Worker,
+deployment/version, hosted and desktop/mobile screenshot identities. The
+promoted receipt is
+`docs/evidence/deployments/2026-08-10-preview-pr-24/workflow-receipt-31338052297.json`;
+only `docs-preview-delivery` is now `externalState: established`.
+
+This does not advance Production, rollback, Preview teardown or report-only.
+The corresponding `pr-24` teardown run `31337384729` stopped at the pinned
+beta.64 dry-run with no destroy or absence readback, so the Worker remains
+present. The report-only schedule remains reviewer-gated and report-only.

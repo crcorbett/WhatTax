@@ -47,10 +47,10 @@ Its Schema and negative fixtures admit only these controls:
 | Named deployment workflow completes; a self-authored or detached run/artifact is promoted without completed Actions API readback, exact source/input identity or bounded failure metadata | `docs-workflow-receipt-reconciliation`; `workflow.contract.test.ts`, `workflow-run-check.runtime.ts`, and the read-only `workflow_run` reconciler; retain the source artifact and reconciliation stop, then retry against the exact completed run | Workflow_run trigger, receipt schema/checker, artifact naming, source checkout or external-state promotion change | A stronger provider-independent receipt reconciler preserves completed-run, artifact, source/input and failure-readback coverage. |
 
 `bun run check:docs-deployment-automation` proves these local records and
-cross-field invariants only. It currently reports zero externally established
-deployment automations. Workflow YAML, protected environments, credential
-storage and hosted receipts remain required before the controls can claim
-operational enforcement.
+cross-field invariants only. It currently reports one externally established
+deployment automation: the exact main-sourced Preview receipt recorded below.
+Production, teardown and report-only still require their own protected
+workflow receipts before those controls can claim operational enforcement.
 
 The dated manual Preview/Production/rollback receipts under
 `docs/evidence/deployments/` prove the same candidate, plan, provider/state and
@@ -79,9 +79,11 @@ report-only signal rather than deletion or teardown authority.
 The current b59e4ee epoch adds claim-matched protected Preview, exact-stage
 teardown, fixed Production and normal rollback receipts under
 `docs/evidence/deployments/2026-08-10-*`; those receipts do not change the
-automation register's external-state status. Report-only run `31319845724`
-passed on the open branch and proved only the separate state/provider read. A
-reviewed default-branch source readback remains the control admission gate.
+automation register's external-state status for those historical candidates.
+Report-only run `31319845724` passed on the open branch and proved only the
+separate state/provider read. The current main-sourced Preview promotion is
+recorded below; a reviewed default-branch source readback remains the control
+admission gate for the remaining classes.
 
 The workflow owners now fail closed on unexpected actions/resources in the
 equal replan, assert exact provider stage/Worker/deployment/version identity,
@@ -93,3 +95,19 @@ readback. These are executable controls; a workflow artifact is still only a
 dated observation until its outer receipt is promoted and admitted by the
 positive external-state path. Report-only scheduling remains reviewer-gated,
 and the 1,000-row pull-request bound fails closed at incomplete inventory.
+
+### 2026-08-10 current main-sourced Preview promotion
+
+The merged default-branch workflow at `bc2ac82f48cce67a6ee5b1b6caf9e8903bf9c182`
+planned candidate `cbcb86878379cc2a126a8e48bee256aa33096c79` for `pr-24` and
+completed deploy run `31338052297` after the accepted/equal-replan digest
+`1a9492fb7a656ddab44565fcc224e502d56dbd04287a31d53aefdb343af0278f`.
+Reconciler run `31338154055` API-read the completed source run and its matching
+artifact. The promoted receipt at
+`docs/evidence/deployments/2026-08-10-preview-pr-24/workflow-receipt-31338052297.json`
+passes the positive external-state policy and establishes only
+`docs-preview-delivery`.
+
+The corresponding teardown run `31337384729` stopped at the beta.64 dry-run
+with no destroy or absence readback. Production, rollback and report-only
+therefore remain unestablished; no claim is inferred from the Preview receipt.

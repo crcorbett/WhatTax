@@ -36,7 +36,7 @@ the milestone and acceptance owner.
 | `DCD-001` | completed   | Accepted at `669a8f3…` after exact dependency/integrity readback, both built-app oracles, docs-maintainer reconciliation, focused Changeset, independent closure, and all change-owned gates. |
 | `DCD-002` | completed   | Accepted candidate `d9cb894…` passed fresh pre-deploy and pre-destroy state/provider readback, equal plans, Preview apply, the complete hosted/browser/screenshot contract, exact-stage teardown/absence, all gates and corrected-boundary independent review. |
 | `DCD-003` | completed   | Accepted after fixed Production, separately Preview-qualified successor, successor Production, restored-source rollback, provider/hosted/screenshot readback, owner reconciliation, full verification and corrected-boundary independent review. |
-| `DCD-004` | in_progress | Mutation workflows now reject unexpected equal-replan resources, Schema-check provider/hosted artifacts, require an accepted Preview run for Production, and prove exact teardown absence. Main-sourced Preview `31336358628` now has a successful reconciled provider/hosted receipt artifact; PR-close teardown `31335980866` remains a claim-matched failure at the pinned Alchemy beta.64 dry-run, so the aggregate register stays `not-established` and Production remains stopped. |
+| `DCD-004` | in_progress | Mutation workflows now reject unexpected equal-replan resources, Schema-check provider/hosted artifacts, require an accepted Preview run for Production, and prove exact teardown absence. Main-sourced Preview `31338052297` now has a promoted outer receipt at `docs/evidence/deployments/2026-08-10-preview-pr-24/`; PR-close teardown `31337384729` remains a claim-matched failure at the pinned Alchemy beta.64 dry-run, so only Preview is established and Production/teardown/report-only remain stopped. |
 | `DCD-005` | pending     | Docs-app bridge-retirement implementation is present and locally qualified at `d649a14…`; waits for exact-candidate hosted Preview/Production/rollback requalification through the corrected workflow receipt contract, the report-only state boundary, fresh independent review and complete closeout evidence. |
 
 ## Baseline
@@ -1514,3 +1514,27 @@ remains `pending`, and the four automation entries remain
 workflow epoch exists. The next action is Alchemy beta.64 hosted-runner
 requalification or a separately reviewed supported correction; accepting the
 non-zero plan would violate the fail-closed teardown contract.
+
+### 2026-08-10 — main-sourced Preview promotion
+
+After PR 24 merged at reviewed default-branch SHA
+`bc2ac82f48cce67a6ee5b1b6caf9e8903bf9c182`, plan run `31337945701` produced
+the update projection for candidate
+`cbcb86878379cc2a126a8e48bee256aa33096c79`, deterministic stage `pr-24` and
+accepted/equal-replan digest
+`1a9492fb7a656ddab44565fcc224e502d56dbd04287a31d53aefdb343af0278f`.
+Deploy run `31338052297` completed provider/state and hosted proof, including
+SSR/assets, server-function, 404, no-reload navigation, accessibility,
+cache/header, console, runtime and desktop/mobile screenshot checks. The
+readback binds deployment `bd7c847d-150a-4f27-8d12-e5f5549f0186`, version
+`e763909b-22ca-4ef2-a6f9-3de826291526`, prior version
+`6b831c22-9f93-47a9-b0da-8227b56017a9`, account/state, Worker and URL. The
+completion reconciler `31338154055` API-read the completed workflow and the
+promoted outer receipt is
+`docs/evidence/deployments/2026-08-10-preview-pr-24/workflow-receipt-31338052297.json`.
+
+This advances only `docs-preview-delivery` to external-state established. The
+corresponding PR-close teardown `31337384729` stopped at the pinned beta.64
+dry-run with no destroy or absence readback; Production, rollback, teardown and
+report-only remain unestablished. DCD-004 remains `in_progress` and DCD-005
+remains `pending`.

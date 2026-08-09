@@ -678,6 +678,7 @@
         "workflow/runbook/architecture/README pointers and accepted workflow receipts",
         "workflow receipt schemas/checker plus provider identity and teardown-absence readbacks",
         "exact workflow-run API reconciliation checker and receipt-control owner under tools/docs-deployment",
+        "one current main-sourced Preview outer receipt at docs/evidence/deployments/2026-08-10-preview-pr-24/workflow-receipt-31338052297.json, with Production, teardown and report-only establishment still separately gated",
         "one report-only orphan inventory receipt, with the current branch-bound success retained at docs/evidence/deployments/2026-08-09-orphan-inventory/report-31319845724.json and default-branch source readback still required",
         "synchronized SPEC/tasks/active plan with exact invocations and observed concurrency semantics"
       ],

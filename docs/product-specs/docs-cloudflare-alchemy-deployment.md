@@ -138,10 +138,23 @@ The protected report-only workflow run `31319845724` also passed for b59e4ee on
 the open branch and returned state/provider agreement, one prod stage, one
 Worker and no Preview/orphan candidates. Its wrapper receipt is
 `docs/evidence/deployments/2026-08-09-orphan-inventory/report-31319845724.json`.
-The aggregate automation register remains `not-established` until that same
-workflow is read back from reviewed default-branch source; DCD-004 and DCD-005
-remain open for that source-bound lifecycle gate, fresh independent review and
-final closeout. No receipt is promoted across candidates or source epochs.
+That receipt remains branch-bound and cannot establish the report-only
+automation class. DCD-004 and DCD-005 remain open for the source-bound
+lifecycle gates, fresh independent review and final closeout. No receipt is
+promoted across candidates or source epochs.
+
+The current main-sourced Preview promotion is recorded in the dated evidence
+route `docs/evidence/deployments/2026-08-10-preview-pr-24/`. Default-branch SHA
+`bc2ac82f48cce67a6ee5b1b6caf9e8903bf9c182` planned and deployed candidate
+`cbcb86878379cc2a126a8e48bee256aa33096c79` for deterministic `pr-24`; plan
+`31337945701`, deploy `31338052297` and reconciler `31338154055` agree on the
+equal-replan digest, account/state, Worker/deployment/version, hosted proof and
+desktop/mobile PNG digests. Its strict outer receipt advances only
+`docs-preview-delivery` to `externalState: established`. The corresponding
+teardown run `31337384729` stopped at the pinned beta.64 dry-run without
+destroy or absence readback; Production, rollback, teardown and report-only
+remain unestablished, and DCD-004 remains in progress while DCD-005 remains
+pending.
 
 ## Target and comparative evidence
 
@@ -280,9 +293,10 @@ the four deployment workflow owners and their focused admission test: three
 mutation workflows plus one cancellable, read-only orphan inventory. DCD-004
 has admitted the deployment-only Schema/control desired state, and the
 2026-08-04 capability receipt now establishes the four protected GitHub
-environments and separate narrow credential identities. The external-state
-entries remain `not-established` because no candidate-bound hosted workflow
-receipt exists yet. Quality's authority remains
+environments and separate narrow credential identities. The current
+main-sourced Preview receipt establishes only the Preview automation entry;
+Production, teardown and report-only remain `not-established`. Quality's
+authority remains
 read-only and independently cancellable; its exact runner bootstrap was
 corrected during DCD-004 to use the frozen app-local Playwright executable and
 complete `main` comparison history after hosted failures exposed those missing
