@@ -88,13 +88,18 @@ const program = Effect.gen(function* inventoryProgram() {
     profile,
     "cloudflare-state-store"
   );
+  if (cachedStateCredentials === undefined) {
+    return yield* new DocsDeploymentInventoryInputError({
+      target: "missing cached Cloudflare state-store credentials",
+    });
+  }
   const decodedStateCredentials = yield* Schema.decodeUnknownEffect(
     CachedStateStoreCredentials
   )(cachedStateCredentials).pipe(
     Effect.mapError(
       () =>
         new DocsDeploymentInventoryInputError({
-          target: "matching cached Cloudflare state-store credentials",
+          target: "invalid cached Cloudflare state-store credentials",
         })
     )
   );

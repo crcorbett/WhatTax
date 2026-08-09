@@ -200,7 +200,7 @@ export const DocsDeploymentOrphanSourcesLive = Layer.effect(
         const outputText = `${stdoutText}\n${stderrText}`;
         if (Number(exitCode) !== 0) {
           const safeFailure = outputText.match(
-            /FAIL \[(inventory-input|inventory-read|inventory-disagreement)\](?: operation=([A-Za-z0-9:_-]+)| target=(CI=1|matching cached Cloudflare state-store credentials|cached state-store account identity))?/u
+            /FAIL \[(inventory-input|inventory-read|inventory-disagreement)\](?: operation=([A-Za-z0-9:_-]+)| target=(CI=1|missing cached Cloudflare state-store credentials|invalid cached Cloudflare state-store credentials|cached state-store account identity))?/u
           );
           let inputSuffix: string | undefined;
           if (safeFailure?.[3] === "CI=1") {
@@ -209,6 +209,16 @@ export const DocsDeploymentOrphanSourcesLive = Layer.effect(
             safeFailure?.[3] === "cached state-store account identity"
           ) {
             inputSuffix = "account";
+          } else if (
+            safeFailure?.[3] ===
+            "missing cached Cloudflare state-store credentials"
+          ) {
+            inputSuffix = "missing-cache";
+          } else if (
+            safeFailure?.[3] ===
+            "invalid cached Cloudflare state-store credentials"
+          ) {
+            inputSuffix = "invalid-cache";
           } else if (safeFailure?.[3] !== undefined) {
             inputSuffix = "credentials";
           }
