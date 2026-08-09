@@ -22,6 +22,8 @@ jobs:
     permissions:
       contents: read
     env:
+      ALCHEMY_PROFILE: default
+      ALCHEMY_STATE_STORE_CREDENTIALS_JSON: ${{ secrets.ALCHEMY_STATE_STORE_CREDENTIALS_JSON }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_READ_API_TOKEN }}
       GH_TOKEN: ${{ github.token }}
@@ -40,6 +42,16 @@ jobs:
 
       - name: Install frozen dependencies
         run: bun install --frozen-lockfile
+
+      - name: Materialize the reviewed state-read cache
+        run: |
+          set -euo pipefail
+          umask 077
+          state_dir="$HOME/.alchemy/credentials/$ALCHEMY_PROFILE"
+          mkdir -p "$state_dir"
+          printf '%s' "$ALCHEMY_STATE_STORE_CREDENTIALS_JSON" > "$state_dir/cloudflare-state-store"
+          jq -e '(.accountId | type == "string" and length > 0) and (.url | type == "string" and startswith("https://")) and (.authToken | type == "string" and length > 0)' \
+            "$state_dir/cloudflare-state-store" > /dev/null
 
       - name: Run report-only orphan inventory
         run: |

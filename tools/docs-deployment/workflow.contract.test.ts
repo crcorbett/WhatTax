@@ -93,6 +93,20 @@ describe("docs deployment workflow admission", () => {
     expect(orphan).not.toContain("alchemy destroy");
   });
 
+  test("materializes only the bounded report-only state-read cache", async () => {
+    const orphan = await readWorkflow(workflowPaths.orphan);
+    expect(orphan).toContain(
+      "ALCHEMY_STATE_STORE_CREDENTIALS_JSON: ${{ secrets.ALCHEMY_STATE_STORE_CREDENTIALS_JSON }}"
+    );
+    expect(orphan).toContain("Materialize the reviewed state-read cache");
+    expect(orphan).toContain("cloudflare-state-store");
+    expect(orphan).toContain("jq -e");
+    expect(orphan).not.toContain("alchemy login");
+    expect(orphan).not.toContain("alchemy cloudflare bootstrap");
+    expect(orphan).not.toContain("alchemy plan");
+    expect(orphan).not.toContain("alchemy destroy");
+  });
+
   test("uses the four exact protected environment identities", async () => {
     const [preview, production, teardown, orphan] = await Promise.all([
       readWorkflow(workflowPaths.preview),

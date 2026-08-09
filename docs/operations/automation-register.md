@@ -3,7 +3,7 @@ document_type: automation-register
 lifecycle: current
 authority: canonical
 owner: taxkit-ci-release-maintainer
-last_reviewed: 2026-08-05
+last_reviewed: 2026-08-09
 review_trigger: workflow, signal, authority, proof, stopping, escalation, rollback, or retirement change
 ---
 
@@ -51,6 +51,12 @@ postconditions. The preceding `alchemy login` command persists only the
 environment-method selector; the token remains a GitHub environment secret.
 That preparation is bounded to the named state-store control plane and is not
 available to report-only inventory; no local OAuth profile is copied into CI.
+The report-only workflow instead materializes the separately scoped
+`ALCHEMY_STATE_STORE_CREDENTIALS_JSON` cache beside its Cloudflare read token.
+It invokes only the inventory reader and has no login, bootstrap, deploy,
+destroy or state-write command. Beta.64 does not expose a cryptographically
+read-only state bearer, so this operational read-only boundary is retained as
+an explicit limitation and must not be reused by mutation workflows.
 
 The local operator command `bun run check:docs-deployment-orphans` now proves
 the report-only data path against one dated observation. It compared the exact

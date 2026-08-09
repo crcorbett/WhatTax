@@ -1183,3 +1183,20 @@ verification pass then identified the now-unreachable
 change-owned Knip finding was corrected by removing that fixture in
 `117bbc4cf2866efbc19f50ccabb4013c39c120a8`, after which the full verification
 graph passed.
+
+### 2026-08-09 — report-only state-read boundary candidate
+
+The installed Alchemy beta.64 state store has one bearer for both read and
+write HTTP routes, and its `loginWithCloudflare` path uploads an ephemeral
+edge-preview Worker to read the bearer from `StateStoreSecrets`. The separate
+Cloudflare read token therefore cannot derive that bearer. The workflow
+candidate now admits a protected `ALCHEMY_STATE_STORE_CREDENTIALS_JSON` secret
+only in `github-actions-report-only`; it materializes the account-matched
+cache and invokes only the existing inventory reader. The workflow contains
+no Alchemy login, bootstrap, plan, deploy, destroy or state-write command.
+This is an operational-read-only boundary, not a cryptographically read-only
+state credential; the limitation and denied operations remain explicit. No
+secret value is present in the repository. The candidate is not accepted until
+the secret names/configuration and exact report-only run retain a dated
+state/provider-agreement receipt; the automation register remains
+`not-established` until then.

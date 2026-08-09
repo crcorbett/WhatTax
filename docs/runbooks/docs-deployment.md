@@ -3,7 +3,7 @@ document_type: runbook
 lifecycle: current
 authority: canonical
 owner: taxkit-docs-deployment-operation-owner
-last_reviewed: 2026-08-05
+last_reviewed: 2026-08-09
 review_trigger: docs deployment candidate, Cloudflare or Alchemy identity/state, stage, plan, provider readback, teardown, rollback, credential or authority change
 ---
 
@@ -547,19 +547,27 @@ secret. The smallest CI prerequisite is an independently provisioned narrow
 Cloudflare principal whose concrete values can be stored without disclosure as
 `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_API_TOKEN` in `taxkit-docs-preview`,
 `taxkit-docs-production` and `taxkit-docs-preview-teardown`, plus a separately
-read-only `CLOUDFLARE_READ_API_TOKEN` in `github-actions-report-only`. Before
+read-only `CLOUDFLARE_READ_API_TOKEN` and the separately scoped
+`ALCHEMY_STATE_STORE_CREDENTIALS_JSON` in `github-actions-report-only`. The
+latter is a redacted JSON credential cache containing only the account-matched
+state-store URL, account identity and bearer; it is materialized ephemerally
+and used only by the read-only inventory command. Installed Alchemy beta.64
+has no cryptographic read-only state bearer, so this is an operational
+read-only boundary: the workflow has no login, bootstrap, deploy, destroy or
+state-write path, and the limitation remains an explicit non-claim. Before
 storage, read back the account, allowed operation/resource set, duration and
 revocation owner against the matching automation record. Creating empty
-environments, substituting local OAuth/cache state or widening the principal
-is not recovery. PR-close teardown also remains gated on reviewed workflow code
-being present on the default branch; merge and PR-ready authority are separate.
+environments, substituting the broad local OAuth profile or widening the
+Cloudflare principal is not recovery. PR-close teardown also remains gated on
+reviewed workflow code being present on the default branch; merge and PR-ready
+authority are separate.
 
 PR-close teardown must run reviewed default-branch implementation code, derive
 only exact `pr-N`, share that stage's non-cancellable mutation lock, and prove
 state/provider/URL absence. Scheduled orphan inventory is report-only: it may
 compare open pull requests, exact TaxKit stages and exact TaxKit Workers, but
-has no write or automatic-deletion authority. An incomplete inventory is an
-inconclusive report, not destroy permission.
+has no provider-write, state-write or automatic-deletion authority. An
+incomplete inventory is an inconclusive report, not destroy permission.
 
 The exact authorized operator invocation is:
 
@@ -608,12 +616,29 @@ read-only Cloudflare token cannot derive Alchemy beta.64's HTTP state-store
 bearer without the mutation-capable bootstrap path. The two failed receipts
 are retained under
 `docs/evidence/deployments/2026-08-05-orphan-inventory/`. Do not copy a
-mutation token, local OAuth profile or state cache into report-only inventory;
-until a separately reviewed read-only state boundary exists, the scheduled
-inventory is an inconclusive report-only report and grants no teardown or
-deletion authority. The executable deployment register therefore remains
+mutation token or local OAuth profile into report-only inventory. A later
+successor may materialize the separately reviewed
+`ALCHEMY_STATE_STORE_CREDENTIALS_JSON` cache, but only with the workflow's
+read-only command path and an explicit limitation that beta.64's bearer is not
+cryptographically read-only. Until that successor receipt exists, the
+scheduled inventory is inconclusive and grants no teardown or deletion
+authority. The executable deployment register therefore remains
 `not-established` as an aggregate claim despite the dated mutation workflow
 successes.
+
+### 2026-08-09 — operational report-only state-read candidate
+
+The exact report-only workflow candidate materializes
+`ALCHEMY_STATE_STORE_CREDENTIALS_JSON` into the default Alchemy credential
+cache after frozen installation, validates account identity, URL and bearer
+shape with `jq`, and then invokes only `bun run check:docs-deployment-orphans`.
+It does not run `alchemy login`, `alchemy cloudflare bootstrap`, `alchemy
+plan`, `alchemy deploy`, `alchemy destroy` or any state-write operation. The
+secret is scoped only to `github-actions-report-only`, alongside
+`CLOUDFLARE_READ_API_TOKEN`; no value is stored in the repository. This is an
+operational-read-only boundary because beta.64's bearer has no native read-only
+scope. The candidate remains unaccepted until a names-only environment
+readback and exact workflow receipt prove state/provider agreement.
 
 ## Stop conditions
 

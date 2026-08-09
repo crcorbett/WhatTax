@@ -3,7 +3,7 @@ document_type: authority-model
 lifecycle: current
 authority: canonical
 owner: taxkit-authority-model-owner
-last_reviewed: 2026-08-05
+last_reviewed: 2026-08-09
 review_trigger: identity, release, Git, registry, deployment, provider, credential, or recovery change
 ---
 
@@ -174,9 +174,13 @@ The report-only class has not crossed its authority boundary. Run
 `30966300887` stopped before inventory because `GH_TOKEN` was not bound; after
 the owner correction, `30967000841` reached deployment inventory but a
 read-only Cloudflare credential could not derive Alchemy beta.64's HTTP
-state-store bearer without the mutation-capable bootstrap path. No mutation or
-secret disclosure occurred. The report-only workflow therefore remains an
-inconclusive, read-only observation and cannot establish absence, teardown or
-deletion. The deployment register remains `not-established` as an aggregate
-claim until a separately reviewed non-mutating state boundary exists; this is
-a capability stop, not a license to widen the credential envelope.
+state-store bearer without the mutation-capable bootstrap path. A successor
+workflow may materialize an account-matched
+`ALCHEMY_STATE_STORE_CREDENTIALS_JSON` cache and invoke only the inventory
+reader. Because beta.64's bearer is not cryptographically read-only, the
+successor must retain an operational-read-only limitation, deny every state
+write and provider mutation command, and prove that denial in its workflow
+contract. No mutation or secret disclosure occurred in the failed epoch. The
+deployment register remains `not-established` until a successor run retains
+the complete read-only receipt; this is a capability boundary, not a license
+to widen the Cloudflare principal.

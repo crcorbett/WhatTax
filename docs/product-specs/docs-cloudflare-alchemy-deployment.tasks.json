@@ -649,7 +649,7 @@
         "allow one source-bound default-branch bootstrap dispatch after the reviewed workflow lands on main because GitHub cannot dispatch a workflow file that exists only on a pull-request branch; bind the merged PR head and deterministic pr-N stage exactly, then require an open trusted draft PR for every later Preview dispatch",
         "make PR-close teardown convergent: an absent exact stage produces an equal noop projection and no destroy, while an existing stage requires equal delete plans and exact absence readback",
         "install the pinned Playwright browser in every provider workflow and build the exact Cloudflare deployment input before teardown hashes apps/docs/dist; a missing build output is a workflow failure, never an absence oracle",
-        "initialize only Alchemy's environment-method profile selector, then materialize the account-matched cloudflare-state-store credential cache with the installed supported bootstrap command on each ephemeral mutation runner before plan or teardown inventory; keep report-only inventory on its separate read-only boundary",
+        "initialize only Alchemy's environment-method profile selector, then materialize the account-matched cloudflare-state-store credential cache with the installed supported bootstrap command on each ephemeral mutation runner before plan or teardown inventory; keep report-only inventory separately credentialed and materialize only its account-matched ALCHEMY_STATE_STORE_CREDENTIALS_JSON cache, with no login, bootstrap, deploy, destroy or state-write path",
         "document cancellation, idempotence/convergence, stopping, recovery, escalation, carrying cost, review triggers and retirement in each control",
         "backfill every new exact workflow-owned command invocation after it is executed successfully"
       ],
@@ -675,7 +675,7 @@
           "a newer run cannot detect a stale candidate after acquiring the lock",
           "plan equality, protected approval or provider readback can be bypassed",
           "orphan inventory can mutate or destroy resources",
-          "report-only inventory cannot read the exact Alchemy state boundary without a separately reviewed non-mutating credential path"
+          "report-only inventory cannot read the exact Alchemy state boundary without a separately reviewed operational-read credential path"
         ],
         "rollback": "Disable or revert the affected workflow/control while retaining the accepted manual runbook path and provider state; do not remove resources without exact teardown authority.",
         "recovery": "Repair the named Schema/policy/fixture finding and rerun the workflow only for a new exact authorized attempt."
@@ -698,7 +698,7 @@
         "bun run check:repository-paths",
         "execute the installed Alchemy Cloudflare bootstrap command with CI=0 in each mutation workflow and retain no runner credential cache beyond the job",
         "execute one authorized exact-candidate workflow path for each admitted mutating class and backfill its exact owned invocation before completion",
-        "execute the orphan inventory in report-only mode and prove no mutation capability; if the exact state boundary is unavailable, retain the claim-matched inconclusive receipt and keep externalState not-established",
+        "execute the orphan inventory in report-only mode with CLOUDFLARE_READ_API_TOKEN plus ALCHEMY_STATE_STORE_CREDENTIALS_JSON, prove no provider/state write command is reachable, and retain the beta.64 bearer limitation as an explicit non-claim",
         "Schema-decode all workflow receipts and reconcile them with provider/state readback",
         "bun run verification",
         "git diff --check",

@@ -217,3 +217,15 @@ hydration, server-function transport, no-document navigation, accessibility,
 console cleanliness, runtime reuse, filesystem isolation and local upload
 limits passed. This is local evidence only; it does not establish hosted
 requalification for this candidate or the report-only Alchemy state boundary.
+
+## 2026-08-09 report-only state-read candidate
+
+The successor workflow candidate uses the protected
+`ALCHEMY_STATE_STORE_CREDENTIALS_JSON` secret only in
+`github-actions-report-only` to materialize the account-matched Alchemy cache
+before the report-only inventory command. The workflow has no Alchemy login,
+bootstrap, plan, deploy, destroy or state-write path. Beta.64's bearer is not
+cryptographically read-only, so this candidate carries an explicit
+operational-read-only limitation. A dated workflow receipt is required before
+the automation register can advance from `not-established`; no state,
+provider, absence or teardown claim is made by this candidate alone.

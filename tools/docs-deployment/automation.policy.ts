@@ -260,6 +260,7 @@ export const inspectDeploymentAutomationRegisters = (
     orphan.authority.operations[0] !== "orphan-inventory-read" ||
     !hasExactStrings(orphan.authority.credentialIdentities, [
       "CLOUDFLARE_READ_API_TOKEN",
+      "ALCHEMY_STATE_STORE_CREDENTIALS_JSON",
     ]) ||
     !hasExactStrings(orphan.authority.resources, [
       "open TaxKit pull-request identities",
@@ -273,6 +274,7 @@ export const inspectDeploymentAutomationRegisters = (
       "deployment",
       "provider-write",
       "release-or-publication",
+      "state-store-write",
     ]) ||
     orphan.plan.acceptedDigestRequired ||
     orphan.plan.equalReplanRequired ||
