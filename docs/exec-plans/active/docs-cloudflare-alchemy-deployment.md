@@ -717,15 +717,15 @@ default branch and the named protected environments and secret identities are
 available. Creating or weakening those GitHub resources is not inferred from
 repository-edit or branch-push authority.
 
-Read-only installed-version proof showed that the public `Cloudflare.state()`
-Layer can inventory the exact stack without evaluating `alchemy.run.ts` under
-the rejected `placeholder` stage. With state version `7`, it observed stack
-`TaxKitDocsCloudflare`, only stage `prod`, and the two expected logical
-resources. A separate authorized Production dry-run selected exactly
-`DocsBuild` and `DocsWebsite` for update and performed no mutation. These
-observations prove a viable DCD-004 readback implementation route; they do not
-admit a workflow, refresh Cloudflare Worker/deployment/version availability or
-replace the dated DCD-003 receipts.
+Read-only installed-version proof showed that the report-only public
+`makeHttpStateStore` plus Worker Provider can inventory the exact stack without
+evaluating `alchemy.run.ts` under the rejected `placeholder` stage. With state
+version `7`, it observed stack `TaxKitDocsCloudflare`, only stage `prod`, and
+the two expected logical resources. A separate authorized Production dry-run
+selected exactly `DocsBuild` and `DocsWebsite` for update and performed no
+mutation. These observations prove a viable DCD-004 readback implementation
+route; they do not admit a workflow, refresh Cloudflare Worker/deployment/
+version availability or replace the dated DCD-003 receipts.
 
 The smallest unresolved capability is external rather than architectural:
 
@@ -1223,3 +1223,24 @@ the installed beta.64 CI cache-ingress boundary, not token scope or approval.
 The next owner must provide a supported non-mutating state-read path or repair
 the cache ingress, then rerun from a fresh candidate; do not broaden credentials
 or copy the local OAuth profile. The active goal remains open.
+
+### 2026-08-09 — public report-only state client and hosted runner stop
+
+The exact candidate `9dd779d70ccf661081856c3b5f07474b406db7ba` replaces the
+report-only inventory's nested `Cloudflare.state()` construction with Alchemy
+beta.64's public `makeHttpStateStore`. The existing Schema-decoded,
+account-matched cache remains the only state credential ingress; the state
+client exposes the inventory read operations and cannot bootstrap, write or
+delete state. Local `bun run check:docs-deployment-inventory` returned
+`state-provider-agree`, version `7`, one `prod` stage and one provider Worker.
+
+The exact hosted successor run `31315231020` checked out this candidate but
+remained queued without a runner or pending environment request and was
+cancelled after the bounded wait. The cancellation receipt is
+`docs/evidence/deployments/2026-08-09-orphan-inventory/cancelled-31315231020.json`.
+This supersedes the cache-ingress repair as the implementation owner, but no
+hosted state/provider agreement was produced. The automation register remains
+`externalState.status: not-established`, DCD-004 remains `in_progress`,
+DCD-005 remains `pending`, and the next action is a fresh protected run when
+hosted runner admission is available. No provider mutation or secret
+disclosure occurred.

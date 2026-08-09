@@ -257,9 +257,9 @@ The supported repeatable state/provider readback invocation is:
 bun run check:docs-deployment-inventory
 ```
 
-It uses only the public installed `Cloudflare.state()` and Worker Provider
-`list()` operations. It requires `CI=1`, a cached state-store credential and
-agreement between that credential's account identity and the current
+It uses Alchemy's public `makeHttpStateStore` plus the public Cloudflare Worker
+Provider `list()` operation. It requires `CI=1`, a cached state-store credential
+and agreement between that credential's account identity and the current
 Cloudflare environment before state initialization. It decodes state and
 provider output once, filters provider inventory by exact Alchemy stack tags,
 and fails on state/Worker disagreement. It prints no account ID, token or raw
@@ -661,6 +661,25 @@ beta.64 cache-ingress repair or replacement, followed by a fresh exact-candidate
 run and successor receipt; until then scheduled orphan detection stays
 report-only and inconclusive.
 
+### 2026-08-09 — public state-client successor and hosted runner stop
+
+Candidate `9dd779d70ccf661081856c3b5f07474b406db7ba` now constructs the
+report-only state reader with Alchemy beta.64's public `makeHttpStateStore`
+after the existing Schema-decoded, account-matched cache ingress. This avoids
+the nested `Cloudflare.state()` credential layer, while retaining the public
+Cloudflare Worker Provider read and leaving all mutation/bootstrap paths
+unchanged. The local inventory command returned state/provider agreement,
+state-store version `7`, one `prod` stage and one Worker.
+
+The exact hosted successor run `31315231020` checked out this candidate but
+remained queued without a runner or pending environment request and was
+cancelled after the bounded wait. Retain
+`docs/evidence/deployments/2026-08-09-orphan-inventory/cancelled-31315231020.json`.
+This is a hosted capability stop, not an approval or provider-state result:
+the report-only automation register remains `not-established`, no orphan or
+teardown claim is made, and the next action is to retry the protected workflow
+when hosted runner admission is available.
+
 ## Stop conditions
 
 Stop before unrelated `versioning`, `commit`, `push`, `tag`, `release`,
@@ -693,16 +712,16 @@ rejects. DCD-002 therefore used direct Schema-decoded state-store and
 Cloudflare readback. Do not admit that internal sentinel into deployable stage
 identity or use the failing generic command as an absence oracle; DCD-004 must
 provide a supported repeatable readback owner before workflow admission.
-Historical receipts cannot establish current provider state. The public
-`Cloudflare.state()` Layer and Worker Provider `list()` now back the supported
-`check:docs-deployment-inventory` command without evaluating `alchemy.run.ts`
-under the rejected placeholder stage. Its latest local authorized read
-observed state/provider agreement for only `prod`, `DocsBuild` and
-`DocsWebsite`. This does not establish hosted workflow execution,
-deployment/version identity, application behavior or future availability. The earlier
-`0d714e6…` chain is not accepted because it lacked exact pre-mutation
-state/provider receipts and complete hosted/screenshot/state false-green
-oracles.
+Historical receipts cannot establish current provider state. The report-only
+`check:docs-deployment-inventory` command now uses Alchemy's public
+`makeHttpStateStore` after Schema-decoding the account-matched cache, plus the
+Worker Provider `list()` operation; the mutation composition retains its
+separate `Cloudflare.state()` layer. Its latest local authorized read observed
+state/provider agreement for only `prod`, `DocsBuild` and `DocsWebsite`. This
+does not establish hosted workflow execution, deployment/version identity,
+application behavior or future availability. The earlier `0d714e6…` chain is
+not accepted because it lacked exact pre-mutation state/provider receipts and
+complete hosted/screenshot/state false-green oracles.
 
 The DCD-003 fixed Production readback is bound to restored source
 `d9cb8945529fb72158e59ca0daf02a98e1e4de1a`, Worker

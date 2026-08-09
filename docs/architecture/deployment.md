@@ -33,10 +33,13 @@ intent and task state belong in the active SPEC and execution plan.
   modules and `dist/client` assets. The former docs-app Nitro/Vercel bridge was
   retired after local parity; `apps/web` remains a separate Nitro owner.
 - Root `alchemy.run.ts` owns one `TaxKitDocsCloudflare` stack, branded
-  `pr-<number>` or `prod` stage admission, `Cloudflare.state()`, one
-  `Command.Build`, and one logical `DocsWebsite` Worker. It uploads the
-  plugin-produced output through `Cloudflare.Worker({ bundle: false })`;
-  Alchemy owns the physical Worker name.
+  `pr-<number>` or `prod` stage admission, the mutation composition's
+  `Cloudflare.state()`, one `Command.Build`, and one logical `DocsWebsite`
+  Worker. It uploads the plugin-produced output through
+  `Cloudflare.Worker({ bundle: false })`; Alchemy owns the physical Worker
+  name. The separate report-only inventory owner uses Alchemy's public
+  `makeHttpStateStore` after decoding the account-matched cache through its
+  Schema boundary, so it cannot bootstrap, write or delete state.
 - The Worker uses compatibility date `2026-06-24`, `nodejs_compat`, default
   asset-first full-stack routing, a provider Worker URL, built-in invocation
   logs and disabled traces. Hashed `/assets/*` responses are immutable.

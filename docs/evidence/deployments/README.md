@@ -247,3 +247,22 @@ mutation. The report-only automation register therefore remains
 `not-established`. The next owner is the Alchemy beta.64 cache-ingress boundary:
 repair or replace it with a supported non-mutating state-read path, then rerun
 from a fresh candidate. The earlier failed receipts remain unchanged.
+
+## 2026-08-09 report-only public state-client successor
+
+Candidate `9dd779d70ccf661081856c3b5f07474b406db7ba` replaces the nested
+`Cloudflare.state()` construction in the report-only inventory owner with
+Alchemy beta.64's public `makeHttpStateStore` service. The cache is decoded once
+through the existing Schema boundary, the state client exposes the inventory's
+read operations only, and the mutation/bootstrap workflows are unchanged.
+The local `bun run check:docs-deployment-inventory` proof returned
+`state-provider-agree`, state-store version `7`, one `prod` stage and one
+provider Worker. No credential value is retained.
+
+The exact hosted successor run `31315231020` checked out this candidate but
+remained queued without a runner or pending environment request and was
+cancelled after the bounded wait. Its cancellation receipt is
+`2026-08-09-orphan-inventory/cancelled-31315231020.json`. This supersedes the
+cache-ingress repair as the current implementation owner, but it does not
+establish hosted state/provider agreement; the report-only automation register
+remains `not-established` and scheduled orphan detection remains inconclusive.
