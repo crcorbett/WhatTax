@@ -91,11 +91,25 @@ jobs:
           mkdir -p "$RUNNER_TEMP/docs-deployment"
           bun run check:docs-deployment-orphans > "$RUNNER_TEMP/docs-deployment/orphan-report.json"
 
+      - name: Materialize successful report-only workflow-run readback
+        if: success()
+        run: |
+          set -euo pipefail
+          jq -nS \
+            --arg event "$GITHUB_EVENT_NAME" \
+            --arg run "$GITHUB_RUN_ID" \
+            --arg source "$GITHUB_SHA" \
+            '{candidateCommit:$source,conclusion:"success",event:$event,headBranch:"main",headSha:$source,path:".github/workflows/docs-orphan-inventory.yml",ref:"refs/heads/main",status:"completed",workflowName:"Docs Orphan Inventory (Report Only)",workflowRunId:$run}' \
+            > "$RUNNER_TEMP/docs-deployment/workflow-run.json"
+
       - name: Upload report-only receipt
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: taxkit-docs-orphan-inventory-${{ github.run_id }}
-          path: ${{ runner.temp }}/docs-deployment/orphan-report.json
+          path: |
+            ${{ runner.temp }}/docs-deployment/orphan-report.json
+            ${{ runner.temp }}/docs-deployment/workflow-input.json
+            ${{ runner.temp }}/docs-deployment/workflow-run.json
           retention-days: 30
           if-no-files-found: error

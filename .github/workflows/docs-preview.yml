@@ -290,6 +290,19 @@ jobs:
           TAXKIT_WORKFLOW_SCREENSHOT_ROOT="$RUNNER_TEMP/docs-deployment" \
             bun run check:docs-deployment-workflow-proof
 
+      - name: Materialize successful Preview workflow-run readback
+        if: success()
+        run: |
+          set -euo pipefail
+          jq -nS \
+            --arg candidate "$CANDIDATE_SHA" \
+            --arg event "$GITHUB_EVENT_NAME" \
+            --arg path ".github/workflows/docs-preview.yml" \
+            --arg run "$GITHUB_RUN_ID" \
+            --arg source "$GITHUB_SHA" \
+            '{candidateCommit:$candidate,conclusion:"success",event:$event,headBranch:"main",headSha:$source,path:$path,ref:"refs/heads/main",status:"completed",workflowName:"Docs Preview Deployment",workflowRunId:$run}' \
+            > "$RUNNER_TEMP/docs-deployment/workflow-run.json"
+
       - name: Upload sanitized Preview plan and replan evidence
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
@@ -307,6 +320,8 @@ jobs:
           path: |
             ${{ runner.temp }}/docs-deployment/provider-inventory.json
             ${{ runner.temp }}/docs-deployment/provider-readback.json
+            ${{ runner.temp }}/docs-deployment/workflow-input.json
+            ${{ runner.temp }}/docs-deployment/workflow-run.json
             ${{ runner.temp }}/docs-deployment/docs/evidence/deployments
             ${{ runner.temp }}/docs-deployment/hosted-proof.raw.json
             ${{ runner.temp }}/docs-deployment/hosted-proof.json

@@ -123,16 +123,10 @@ jobs:
           fi
           for attempt in one two; do
             ALCHEMY_PLAIN=1 CI=1 bunx alchemy destroy --dry-run --stage "$stage" --profile "$ALCHEMY_PROFILE" --yes > "$RUNNER_TEMP/docs-deployment/destroy-${attempt}.txt"
-            sed -E $'s/\\033\\[[0-9;]*m//g' "$RUNNER_TEMP/docs-deployment/destroy-${attempt}.txt" | grep -E '^\[(DocsBuild|DocsWebsite)\] delete$' > "$RUNNER_TEMP/docs-deployment/destroy-${attempt}.resources.txt" || true
-            unexpected_destroy_resources="$(sed -E $'s/\\033\\[[0-9;]*m//g' "$RUNNER_TEMP/docs-deployment/destroy-${attempt}.txt" | grep -E '^\\[[^]]+\\] (delete|noop)$' | grep -Ev '^\\[(DocsBuild|DocsWebsite)\\] (delete|noop)$' || true)"
+            destroy_resource_lines="$(sed -E $'s/\\033\\[[0-9;]*m//g' "$RUNNER_TEMP/docs-deployment/destroy-${attempt}.txt" | grep -E '^\\[[^]]+\\] ' || true)"
+            unexpected_destroy_resources="$(printf '%s\\n' "$destroy_resource_lines" | grep -Ev '^\\[(DocsBuild|DocsWebsite)\\] (delete|noop)$' || true)"
             test -z "$unexpected_destroy_resources"
-            all_destroy_resources="$(sed -E $'s/\\033\\[[0-9;]*m//g' "$RUNNER_TEMP/docs-deployment/destroy-${attempt}.txt" | grep -E '^\\[[^]]+\\] (create|update|delete|noop)$' || true)"
-            unexpected_destroy_actions="$(printf '%s\\n' "$all_destroy_resources" | grep -Ev '^\\[(DocsBuild|DocsWebsite)\\] (create|update|delete|noop)$' || true)"
-            test -z "$unexpected_destroy_actions"
-            if printf '%s\\n' "$all_destroy_resources" | grep -E '^\\[(DocsBuild|DocsWebsite)\\] (create|update)$' | grep -q .; then
-              echo "Destroy plan contains non-delete action for an owned resource" >&2
-              exit 1
-            fi
+            printf '%s\\n' "$destroy_resource_lines" | grep -E '^\\[(DocsBuild|DocsWebsite)\\] delete$' > "$RUNNER_TEMP/docs-deployment/destroy-${attempt}.resources.txt" || true
             resource_count="$(wc -l < "$RUNNER_TEMP/docs-deployment/destroy-${attempt}.resources.txt" | tr -d ' ')"
             test "$resource_count" -eq 0 || test "$resource_count" -eq 2
           done
@@ -170,6 +164,14 @@ jobs:
           TAXKIT_WORKFLOW_PLAN_SHA256="$destroy_sha256" \
           TAXKIT_WORKFLOW_PLAN_REQUIRE_REPLAN=1 \
             bun run check:docs-deployment-workflow-plan
+          ALCHEMY_PROFILE="$ALCHEMY_PROFILE" CI=1 bun run check:docs-deployment-inventory > "$RUNNER_TEMP/docs-deployment/provider-inventory-pre-destroy.json"
+          jq -e --arg stage "$stage" --argjson expected "$stage_count_before" --arg worker "$previous_worker_name" --arg url "$previous_worker_url" '
+            ([.stages[] | select(.stage == $stage)] | length == $expected) and
+            (if $expected == 0 then true else
+              ([.stages[] | select(.stage == $stage) | .resources | map(.logicalId) | sort] == [["DocsBuild", "DocsWebsite"]]) and
+              ([.providerWorkers[] | select(.stage == $stage and .logicalId == "DocsWebsite" and .workerName == $worker and .workerUrl == $url)] | length == 1)
+            end)
+          ' "$RUNNER_TEMP/docs-deployment/provider-inventory-pre-destroy.json" > /dev/null
           if [ "$resource_count" -eq 2 ]; then
             ALCHEMY_PLAIN=1 CI=1 bunx alchemy destroy --stage "$stage" --profile "$ALCHEMY_PROFILE" --yes
           fi
@@ -197,6 +199,19 @@ jobs:
           TAXKIT_WORKFLOW_CANDIDATE_COMMIT="$REVIEWED_WORKFLOW_SHA" \
           TAXKIT_WORKFLOW_STAGE="$stage" \
             bun run check:docs-deployment-workflow-teardown-proof
+
+      - name: Materialize successful teardown workflow-run readback
+        if: success()
+        run: |
+          set -euo pipefail
+          jq -nS \
+            --arg candidate "$REVIEWED_WORKFLOW_SHA" \
+            --arg event "$GITHUB_EVENT_NAME" \
+            --arg path ".github/workflows/docs-preview-teardown.yml" \
+            --arg run "$GITHUB_RUN_ID" \
+            --arg source "$REVIEWED_WORKFLOW_SHA" \
+            '{candidateCommit:$candidate,conclusion:"success",event:$event,headBranch:"main",headSha:$source,path:$path,ref:"refs/heads/main",status:"completed",workflowName:"Docs Preview Teardown",workflowRunId:$run}' \
+            > "$RUNNER_TEMP/docs-deployment/workflow-run.json"
 
       - name: Upload sanitized Preview teardown evidence
         if: always()

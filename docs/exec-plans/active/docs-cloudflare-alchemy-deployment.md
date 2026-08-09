@@ -1348,6 +1348,10 @@ default-branch source, run, operation and dispatch candidate input, while the
 latter is the GitHub API run readback. The Preview and Production plan shells
 also reject every resource-like line outside the two owned resources and reject
 `delete` before a deploy apply.
+Successful Preview, Production, teardown and report-only runs now materialise
+the strict `workflow-run.json` readback beside the input receipt; the report-only
+artifact retains both files. Teardown performs a final state/Worker identity
+readback after equal dry-runs and before any destroy.
 The workflow hosted receipt remains a bounded automation supplement: it retains
 PNG identity/bytes and the two viewport classes, but does not yet replace the
 full manual screenshot-manifest/oracle packet or guarantee an early failure

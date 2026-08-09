@@ -97,6 +97,7 @@ describe("docs deployment workflow admission", () => {
       expect(source).toContain("TAXKIT_WORKFLOW_SCREENSHOT_ROOT");
       expect(source).toContain("check:docs-deployment-workflow-input");
       expect(source).toContain("workflow-input.json");
+      expect(source).toContain("workflow-run.json");
       expect(source).toContain("all_replan_resources");
       expect(source).toContain("docs/evidence/deployments");
       expect(source).toContain("configSha256");
@@ -109,6 +110,7 @@ describe("docs deployment workflow admission", () => {
     expect(teardown).toContain("CLOUDFLARE_ACCOUNT_ID");
     expect(teardown).toContain("CLOUDFLARE_API_TOKEN");
     expect(teardown).toContain("provider-inventory-before.json");
+    expect(teardown).toContain("provider-inventory-pre-destroy.json");
     expect(teardown).toContain("stage_count_before");
     expect(teardown).toContain("unexpected_destroy_resources");
     expect(teardown).toContain("providerWorkers");
@@ -120,9 +122,10 @@ describe("docs deployment workflow admission", () => {
     expect(teardown).toContain("pulls/");
     expect(teardown).toContain('= "closed"');
     expect(teardown).toContain("grep -Eq '^[1-9][0-9]*$'");
-    expect(teardown).toContain("(create|update|delete|noop)");
+    expect(teardown).toContain("(delete|noop)");
     expect(teardown).toContain("check:docs-deployment-workflow-teardown-proof");
     expect(teardown).toContain("check:docs-deployment-workflow-input");
+    expect(teardown).toContain("workflow-run.json");
     expect(teardown).toContain(
       "TAXKIT_WORKFLOW_PLAN_OPERATION=preview-destroy"
     );
@@ -154,6 +157,7 @@ describe("docs deployment workflow admission", () => {
     expect(orphan).not.toContain("alchemy login");
     expect(orphan).not.toContain("alchemy cloudflare bootstrap");
     expect(orphan).toContain("check:docs-deployment-workflow-input");
+    expect(orphan).toContain("workflow-run.json");
     expect(orphan).not.toContain("alchemy plan");
     expect(orphan).not.toContain("alchemy destroy");
   });
