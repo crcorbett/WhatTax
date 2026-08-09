@@ -296,6 +296,20 @@ browser and build the Cloudflare deployment input before hashing `dist`.
 These corrections preserve the no-op-versus-delete teardown contract and add
 no provider resource or authority.
 
+The workflow receipt boundary is strict. Raw hosted output is retained only as
+diagnostic artifact material; the promoted receipt is filtered to the
+`DeploymentWorkflowHostedProbe` Schema, and the workflow copies the referenced
+desktop/mobile PNG bytes into the artifact route before recomputing their
+digests. Provider readback carries account and state-store identity plus the
+pre-mutation version where present. Production accepts only a successful
+Preview run from the named workflow whose `accepted_preview_pr_number` exactly
+matches the deterministic `pr-N` stage. Teardown checks live PR closure for
+both event and manual dispatch, rejects every unexpected action, and invokes a
+dedicated Schema-decoded absence checker. External-state admission decodes the
+plan as well as provider/hosted/teardown receipts and rejects any cross-file
+candidate, stage, plan, config, dependency, account/state, Worker, URL,
+deployment/version, rollback or screenshot-byte mismatch.
+
 The successor teardown runs `30896950134` (automatic PR-close) and
 `30896963746` (manual `pr-1`) passed source checkout, frozen install, browser
 setup, docs validation, exact build and equal destroy dry-runs, then stopped at

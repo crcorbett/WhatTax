@@ -1,25 +1,40 @@
 import { Schema } from "effect";
 
 import { DocsDeploymentStage } from "../../apps/docs/src/lib/build/docs-deployment-stage.js";
+import type { DeploymentPlanReceipt } from "./schemas.js";
 
 const CommitSha = Schema.String.check(Schema.isPattern(/^[a-f0-9]{40}$/u));
 const Sha256 = Schema.String.check(Schema.isPattern(/^[a-f0-9]{64}$/u));
 const ProviderIdentity = Schema.String.check(
   Schema.isPattern(/^[A-Za-z0-9._:/-]+$/u)
 );
+const CloudflareAccountId = Schema.String.check(
+  Schema.isPattern(/^[a-f0-9]{32}$/u)
+);
+const PositivePrNumber = Schema.Int.check(Schema.isGreaterThan(0));
 const WorkersDevUrl = Schema.String.check(
   Schema.isPattern(/^https:\/\/[^/]+\.workers\.dev\/?$/u)
+);
+const ReceiptPath = Schema.String.check(
+  Schema.isPattern(
+    /^docs\/evidence\/deployments\/(?!.*\.\.(?:\/|$))[A-Za-z0-9._/-]+$/u
+  )
 );
 
 export const DeploymentWorkflowProviderReadback = Schema.Struct({
   acceptedPlanSha256: Sha256,
+  accountId: CloudflareAccountId,
   candidateCommit: CommitSha,
   configSha256: Sha256,
   deploymentId: ProviderIdentity,
   deploymentInputSha256: Sha256,
   lockfileSha256: Sha256,
+  previewPrNumber: Schema.NullOr(PositivePrNumber),
+  previousVersionId: Schema.NullOr(ProviderIdentity),
+  rollbackRecoveryIdentity: Schema.NullOr(Schema.NonEmptyString),
   schemaVersion: Schema.Literal(1),
   stage: DocsDeploymentStage,
+  stateStoreId: Schema.NonEmptyString,
   url: WorkersDevUrl,
   versionId: ProviderIdentity,
   workerName: ProviderIdentity,
@@ -44,11 +59,20 @@ const WorkflowScreenshot = Schema.Struct({
 
 export const DeploymentWorkflowHostedProbe = Schema.Struct({
   acceptedPlanSha256: Sha256,
+  accountId: CloudflareAccountId,
   candidateCommit: CommitSha,
+  configSha256: Sha256,
   deploymentId: ProviderIdentity,
+  deploymentInputSha256: Sha256,
   diagnostics: Schema.Array(Schema.String),
+  environment: Schema.Literals(["preview", "production", "rollback"]),
+  lockfileSha256: Sha256,
+  previewPrNumber: Schema.NullOr(PositivePrNumber),
+  previousVersionId: Schema.NullOr(ProviderIdentity),
+  rollbackRecoveryIdentity: Schema.NonEmptyString,
   screenshots: Schema.Tuple([WorkflowScreenshot, WorkflowScreenshot]),
   stage: DocsDeploymentStage,
+  stateStoreId: Schema.NonEmptyString,
   url: WorkersDevUrl,
   versionId: ProviderIdentity,
   workerName: ProviderIdentity,
@@ -57,6 +81,7 @@ export type DeploymentWorkflowHostedProbe =
   typeof DeploymentWorkflowHostedProbe.Type;
 
 export const DeploymentWorkflowTeardownReadback = Schema.Struct({
+  accountId: CloudflareAccountId,
   candidateCommit: CommitSha,
   configSha256: Sha256,
   deploymentInputSha256: Sha256,
@@ -65,12 +90,14 @@ export const DeploymentWorkflowTeardownReadback = Schema.Struct({
   schemaVersion: Schema.Literal(1),
   stage: Schema.String.check(Schema.isPattern(/^pr-[1-9]\d*$/u)),
   stateStageAbsent: Schema.Literal(true),
+  stateStoreId: Schema.NonEmptyString,
 });
 export type DeploymentWorkflowTeardownReadback =
   typeof DeploymentWorkflowTeardownReadback.Type;
 
 export const DeploymentWorkflowExternalReceipt = Schema.Struct({
   acceptedPlanSha256: Schema.NullOr(Sha256),
+  accountId: Schema.NullOr(CloudflareAccountId),
   automationId: Schema.Literals([
     "docs-preview-delivery",
     "docs-production-delivery",
@@ -78,28 +105,43 @@ export const DeploymentWorkflowExternalReceipt = Schema.Struct({
     "docs-orphan-inventory",
   ]),
   candidateCommit: CommitSha,
+  configSha256: Schema.NullOr(Sha256),
+  deploymentInputSha256: Schema.NullOr(Sha256),
   environment: Schema.Literals([
     "taxkit-docs-preview",
     "taxkit-docs-production",
     "taxkit-docs-preview-teardown",
     "github-actions-report-only",
   ]),
-  hostedProofPath: Schema.NullOr(Schema.NonEmptyString),
+  hostedProofPath: Schema.NullOr(ReceiptPath),
   lockGroup: Schema.NonEmptyString,
+  lockfileSha256: Schema.NullOr(Sha256),
   nonClaims: Schema.NonEmptyArray(Schema.NonEmptyString),
   observedAt: Schema.String.check(
     Schema.isPattern(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/u)
   ),
-  planPath: Schema.NullOr(Schema.NonEmptyString),
+  planPath: Schema.NullOr(ReceiptPath),
   postcondition: Schema.NonEmptyString,
+  previousVersionId: Schema.NullOr(ProviderIdentity),
   principal: Schema.NonEmptyString,
-  providerReadbackPath: Schema.NullOr(Schema.NonEmptyString),
+  providerReadbackPath: Schema.NullOr(ReceiptPath),
+  rollbackRecoveryIdentity: Schema.NullOr(Schema.NonEmptyString),
   schemaVersion: Schema.Literal(1),
   stage: DocsDeploymentStage,
   workflowCommit: CommitSha,
   workflowPath: Schema.NonEmptyString,
-  workflowReceiptPath: Schema.NonEmptyString,
+  workflowReceiptPath: ReceiptPath,
   workflowRunId: Schema.NonEmptyString,
 });
 export type DeploymentWorkflowExternalReceipt =
   typeof DeploymentWorkflowExternalReceipt.Type;
+
+export interface DeploymentWorkflowExternalEvidence {
+  readonly hosted: DeploymentWorkflowHostedProbe | null;
+  readonly plan: DeploymentPlanReceipt | null;
+  readonly provider:
+    | DeploymentWorkflowProviderReadback
+    | DeploymentWorkflowTeardownReadback
+    | null;
+  readonly receipt: DeploymentWorkflowExternalReceipt;
+}

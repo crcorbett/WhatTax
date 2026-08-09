@@ -5,7 +5,12 @@ import type {
   DeploymentControl,
 } from "./automation.schemas.js";
 import { DeploymentAutomationFinding } from "./automation.schemas.js";
-import type { DeploymentWorkflowExternalReceipt } from "./workflow-receipts.schemas.js";
+import type {
+  DeploymentWorkflowExternalEvidence,
+  DeploymentWorkflowExternalReceipt,
+  DeploymentWorkflowProviderReadback,
+  DeploymentWorkflowTeardownReadback,
+} from "./workflow-receipts.schemas.js";
 
 const expectedAutomationIds = [
   "docs-preview-delivery",
@@ -183,6 +188,10 @@ export const inspectDeploymentAutomationRegisters = (
   externalReceipts: ReadonlyMap<
     DeploymentAutomation["id"],
     DeploymentWorkflowExternalReceipt
+  > = new Map(),
+  externalEvidence: ReadonlyMap<
+    DeploymentAutomation["id"],
+    DeploymentWorkflowExternalEvidence
   > = new Map()
 ): readonly DeploymentAutomationFinding[] => {
   const findings: DeploymentAutomationFinding[] = [];
@@ -221,34 +230,115 @@ export const inspectDeploymentAutomationRegisters = (
         automation.externalState.receipt === null
           ? undefined
           : externalReceipts.get(automation.id);
+      const evidence = externalEvidence.get(automation.id);
+      const plan = evidence?.plan ?? null;
+      const provider = evidence?.provider ?? null;
+      const hosted = evidence?.hosted ?? null;
+      const workflowPath = (
+        {
+          "docs-orphan-inventory":
+            ".github/workflows/docs-orphan-inventory.yml",
+          "docs-preview-delivery": ".github/workflows/docs-preview.yml",
+          "docs-preview-teardown":
+            ".github/workflows/docs-preview-teardown.yml",
+          "docs-production-delivery": ".github/workflows/docs-production.yml",
+        } as const
+      )[automation.id];
+      const isOrphan = automation.id === "docs-orphan-inventory";
+      const isTeardown = automation.id === "docs-preview-teardown";
+      const workflowProvider: DeploymentWorkflowProviderReadback | null =
+        provider !== null && "acceptedPlanSha256" in provider ? provider : null;
+      const teardownProvider: DeploymentWorkflowTeardownReadback | null =
+        provider !== null && "providerWorkerAbsent" in provider
+          ? provider
+          : null;
+      let providerIdentityMismatch = false;
+      if (isOrphan) {
+        providerIdentityMismatch =
+          provider !== null || hosted !== null || plan !== null;
+      } else if (isTeardown) {
+        providerIdentityMismatch =
+          teardownProvider === null ||
+          teardownProvider.candidateCommit !== receipt?.candidateCommit ||
+          teardownProvider.stage !== receipt?.stage ||
+          teardownProvider.accountId !== receipt?.accountId ||
+          teardownProvider.stateStoreId.length === 0;
+      } else {
+        providerIdentityMismatch =
+          workflowProvider === null ||
+          workflowProvider.candidateCommit !== receipt?.candidateCommit ||
+          workflowProvider.stage !== receipt?.stage ||
+          workflowProvider.acceptedPlanSha256 !== receipt?.acceptedPlanSha256 ||
+          workflowProvider.accountId !== receipt?.accountId ||
+          workflowProvider.configSha256 !== receipt?.configSha256 ||
+          workflowProvider.deploymentInputSha256 !==
+            receipt?.deploymentInputSha256 ||
+          workflowProvider.lockfileSha256 !== receipt?.lockfileSha256 ||
+          workflowProvider.previousVersionId !== receipt?.previousVersionId ||
+          workflowProvider.rollbackRecoveryIdentity !==
+            receipt?.rollbackRecoveryIdentity ||
+          (workflowProvider.previewPrNumber === null
+            ? workflowProvider.stage !== "prod"
+            : workflowProvider.stage !==
+              `pr-${workflowProvider.previewPrNumber}`);
+      }
+      const planMismatch = isOrphan
+        ? plan !== null
+        : plan === null ||
+          receipt === undefined ||
+          plan.acceptedPlanSha256 !== receipt.acceptedPlanSha256 ||
+          plan.projection.candidate.exactCommit !== receipt.candidateCommit ||
+          plan.projection.stage !== receipt.stage ||
+          plan.projection.configSha256 !== receipt.configSha256 ||
+          plan.projection.candidate.deploymentInputSha256 !==
+            receipt.deploymentInputSha256 ||
+          plan.projection.candidate.lockfileSha256 !== receipt.lockfileSha256;
+      const hostedIdentityMismatch =
+        isOrphan || isTeardown
+          ? hosted !== null
+          : hosted === null ||
+            receipt === undefined ||
+            workflowProvider === null ||
+            hosted.accountId !== workflowProvider.accountId ||
+            hosted.stateStoreId !== workflowProvider.stateStoreId ||
+            hosted.candidateCommit !== receipt.candidateCommit ||
+            hosted.stage !== workflowProvider.stage ||
+            hosted.acceptedPlanSha256 !== workflowProvider.acceptedPlanSha256 ||
+            hosted.configSha256 !== workflowProvider.configSha256 ||
+            hosted.deploymentInputSha256 !==
+              workflowProvider.deploymentInputSha256 ||
+            hosted.lockfileSha256 !== workflowProvider.lockfileSha256 ||
+            hosted.previousVersionId !== workflowProvider.previousVersionId ||
+            hosted.previewPrNumber !== workflowProvider.previewPrNumber ||
+            hosted.rollbackRecoveryIdentity !==
+              workflowProvider.rollbackRecoveryIdentity ||
+            hosted.deploymentId !== workflowProvider.deploymentId ||
+            hosted.versionId !== workflowProvider.versionId ||
+            hosted.workerName !== workflowProvider.workerName ||
+            hosted.url !== workflowProvider.url ||
+            hosted.diagnostics.length !== 0;
       const receiptMismatch =
         receipt === undefined ||
+        evidence === undefined ||
         automation.externalState.receipt !== receipt?.workflowReceiptPath ||
         receipt.automationId !== automation.id ||
         receipt.environment !== automation.environment.id ||
         receipt.principal !== automation.authority.principal ||
         receipt.lockGroup !== automation.lock.group ||
-        receipt.workflowPath !==
-          (
-            {
-              "docs-orphan-inventory":
-                ".github/workflows/docs-orphan-inventory.yml",
-              "docs-preview-delivery": ".github/workflows/docs-preview.yml",
-              "docs-preview-teardown":
-                ".github/workflows/docs-preview-teardown.yml",
-              "docs-production-delivery":
-                ".github/workflows/docs-production.yml",
-            } as const
-          )[automation.id] ||
-        (automation.id === "docs-orphan-inventory"
+        receipt.workflowPath !== workflowPath ||
+        (isOrphan
           ? receipt.acceptedPlanSha256 !== null ||
             receipt.planPath !== null ||
             receipt.hostedProofPath !== null
           : receipt.acceptedPlanSha256 === null ||
             receipt.planPath === null ||
             receipt.providerReadbackPath === null ||
-            (automation.id !== "docs-preview-teardown" &&
-              receipt.hostedProofPath === null));
+            (isTeardown
+              ? receipt.hostedProofPath !== null
+              : receipt.hostedProofPath === null)) ||
+        providerIdentityMismatch ||
+        planMismatch ||
+        hostedIdentityMismatch;
       if (receiptMismatch) {
         findings.push(
           finding(

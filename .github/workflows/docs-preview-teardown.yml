@@ -43,6 +43,10 @@ jobs:
         run: |
           set -euo pipefail
           test "$PR_NUMBER" -gt 0
+          pr_json="$(gh api "repos/${GITHUB_REPOSITORY}/pulls/${PR_NUMBER}")"
+          test "$(jq -r .state <<<"$pr_json")" = "closed"
+          test "$(jq -r .base.ref <<<"$pr_json")" = "main"
+          test "$(jq -r .head.repo.full_name <<<"$pr_json")" = "$GITHUB_REPOSITORY"
           if [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
             test "$(jq -r .pull_request.base.ref "$GITHUB_EVENT_PATH")" = "main"
             test "$(jq -r .pull_request.state "$GITHUB_EVENT_PATH")" = "closed"
@@ -99,6 +103,13 @@ jobs:
             sed -E $'s/\\033\\[[0-9;]*m//g' "$RUNNER_TEMP/docs-deployment/destroy-${attempt}.txt" | grep -E '^\[(DocsBuild|DocsWebsite)\] delete$' > "$RUNNER_TEMP/docs-deployment/destroy-${attempt}.resources.txt" || true
             unexpected_destroy_resources="$(sed -E $'s/\\033\\[[0-9;]*m//g' "$RUNNER_TEMP/docs-deployment/destroy-${attempt}.txt" | grep -E '^\\[[^]]+\\] (delete|noop)$' | grep -Ev '^\\[(DocsBuild|DocsWebsite)\\] (delete|noop)$' || true)"
             test -z "$unexpected_destroy_resources"
+            all_destroy_resources="$(sed -E $'s/\\033\\[[0-9;]*m//g' "$RUNNER_TEMP/docs-deployment/destroy-${attempt}.txt" | grep -E '^\\[[^]]+\\] (create|update|delete|noop)$' || true)"
+            unexpected_destroy_actions="$(printf '%s\\n' "$all_destroy_resources" | grep -Ev '^\\[(DocsBuild|DocsWebsite)\\] (create|update|delete|noop)$' || true)"
+            test -z "$unexpected_destroy_actions"
+            if printf '%s\\n' "$all_destroy_resources" | grep -E '^\\[(DocsBuild|DocsWebsite)\\] (create|update)$' | grep -q .; then
+              echo "Destroy plan contains non-delete action for an owned resource" >&2
+              exit 1
+            fi
             resource_count="$(wc -l < "$RUNNER_TEMP/docs-deployment/destroy-${attempt}.resources.txt" | tr -d ' ')"
             test "$resource_count" -eq 0 || test "$resource_count" -eq 2
           done
@@ -131,14 +142,21 @@ jobs:
             worker_url_before="$(jq -er --arg stage "$stage" '.stages[] | select(.stage == $stage) | .resources[] | select(.logicalId == "DocsWebsite") | .workerUrl' "$RUNNER_TEMP/docs-deployment/provider-inventory-before.json")"
             test "$(curl --silent --show-error --output /dev/null --write-out '%{http_code}' "$worker_url_before")" = "404"
           fi
+          state_store_id="$(jq -er '.stateStore.id' "$RUNNER_TEMP/docs-deployment/provider-inventory.json")"
           jq -nS \
+            --arg account "$CLOUDFLARE_ACCOUNT_ID" \
             --arg candidate "$REVIEWED_WORKFLOW_SHA" \
             --arg config "$config_sha256" \
             --arg deployment "$deployment_input_sha256" \
             --arg lockfile "$lockfile_sha256" \
             --arg stage "$stage" \
-            '{candidateCommit:$candidate,configSha256:$config,deploymentInputSha256:$deployment,lockfileSha256:$lockfile,providerWorkerAbsent:true,schemaVersion:1,stage:$stage,stateStageAbsent:true}' \
+            --arg stateStoreId "$state_store_id" \
+            '{accountId:$account,candidateCommit:$candidate,configSha256:$config,deploymentInputSha256:$deployment,lockfileSha256:$lockfile,providerWorkerAbsent:true,schemaVersion:1,stage:$stage,stateStoreId:$stateStoreId,stateStageAbsent:true}' \
             > "$RUNNER_TEMP/docs-deployment/provider-readback.json"
+          TAXKIT_WORKFLOW_TEARDOWN_READBACK="$RUNNER_TEMP/docs-deployment/provider-readback.json" \
+          TAXKIT_WORKFLOW_CANDIDATE_COMMIT="$REVIEWED_WORKFLOW_SHA" \
+          TAXKIT_WORKFLOW_STAGE="$stage" \
+            bun run check:docs-deployment-workflow-teardown-proof
           jq -nS \
             --arg acceptedBy "$GITHUB_ACTOR" \
             --arg acceptedPlanSha256 "$destroy_sha256" \

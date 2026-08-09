@@ -197,19 +197,23 @@ The protected Preview and Production workflows build the exact candidate, run
 the existing `test:cloudflare-hosted` owner (including HTTP, browser,
 accessibility, console, cache/header and bounded desktop/mobile screenshot
 proof), then run `bun run check:docs-deployment-workflow-proof` against the
-sanitized provider and hosted identities. They also read the latest Worker
-deployment and version with the pinned Wrangler CLI and upload the plan,
-provider, hosted and screenshot artifacts. A workflow observation is not a
-durable deployment claim until its exact candidate, run, environment, plan,
-provider, hosted and postcondition receipt is promoted under
-`docs/evidence/deployments/` and Schema-decoded by the automation owner.
+sanitized provider and hosted identities. The workflow retains the raw hosted
+output separately, filters a strict Schema receipt, copies the PNG bytes into
+the artifact-owned `docs/evidence/deployments/` subtree, and recomputes each
+image digest before success. Provider readback includes the account and
+Alchemy state-store identities plus the pre-mutation version when one exists;
+the latter is required for source-bound rollback. A workflow observation is
+not a durable deployment claim until its exact candidate, run, environment,
+plan, provider, hosted, screenshot-byte and postcondition receipt is promoted
+under `docs/evidence/deployments/` and Schema-decoded by the automation owner.
 
 Production mutation additionally requires `accepted_preview_run_id`. That run
 must be a successful `Docs Preview Deployment` from `main` for the exact
 candidate; the downloaded provider and hosted receipts are Schema-checked and
-must agree on candidate, Preview stage, plan digest, Worker, URL, deployment,
-version and zero diagnostics before the Production plan is admitted. A caller
-supplied commit or digest without that receipt is not Preview acceptance.
+must agree on candidate, the exact deterministic `pr-N` Preview stage, plan
+digest, Worker, URL, deployment, version and zero diagnostics before the
+Production plan is admitted. A caller-supplied commit, digest or `pr-*` prefix
+without that receipt and exact PR binding is not Preview acceptance.
 
 Teardown reads the exact `pr-N` stage and Worker before mutation, rejects any
 unexpected action/resource projection, and requires both Alchemy stage absence
@@ -356,8 +360,11 @@ values, the verified hosted proof invocation is:
 ```sh
 TAXKIT_DOCS_HOSTED_URL="${READ_BACK_WORKERS_DEV_URL}" \
 TAXKIT_DOCS_CANDIDATE_COMMIT="${EXACT_CANDIDATE_COMMIT}" \
+TAXKIT_DOCS_ACCOUNT_ID="${READ_BACK_ACCOUNT_ID}" \
+TAXKIT_DOCS_STATE_STORE_ID="${READ_BACK_STATE_STORE_ID}" \
 TAXKIT_DOCS_DEPLOYMENT_ID="${READ_BACK_DEPLOYMENT_ID}" \
 TAXKIT_DOCS_VERSION_ID="${READ_BACK_VERSION_ID}" \
+TAXKIT_DOCS_PREVIOUS_VERSION_ID="${READ_BACK_PREVIOUS_VERSION_ID}" \
 TAXKIT_DOCS_WORKER_NAME="${READ_BACK_WORKER_NAME}" \
 TAXKIT_DOCS_STAGE="${READ_BACK_STAGE}" \
 TAXKIT_DOCS_ENVIRONMENT="${ACCEPTED_ENVIRONMENT}" \
@@ -418,9 +425,11 @@ and only the provider/state-agreed URL and deployment/version identity.
 ### Normal rollback
 
 Select the retained last-known-good source, keep the same stack, `prod` stage
-and physical Worker identity, run the normal build/plan/equal-replan/deploy
-path, then prove provider version and hosted postcondition. A prior version ID
-or successful API response alone is insufficient.
+and physical Worker identity, read the current Production version immediately
+before mutation, and require the source-bound recovery identity and expected
+current version to match. Run the normal build/plan/equal-replan/deploy path,
+then prove the resulting provider version and hosted postcondition. A prior
+version ID or successful API response alone is insufficient.
 
 The verified rollback uses the same two invocations above with the restored
 source candidate and `TAXKIT_DOCS_ENVIRONMENT=rollback` for hosted proof. The

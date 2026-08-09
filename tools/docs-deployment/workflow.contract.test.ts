@@ -84,6 +84,11 @@ describe("docs deployment workflow admission", () => {
       expect(source).toContain("wrangler deployments list");
       expect(source).toContain("test:cloudflare-hosted");
       expect(source).toContain("check:docs-deployment-workflow-proof");
+      expect(source).toContain("TAXKIT_DOCS_CANDIDATE_COMMIT");
+      expect(source).toContain("hosted-proof.raw.json");
+      expect(source).toContain("hosted-proof.json");
+      expect(source).toContain("TAXKIT_WORKFLOW_SCREENSHOT_ROOT");
+      expect(source).toContain("docs/evidence/deployments");
       expect(source).toContain("configSha256");
       expect(source).toContain("deploymentInputSha256");
       expect(source).toContain("lockfileSha256");
@@ -99,6 +104,10 @@ describe("docs deployment workflow admission", () => {
     expect(teardown).toContain("providerWorkers");
     expect(teardown).toContain("provider-readback.json");
     expect(teardown).toContain("providerWorkerAbsent:true");
+    expect(teardown).toContain("pulls/");
+    expect(teardown).toContain('= "closed"');
+    expect(teardown).toContain("(create|update|delete|noop)");
+    expect(teardown).toContain("check:docs-deployment-workflow-teardown-proof");
     const orphan = await readWorkflow(workflowPaths.orphan);
     expect(orphan).toContain("cancel-in-progress: true");
     expect(orphan).toContain("CLOUDFLARE_READ_API_TOKEN");
@@ -157,6 +166,10 @@ describe("docs deployment workflow admission", () => {
   test("binds Production mutation to a Schema-checked Preview workflow receipt", async () => {
     const production = await readWorkflow(workflowPaths.production);
     expect(production).toContain("accepted_preview_run_id");
+    expect(production).toContain("accepted_preview_pr_number");
+    expect(production).toContain("rollback_expected_current_version_id");
+    expect(production).toContain("rollback_recovery_identity");
+    expect(production).toContain("actions/runs/");
     expect(production).toContain("gh run download");
     expect(production).toContain("check:docs-deployment-workflow-proof");
     expect(production).toContain("accepted_preview_readback");

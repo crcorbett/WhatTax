@@ -92,20 +92,26 @@ report-only owner are read back from the reviewed default branch; no provider
 mutation, state write, teardown or credential-scope expansion is inferred.
 
 Each admitted mutation workflow now enforces the remaining boundary in its
-own YAML: the equal replan rejects every action/resource outside `DocsBuild`
-and `DocsWebsite`; provider inventory and the latest Wrangler deployment are
-bound to the candidate, stage, plan, Worker, URL and version; and the shared
-hosted proof checker must pass before the provider artifact is accepted.
+own YAML: the initial plan and equal replan reject every action/resource outside
+`DocsBuild` and `DocsWebsite`; provider inventory and the latest Wrangler
+deployment are bound to the candidate, stage, plan, account, Alchemy state,
+Worker, URL, version and pre-mutation version; and the shared hosted proof
+checker must pass after strict receipt filtering and screenshot-byte digest
+recomputation before the provider artifact is accepted.
 Production downloads and Schema-checks a successful `main` Preview receipt
-identified by `accepted_preview_run_id`. Teardown records a separate
-Schema-decoded absence readback and rejects a false no-op. These workflow
+identified by `accepted_preview_run_id`, its workflow path and exact
+`accepted_preview_pr_number`/`pr-N` stage. Teardown records a separate
+Schema-decoded absence readback, checks the live PR is closed for both event and
+manual dispatch, and rejects a false no-op or unexpected action. These workflow
 artifacts still require promotion into a dated repository receipt before an
 entry can move to `externalState.status: established`.
 
 The positive admission path is explicit: decode one outer
 `DeploymentWorkflowExternalReceipt`, then decode its plan/provider/hosted (or
-teardown absence) paths and cross-check workflow path, source SHA, environment,
-principal, stage lock, plan identity and postconditions. A stale branch-bound
+teardown absence) paths, recompute retained screenshot bytes and cross-check
+workflow path, source SHA, environment, principal, stage lock, plan/config/
+deployment/lockfile identity, account/state identity, deterministic PR stage,
+provider/hosted identity and postconditions. A stale branch-bound
 receipt remains historical and cannot establish the current default-branch
 automation class. The report-only schedule is protected by a reviewer gate;
 until that gate is intentionally removed, scheduled inventory is manual/report

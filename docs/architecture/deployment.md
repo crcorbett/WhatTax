@@ -204,12 +204,17 @@ reviewed default-branch source readback exists.
 The workflow contract is intentionally narrower than the application graph:
 Preview and Production derive a canonical plan projection, reject unexpected
 Alchemy resources on both the initial plan and equal replan, then read back the
-exact stage, Worker, deployment and version before running the shared hosted
-proof owner. Production consumes a successful, Schema-decoded Preview
-workflow receipt rather than trusting caller-supplied source or plan fields.
+exact stage, Worker, account/state identity, deployment, version and
+pre-mutation version before running the shared hosted proof owner. The hosted
+workflow output is split into a retained raw diagnostic and a strict
+Schema-decoded receipt; screenshot bytes are copied into the artifact route and
+their digests are recomputed. Production consumes a successful,
+Schema-decoded Preview workflow receipt, exact workflow path and deterministic
+`pr-N` binding rather than trusting caller-supplied source or plan fields.
 Teardown has a target-specific preflight and exact state/Worker absence
 postcondition, including a distinct Schema-decoded absence receipt for a safe
-no-op. The scheduled orphan workflow is reviewer-protected and remains a
+no-op; both pull-request events and manual teardown recheck that the PR is
+closed. The scheduled orphan workflow is reviewer-protected and remains a
 report-only/manual signal; its 1,000-row pull-request bound fails closed when
 inventory completeness is unknown. These controls are desired-state and
 dated-receipt owners, not claims that the current branch or public domain is

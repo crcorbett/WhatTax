@@ -1300,3 +1300,15 @@ The automation register remains `not-established` until the same workflow is
 read back from reviewed default-branch source. DCD-004 and DCD-005 remain open
 for that source-bound lifecycle gate, fresh review and final closeout; no
 receipt is promoted across candidates or source epochs.
+
+### 2026-08-10 — workflow receipt correction slice
+
+The post-review correction keeps DCD-004 in progress and adds the missing
+positive-boundary owners: raw-versus-strict hosted receipt filtering, artifact
+PNG retention and digest recomputation, account/state and pre-mutation version
+readback, exact Preview workflow/path/`pr-N` admission, all-action teardown
+projection rejection, live closed-PR checks for manual teardown, a dedicated
+Schema-decoded teardown checker, and plan/provider/hosted cross-file identity
+reconciliation before external-state establishment. No current provider or
+default-branch workflow receipt is promoted by this local correction; b59e4ee
+and the branch-bound report-only receipt remain historical as recorded above.

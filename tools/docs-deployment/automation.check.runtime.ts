@@ -5,18 +5,21 @@ import * as FileSystem from "effect/FileSystem";
 import * as Path from "effect/Path";
 
 import { inspectDeploymentAutomationRegisters } from "./automation.policy.js";
+import type { DeploymentAutomation } from "./automation.schemas.js";
 import {
   DeploymentAutomationInputError,
   DeploymentAutomationPolicyError,
   DeploymentAutomationRegister,
   DeploymentControlRegister,
 } from "./automation.schemas.js";
+import { DeploymentPlanReceipt } from "./schemas.js";
 import {
   DeploymentWorkflowExternalReceipt,
   DeploymentWorkflowHostedProbe,
   DeploymentWorkflowProviderReadback,
   DeploymentWorkflowTeardownReadback,
 } from "./workflow-receipts.schemas.js";
+import type { DeploymentWorkflowExternalEvidence } from "./workflow-receipts.schemas.js";
 
 const repositoryRootUrl = new URL("../..", import.meta.url);
 
@@ -44,6 +47,25 @@ const readJson = <A>(
     );
   });
 
+const readSha256 = (
+  repositoryRoot: string,
+  target: string
+): Effect.Effect<
+  string,
+  DeploymentAutomationInputError,
+  FileSystem.FileSystem | Path.Path
+> =>
+  Effect.gen(function* readDeploymentSha256() {
+    const fileSystem = yield* FileSystem.FileSystem;
+    const path = yield* Path.Path;
+    const bytes = yield* fileSystem
+      .readFile(path.join(repositoryRoot, target))
+      .pipe(
+        Effect.mapError(() => new DeploymentAutomationInputError({ target }))
+      );
+    return new Bun.CryptoHasher("sha256").update(bytes).digest("hex");
+  });
+
 export const checkDocsDeploymentAutomation = (repositoryRoot: string) =>
   Effect.gen(function* checkDocsDeploymentAutomationProgram() {
     const [automations, controls] = yield* Effect.all([
@@ -59,6 +81,10 @@ export const checkDocsDeploymentAutomation = (repositoryRoot: string) =>
       ),
     ]);
     const externalReceipts = new Map();
+    const externalEvidence = new Map<
+      DeploymentAutomation["id"],
+      DeploymentWorkflowExternalEvidence
+    >();
     for (const automation of automations) {
       if (
         automation.externalState.status === "established" &&
@@ -69,36 +95,61 @@ export const checkDocsDeploymentAutomation = (repositoryRoot: string) =>
           automation.externalState.receipt,
           DeploymentWorkflowExternalReceipt
         );
+        const plan =
+          receipt.planPath === null
+            ? null
+            : yield* readJson(
+                repositoryRoot,
+                receipt.planPath,
+                DeploymentPlanReceipt
+              );
+        let provider: DeploymentWorkflowExternalEvidence["provider"] = null;
         if (receipt.providerReadbackPath !== null) {
           // oxlint-disable-next-line unicorn/prefer-ternary -- decoder selection preserves the distinct teardown absence schema
           if (automation.id === "docs-preview-teardown") {
-            yield* readJson(
+            provider = yield* readJson(
               repositoryRoot,
               receipt.providerReadbackPath,
               DeploymentWorkflowTeardownReadback
             );
           } else {
-            yield* readJson(
+            provider = yield* readJson(
               repositoryRoot,
               receipt.providerReadbackPath,
               DeploymentWorkflowProviderReadback
             );
           }
         }
+        let hosted: DeploymentWorkflowExternalEvidence["hosted"] = null;
         if (receipt.hostedProofPath !== null) {
-          yield* readJson(
+          hosted = yield* readJson(
             repositoryRoot,
             receipt.hostedProofPath,
             DeploymentWorkflowHostedProbe
           );
+          for (const screenshot of hosted.screenshots) {
+            const digest = yield* readSha256(repositoryRoot, screenshot.path);
+            if (digest !== screenshot.sha256) {
+              return yield* new DeploymentAutomationInputError({
+                target: `${receipt.hostedProofPath}:${screenshot.path}:sha256`,
+              });
+            }
+          }
         }
         externalReceipts.set(automation.id, receipt);
+        externalEvidence.set(automation.id, {
+          hosted,
+          plan,
+          provider,
+          receipt,
+        });
       }
     }
     const findings = inspectDeploymentAutomationRegisters(
       automations,
       controls,
-      externalReceipts
+      externalReceipts,
+      externalEvidence
     );
     const [firstFinding, ...remainingFindings] = findings;
     if (firstFinding !== undefined) {
