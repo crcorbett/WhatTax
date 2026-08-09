@@ -2,12 +2,23 @@ import * as BunRuntime from "@effect/platform-bun/BunRuntime";
 import * as BunServices from "@effect/platform-bun/BunServices";
 import { AlchemyContextLive, AuthProviders } from "alchemy";
 import { ArtifactStore, createArtifactStore } from "alchemy/Artifacts";
-import { CredentialsStore } from "alchemy/Auth/Credentials";
+import {
+  CredentialsStore,
+  credentialsFilePath,
+} from "alchemy/Auth/Credentials";
 import { LoggingCli } from "alchemy/Cli/LoggingCli";
 import * as Cloudflare from "alchemy/Cloudflare";
 import { Stack } from "alchemy/Stack";
 import { Stage } from "alchemy/Stage";
-import { Config, Console, Effect, Layer, Match, Schema } from "effect";
+import {
+  Config,
+  Console,
+  Effect,
+  FileSystem,
+  Layer,
+  Match,
+  Schema,
+} from "effect";
 import * as FetchHttpClient from "effect/unstable/http/FetchHttpClient";
 
 import { docsCloudflareStackName } from "../../apps/docs/src/lib/build/cloudflare-stack.js";
@@ -89,6 +100,29 @@ const program = Effect.gen(function* inventoryProgram() {
     "cloudflare-state-store"
   );
   if (cachedStateCredentials === undefined) {
+    const fileSystem = yield* FileSystem.FileSystem;
+    const fileShape = yield* fileSystem
+      .readFileString(credentialsFilePath(profile, "cloudflare-state-store"))
+      .pipe(
+        Effect.map((contents) => {
+          try {
+            const parsed: unknown = JSON.parse(contents);
+            return {
+              fileJsonObject:
+                parsed !== null && typeof parsed === "object",
+              fileVisible: true,
+            };
+          } catch {
+            return { fileJsonObject: false, fileVisible: true };
+          }
+        }),
+        Effect.catch(() =>
+          Effect.succeed({ fileJsonObject: false, fileVisible: false })
+        )
+      );
+    yield* Console.error(
+      `FAIL [inventory-input] target=missing cached Cloudflare state-store credentials fileVisible=${fileShape.fileVisible} fileJsonObject=${fileShape.fileJsonObject}`
+    );
     return yield* new DocsDeploymentInventoryInputError({
       target: "missing cached Cloudflare state-store credentials",
     });
