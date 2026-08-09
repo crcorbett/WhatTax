@@ -185,20 +185,15 @@ export const DocsDeploymentOrphanSourcesLive = Layer.effect(
               () => new DocsDeploymentOrphanInventoryReadError({ operation })
             )
           );
-        const [stdout, [exitCode, stderr]] = yield* Effect.all(
-          [
-            Stream.runCollect(handle.stdout),
-            Effect.all([handle.exitCode, Stream.runCollect(handle.stderr)], {
-              concurrency: "unbounded",
-            }),
-          ],
+        const [exitCode, output] = yield* Effect.all(
+          [handle.exitCode, Stream.runCollect(handle.all)],
           { concurrency: "unbounded" }
         );
+        const outputText = new TextDecoder().decode(
+          Uint8Array.from([...output].flatMap((bytes) => [...bytes]))
+        );
         if (Number(exitCode) !== 0) {
-          const stderrText = new TextDecoder().decode(
-            Uint8Array.from([...stderr].flatMap((bytes) => [...bytes]))
-          );
-          const safeFailure = stderrText.match(
+          const safeFailure = outputText.match(
             /FAIL \[(?:inventory-input|inventory-read|inventory-disagreement)\](?: operation=([A-Za-z0-9:_-]+))?/u
           );
           return yield* new DocsDeploymentOrphanInventoryReadError({
@@ -207,15 +202,21 @@ export const DocsDeploymentOrphanSourcesLive = Layer.effect(
               : operation,
           });
         }
+        const jsonStart = outputText.indexOf("{");
+        const jsonEnd = outputText.lastIndexOf("}");
         const text = yield* Effect.try({
           catch: () =>
             new DocsDeploymentOrphanInventoryInputError({
               target: `${operation}:utf8`,
             }),
-          try: () =>
-            new TextDecoder("utf-8", { fatal: true }).decode(
-              Uint8Array.from([...stdout].flatMap((bytes) => [...bytes]))
-            ),
+          try: () => {
+            if (jsonStart === -1 || jsonEnd < jsonStart) {
+              throw new Error("JSON output was not found");
+            }
+            return new TextDecoder("utf-8", { fatal: true }).decode(
+              new TextEncoder().encode(outputText.slice(jsonStart, jsonEnd + 1))
+            );
+          },
         });
         return yield* Schema.decodeUnknownEffect(
           Schema.fromJsonString(schema),
