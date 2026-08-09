@@ -130,7 +130,7 @@ jobs:
           for attempt in one two; do
             dry_run_status=1
             for retry in 1 2 3; do
-              ALCHEMY_PLAIN=1 CI=1 bun node_modules/alchemy/bin/alchemy.ts destroy --dry-run --stage "$stage" --profile "$ALCHEMY_PROFILE" --yes > "$RUNNER_TEMP/docs-deployment/destroy-${attempt}.txt" 2> "$RUNNER_TEMP/docs-deployment/destroy-${attempt}.stderr.txt" && dry_run_status=0 || dry_run_status=$?
+              ALCHEMY_TELEMETRY_DISABLED=1 ALCHEMY_PLAIN=1 CI=1 bun node_modules/alchemy/bin/alchemy.ts destroy --dry-run --stage "$stage" --profile "$ALCHEMY_PROFILE" --yes > "$RUNNER_TEMP/docs-deployment/destroy-${attempt}.txt" 2> "$RUNNER_TEMP/docs-deployment/destroy-${attempt}.stderr.txt" && dry_run_status=0 || dry_run_status=$?
               sed -E 's/(Bearer[[:space:]]+|token[=:])[A-Za-z0-9._-]+/\1[REDACTED]/g' "$RUNNER_TEMP/docs-deployment/destroy-${attempt}.stderr.txt" > "$RUNNER_TEMP/docs-deployment/destroy-${attempt}.stderr.redacted.txt"
               mv "$RUNNER_TEMP/docs-deployment/destroy-${attempt}.stderr.redacted.txt" "$RUNNER_TEMP/docs-deployment/destroy-${attempt}.stderr.txt"
               if [ "$dry_run_status" -eq 0 ]; then
@@ -195,7 +195,7 @@ jobs:
             end)
           ' "$RUNNER_TEMP/docs-deployment/provider-inventory-pre-destroy.json" > /dev/null
           if [ "$resource_count" -eq 2 ]; then
-            ALCHEMY_PLAIN=1 CI=1 bun node_modules/alchemy/bin/alchemy.ts destroy --stage "$stage" --profile "$ALCHEMY_PROFILE" --yes
+            ALCHEMY_TELEMETRY_DISABLED=1 ALCHEMY_PLAIN=1 CI=1 bun node_modules/alchemy/bin/alchemy.ts destroy --stage "$stage" --profile "$ALCHEMY_PROFILE" --yes
           fi
           ALCHEMY_PROFILE="$ALCHEMY_PROFILE" CI=1 bun run check:docs-deployment-inventory > "$RUNNER_TEMP/docs-deployment/provider-inventory.json"
           jq -e --arg stage "$stage" '(.agreement == "state-provider-agree") and ([.stages[] | select(.stage == $stage)] | length == 0) and ([.providerWorkers[] | select(.stage == $stage and .logicalId == "DocsWebsite")] | length == 0)' "$RUNNER_TEMP/docs-deployment/provider-inventory.json" > /dev/null

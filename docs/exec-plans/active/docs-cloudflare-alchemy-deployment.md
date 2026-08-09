@@ -1458,3 +1458,20 @@ direct entrypoint must be retired when the published launcher is requalified
 on the hosted runner. DCD-004 remains `in_progress`, DCD-005 remains
 `pending`, and a fresh reviewed-main teardown run is required before any
 absence claim.
+
+### 2026-08-10 — direct-entrypoint teardown retry and telemetry diagnostic
+
+Reviewed-main teardown run `31334710165` for candidate
+`653b6a00fabfdae30d35d9a75b672b3b1c71bf5d` again read the exact `pr-18`
+state/provider inventory and emitted the two expected delete lines, but the
+pinned `bun node_modules/alchemy/bin/alchemy.ts destroy --dry-run` process
+returned non-zero with empty stderr. No destroy was attempted. The retained
+artifact is available from the run's sanitized teardown artifact at
+`https://github.com/crcorbett/taxkit/actions/runs/31334710165`; it contains
+the pre-destroy inventory, plan stdout and workflow input, with no absence
+readback. The stage and Worker therefore remain present and this run is a
+failed/non-claim receipt. The next bounded retry disables only Alchemy's
+optional telemetry export for the teardown process; it still requires exit 0,
+equal projections and all existing freshness/absence checks. DCD-004 remains
+`in_progress`, DCD-005 remains `pending`, and no Preview teardown or
+Production claim is established.

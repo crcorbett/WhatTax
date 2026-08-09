@@ -130,10 +130,10 @@ describe("docs deployment workflow admission", () => {
     expect(teardown).toContain("unexpected_destroy_resources");
     expect(teardown).toContain("dry_run_status");
     expect(teardown).toContain(
-      "ALCHEMY_PLAIN=1 CI=1 bun node_modules/alchemy/bin/alchemy.ts destroy --dry-run"
+      "ALCHEMY_TELEMETRY_DISABLED=1 ALCHEMY_PLAIN=1 CI=1 bun node_modules/alchemy/bin/alchemy.ts destroy --dry-run"
     );
     expect(teardown).toContain(
-      "ALCHEMY_PLAIN=1 CI=1 bun node_modules/alchemy/bin/alchemy.ts destroy --stage"
+      "ALCHEMY_TELEMETRY_DISABLED=1 ALCHEMY_PLAIN=1 CI=1 bun node_modules/alchemy/bin/alchemy.ts destroy --stage"
     );
     expect(teardown).toContain(
       ["destroy-", "$", "{attempt}.stderr.txt"].join("")
