@@ -130,6 +130,12 @@ describe("docs deployment workflow admission", () => {
     expect(teardown).toContain("unexpected_destroy_resources");
     expect(teardown).toContain("dry_run_status");
     expect(teardown).toContain(
+      "ALCHEMY_PLAIN=1 CI=1 bunx --bun alchemy destroy --dry-run"
+    );
+    expect(teardown).toContain(
+      "ALCHEMY_PLAIN=1 CI=1 bunx --bun alchemy destroy --stage"
+    );
+    expect(teardown).toContain(
       ["destroy-", "$", "{attempt}.stderr.txt"].join("")
     );
     expect(teardown).toContain("[REDACTED]");
