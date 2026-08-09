@@ -49,9 +49,9 @@ jobs:
           umask 077
           state_dir="$HOME/.alchemy/credentials/$ALCHEMY_PROFILE"
           mkdir -p "$state_dir"
-          printf '%s' "$ALCHEMY_STATE_STORE_CREDENTIALS_JSON" > "$state_dir/cloudflare-state-store"
+          printf '%s' "$ALCHEMY_STATE_STORE_CREDENTIALS_JSON" > "$state_dir/cloudflare-state-store.json"
           jq -e '(.accountId | type == "string" and length > 0) and (.url | type == "string" and startswith("https://")) and (.authToken | type == "string" and length > 0)' \
-            "$state_dir/cloudflare-state-store" > /dev/null
+            "$state_dir/cloudflare-state-store.json" > /dev/null
 
       - name: Run report-only orphan inventory
         run: |

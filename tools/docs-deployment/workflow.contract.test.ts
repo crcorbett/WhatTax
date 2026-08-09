@@ -101,7 +101,7 @@ describe("docs deployment workflow admission", () => {
     ].join("");
     expect(orphan).toContain(stateSecretEnv);
     expect(orphan).toContain("Materialize the reviewed state-read cache");
-    expect(orphan).toContain("cloudflare-state-store");
+    expect(orphan).toContain("cloudflare-state-store.json");
     expect(orphan).toContain("jq -e");
     expect(orphan).not.toContain("alchemy login");
     expect(orphan).not.toContain("alchemy cloudflare bootstrap");
