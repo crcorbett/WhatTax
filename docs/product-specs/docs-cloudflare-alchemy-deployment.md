@@ -96,12 +96,13 @@ resolved.
 The 2026-08-09 report-only successor candidate
 `9dd779d70ccf661081856c3b5f07474b406db7ba` now uses Alchemy beta.64's public
 `makeHttpStateStore` after the existing Schema-decoded, account-matched cache
-ingress, avoiding the nested `Cloudflare.state()` credential layer while
-leaving all mutation/bootstrap paths unchanged. Local inventory proof returned
-state/provider agreement, state-store version `7`, one `prod` stage and one
-provider Worker. The exact hosted successor run `31315231020` remained queued
-without a runner or pending environment request and was cancelled; its receipt
-is retained under `docs/evidence/deployments/2026-08-09-orphan-inventory/`.
+ingress. A nested process may decode the same protected JSON credential only
+when it cannot see that cache, avoiding the nested `Cloudflare.state()` layer
+while leaving all mutation/bootstrap paths unchanged. Local inventory proof
+returned state/provider agreement, state-store version `7`, one `prod` stage
+and one provider Worker. The exact hosted successor run `31315231020` remained
+queued without a runner or pending environment request and was cancelled; its
+receipt is retained under `docs/evidence/deployments/2026-08-09-orphan-inventory/`.
 Hosted report-only state/provider agreement remains unestablished, so DCD-004
 and DCD-005 stay open and the automation register remains `not-established`.
 

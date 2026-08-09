@@ -258,14 +258,16 @@ bun run check:docs-deployment-inventory
 ```
 
 It uses Alchemy's public `makeHttpStateStore` plus the public Cloudflare Worker
-Provider `list()` operation. It requires `CI=1`, a cached state-store credential
-and agreement between that credential's account identity and the current
-Cloudflare environment before state initialization. It decodes state and
-provider output once, filters provider inventory by exact Alchemy stack tags,
-and fails on state/Worker disagreement. It prints no account ID, token or raw
-provider response. Do not place it in root verification: it is a
-credentialed, provider-bound observation whose exact execution belongs in an
-authorized operation or report-only workflow.
+Provider `list()` operation. It requires `CI=1`, the protected state-store
+credential and agreement between that credential's account identity and the
+current Cloudflare environment before state initialization. The workflow
+materializes the cache as the primary ingress; the nested report-only process
+may decode the same protected JSON credential directly only when it cannot see
+that cache. It decodes state and provider output once, filters provider
+inventory by exact Alchemy stack tags, and fails on state/Worker disagreement.
+It prints no account ID, token or raw provider response. Do not place it in
+root verification: it is a credentialed, provider-bound observation whose
+exact execution belongs in an authorized operation or report-only workflow.
 
 Mutation workflows must first materialize the ephemeral cache with the
 installed Alchemy Cloudflare bootstrap command recorded above. The command is
@@ -665,11 +667,13 @@ report-only and inconclusive.
 
 Candidate `9dd779d70ccf661081856c3b5f07474b406db7ba` now constructs the
 report-only state reader with Alchemy beta.64's public `makeHttpStateStore`
-after the existing Schema-decoded, account-matched cache ingress. This avoids
-the nested `Cloudflare.state()` credential layer, while retaining the public
-Cloudflare Worker Provider read and leaving all mutation/bootstrap paths
-unchanged. The local inventory command returned state/provider agreement,
-state-store version `7`, one `prod` stage and one Worker.
+after the existing Schema-decoded, account-matched cache ingress. The nested
+process has a bounded fallback to decode the same protected JSON credential
+when cache visibility differs, avoiding the nested `Cloudflare.state()` layer
+while retaining the public Cloudflare Worker Provider read and leaving all
+mutation/bootstrap paths unchanged. The local inventory command returned
+state/provider agreement, state-store version `7`, one `prod` stage and one
+Worker.
 
 The exact hosted successor run `31315231020` checked out this candidate but
 remained queued without a runner or pending environment request and was
@@ -714,7 +718,8 @@ identity or use the failing generic command as an absence oracle; DCD-004 must
 provide a supported repeatable readback owner before workflow admission.
 Historical receipts cannot establish current provider state. The report-only
 `check:docs-deployment-inventory` command now uses Alchemy's public
-`makeHttpStateStore` after Schema-decoding the account-matched cache, plus the
+`makeHttpStateStore` after Schema-decoding the account-matched cache, with the
+same protected JSON credential as a bounded nested-process fallback, plus the
 Worker Provider `list()` operation; the mutation composition retains its
 separate `Cloudflare.state()` layer. Its latest local authorized read observed
 state/provider agreement for only `prod`, `DocsBuild` and `DocsWebsite`. This

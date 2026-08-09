@@ -772,7 +772,7 @@ The first local DCD-004 owner is now concrete:
   Quality's provider-free, read-only authority remains preserved.
 
 Focused acceptance currently passes the deployment tool typecheck, the new
-automation validator and `27` deployment-policy tests with `61` expectations.
+automation validator and `37` deployment tests with `133` expectations.
 This admits local desired state only; it is neither a hosted workflow receipt
 nor DCD-004 completion.
 
@@ -782,9 +782,10 @@ The task-created provider-bound command is now exactly
 identities, tagged input/read/disagreement errors and one-time Schema decoding
 of state and provider ingress. Its test Layer accepts agreement and rejects a
 different physical Worker. The live command fails before state initialization
-unless `CI=1`, cached state-store credentials exist and their account identity
-matches the authenticated Cloudflare environment; it never emits credential
-or account values.
+unless `CI=1`, the protected state-store credential is available through the
+materialized cache or the bounded nested-process environment fallback, and its
+account identity matches the authenticated Cloudflare environment; it never
+emits credential or account values.
 
 The latest authorized execution observed state store `cloudflare-http` version
 `7`, only stage `prod`, logical resources `DocsBuild` and `DocsWebsite`, and
@@ -1229,9 +1230,10 @@ or copy the local OAuth profile. The active goal remains open.
 The exact candidate `9dd779d70ccf661081856c3b5f07474b406db7ba` replaces the
 report-only inventory's nested `Cloudflare.state()` construction with Alchemy
 beta.64's public `makeHttpStateStore`. The existing Schema-decoded,
-account-matched cache remains the only state credential ingress; the state
-client exposes the inventory read operations and cannot bootstrap, write or
-delete state. Local `bun run check:docs-deployment-inventory` returned
+account-matched cache is primary; a nested process may decode the same
+protected JSON credential only when it cannot see that cache. The state client
+exposes the inventory read operations and cannot bootstrap, write or delete
+state. Local `bun run check:docs-deployment-inventory` returned
 `state-provider-agree`, version `7`, one `prod` stage and one provider Worker.
 
 The exact hosted successor run `31315231020` checked out this candidate but

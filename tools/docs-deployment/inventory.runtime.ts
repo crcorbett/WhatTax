@@ -67,8 +67,9 @@ const cloudflareApiLayer = Cloudflare.CloudflareApiLive().pipe(
   Layer.provideMerge(runtimeLayer)
 );
 // `Cloudflare.state()` builds its own Cloudflare API layer and may refresh or
-// delete cached credentials. The report-only path has already decoded its
-// account-matched cache, so use Alchemy's public HTTP State service directly;
+// delete cached credentials. The report-only path decodes its account-matched
+// cache (or the same protected JSON credential when a nested process cannot
+// see that cache) once, then uses Alchemy's public HTTP State service directly;
 // this keeps the inventory read-only and leaves mutation/bootstrap ownership
 // with the deployment workflows.
 const makeReadOnlyStateLayer = (
@@ -122,7 +123,23 @@ const program = Effect.gen(function* inventoryProgram() {
     profile,
     "cloudflare-state-store"
   );
-  if (cachedStateCredentials === undefined) {
+  const environmentStateCredentials = yield* Config.string(
+    "ALCHEMY_STATE_STORE_CREDENTIALS_JSON"
+  ).pipe(
+    Effect.flatMap((value) =>
+      Effect.try({
+        catch: () => null,
+        try: () => {
+          const parsed: unknown = JSON.parse(value);
+          return parsed;
+        },
+      })
+    ),
+    Effect.catch(() => Effect.succeed(null))
+  );
+  const rawStateCredentials =
+    cachedStateCredentials ?? environmentStateCredentials;
+  if (rawStateCredentials === undefined || rawStateCredentials === null) {
     const fileSystem = yield* FileSystem.FileSystem;
     const fileShape = yield* fileSystem
       .readFileString(credentialsFilePath(profile, "cloudflare-state-store"))
@@ -151,7 +168,7 @@ const program = Effect.gen(function* inventoryProgram() {
   }
   const decodedStateCredentials = yield* Schema.decodeUnknownEffect(
     CachedStateStoreCredentials
-  )(cachedStateCredentials).pipe(
+  )(rawStateCredentials).pipe(
     Effect.mapError(
       () =>
         new DocsDeploymentInventoryInputError({

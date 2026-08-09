@@ -38,8 +38,9 @@ intent and task state belong in the active SPEC and execution plan.
   Worker. It uploads the plugin-produced output through
   `Cloudflare.Worker({ bundle: false })`; Alchemy owns the physical Worker
   name. The separate report-only inventory owner uses Alchemy's public
-  `makeHttpStateStore` after decoding the account-matched cache through its
-  Schema boundary, so it cannot bootstrap, write or delete state.
+  `makeHttpStateStore` after Schema-decoding the account-matched cache, with a
+  fallback to the same protected JSON credential only when a nested process
+  cannot see that cache, so it cannot bootstrap, write or delete state.
 - The Worker uses compatibility date `2026-06-24`, `nodejs_compat`, default
   asset-first full-stack routing, a provider Worker URL, built-in invocation
   logs and disabled traces. Hashed `/assets/*` responses are immutable.

@@ -253,8 +253,10 @@ from a fresh candidate. The earlier failed receipts remain unchanged.
 Candidate `9dd779d70ccf661081856c3b5f07474b406db7ba` replaces the nested
 `Cloudflare.state()` construction in the report-only inventory owner with
 Alchemy beta.64's public `makeHttpStateStore` service. The cache is decoded once
-through the existing Schema boundary, the state client exposes the inventory's
-read operations only, and the mutation/bootstrap workflows are unchanged.
+through the existing Schema boundary; a nested process may decode the same
+protected JSON credential only when it cannot see that cache. The state client
+exposes the inventory's read operations only, and the mutation/bootstrap
+workflows are unchanged.
 The local `bun run check:docs-deployment-inventory` proof returned
 `state-provider-agree`, state-store version `7`, one `prod` stage and one
 provider Worker. No credential value is retained.
