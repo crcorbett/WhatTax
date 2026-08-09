@@ -4,7 +4,7 @@
   "failure": "The protected report-only job materialized the account-matched Alchemy state-store cache and passed the names-only structural check, but installed Alchemy beta.64 returned no cached credentials through CredentialsStore.read during the inventory command.",
   "githubRun": "https://github.com/crcorbett/taxkit/actions/runs/31313055223",
   "observedPreconditions": {
-    "alchemyHome": "/home/runner",
+    "alchemyHome": "runner-home",
     "cacheExists": true,
     "cacheKeys": ["accountId", "authToken", "url"],
     "accountIdLength": 32,
