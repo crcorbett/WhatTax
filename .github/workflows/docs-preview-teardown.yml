@@ -128,7 +128,23 @@ jobs:
             previous_worker_url="$(jq -er --arg stage "$stage" '.stages[] | select(.stage == $stage) | .resources[] | select(.logicalId == "DocsWebsite") | .workerUrl' "$RUNNER_TEMP/docs-deployment/provider-inventory-before.json")"
           fi
           for attempt in one two; do
-            ALCHEMY_PLAIN=1 CI=1 bunx alchemy destroy --dry-run --stage "$stage" --profile "$ALCHEMY_PROFILE" --yes > "$RUNNER_TEMP/docs-deployment/destroy-${attempt}.txt"
+            dry_run_status=1
+            for retry in 1 2 3; do
+              ALCHEMY_PLAIN=1 CI=1 bunx alchemy destroy --dry-run --stage "$stage" --profile "$ALCHEMY_PROFILE" --yes > "$RUNNER_TEMP/docs-deployment/destroy-${attempt}.txt" 2> "$RUNNER_TEMP/docs-deployment/destroy-${attempt}.stderr.txt" && dry_run_status=0 || dry_run_status=$?
+              sed -E 's/(Bearer[[:space:]]+|token[=:])[A-Za-z0-9._-]+/\1[REDACTED]/g' "$RUNNER_TEMP/docs-deployment/destroy-${attempt}.stderr.txt" > "$RUNNER_TEMP/docs-deployment/destroy-${attempt}.stderr.redacted.txt"
+              mv "$RUNNER_TEMP/docs-deployment/destroy-${attempt}.stderr.redacted.txt" "$RUNNER_TEMP/docs-deployment/destroy-${attempt}.stderr.txt"
+              if [ "$dry_run_status" -eq 0 ]; then
+                break
+              fi
+              if [ "$retry" -lt 3 ]; then
+                sleep 5
+              fi
+            done
+            if [ "$dry_run_status" -ne 0 ]; then
+              sed -E 's/(Bearer[[:space:]]+|token[=:])[A-Za-z0-9._-]+/\1[REDACTED]/g' "$RUNNER_TEMP/docs-deployment/destroy-${attempt}.stderr.txt" >&2 || true
+              printf 'alchemy destroy --dry-run exit=%s attempt=%s\n' "$dry_run_status" "$attempt" >&2
+              exit "$dry_run_status"
+            fi
             destroy_resource_lines="$(sed -E $'s/\\033\\[[0-9;]*m//g' "$RUNNER_TEMP/docs-deployment/destroy-${attempt}.txt" | grep -E '^\\[[^]]+\\] ' || true)"
             unexpected_destroy_resources="$(printf '%s\\n' "$destroy_resource_lines" | grep -Ev '^\\[(DocsBuild|DocsWebsite)\\] (delete|noop)$' || true)"
             test -z "$unexpected_destroy_resources"

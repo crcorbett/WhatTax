@@ -186,6 +186,10 @@ PR-close teardown is convergent and safe when no stage exists. Its equal dry-run
 projection records `noop` for both logical resources and performs no destroy;
 when both exact `DocsBuild` and `DocsWebsite` resources exist, it records equal
 `delete` actions, destroys only that `pr-N` stage, and requires absence readback.
+The workflow retries each dry-run at most twice after a non-zero Alchemy exit,
+with a five-second bounded delay; it proceeds only after a zero exit and equal
+sanitized resource projection. A final non-zero exit is a stop receipt, not
+permission to destroy, and retains only redacted stderr diagnostics.
 This bootstrap exception and no-op postcondition do not establish workflow,
 hosted or teardown success until a default-branch run retains its dated,
 candidate-bound receipts. The current automation register remains
@@ -402,7 +406,10 @@ ALCHEMY_PLAIN=1 CI=1 bunx alchemy destroy --dry-run --stage pr-1 --profile defau
 ALCHEMY_PLAIN=1 CI=1 bunx alchemy destroy --stage pr-1 --profile default --yes
 ```
 
-Run the dry-run twice and require the same sanitized digest before destroy.
+Run the dry-run twice and require the same sanitized digest before destroy. A
+transient non-zero Alchemy dry-run may be retried twice with a five-second
+bounded delay; any final non-zero exit is a stop and must retain redacted
+diagnostics rather than proceed.
 Afterward, independently require the exact Worker settings endpoint and hosted
 URL to return `404`, matching Worker inventory to be empty, and the Alchemy
 stage/resource inventory to contain no `pr-1` resources.
