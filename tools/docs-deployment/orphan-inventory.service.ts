@@ -203,6 +203,9 @@ export const DocsDeploymentOrphanSourcesLive = Layer.effect(
         const stderrText = decodeProcessBytes([...stderr]);
         const outputText = `${stdoutText}\n${stderrText}`;
         if (Number(exitCode) !== 0) {
+          const cacheShape = outputText.match(
+            /FAIL \[inventory-input\] target=missing cached Cloudflare state-store credentials fileVisible=(true|false) fileJsonObject=(true|false)/u
+          );
           const safeFailure = outputText.match(
             /FAIL \[(inventory-input|inventory-read|inventory-disagreement)\](?: operation=([A-Za-z0-9:_-]+)| target=(CI=1|missing cached Cloudflare state-store credentials|invalid cached Cloudflare state-store credentials|cached state-store account identity))?/u
           );
@@ -230,9 +233,12 @@ export const DocsDeploymentOrphanSourcesLive = Layer.effect(
             safeFailure?.[2] ??
             inputSuffix ??
             safeFailure?.[1]?.replace("inventory-", "");
+          const cacheShapeSuffix = cacheShape
+            ? `-file-visible-${cacheShape[1]}-json-object-${cacheShape[2]}`
+            : "";
           return yield* new DocsDeploymentOrphanInventoryReadError({
             operation: failureSuffix
-              ? `${operation}:${failureSuffix}`
+              ? `${operation}:${failureSuffix}${cacheShapeSuffix}`
               : operation,
           });
         }
