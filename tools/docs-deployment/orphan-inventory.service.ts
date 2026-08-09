@@ -33,6 +33,11 @@ const githubArgs = [
 const previewStageNumber = (stage: string): number =>
   Number.parseInt(stage.slice("pr-".length), 10);
 
+const decodeProcessBytes = (bytes: readonly Uint8Array[]) =>
+  new TextDecoder().decode(
+    Uint8Array.from(bytes.flatMap((chunk) => [...chunk]))
+  );
+
 export const makeDocsDeploymentOrphanInventoryReceipt = (
   observedAt: string,
   openPullRequests: readonly GitHubOpenPullRequest[],
@@ -185,46 +190,35 @@ export const DocsDeploymentOrphanSourcesLive = Layer.effect(
               () => new DocsDeploymentOrphanInventoryReadError({ operation })
             )
           );
-        const [exitCode, output] = yield* Effect.all(
-          [handle.exitCode, Stream.runCollect(handle.all)],
+        const [stdout, stderr] = yield* Effect.all(
+          [Stream.runCollect(handle.stdout), Stream.runCollect(handle.stderr)],
           { concurrency: "unbounded" }
         );
-        const outputText = new TextDecoder().decode(
-          Uint8Array.from([...output].flatMap((bytes) => [...bytes]))
-        );
+        const exitCode = yield* handle.exitCode;
+        const stdoutText = decodeProcessBytes([...stdout]);
+        const stderrText = decodeProcessBytes([...stderr]);
+        const outputText = `${stdoutText}\n${stderrText}`;
         if (Number(exitCode) !== 0) {
           const safeFailure = outputText.match(
-            /FAIL \[(?:inventory-input|inventory-read|inventory-disagreement)\](?: operation=([A-Za-z0-9:_-]+))?/u
+            /FAIL \[(inventory-input|inventory-read|inventory-disagreement)\](?: operation=([A-Za-z0-9:_-]+))?/u
           );
+          const failureSuffix =
+            safeFailure?.[2] ?? safeFailure?.[1]?.replace("inventory-", "");
           return yield* new DocsDeploymentOrphanInventoryReadError({
-            operation: safeFailure?.[1]
-              ? `${operation}:${safeFailure[1]}`
+            operation: failureSuffix
+              ? `${operation}:${failureSuffix}`
               : operation,
           });
         }
-        const objectStart = outputText.indexOf("{");
-        const arrayStart = outputText.indexOf("[");
-        let jsonStart = objectStart;
-        if (jsonStart === -1 || (arrayStart !== -1 && arrayStart < jsonStart)) {
-          jsonStart = arrayStart;
-        }
-        const jsonEnd = Math.max(
-          outputText.lastIndexOf("}"),
-          outputText.lastIndexOf("]")
-        );
         const text = yield* Effect.try({
           catch: () =>
             new DocsDeploymentOrphanInventoryInputError({
               target: `${operation}:utf8`,
             }),
-          try: () => {
-            if (jsonStart === -1 || jsonEnd < jsonStart) {
-              throw new Error("JSON output was not found");
-            }
-            return new TextDecoder("utf-8", { fatal: true }).decode(
-              new TextEncoder().encode(outputText.slice(jsonStart, jsonEnd + 1))
-            );
-          },
+          try: () =>
+            new TextDecoder("utf-8", { fatal: true }).decode(
+              new TextEncoder().encode(stdoutText)
+            ),
         });
         return yield* Schema.decodeUnknownEffect(
           Schema.fromJsonString(schema),
