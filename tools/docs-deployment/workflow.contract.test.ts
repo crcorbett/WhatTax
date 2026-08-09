@@ -131,7 +131,7 @@ describe("docs deployment workflow admission", () => {
       'test "$hosted_rollback_identity" = "$(jq -er \'.rollbackRecoveryIdentity\' "$RUNNER_TEMP/docs-deployment/provider-readback.json")"'
     );
     expect(production).toContain(
-      'TAXKIT_DOCS_ROLLBACK_RECOVERY_IDENTITY="$hosted_rollback_identity" \\\n            bun apps/docs/scripts/test-cloudflare-hosted.tsx'
+      'env -u TAXKIT_DOCS_PREVIEW_PR_NUMBER \\\n            TAXKIT_DOCS_ROLLBACK_RECOVERY_IDENTITY="$hosted_rollback_identity" \\\n            bun apps/docs/scripts/test-cloudflare-hosted.tsx'
     );
     const teardown = await readWorkflow(workflowPaths.teardown);
     expect(teardown).toContain("cancel-in-progress: false");
