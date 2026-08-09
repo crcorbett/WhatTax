@@ -185,18 +185,27 @@ export const DocsDeploymentOrphanSourcesLive = Layer.effect(
               () => new DocsDeploymentOrphanInventoryReadError({ operation })
             )
           );
-        const [stdout, [exitCode]] = yield* Effect.all(
+        const [stdout, [exitCode, stderr]] = yield* Effect.all(
           [
             Stream.runCollect(handle.stdout),
-            Effect.zip(handle.exitCode, Stream.runDrain(handle.stderr), {
-              concurrent: true,
-            }),
+            Effect.all(
+              [handle.exitCode, Stream.runCollect(handle.stderr)],
+              { concurrency: "unbounded" }
+            ),
           ],
           { concurrency: "unbounded" }
         );
         if (Number(exitCode) !== 0) {
+          const stderrText = new TextDecoder().decode(
+            Uint8Array.from([...stderr].flatMap((bytes) => [...bytes]))
+          );
+          const safeFailure = stderrText.match(
+            /FAIL \[(?:inventory-input|inventory-read|inventory-disagreement)\](?: operation=([A-Za-z0-9:_-]+))?/u
+          );
           return yield* new DocsDeploymentOrphanInventoryReadError({
-            operation,
+            operation: safeFailure?.[1]
+              ? `${operation}:${safeFailure[1]}`
+              : operation,
           });
         }
         const text = yield* Effect.try({
