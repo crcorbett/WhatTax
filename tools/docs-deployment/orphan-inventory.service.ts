@@ -200,10 +200,22 @@ export const DocsDeploymentOrphanSourcesLive = Layer.effect(
         const outputText = `${stdoutText}\n${stderrText}`;
         if (Number(exitCode) !== 0) {
           const safeFailure = outputText.match(
-            /FAIL \[(inventory-input|inventory-read|inventory-disagreement)\](?: operation=([A-Za-z0-9:_-]+))?/u
+            /FAIL \[(inventory-input|inventory-read|inventory-disagreement)\](?: operation=([A-Za-z0-9:_-]+)| target=(CI=1|matching cached Cloudflare state-store credentials|cached state-store account identity))?/u
           );
+          let inputSuffix: string | undefined;
+          if (safeFailure?.[3] === "CI=1") {
+            inputSuffix = "ci";
+          } else if (
+            safeFailure?.[3] === "cached state-store account identity"
+          ) {
+            inputSuffix = "account";
+          } else if (safeFailure?.[3] !== undefined) {
+            inputSuffix = "credentials";
+          }
           const failureSuffix =
-            safeFailure?.[2] ?? safeFailure?.[1]?.replace("inventory-", "");
+            safeFailure?.[2] ??
+            inputSuffix ??
+            safeFailure?.[1]?.replace("inventory-", "");
           return yield* new DocsDeploymentOrphanInventoryReadError({
             operation: failureSuffix
               ? `${operation}:${failureSuffix}`
