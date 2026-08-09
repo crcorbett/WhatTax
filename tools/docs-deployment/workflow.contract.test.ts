@@ -95,9 +95,11 @@ describe("docs deployment workflow admission", () => {
 
   test("materializes only the bounded report-only state-read cache", async () => {
     const orphan = await readWorkflow(workflowPaths.orphan);
-    expect(orphan).toContain(
-      "ALCHEMY_STATE_STORE_CREDENTIALS_JSON: ${{ secrets.ALCHEMY_STATE_STORE_CREDENTIALS_JSON }}"
-    );
+    const stateSecretEnv = [
+      "ALCHEMY_STATE_STORE_CREDENTIALS_JSON: $",
+      "{{ secrets.ALCHEMY_STATE_STORE_CREDENTIALS_JSON }}",
+    ].join("");
+    expect(orphan).toContain(stateSecretEnv);
     expect(orphan).toContain("Materialize the reviewed state-read cache");
     expect(orphan).toContain("cloudflare-state-store");
     expect(orphan).toContain("jq -e");
