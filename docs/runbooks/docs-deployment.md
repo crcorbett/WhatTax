@@ -194,18 +194,22 @@ candidate-bound receipts. The current automation register remains
 ### Workflow proof and receipt contract
 
 The protected Preview and Production workflows build the exact candidate, run
-the existing `test:cloudflare-hosted` owner (including HTTP, browser,
+the existing `test-cloudflare-hosted.tsx` owner (including HTTP, browser,
 accessibility, console, cache/header and bounded desktop/mobile screenshot
 proof), then run `bun run check:docs-deployment-workflow-proof` against the
-sanitized provider and hosted identities. The workflow retains the raw hosted
-output separately, filters a strict Schema receipt, copies the PNG bytes into
-the artifact-owned `docs/evidence/deployments/` subtree, and recomputes each
-image digest before success. Provider readback includes the account and
-Alchemy state-store identities plus the pre-mutation version when one exists;
-the latter is required for source-bound rollback. A workflow observation is
-not a durable deployment claim until its exact candidate, run, environment,
-plan, provider, hosted, screenshot-byte and postcondition receipt is promoted
-under `docs/evidence/deployments/` and Schema-decoded by the automation owner.
+sanitized provider and hosted identities. The workflow invokes the source
+directly as `bun apps/docs/scripts/test-cloudflare-hosted.tsx` so the captured
+stdout is JSON; the package-level `bun run --filter=docs
+test:cloudflare-hosted` command remains the operator-facing local invocation.
+The workflow retains the raw hosted output separately, filters a strict Schema
+receipt, copies the PNG bytes into the artifact-owned
+`docs/evidence/deployments/` subtree, and recomputes each image digest before
+success. Provider readback includes the account and Alchemy state-store
+identities plus the pre-mutation version when one exists; the latter is
+required for source-bound rollback. A workflow observation is not a durable
+deployment claim until its exact candidate, run, environment, plan, provider,
+hosted, screenshot-byte and postcondition receipt is promoted under
+`docs/evidence/deployments/` and Schema-decoded by the automation owner.
 
 Production mutation additionally requires `accepted_preview_run_id`. That run
 must be a successful `Docs Preview Deployment` from `main` for the exact
