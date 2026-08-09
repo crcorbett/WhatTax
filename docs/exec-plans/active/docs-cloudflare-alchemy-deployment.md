@@ -1410,3 +1410,32 @@ Preview and Production now normalize only that first-create empty value to JSON
 preserved. DCD-004 remains `in_progress`, DCD-005 remains `pending`, and a
 fresh default-branch Preview deploy is required before any external-state
 promotion.
+
+### 2026-08-10 — current default-branch Preview and teardown epoch
+
+The merged default-branch candidate `d7725435443bc3dd3758221f6b2ae076cc6bc6b4`
+was planned and deployed for deterministic `pr-18`. Preview plan run
+`31331799021` was superseded by equal source-bound plan run `31332082949`,
+whose digest was `54aeb44c0d1d3e7fd1bb225c6e32a5d0b2b5afb0ae48478ec4e68cf8dbe73f80`.
+Deploy run `31332168458` passed provider/state readback, hosted HTTP/browser,
+accessibility, cache/header, console, navigation, server-function, 404 and
+desktop/mobile screenshot checks. The readback binds deployment
+`0ea77629-7fb1-4f35-a1fb-61cb65158a24`, version
+`75e388ee-4f86-4c15-bad1-548d1967f707`, prior version
+`c1a5cc09-71d2-4954-80d6-78004a955100`, stage `pr-18`, and the provider
+workers.dev URL. PNG bytes were retained in the workflow artifact and their
+desktop/mobile hashes were recomputed. The completed read-only reconciler run
+`31332273454` API-read the source run and emitted the matching workflow-run
+identity; no repository durable outer receipt has yet been promoted.
+
+Automatic teardown run `31331787598` and reviewed-main manual retries
+`31332442611` and `31332592610` retained only the pre-destroy inventory and a
+first dry-run before a non-zero Alchemy dry-run exit. No destroy was attempted;
+the `pr-18` stage and Worker remained present on the final inventory readback.
+These are failed/non-claim receipts. The teardown workflow now retries each
+dry-run at most twice after a non-zero exit, waits five seconds between bounded
+retries, retains redacted stderr/exit metadata, and still fails closed before
+destroy after a final non-zero exit. DCD-004 remains `in_progress`, DCD-005
+remains `pending`, and the next action is a fresh reviewed-main teardown run
+after this correction lands; no teardown absence claim is made from the failed
+epoch.
