@@ -53,6 +53,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
+          printf '%s' "$PR_NUMBER" | grep -Eq '^[1-9][0-9]*$'
           pr_json="$(gh api "repos/${GITHUB_REPOSITORY}/pulls/${PR_NUMBER}")"
           test "$(jq -r .base.ref <<<"$pr_json")" = "main"
           pr_state="$(jq -r .state <<<"$pr_json")"
@@ -149,6 +150,14 @@ jobs:
             > "$RUNNER_TEMP/docs-deployment/plan.json"
           echo "plan_sha256=$plan_sha256" >> "$GITHUB_OUTPUT"
 
+      - name: Schema-check initial Preview plan
+        env:
+          TAXKIT_WORKFLOW_PLAN_RECEIPT: ${{ runner.temp }}/docs-deployment/plan.json
+          TAXKIT_WORKFLOW_PLAN_CANDIDATE_COMMIT: ${{ inputs.candidate_sha }}
+          TAXKIT_WORKFLOW_PLAN_STAGE: pr-${{ inputs.pr_number }}
+          TAXKIT_WORKFLOW_PLAN_SHA256: ${{ steps.plan.outputs.plan_sha256 }}
+        run: bun run check:docs-deployment-workflow-plan
+
       - name: Replan and deploy accepted Preview candidate
         if: inputs.operation == 'deploy'
         run: |
@@ -192,6 +201,12 @@ jobs:
           test "$ACCEPTED_PLAN_SHA256" = "$replan_sha256"
           jq --arg replan "$replan_sha256" '.replanSha256=$replan' "$RUNNER_TEMP/docs-deployment/plan.json" > "$RUNNER_TEMP/docs-deployment/plan.with-replan.json"
           mv "$RUNNER_TEMP/docs-deployment/plan.with-replan.json" "$RUNNER_TEMP/docs-deployment/plan.json"
+          TAXKIT_WORKFLOW_PLAN_RECEIPT="$RUNNER_TEMP/docs-deployment/plan.json" \
+          TAXKIT_WORKFLOW_PLAN_CANDIDATE_COMMIT="$CANDIDATE_SHA" \
+          TAXKIT_WORKFLOW_PLAN_STAGE="$stage" \
+          TAXKIT_WORKFLOW_PLAN_SHA256="$ACCEPTED_PLAN_SHA256" \
+          TAXKIT_WORKFLOW_PLAN_REQUIRE_REPLAN=1 \
+            bun run check:docs-deployment-workflow-plan
           ALCHEMY_PROFILE="$ALCHEMY_PROFILE" CI=1 bun run check:docs-deployment-inventory > "$RUNNER_TEMP/docs-deployment/provider-inventory-before.json"
           stage_count_before="$(jq --arg stage "$stage" '[.stages[] | select(.stage == $stage)] | length' "$RUNNER_TEMP/docs-deployment/provider-inventory-before.json")"
           test "$stage_count_before" -eq 0 || test "$stage_count_before" -eq 1

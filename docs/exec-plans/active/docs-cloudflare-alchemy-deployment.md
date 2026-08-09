@@ -1312,3 +1312,20 @@ Schema-decoded teardown checker, and plan/provider/hosted cross-file identity
 reconciliation before external-state establishment. No current provider or
 default-branch workflow receipt is promoted by this local correction; b59e4ee
 and the branch-bound report-only receipt remain historical as recorded above.
+
+### 2026-08-10 — workflow admission correction slice
+
+The next correction adds a live Schema-decoded plan checker to Preview,
+Production and teardown before any provider mutation. Production now downloads
+and checks the canonical Preview plan/replan artifact in addition to its
+provider/hosted artifact. Established external receipts must name a strict
+Schema-decoded GitHub run readback whose path, successful conclusion, `main`
+ref/head and workflow path agree with the outer receipt; promotion also checks
+hosted environment semantics and exactly one desktop plus one mobile screenshot.
+Report-only dispatch is forced to the reviewed default branch before dependency
+installation or state-bearer materialisation, and Preview PR numbers are
+validated as positive integers before provider bootstrap. Rollback identity is
+bound to the accepted Preview provider receipt rather than caller text alone.
+DCD-004 remains `in_progress`, DCD-005 remains `pending`, and no current
+provider or default-branch receipt is established until a fresh workflow epoch
+and dated promotion satisfy these checks.

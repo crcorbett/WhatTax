@@ -218,6 +218,7 @@ describe("docs deployment automation admission", () => {
         lockfileSha256,
         nonClaims: ["This fixture is not provider proof."],
         observedAt: "2026-08-10T00:00:00Z",
+        operation: "preview-deploy",
         planPath: "docs/evidence/deployments/workflow-plan.json",
         postcondition: "provider and hosted identities agree",
         previousVersionId: null,
@@ -231,6 +232,7 @@ describe("docs deployment automation admission", () => {
         workflowPath: ".github/workflows/docs-preview.yml",
         workflowReceiptPath: "docs/evidence/deployments/workflow-preview.json",
         workflowRunId: "123",
+        workflowRunPath: "docs/evidence/deployments/workflow-run.json",
       })
     );
     const plan = await Effect.runPromise(
@@ -327,6 +329,17 @@ describe("docs deployment automation admission", () => {
         workerName: provider.workerName,
       })
     );
+    const workflowRun = {
+      conclusion: "success" as const,
+      event: "workflow_dispatch",
+      headBranch: "main" as const,
+      headSha: receipt.workflowCommit,
+      path: receipt.workflowPath,
+      ref: "refs/heads/main" as const,
+      status: "completed" as const,
+      workflowName: "Docs Preview Deployment",
+      workflowRunId: receipt.workflowRunId,
+    };
     const established = automations.map((entry) =>
       entry.id === preview.id
         ? {
@@ -343,9 +356,55 @@ describe("docs deployment automation admission", () => {
         established,
         controls,
         new Map([[preview.id, receipt]]),
-        new Map([[preview.id, { hosted, plan, provider, receipt }]])
+        new Map([
+          [preview.id, { hosted, plan, provider, receipt, workflowRun }],
+        ])
       )
     ).toEqual([]);
+
+    expect(
+      inspectDeploymentAutomationRegisters(
+        established,
+        controls,
+        new Map([[preview.id, receipt]]),
+        new Map([
+          [
+            preview.id,
+            {
+              hosted,
+              plan,
+              provider,
+              receipt,
+              workflowRun: { ...workflowRun, headSha: "d".repeat(40) },
+            },
+          ],
+        ])
+      ).map((item) => item.invariant)
+    ).toContain("external-proof");
+
+    expect(
+      inspectDeploymentAutomationRegisters(
+        established,
+        controls,
+        new Map([[preview.id, receipt]]),
+        new Map([
+          [
+            preview.id,
+            {
+              hosted: {
+                ...hosted,
+                environment: "production",
+                screenshots: [hosted.screenshots[0], hosted.screenshots[0]],
+              },
+              plan,
+              provider,
+              receipt,
+              workflowRun,
+            },
+          ],
+        ])
+      ).map((item) => item.invariant)
+    ).toContain("external-proof");
   });
 
   test("rejects additive denials and orphan ownership expansion", async () => {

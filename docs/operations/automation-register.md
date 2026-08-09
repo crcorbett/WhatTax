@@ -117,3 +117,14 @@ automation class. The report-only schedule is protected by a reviewer gate;
 until that gate is intentionally removed, scheduled inventory is manual/report
 only and must not be described as unattended detection. The orphan reader
 requests at most 1,000 pull requests and fails closed at the bound.
+
+The live workflow owners also Schema-decode the plan/replan or teardown
+projection before mutation. Production accepts both the Preview provider/
+hosted artifact and its canonical plan artifact. A future established receipt
+must name a strict workflow-run readback proving a successful `main` ref/head
+and exact workflow path; synthetic workflow IDs or branch-bound output cannot
+establish external state. Promotion checks hosted environment/stage semantics,
+one desktop and one mobile screenshot with retained bytes, positive numeric PR
+identity before Preview bootstrap, and a rollback identity sourced from the
+accepted Preview provider receipt. Report-only dispatch is rejected unless its
+ref and SHA are the reviewed default branch before bearer materialisation.

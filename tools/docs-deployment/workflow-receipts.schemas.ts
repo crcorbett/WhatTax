@@ -20,6 +20,21 @@ const ReceiptPath = Schema.String.check(
     /^docs\/evidence\/deployments\/(?!.*\.\.(?:\/|$))[A-Za-z0-9._/-]+$/u
   )
 );
+const WorkflowRunId = Schema.String.check(Schema.isPattern(/^\d+$/u));
+
+export const DeploymentWorkflowRunReadback = Schema.Struct({
+  conclusion: Schema.Literal("success"),
+  event: Schema.NonEmptyString,
+  headBranch: Schema.Literal("main"),
+  headSha: CommitSha,
+  path: Schema.NonEmptyString,
+  ref: Schema.Literal("refs/heads/main"),
+  status: Schema.Literal("completed"),
+  workflowName: Schema.NonEmptyString,
+  workflowRunId: WorkflowRunId,
+});
+export type DeploymentWorkflowRunReadback =
+  typeof DeploymentWorkflowRunReadback.Type;
 
 export const DeploymentWorkflowProviderReadback = Schema.Struct({
   acceptedPlanSha256: Sha256,
@@ -120,6 +135,13 @@ export const DeploymentWorkflowExternalReceipt = Schema.Struct({
   observedAt: Schema.String.check(
     Schema.isPattern(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/u)
   ),
+  operation: Schema.Literals([
+    "preview-deploy",
+    "production-deploy",
+    "production-rollback",
+    "preview-destroy",
+    "orphan-inventory-read",
+  ]),
   planPath: Schema.NullOr(ReceiptPath),
   postcondition: Schema.NonEmptyString,
   previousVersionId: Schema.NullOr(ProviderIdentity),
@@ -131,7 +153,8 @@ export const DeploymentWorkflowExternalReceipt = Schema.Struct({
   workflowCommit: CommitSha,
   workflowPath: Schema.NonEmptyString,
   workflowReceiptPath: ReceiptPath,
-  workflowRunId: Schema.NonEmptyString,
+  workflowRunId: WorkflowRunId,
+  workflowRunPath: ReceiptPath,
 });
 export type DeploymentWorkflowExternalReceipt =
   typeof DeploymentWorkflowExternalReceipt.Type;
@@ -144,4 +167,5 @@ export interface DeploymentWorkflowExternalEvidence {
     | DeploymentWorkflowTeardownReadback
     | null;
   readonly receipt: DeploymentWorkflowExternalReceipt;
+  readonly workflowRun: DeploymentWorkflowRunReadback | null;
 }

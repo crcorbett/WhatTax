@@ -133,6 +133,19 @@ jobs:
             '{candidate:{deploymentInputSha256:$deployment,exactCommit:$commit,lockfileSha256:$lockfile},configSha256:$config,logicalResources:[{action:$action,logicalId:"DocsBuild",resourceType:"Command.Build"},{action:$action,logicalId:"DocsWebsite",resourceType:"Cloudflare.Worker"}],redaction:{ansiRemoved:true,secretValuesIncluded:false,timestampsExcludedFromDigest:true},schemaVersion:1,stack:"TaxKitDocsCloudflare",stage:$stage}' \
             > "$RUNNER_TEMP/docs-deployment/projection.json"
           destroy_sha256="$(jq -cS . "$RUNNER_TEMP/docs-deployment/projection.json" | tr -d '\n' | shasum -a 256 | cut -d ' ' -f1)"
+          jq -nS \
+            --arg acceptedBy "$GITHUB_ACTOR" \
+            --arg acceptedPlanSha256 "$destroy_sha256" \
+            --arg observedAt "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+            --slurpfile projection "$RUNNER_TEMP/docs-deployment/projection.json" \
+            '{acceptedBy:$acceptedBy,acceptedPlanSha256:$acceptedPlanSha256,observedAt:$observedAt,operation:"preview-destroy",projection:$projection[0],receiptPath:("docs/evidence/deployments/workflow-" + env.GITHUB_RUN_ID + "/destroy-plan.json"),replanSha256:$acceptedPlanSha256,schemaVersion:1}' \
+            > "$RUNNER_TEMP/docs-deployment/destroy-plan.json"
+          TAXKIT_WORKFLOW_PLAN_RECEIPT="$RUNNER_TEMP/docs-deployment/destroy-plan.json" \
+          TAXKIT_WORKFLOW_PLAN_CANDIDATE_COMMIT="$REVIEWED_WORKFLOW_SHA" \
+          TAXKIT_WORKFLOW_PLAN_STAGE="$stage" \
+          TAXKIT_WORKFLOW_PLAN_SHA256="$destroy_sha256" \
+          TAXKIT_WORKFLOW_PLAN_REQUIRE_REPLAN=1 \
+            bun run check:docs-deployment-workflow-plan
           if [ "$resource_count" -eq 2 ]; then
             ALCHEMY_PLAIN=1 CI=1 bunx alchemy destroy --stage "$stage" --profile "$ALCHEMY_PROFILE" --yes
           fi
@@ -157,13 +170,6 @@ jobs:
           TAXKIT_WORKFLOW_CANDIDATE_COMMIT="$REVIEWED_WORKFLOW_SHA" \
           TAXKIT_WORKFLOW_STAGE="$stage" \
             bun run check:docs-deployment-workflow-teardown-proof
-          jq -nS \
-            --arg acceptedBy "$GITHUB_ACTOR" \
-            --arg acceptedPlanSha256 "$destroy_sha256" \
-            --arg observedAt "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
-            --slurpfile projection "$RUNNER_TEMP/docs-deployment/projection.json" \
-            '{acceptedBy:$acceptedBy,acceptedPlanSha256:$acceptedPlanSha256,observedAt:$observedAt,operation:"preview-destroy",projection:$projection[0],receiptPath:("docs/evidence/deployments/workflow-" + env.GITHUB_RUN_ID + "/destroy-plan.json"),replanSha256:$acceptedPlanSha256,schemaVersion:1}' \
-            > "$RUNNER_TEMP/docs-deployment/destroy-plan.json"
 
       - name: Upload sanitized Preview teardown evidence
         if: always()

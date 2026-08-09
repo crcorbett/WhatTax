@@ -310,6 +310,20 @@ plan as well as provider/hosted/teardown receipts and rejects any cross-file
 candidate, stage, plan, config, dependency, account/state, Worker, URL,
 deployment/version, rollback or screenshot-byte mismatch.
 
+The live mutation jobs invoke the same plan Schema checker before any apply or
+destroy, and Production downloads and checks the accepted Preview plan/replan
+artifact rather than trusting a caller-supplied digest. A promoted external
+receipt must also name a Schema-decoded GitHub run readback whose successful
+completed run has the exact workflow path, `refs/heads/main`, `headBranch:
+main`, and `headSha` equal to the recorded workflow commit. Promotion rejects
+hosted environment/stage mismatches and any screenshot set other than exactly
+one desktop and one mobile image. Report-only dispatch verifies the reviewed
+default branch before installing dependencies or materialising its state bearer;
+Preview validates a positive numeric PR number before provider bootstrap. A
+normal rollback binds its recovery identity to the accepted Preview provider
+receipt, making the accepted Preview target explicit rather than trusting
+caller text alone.
+
 The successor teardown runs `30896950134` (automatic PR-close) and
 `30896963746` (manual `pr-1`) passed source checkout, frozen install, browser
 setup, docs validation, exact build and equal destroy dry-runs, then stopped at
@@ -782,6 +796,12 @@ separate exact stage/Worker absence receipt; an empty action list is accepted
 only after target-specific preflight proves the stage was already absent. The
 report-only inventory remains reviewer-gated/manual and fails closed at the
 1,000-pull-request completeness bound.
+
+The initial plan, equal replan and teardown projection are Schema-decoded in
+the mutation job itself before the provider operation. Production preflight
+downloads both the Preview provider/hosted artifact and its canonical plan
+artifact, then checks their candidate, deterministic `pr-N` stage and digest
+identity before it builds or mutates fixed Production.
 
 ### `DCD-009` — authority, state, config and secrets
 

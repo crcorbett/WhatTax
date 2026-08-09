@@ -47,6 +47,7 @@ const decodingBoundaryFiles = [
   "tools/docs-deployment/automation.check.runtime.ts",
   "tools/docs-deployment/automation.policy.test.ts",
   "tools/docs-deployment/workflow-proof-check.runtime.ts",
+  "tools/docs-deployment/workflow-plan-check.runtime.ts",
   "tools/docs-deployment/workflow-teardown-proof-check.runtime.ts",
   "tools/docs-deployment/inventory.runtime.ts",
   "tools/docs-deployment/inventory.service.test.ts",
@@ -213,6 +214,7 @@ const runtimeBoundaryFiles = [
   "tools/docs-deployment/orphan-inventory.service.ts",
   "tools/docs-deployment/policy.test.ts",
   "tools/docs-deployment/workflow-proof-check.runtime.ts",
+  "tools/docs-deployment/workflow-plan-check.runtime.ts",
   "tools/docs-deployment/workflow-teardown-proof-check.runtime.ts",
 ];
 
@@ -236,6 +238,7 @@ const processBoundaryFiles = [
   "tools/docs-deployment/orphan-inventory.runtime.ts",
   "tools/docs-deployment/orphan-inventory.service.ts",
   "tools/docs-deployment/workflow-proof-check.runtime.ts",
+  "tools/docs-deployment/workflow-plan-check.runtime.ts",
   "tools/docs-deployment/workflow-teardown-proof-check.runtime.ts",
 ];
 
@@ -260,6 +263,7 @@ const consoleBoundaryFiles = [
   "tools/docs-deployment/inventory.runtime.ts",
   "tools/docs-deployment/orphan-inventory.runtime.ts",
   "tools/docs-deployment/workflow-proof-check.runtime.ts",
+  "tools/docs-deployment/workflow-plan-check.runtime.ts",
   "tools/docs-deployment/workflow-teardown-proof-check.runtime.ts",
 ];
 
@@ -287,6 +291,7 @@ const bunAdapterFiles = [
   "tools/docs-deployment/inventory.runtime.ts",
   "tools/docs-deployment/orphan-inventory.runtime.ts",
   "tools/docs-deployment/workflow-proof-check.runtime.ts",
+  "tools/docs-deployment/workflow-plan-check.runtime.ts",
   "tools/docs-deployment/workflow-teardown-proof-check.runtime.ts",
 ];
 
@@ -312,6 +317,7 @@ const bunRuntimeEntrypointFiles = [
   "tools/docs-deployment/inventory.runtime.ts",
   "tools/docs-deployment/orphan-inventory.runtime.ts",
   "tools/docs-deployment/workflow-proof-check.runtime.ts",
+  "tools/docs-deployment/workflow-plan-check.runtime.ts",
   "tools/docs-deployment/workflow-teardown-proof-check.runtime.ts",
 ];
 

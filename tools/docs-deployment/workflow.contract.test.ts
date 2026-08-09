@@ -84,6 +84,7 @@ describe("docs deployment workflow admission", () => {
       expect(source).toContain("wrangler deployments list");
       expect(source).toContain("test:cloudflare-hosted");
       expect(source).toContain("check:docs-deployment-workflow-proof");
+      expect(source).toContain("check:docs-deployment-workflow-plan");
       expect(source).toContain("TAXKIT_DOCS_CANDIDATE_COMMIT");
       expect(source).toContain("hosted-proof.raw.json");
       expect(source).toContain("hosted-proof.json");
@@ -110,6 +111,8 @@ describe("docs deployment workflow admission", () => {
     expect(teardown).toContain("check:docs-deployment-workflow-teardown-proof");
     const orphan = await readWorkflow(workflowPaths.orphan);
     expect(orphan).toContain("cancel-in-progress: true");
+    expect(orphan).toContain('test "$GITHUB_REF" = "refs/heads/main"');
+    expect(orphan).toContain('test "$GITHUB_REF_NAME" = "main"');
     expect(orphan).toContain("CLOUDFLARE_READ_API_TOKEN");
     expect(orphan).not.toContain("alchemy deploy");
     expect(orphan).not.toContain("alchemy destroy");
@@ -124,6 +127,12 @@ describe("docs deployment workflow admission", () => {
     expect(orphan).toContain(stateSecretEnv);
     expect(orphan).toContain("Materialize the reviewed state-read cache");
     expect(orphan).toContain("cloudflare-state-store.json");
+    expect(orphan).not.toContain(
+      [
+        "    env:\n      ALCHEMY_STATE_STORE_CREDENTIALS_JSON: $",
+        "{{ secrets.ALCHEMY_STATE_STORE_CREDENTIALS_JSON }}",
+      ].join("")
+    );
     expect(orphan).toContain("jq -e");
     expect(orphan).not.toContain("alchemy login");
     expect(orphan).not.toContain("alchemy cloudflare bootstrap");
@@ -173,5 +182,11 @@ describe("docs deployment workflow admission", () => {
     expect(production).toContain("gh run download");
     expect(production).toContain("check:docs-deployment-workflow-proof");
     expect(production).toContain("accepted_preview_readback");
+    expect(production).toContain(
+      "taxkit-docs-preview-$ACCEPTED_PREVIEW_RUN_ID"
+    );
+    expect(production).toContain("accepted_preview_plan");
+    expect(production).toContain("accepted_preview_recovery_identity");
+    expect(production).toContain("TAXKIT_WORKFLOW_PLAN_REQUIRE_REPLAN=1");
   });
 });

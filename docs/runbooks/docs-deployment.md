@@ -571,6 +571,17 @@ Before marking its `externalState` as `established`, require all of:
 6. state/provider and hosted postcondition readback; and
 7. a retained dated receipt named in `externalState.receipt`.
 
+The receipt must also name a Schema-decoded workflow-run readback under the
+owned evidence route. That readback must show the exact workflow path, a
+successful completed run, `refs/heads/main`, `headBranch: main`, and a head SHA
+equal to the workflow commit recorded by the outer receipt. Promotion rejects
+branch-only or synthetic run metadata. The named plan receipt is decoded and
+its projection digest, candidate, stage and equal-replan identity are checked
+before any Production acceptance or mutation. Hosted promotion additionally
+requires `preview` with `pr-N` for Preview, `production` or `rollback` with
+`prod` for Production, and exactly one desktop plus one mobile screenshot whose
+retained PNG bytes hash to the manifest.
+
 The current register intentionally records all four entries as
 `not-established` until each record's complete receipt contract is satisfied.
 The 2026-08-04 capability receipt records the exact protected environment
@@ -613,6 +624,15 @@ state/provider/URL absence. Scheduled orphan inventory is report-only: it may
 compare open pull requests, exact TaxKit stages and exact TaxKit Workers, but
 has no provider-write, state-write or automatic-deletion authority. An
 incomplete inventory is an inconclusive report, not destroy permission.
+
+The report-only workflow is permitted to materialise its read-only state bearer
+only after it verifies `refs/heads/main`, `GITHUB_REF_NAME=main`, and that
+`GITHUB_SHA` equals the live default-branch ref. Manual dispatch on another
+branch is rejected before dependency installation or secret use. Preview and
+teardown reject a non-positive or non-numeric PR number before Alchemy cache
+bootstrap. A normal rollback must use the accepted Preview provider receipt's
+source-bound recovery identity; a caller-supplied identity or expected version
+alone is not a last-known-good proof.
 
 The exact authorized operator invocation is:
 
