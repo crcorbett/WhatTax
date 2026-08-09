@@ -310,14 +310,21 @@ plan as well as provider/hosted/teardown receipts and rejects any cross-file
 candidate, stage, plan, config, dependency, account/state, Worker, URL,
 deployment/version, rollback or screenshot-byte mismatch.
 
-The live mutation jobs invoke the same plan Schema checker before any apply or
-destroy, and Production downloads and checks the accepted Preview plan/replan
+The live mutation jobs invoke the same operation-bound plan Schema checker
+before any apply or destroy. Plan-only receipts use `preview-plan` or
+`production-plan`; a mutating equal-replan receipt switches to
+`preview-equal-replan` or `production-equal-replan` before apply. Production
+downloads and checks the accepted Preview plan/replan
 artifact rather than trusting a caller-supplied digest. A promoted external
 receipt must also name a Schema-decoded GitHub run readback whose successful
-completed run has the exact workflow path, `refs/heads/main`, `headBranch:
-main`, and `headSha` equal to the recorded workflow commit. Promotion rejects
-hosted environment/stage mismatches and any screenshot set other than exactly
-one desktop and one mobile image. Report-only dispatch verifies the reviewed
+completed run has the expected workflow name, exact workflow path,
+`refs/heads/main`, `headBranch: main`, and `headSha` equal to the recorded
+workflow source commit. The readback records the exact deployment candidate
+input separately, and that input must equal the outer receipt's candidate; a
+default-branch run may build a reviewed PR head, so the two identities are
+intentionally distinct. Promotion rejects hosted environment/stage mismatches
+and any screenshot set other than exactly one desktop and one mobile image.
+Report-only dispatch verifies the reviewed
 default branch before installing dependencies or materialising its state bearer;
 Preview validates a positive numeric PR number before provider bootstrap. A
 normal rollback binds its recovery identity to the accepted Preview provider

@@ -240,7 +240,7 @@ describe("docs deployment automation admission", () => {
         acceptedBy: "Cooper",
         acceptedPlanSha256: receipt.acceptedPlanSha256,
         observedAt: "2026-08-10T00:00:00Z",
-        operation: "preview-plan",
+        operation: "preview-equal-replan",
         projection: {
           candidate: {
             deploymentInputSha256,
@@ -330,6 +330,7 @@ describe("docs deployment automation admission", () => {
       })
     );
     const workflowRun = {
+      candidateCommit: receipt.candidateCommit,
       conclusion: "success" as const,
       event: "workflow_dispatch",
       headBranch: "main" as const,
@@ -376,6 +377,29 @@ describe("docs deployment automation admission", () => {
               provider,
               receipt,
               workflowRun: { ...workflowRun, headSha: "d".repeat(40) },
+            },
+          ],
+        ])
+      ).map((item) => item.invariant)
+    ).toContain("external-proof");
+
+    expect(
+      inspectDeploymentAutomationRegisters(
+        established,
+        controls,
+        new Map([[preview.id, receipt]]),
+        new Map([
+          [
+            preview.id,
+            {
+              hosted,
+              plan,
+              provider,
+              receipt,
+              workflowRun: {
+                ...workflowRun,
+                candidateCommit: "d".repeat(40),
+              },
             },
           ],
         ])

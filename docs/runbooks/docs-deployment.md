@@ -572,11 +572,15 @@ Before marking its `externalState` as `established`, require all of:
 7. a retained dated receipt named in `externalState.receipt`.
 
 The receipt must also name a Schema-decoded workflow-run readback under the
-owned evidence route. That readback must show the exact workflow path, a
-successful completed run, `refs/heads/main`, `headBranch: main`, and a head SHA
-equal to the workflow commit recorded by the outer receipt. Promotion rejects
-branch-only or synthetic run metadata. The named plan receipt is decoded and
-its projection digest, candidate, stage and equal-replan identity are checked
+owned evidence route. That readback must show the expected workflow name,
+exact workflow path, a successful completed run, `refs/heads/main`,
+`headBranch: main`, and a head SHA equal to the workflow source commit recorded
+by the outer receipt. It records the exact deployment candidate input
+separately, and that input must equal the outer receipt's candidate. The source
+head and candidate are intentionally distinct when a reviewed default-branch
+workflow builds a PR head. Promotion rejects branch-only or synthetic run
+metadata. The named plan receipt is decoded and its operation, projection
+digest, candidate, stage and equal-replan identity are checked
 before any Production acceptance or mutation. Hosted promotion additionally
 requires `preview` with `pr-N` for Preview, `production` or `rollback` with
 `prod` for Production, and exactly one desktop plus one mobile screenshot whose

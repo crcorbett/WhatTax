@@ -145,6 +145,7 @@ jobs:
       - name: Schema-check accepted Preview plan
         env:
           TAXKIT_WORKFLOW_PLAN_CANDIDATE_COMMIT: ${{ inputs.candidate_sha }}
+          TAXKIT_WORKFLOW_PLAN_OPERATION: preview-equal-replan
           TAXKIT_WORKFLOW_PLAN_STAGE: pr-${{ inputs.accepted_preview_pr_number }}
           TAXKIT_WORKFLOW_PLAN_SHA256: ${{ inputs.accepted_preview_plan_sha256 }}
           TAXKIT_WORKFLOW_PLAN_REQUIRE_REPLAN: "1"
@@ -214,6 +215,7 @@ jobs:
         env:
           TAXKIT_WORKFLOW_PLAN_RECEIPT: ${{ runner.temp }}/docs-deployment/plan.json
           TAXKIT_WORKFLOW_PLAN_CANDIDATE_COMMIT: ${{ inputs.candidate_sha }}
+          TAXKIT_WORKFLOW_PLAN_OPERATION: production-plan
           TAXKIT_WORKFLOW_PLAN_STAGE: prod
           TAXKIT_WORKFLOW_PLAN_SHA256: ${{ steps.plan.outputs.plan_sha256 }}
         run: bun run check:docs-deployment-workflow-plan
@@ -252,10 +254,11 @@ jobs:
             > "$RUNNER_TEMP/docs-deployment/replan-projection.json"
           replan_sha256="$(jq -cS . "$RUNNER_TEMP/docs-deployment/replan-projection.json" | tr -d '\n' | shasum -a 256 | cut -d ' ' -f1)"
           test "$ACCEPTED_PLAN_SHA256" = "$replan_sha256"
-          jq --arg replan "$replan_sha256" '.replanSha256=$replan' "$RUNNER_TEMP/docs-deployment/plan.json" > "$RUNNER_TEMP/docs-deployment/plan.with-replan.json"
+          jq --arg replan "$replan_sha256" '.operation="production-equal-replan" | .replanSha256=$replan' "$RUNNER_TEMP/docs-deployment/plan.json" > "$RUNNER_TEMP/docs-deployment/plan.with-replan.json"
           mv "$RUNNER_TEMP/docs-deployment/plan.with-replan.json" "$RUNNER_TEMP/docs-deployment/plan.json"
           TAXKIT_WORKFLOW_PLAN_RECEIPT="$RUNNER_TEMP/docs-deployment/plan.json" \
           TAXKIT_WORKFLOW_PLAN_CANDIDATE_COMMIT="$CANDIDATE_SHA" \
+          TAXKIT_WORKFLOW_PLAN_OPERATION=production-equal-replan \
           TAXKIT_WORKFLOW_PLAN_STAGE=prod \
           TAXKIT_WORKFLOW_PLAN_SHA256="$ACCEPTED_PLAN_SHA256" \
           TAXKIT_WORKFLOW_PLAN_REQUIRE_REPLAN=1 \

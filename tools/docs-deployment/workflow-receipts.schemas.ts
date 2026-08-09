@@ -23,6 +23,7 @@ const ReceiptPath = Schema.String.check(
 const WorkflowRunId = Schema.String.check(Schema.isPattern(/^\d+$/u));
 
 export const DeploymentWorkflowRunReadback = Schema.Struct({
+  candidateCommit: CommitSha,
   conclusion: Schema.Literal("success"),
   event: Schema.NonEmptyString,
   headBranch: Schema.Literal("main"),

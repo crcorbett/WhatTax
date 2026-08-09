@@ -26,12 +26,14 @@ const program = Effect.gen(function* workflowProofCheck() {
     return yield* Effect.fail("workflow proof inputs are incomplete");
   }
   const provider = yield* Schema.decodeUnknownEffect(
-    DeploymentWorkflowProviderReadback
+    DeploymentWorkflowProviderReadback,
+    { onExcessProperty: "error" }
   )(yield* Effect.promise(() => readJson(providerPath))).pipe(
     Effect.mapError(() => "provider readback failed Schema decoding")
   );
   const hosted = yield* Schema.decodeUnknownEffect(
-    DeploymentWorkflowHostedProbe
+    DeploymentWorkflowHostedProbe,
+    { onExcessProperty: "error" }
   )(yield* Effect.promise(() => readJson(hostedPath))).pipe(
     Effect.mapError(() => "hosted probe failed Schema decoding")
   );

@@ -121,9 +121,12 @@ requests at most 1,000 pull requests and fails closed at the bound.
 The live workflow owners also Schema-decode the plan/replan or teardown
 projection before mutation. Production accepts both the Preview provider/
 hosted artifact and its canonical plan artifact. A future established receipt
-must name a strict workflow-run readback proving a successful `main` ref/head
-and exact workflow path; synthetic workflow IDs or branch-bound output cannot
-establish external state. Promotion checks hosted environment/stage semantics,
+must name a strict workflow-run readback proving the expected workflow name, a
+successful `main` ref/head and exact workflow path. The readback records both
+the workflow source head and exact deployment candidate input: the source head
+must match the outer workflow commit and the candidate input must match the
+outer candidate. Synthetic workflow IDs or branch-bound output cannot establish
+external state. Promotion checks hosted environment/stage semantics,
 one desktop and one mobile screenshot with retained bytes, positive numeric PR
 identity before Preview bootstrap, and a rollback identity sourced from the
 accepted Preview provider receipt. Report-only dispatch is rejected unless its

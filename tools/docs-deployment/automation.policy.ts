@@ -247,6 +247,14 @@ export const inspectDeploymentAutomationRegisters = (
           "docs-production-delivery": ".github/workflows/docs-production.yml",
         } as const
       )[automation.id];
+      const workflowName = (
+        {
+          "docs-orphan-inventory": "Docs Orphan Inventory (Report Only)",
+          "docs-preview-delivery": "Docs Preview Deployment",
+          "docs-preview-teardown": "Docs Preview Teardown",
+          "docs-production-delivery": "Docs Production Deployment",
+        } as const
+      )[automation.id];
       let operationMismatch = receipt === undefined;
       if (!operationMismatch && receipt !== undefined) {
         if (automation.id === "docs-production-delivery") {
@@ -302,10 +310,17 @@ export const inspectDeploymentAutomationRegisters = (
             : workflowProvider.stage !==
               `pr-${workflowProvider.previewPrNumber}`);
       }
+      let expectedPlanOperation = "production-equal-replan";
+      if (receipt?.operation === "preview-deploy") {
+        expectedPlanOperation = "preview-equal-replan";
+      } else if (receipt?.operation === "preview-destroy") {
+        expectedPlanOperation = "preview-destroy";
+      }
       const planMismatch = isOrphan
         ? plan !== null
         : plan === null ||
           receipt === undefined ||
+          plan.operation !== expectedPlanOperation ||
           plan.acceptedPlanSha256 !== receipt.acceptedPlanSha256 ||
           plan.projection.candidate.exactCommit !== receipt.candidateCommit ||
           plan.projection.stage !== receipt.stage ||
@@ -374,8 +389,10 @@ export const inspectDeploymentAutomationRegisters = (
         }
         workflowRunMismatch =
           workflowRun.workflowRunId !== receipt.workflowRunId ||
+          workflowRun.candidateCommit !== receipt.candidateCommit ||
           workflowRun.headSha !== receipt.workflowCommit ||
           workflowRun.path !== receipt.workflowPath ||
+          workflowRun.workflowName !== workflowName ||
           workflowRun.headBranch !== "main" ||
           workflowRun.ref !== "refs/heads/main" ||
           workflowRun.status !== "completed" ||

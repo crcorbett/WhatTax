@@ -212,11 +212,17 @@ their digests are recomputed. Production consumes a successful,
 Schema-decoded Preview workflow receipt, exact workflow path and deterministic
 `pr-N` binding rather than trusting caller-supplied source or plan fields.
 The mutation jobs Schema-decode the initial plan, equal replan and teardown
-projection before apply/destroy; Production also downloads and checks the
+projection, including the operation (`preview-plan`, `preview-equal-replan`,
+`production-plan`, `production-equal-replan` or `preview-destroy`), before
+apply/destroy; Production also downloads and checks the
 accepted Preview plan artifact. A promoted external receipt must carry a
-Schema-decoded successful `main` workflow-run readback whose path/ref/head
-matches its workflow commit, and its hosted receipt must match stage semantics
-with exactly one desktop and one mobile screenshot. Report-only dispatch is
+Schema-decoded successful `main` workflow-run readback whose expected workflow
+name and path/ref/head match its workflow source commit. The readback records
+the exact deployment candidate input separately, and that input must match the
+outer receipt's candidate: a default-branch run may build a reviewed PR head,
+so these two identities are intentionally distinct. The hosted receipt must
+match stage semantics with exactly one desktop and one mobile screenshot.
+Report-only dispatch is
 forced to the reviewed default branch before installing dependencies or
 materialising the state bearer, while Preview rejects non-numeric PR identity
 before provider bootstrap. Rollback recovery identity is bound to the accepted

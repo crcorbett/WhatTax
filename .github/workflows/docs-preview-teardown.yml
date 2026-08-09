@@ -42,7 +42,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          test "$PR_NUMBER" -gt 0
+          printf '%s' "$PR_NUMBER" | grep -Eq '^[1-9][0-9]*$'
           pr_json="$(gh api "repos/${GITHUB_REPOSITORY}/pulls/${PR_NUMBER}")"
           test "$(jq -r .state <<<"$pr_json")" = "closed"
           test "$(jq -r .base.ref <<<"$pr_json")" = "main"
@@ -142,6 +142,7 @@ jobs:
             > "$RUNNER_TEMP/docs-deployment/destroy-plan.json"
           TAXKIT_WORKFLOW_PLAN_RECEIPT="$RUNNER_TEMP/docs-deployment/destroy-plan.json" \
           TAXKIT_WORKFLOW_PLAN_CANDIDATE_COMMIT="$REVIEWED_WORKFLOW_SHA" \
+          TAXKIT_WORKFLOW_PLAN_OPERATION=preview-destroy \
           TAXKIT_WORKFLOW_PLAN_STAGE="$stage" \
           TAXKIT_WORKFLOW_PLAN_SHA256="$destroy_sha256" \
           TAXKIT_WORKFLOW_PLAN_REQUIRE_REPLAN=1 \

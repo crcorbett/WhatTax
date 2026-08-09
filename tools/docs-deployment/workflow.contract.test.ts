@@ -85,6 +85,7 @@ describe("docs deployment workflow admission", () => {
       expect(source).toContain("test:cloudflare-hosted");
       expect(source).toContain("check:docs-deployment-workflow-proof");
       expect(source).toContain("check:docs-deployment-workflow-plan");
+      expect(source).toContain("TAXKIT_WORKFLOW_PLAN_OPERATION");
       expect(source).toContain("TAXKIT_DOCS_CANDIDATE_COMMIT");
       expect(source).toContain("hosted-proof.raw.json");
       expect(source).toContain("hosted-proof.json");
@@ -107,8 +108,12 @@ describe("docs deployment workflow admission", () => {
     expect(teardown).toContain("providerWorkerAbsent:true");
     expect(teardown).toContain("pulls/");
     expect(teardown).toContain('= "closed"');
+    expect(teardown).toContain("grep -Eq '^[1-9][0-9]*$'");
     expect(teardown).toContain("(create|update|delete|noop)");
     expect(teardown).toContain("check:docs-deployment-workflow-teardown-proof");
+    expect(teardown).toContain(
+      "TAXKIT_WORKFLOW_PLAN_OPERATION=preview-destroy"
+    );
     const orphan = await readWorkflow(workflowPaths.orphan);
     expect(orphan).toContain("cancel-in-progress: true");
     expect(orphan).toContain('test "$GITHUB_REF" = "refs/heads/main"');
@@ -188,5 +193,8 @@ describe("docs deployment workflow admission", () => {
     expect(production).toContain("accepted_preview_plan");
     expect(production).toContain("accepted_preview_recovery_identity");
     expect(production).toContain("TAXKIT_WORKFLOW_PLAN_REQUIRE_REPLAN=1");
+    expect(production).toContain(
+      "TAXKIT_WORKFLOW_PLAN_OPERATION: preview-equal-replan"
+    );
   });
 });

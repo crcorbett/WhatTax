@@ -154,6 +154,7 @@ jobs:
         env:
           TAXKIT_WORKFLOW_PLAN_RECEIPT: ${{ runner.temp }}/docs-deployment/plan.json
           TAXKIT_WORKFLOW_PLAN_CANDIDATE_COMMIT: ${{ inputs.candidate_sha }}
+          TAXKIT_WORKFLOW_PLAN_OPERATION: preview-plan
           TAXKIT_WORKFLOW_PLAN_STAGE: pr-${{ inputs.pr_number }}
           TAXKIT_WORKFLOW_PLAN_SHA256: ${{ steps.plan.outputs.plan_sha256 }}
         run: bun run check:docs-deployment-workflow-plan
@@ -199,10 +200,11 @@ jobs:
           find "$RUNNER_TEMP/docs-deployment" -maxdepth 1 -type f -print | LC_ALL=C sort
           test "$ACCEPTED_PLAN_SHA256" = "${{ steps.plan.outputs.plan_sha256 }}"
           test "$ACCEPTED_PLAN_SHA256" = "$replan_sha256"
-          jq --arg replan "$replan_sha256" '.replanSha256=$replan' "$RUNNER_TEMP/docs-deployment/plan.json" > "$RUNNER_TEMP/docs-deployment/plan.with-replan.json"
+          jq --arg replan "$replan_sha256" '.operation="preview-equal-replan" | .replanSha256=$replan' "$RUNNER_TEMP/docs-deployment/plan.json" > "$RUNNER_TEMP/docs-deployment/plan.with-replan.json"
           mv "$RUNNER_TEMP/docs-deployment/plan.with-replan.json" "$RUNNER_TEMP/docs-deployment/plan.json"
           TAXKIT_WORKFLOW_PLAN_RECEIPT="$RUNNER_TEMP/docs-deployment/plan.json" \
           TAXKIT_WORKFLOW_PLAN_CANDIDATE_COMMIT="$CANDIDATE_SHA" \
+          TAXKIT_WORKFLOW_PLAN_OPERATION=preview-equal-replan \
           TAXKIT_WORKFLOW_PLAN_STAGE="$stage" \
           TAXKIT_WORKFLOW_PLAN_SHA256="$ACCEPTED_PLAN_SHA256" \
           TAXKIT_WORKFLOW_PLAN_REQUIRE_REPLAN=1 \

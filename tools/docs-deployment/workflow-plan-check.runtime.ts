@@ -5,6 +5,7 @@ import { DeploymentPlanReceipt } from "./schemas.js";
 const program = Effect.gen(function* workflowPlanCheck() {
   const planPath = process.env["TAXKIT_WORKFLOW_PLAN_RECEIPT"];
   const candidateCommit = process.env["TAXKIT_WORKFLOW_PLAN_CANDIDATE_COMMIT"];
+  const operation = process.env["TAXKIT_WORKFLOW_PLAN_OPERATION"];
   const stage = process.env["TAXKIT_WORKFLOW_PLAN_STAGE"];
   const acceptedPlanSha256 = process.env["TAXKIT_WORKFLOW_PLAN_SHA256"];
   const requireReplan =
@@ -12,14 +13,17 @@ const program = Effect.gen(function* workflowPlanCheck() {
   if (
     planPath === undefined ||
     candidateCommit === undefined ||
+    operation === undefined ||
     stage === undefined ||
     acceptedPlanSha256 === undefined
   ) {
     return yield* Effect.fail("workflow plan inputs are incomplete");
   }
-  const plan = yield* Schema.decodeUnknownEffect(DeploymentPlanReceipt)(
-    yield* Effect.promise(() => Bun.file(planPath).json())
-  ).pipe(Effect.mapError(() => "workflow plan failed Schema decoding"));
+  const plan = yield* Schema.decodeUnknownEffect(DeploymentPlanReceipt, {
+    onExcessProperty: "error",
+  })(yield* Effect.promise(() => Bun.file(planPath).json())).pipe(
+    Effect.mapError(() => "workflow plan failed Schema decoding")
+  );
   const { projection } = plan;
   const canonicalProjection = {
     candidate: {
@@ -39,6 +43,7 @@ const program = Effect.gen(function* workflowPlanCheck() {
     .digest("hex");
   if (
     plan.acceptedPlanSha256 !== acceptedPlanSha256 ||
+    plan.operation !== operation ||
     projectionDigest !== acceptedPlanSha256 ||
     plan.projection.candidate.exactCommit !== candidateCommit ||
     plan.projection.stage !== stage ||
@@ -50,7 +55,7 @@ const program = Effect.gen(function* workflowPlanCheck() {
   }
   yield* Effect.sync(() =>
     console.log(
-      `Docs deployment workflow plan: candidate=${candidateCommit}; stage=${stage}; digest=${acceptedPlanSha256}; schema=1; equalReplan=${plan.replanSha256 !== null}.`
+      `Docs deployment workflow plan: operation=${operation}; candidate=${candidateCommit}; stage=${stage}; digest=${acceptedPlanSha256}; schema=1; equalReplan=${plan.replanSha256 !== null}.`
     )
   );
 });

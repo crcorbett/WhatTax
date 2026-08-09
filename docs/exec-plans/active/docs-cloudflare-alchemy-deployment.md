@@ -1315,13 +1315,15 @@ and the branch-bound report-only receipt remain historical as recorded above.
 
 ### 2026-08-10 — workflow admission correction slice
 
-The next correction adds a live Schema-decoded plan checker to Preview,
+The next correction adds a live operation-bound Schema-decoded plan checker to Preview,
 Production and teardown before any provider mutation. Production now downloads
 and checks the canonical Preview plan/replan artifact in addition to its
 provider/hosted artifact. Established external receipts must name a strict
-Schema-decoded GitHub run readback whose path, successful conclusion, `main`
-ref/head and workflow path agree with the outer receipt; promotion also checks
-hosted environment semantics and exactly one desktop plus one mobile screenshot.
+Schema-decoded GitHub run readback whose expected workflow name, path,
+successful conclusion and `main` ref/head agree with the outer workflow source
+commit, while its separately recorded candidate input agrees with the outer
+candidate. Promotion also checks hosted environment semantics and exactly one
+desktop plus one mobile screenshot.
 Report-only dispatch is forced to the reviewed default branch before dependency
 installation or state-bearer materialisation, and Preview PR numbers are
 validated as positive integers before provider bootstrap. Rollback identity is
