@@ -316,13 +316,14 @@ operation-bound plan Schema checker before any apply or destroy. Plan-only recei
 `preview-equal-replan` or `production-equal-replan` before apply. Production
 downloads and checks the accepted Preview plan/replan
 artifact rather than trusting a caller-supplied digest. A promoted external
-receipt must also name a Schema-decoded GitHub run readback whose successful
-completed run has the expected workflow name, exact workflow path,
+receipt must also name Schema-decoded GitHub run and workflow-input readbacks
+whose successful completed run has the expected workflow name, exact workflow path,
 `refs/heads/main`, `headBranch: main`, and `headSha` equal to the recorded
-workflow source commit. The readback records the exact deployment candidate
-input separately, and that input must equal the outer receipt's candidate; a
-default-branch run may build a reviewed PR head, so the two identities are
-intentionally distinct. Promotion rejects hosted environment/stage mismatches
+workflow source commit. The workflow-input readback binds the same run/path,
+source commit, operation and exact deployment candidate input; that input must
+equal the outer receipt's candidate. A default-branch run may build a reviewed
+PR head, so the two identities are intentionally distinct. Promotion rejects
+hosted environment/stage mismatches
 and any screenshot set other than exactly one desktop and one mobile image.
 Report-only dispatch verifies the reviewed
 default branch before installing dependencies or materialising its state bearer;
@@ -805,7 +806,9 @@ report-only inventory remains reviewer-gated/manual and fails closed at the
 1,000-pull-request completeness bound. A future positive report-only admission
 must name a dedicated `reportPath` decoded as
 `DocsDeploymentOrphanInventoryReceipt`; the mutation provider-readback path is
-not a substitute for that state/provider report.
+not a substitute for that state/provider report. Its current GitHub source must
+be the 1,000-row `isDraft`-aware command and remain below the completeness
+bound; the historical 100-row report remains immutable evidence only.
 
 The initial plan, equal replan and teardown projection are Schema-decoded in
 the mutation job itself before the provider operation. Production preflight
@@ -824,7 +827,8 @@ authority envelopes for:
 - Preview plan/deploy/readback;
 - Preview destroy;
 - Production plan/deploy/readback;
-- normal rollback;
+- normal rollback, admitted as a separate `production-rollback` operation on
+  the same protected Production principal and stage lock;
 - break-glass version rollback; and
 - Alchemy reconciliation.
 

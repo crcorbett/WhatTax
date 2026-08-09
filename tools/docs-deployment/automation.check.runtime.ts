@@ -17,6 +17,7 @@ import { DeploymentPlanReceipt } from "./schemas.js";
 import {
   DeploymentWorkflowExternalReceipt,
   DeploymentWorkflowHostedProbe,
+  DeploymentWorkflowInputReadback,
   DeploymentWorkflowProviderReadback,
   DeploymentWorkflowRunReadback,
   DeploymentWorkflowTeardownReadback,
@@ -152,6 +153,11 @@ export const checkDocsDeploymentAutomation = (repositoryRoot: string) =>
           receipt.workflowRunPath,
           DeploymentWorkflowRunReadback
         );
+        const workflowInput = yield* readJson(
+          repositoryRoot,
+          receipt.workflowInputPath,
+          DeploymentWorkflowInputReadback
+        );
         externalReceipts.set(automation.id, receipt);
         externalEvidence.set(automation.id, {
           hosted,
@@ -159,6 +165,7 @@ export const checkDocsDeploymentAutomation = (repositoryRoot: string) =>
           plan,
           provider,
           receipt,
+          workflowInput,
           workflowRun,
         });
       }

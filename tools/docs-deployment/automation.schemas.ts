@@ -10,6 +10,7 @@ const AutomationId = Schema.Literals([
 const MutationOperation = Schema.Literals([
   "preview-deploy",
   "production-deploy",
+  "production-rollback",
   "preview-destroy",
 ]);
 
@@ -19,6 +20,12 @@ const EnvironmentId = Schema.Literals([
   "taxkit-docs-preview-teardown",
   "github-actions-report-only",
 ]);
+
+const ReceiptPath = Schema.String.check(
+  Schema.isPattern(
+    /^docs\/evidence\/deployments\/(?!.*\.\.(?:\/|$))[A-Za-z0-9._/-]+$/u
+  )
+);
 
 const AutomationAuthority = Schema.Struct({
   credentialIdentities: Schema.Array(Schema.NonEmptyString),
@@ -66,7 +73,7 @@ const AutomationFailure = Schema.Struct({
 });
 
 const AutomationExternalState = Schema.Struct({
-  receipt: Schema.NullOr(Schema.NonEmptyString),
+  receipt: Schema.NullOr(ReceiptPath),
   status: Schema.Literals(["not-established", "established"]),
 });
 

@@ -5,12 +5,14 @@ import type {
   DeploymentControl,
 } from "./automation.schemas.js";
 import { DeploymentAutomationFinding } from "./automation.schemas.js";
+import { docsDeploymentOpenPullRequestsCommand } from "./orphan-inventory.schemas.js";
 import { inspectDocsDeploymentOrphanInventoryReceipt } from "./orphan-inventory.service.js";
 import { inspectDeploymentPlanReceipt } from "./policy.js";
 import type {
   DeploymentWorkflowExternalEvidence,
   DeploymentWorkflowExternalReceipt,
   DeploymentWorkflowProviderReadback,
+  DeploymentWorkflowInputReadback,
   DeploymentWorkflowRunReadback,
   DeploymentWorkflowTeardownReadback,
 } from "./workflow-receipts.schemas.js";
@@ -131,7 +133,12 @@ const inspectMutation = (
     automation.lock.group === expected.group,
     automation.lock.scope === "stage",
     automation.lock.cancelInProgress === false,
-    hasExactStrings(automation.authority.operations, [expected.operation]),
+    hasExactStrings(
+      automation.authority.operations,
+      automation.id === "docs-production-delivery"
+        ? ["production-deploy", "production-rollback"]
+        : [expected.operation]
+    ),
   ].every(Boolean);
   const findings = lockMismatch
     ? [
@@ -228,6 +235,20 @@ export const inspectDeploymentAutomationRegisters = (
   }
   for (const automation of automations) {
     findings.push(...inspectMutation(automation));
+    if (
+      (automation.externalState.status === "not-established" &&
+        automation.externalState.receipt !== null) ||
+      (automation.externalState.status === "established" &&
+        automation.externalState.receipt === null)
+    ) {
+      findings.push(
+        finding(
+          "external-proof",
+          `tools/docs-deployment/automation-register.json:${automation.id}.externalState`,
+          "Keep a non-established entry receipt-free, or establish it only with a named decoded workflow receipt."
+        )
+      );
+    }
     if (automation.externalState.status === "established") {
       const receipt =
         automation.externalState.receipt === null
@@ -240,6 +261,8 @@ export const inspectDeploymentAutomationRegisters = (
       const hosted = evidence?.hosted ?? null;
       const workflowRun: DeploymentWorkflowRunReadback | null =
         evidence?.workflowRun ?? null;
+      const workflowInput: DeploymentWorkflowInputReadback | null =
+        evidence?.workflowInput ?? null;
       const workflowPath = (
         {
           "docs-orphan-inventory":
@@ -293,6 +316,14 @@ export const inspectDeploymentAutomationRegisters = (
           orphanReport.repository !== "crcorbett/taxkit" ||
           orphanReport.mutationCapability !== "none" ||
           orphanReport.automaticDeletion !== "prohibited" ||
+          orphanReport.sources.github.command !==
+            docsDeploymentOpenPullRequestsCommand ||
+          orphanReport.sources.github.openPullRequests.length >= 1000 ||
+          orphanReport.previewStages.some(
+            (entry) =>
+              entry.classification === "active-trusted-preview" &&
+              entry.pullRequest?.isDraft !== true
+          ) ||
           orphanReport.sources.deploymentInventory.report.agreement !==
             "state-provider-agree" ||
           inspectDocsDeploymentOrphanInventoryReceipt(orphanReport).length !==
@@ -302,8 +333,18 @@ export const inspectDeploymentAutomationRegisters = (
           teardownProvider === null ||
           teardownProvider.candidateCommit !== receipt?.candidateCommit ||
           teardownProvider.stage !== receipt?.stage ||
+          !/^pr-[1-9]\d*$/u.test(teardownProvider.stage) ||
           teardownProvider.accountId !== receipt?.accountId ||
-          teardownProvider.stateStoreId.length === 0;
+          teardownProvider.stateStoreId.length === 0 ||
+          (teardownProvider.preexistingStage
+            ? teardownProvider.formerWorkerName === null ||
+              teardownProvider.formerWorkerUrl === null
+            : teardownProvider.formerWorkerName !== null ||
+              teardownProvider.formerWorkerUrl !== null) ||
+          teardownProvider.configSha256 !== receipt?.configSha256 ||
+          teardownProvider.deploymentInputSha256 !==
+            receipt?.deploymentInputSha256 ||
+          teardownProvider.lockfileSha256 !== receipt?.lockfileSha256;
       } else {
         providerIdentityMismatch =
           workflowProvider === null ||
@@ -318,10 +359,12 @@ export const inspectDeploymentAutomationRegisters = (
           workflowProvider.previousVersionId !== receipt?.previousVersionId ||
           workflowProvider.rollbackRecoveryIdentity !==
             receipt?.rollbackRecoveryIdentity ||
-          (workflowProvider.previewPrNumber === null
-            ? workflowProvider.stage !== "prod"
-            : workflowProvider.stage !==
-              `pr-${workflowProvider.previewPrNumber}`);
+          (automation.id === "docs-preview-delivery"
+            ? workflowProvider.previewPrNumber === null ||
+              workflowProvider.stage !==
+                `pr-${workflowProvider.previewPrNumber}`
+            : workflowProvider.previewPrNumber !== null ||
+              workflowProvider.stage !== "prod");
       }
       let expectedPlanOperation = "production-equal-replan";
       if (receipt?.operation === "preview-deploy") {
@@ -340,15 +383,23 @@ export const inspectDeploymentAutomationRegisters = (
             ({ action }) => action === "noop"
           )
         );
+      const deployActionMismatch =
+        receipt?.operation !== "preview-destroy" &&
+        plan !== null &&
+        plan.projection.logicalResources.some(
+          ({ action }) => action === "delete"
+        );
       const planContractMismatch =
         plan === null ||
         inspectDeploymentPlanReceipt(plan).length !== 0 ||
-        teardownActionMismatch;
+        teardownActionMismatch ||
+        deployActionMismatch;
       const planMismatch = isOrphan
         ? plan !== null
         : planContractMismatch ||
           receipt === undefined ||
           plan.operation !== expectedPlanOperation ||
+          plan.receiptPath !== receipt.planPath ||
           plan.acceptedPlanSha256 !== receipt.acceptedPlanSha256 ||
           plan.projection.candidate.exactCommit !== receipt.candidateCommit ||
           plan.projection.stage !== receipt.stage ||
@@ -431,6 +482,47 @@ export const inspectDeploymentAutomationRegisters = (
           workflowRun.conclusion !== "success" ||
           !allowedEvents.includes(workflowRun.event);
       }
+      let workflowInputMismatch =
+        workflowInput === null || receipt === undefined;
+      if (
+        !workflowInputMismatch &&
+        workflowInput !== null &&
+        receipt !== undefined
+      ) {
+        let expectedInputOperation:
+          | "deploy"
+          | "destroy"
+          | "report"
+          | "rollback";
+        if (
+          receipt.operation === "preview-deploy" ||
+          receipt.operation === "production-deploy"
+        ) {
+          expectedInputOperation = "deploy";
+        } else if (receipt.operation === "production-rollback") {
+          expectedInputOperation = "rollback";
+        } else if (receipt.operation === "preview-destroy") {
+          expectedInputOperation = "destroy";
+        } else {
+          expectedInputOperation = "report";
+        }
+        let expectedPrNumber: number | null = null;
+        if (
+          automation.id === "docs-preview-delivery" ||
+          automation.id === "docs-preview-teardown"
+        ) {
+          expectedPrNumber = Number.parseInt(receipt.stage.slice(3), 10);
+        }
+        workflowInputMismatch =
+          workflowInput.candidateCommit !== receipt.candidateCommit ||
+          workflowInput.workflowCommit !== receipt.workflowCommit ||
+          workflowInput.workflowRunId !== receipt.workflowRunId ||
+          workflowInput.workflowPath !== receipt.workflowPath ||
+          workflowInput.workflowName !== workflowName ||
+          workflowInput.sourceRef !== "refs/heads/main" ||
+          workflowInput.operation !== expectedInputOperation ||
+          workflowInput.prNumber !== expectedPrNumber;
+      }
       const receiptMismatch =
         receipt === undefined ||
         evidence === undefined ||
@@ -443,9 +535,15 @@ export const inspectDeploymentAutomationRegisters = (
         receipt.workflowPath !== workflowPath ||
         (isOrphan
           ? receipt.acceptedPlanSha256 !== null ||
+            receipt.accountId !== null ||
+            receipt.configSha256 !== null ||
+            receipt.deploymentInputSha256 !== null ||
             receipt.planPath !== null ||
             receipt.providerReadbackPath !== null ||
             receipt.hostedProofPath !== null ||
+            receipt.lockfileSha256 !== null ||
+            receipt.previousVersionId !== null ||
+            receipt.rollbackRecoveryIdentity !== null ||
             receipt.reportPath === null
           : receipt.acceptedPlanSha256 === null ||
             receipt.planPath === null ||
@@ -456,6 +554,8 @@ export const inspectDeploymentAutomationRegisters = (
               : receipt.hostedProofPath === null)) ||
         receipt.workflowRunPath.length === 0 ||
         workflowRunMismatch ||
+        receipt.workflowInputPath.length === 0 ||
+        workflowInputMismatch ||
         providerIdentityMismatch ||
         planMismatch ||
         hostedIdentityMismatch;

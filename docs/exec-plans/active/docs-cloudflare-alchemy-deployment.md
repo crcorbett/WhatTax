@@ -1333,6 +1333,26 @@ The report-only positive boundary also requires a dedicated `reportPath`
 decoded as `DocsDeploymentOrphanInventoryReceipt`; the mutation
 `providerReadbackPath` remains null for that class and cannot stand in for
 state/provider inventory proof.
+The Production automation authority now admits both `production-deploy` and
+the separately recorded `production-rollback` operation under the same fixed
+stage lock; rollback receipts cannot pass through deploy-only authority.
+External admission also binds Preview to `pr-N`, Production/rollback to `prod`,
+teardown absence to `pr-N`, rejects deploy plans containing deletes, checks
+teardown config/deployment/lockfile identities and plan self-path, rejects
+hidden receipts on `not-established` entries, and requires the current
+1,000-row/draft-aware report command for a positive orphan admission while
+preserving legacy dated receipts as historical evidence.
+The workflow receipt contract now names a separate Schema-decoded
+`workflowInputPath` alongside `workflowRunPath`: the former binds the reviewed
+default-branch source, run, operation and dispatch candidate input, while the
+latter is the GitHub API run readback. The Preview and Production plan shells
+also reject every resource-like line outside the two owned resources and reject
+`delete` before a deploy apply.
+The workflow hosted receipt remains a bounded automation supplement: it retains
+PNG identity/bytes and the two viewport classes, but does not yet replace the
+full manual screenshot-manifest/oracle packet or guarantee an early failure
+receipt when a runner stops before the artifact directory is created. Those are
+explicit DCD-004 closeout limitations, not established claims.
 DCD-004 remains `in_progress`, DCD-005 remains `pending`, and no current
 provider or default-branch receipt is established until a fresh workflow epoch
 and dated promotion satisfy these checks.

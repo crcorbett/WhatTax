@@ -71,10 +71,15 @@ describe("docs deployment workflow admission", () => {
   });
 
   test("keeps mutation locks non-cancellable and report-only work cancellable", async () => {
+    const planCancellation = [
+      "cancel-in-progress: ",
+      "$",
+      "{{ inputs.operation == 'plan' }}",
+    ].join("");
     for (const path of [workflowPaths.preview, workflowPaths.production]) {
       const source = await readWorkflow(path);
       expect(source).toContain("checks: read");
-      expect(source).toContain("cancel-in-progress: false");
+      expect(source).toContain(planCancellation);
       expect(source).toContain("CLOUDFLARE_ACCOUNT_ID");
       expect(source).toContain("CLOUDFLARE_API_TOKEN");
       expect(source).toContain(
@@ -90,6 +95,9 @@ describe("docs deployment workflow admission", () => {
       expect(source).toContain("hosted-proof.raw.json");
       expect(source).toContain("hosted-proof.json");
       expect(source).toContain("TAXKIT_WORKFLOW_SCREENSHOT_ROOT");
+      expect(source).toContain("check:docs-deployment-workflow-input");
+      expect(source).toContain("workflow-input.json");
+      expect(source).toContain("all_replan_resources");
       expect(source).toContain("docs/evidence/deployments");
       expect(source).toContain("configSha256");
       expect(source).toContain("deploymentInputSha256");
@@ -106,11 +114,15 @@ describe("docs deployment workflow admission", () => {
     expect(teardown).toContain("providerWorkers");
     expect(teardown).toContain("provider-readback.json");
     expect(teardown).toContain("providerWorkerAbsent:true");
+    expect(teardown).toContain("formerWorkerName");
+    expect(teardown).toContain("formerWorkerUrl");
+    expect(teardown).toContain("preexistingStage");
     expect(teardown).toContain("pulls/");
     expect(teardown).toContain('= "closed"');
     expect(teardown).toContain("grep -Eq '^[1-9][0-9]*$'");
     expect(teardown).toContain("(create|update|delete|noop)");
     expect(teardown).toContain("check:docs-deployment-workflow-teardown-proof");
+    expect(teardown).toContain("check:docs-deployment-workflow-input");
     expect(teardown).toContain(
       "TAXKIT_WORKFLOW_PLAN_OPERATION=preview-destroy"
     );
@@ -141,6 +153,7 @@ describe("docs deployment workflow admission", () => {
     expect(orphan).toContain("jq -e");
     expect(orphan).not.toContain("alchemy login");
     expect(orphan).not.toContain("alchemy cloudflare bootstrap");
+    expect(orphan).toContain("check:docs-deployment-workflow-input");
     expect(orphan).not.toContain("alchemy plan");
     expect(orphan).not.toContain("alchemy destroy");
   });
@@ -180,6 +193,9 @@ describe("docs deployment workflow admission", () => {
   test("binds Production mutation to a Schema-checked Preview workflow receipt", async () => {
     const production = await readWorkflow(workflowPaths.production);
     expect(production).toContain("accepted_preview_run_id");
+    expect(production).toContain(
+      "printf '%s' \"$ACCEPTED_PREVIEW_RUN_ID\" | grep -Eq '^[1-9][0-9]*$'"
+    );
     expect(production).toContain("accepted_preview_pr_number");
     expect(production).toContain("rollback_expected_current_version_id");
     expect(production).toContain("rollback_recovery_identity");

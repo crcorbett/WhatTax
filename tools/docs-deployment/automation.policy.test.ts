@@ -116,6 +116,28 @@ describe("docs deployment automation admission", () => {
     ).toEqual(["candidate-trust"]);
   });
 
+  test("requires the Production authority to admit normal rollback explicitly", async () => {
+    const [automations, controls] = await decodeRegisters();
+    const contaminated = await decodeAutomations(
+      automations.map((entry) =>
+        entry.id === "docs-production-delivery"
+          ? {
+              ...entry,
+              authority: {
+                ...entry.authority,
+                operations: ["production-deploy"],
+              },
+            }
+          : entry
+      )
+    );
+    expect(
+      inspectDeploymentAutomationRegisters(contaminated, controls).map(
+        (item) => item.invariant
+      )
+    ).toContain("mutation-lock");
+  });
+
   test("rejects pull-request-head teardown code", async () => {
     const [automations, controls] = await decodeRegisters();
     const contaminated = await decodeAutomations(
@@ -196,6 +218,28 @@ describe("docs deployment automation admission", () => {
     expect(findings).toEqual(["control-register", "external-proof"]);
   });
 
+  test("rejects a hidden external receipt on a not-established entry", async () => {
+    const [automations, controls] = await decodeRegisters();
+    const contaminated = await decodeAutomations(
+      automations.map((entry) =>
+        entry.id === "docs-preview-delivery"
+          ? {
+              ...entry,
+              externalState: {
+                receipt: "docs/evidence/deployments/hidden.json",
+                status: "not-established" as const,
+              },
+            }
+          : entry
+      )
+    );
+    expect(
+      inspectDeploymentAutomationRegisters(contaminated, controls).map(
+        (item) => item.invariant
+      )
+    ).toContain("external-proof");
+  });
+
   test("accepts an established entry only with the decoded matching workflow receipt", async () => {
     const [automations, controls] = await decodeRegisters();
     const preview = automations.find(
@@ -267,6 +311,7 @@ describe("docs deployment automation admission", () => {
         schemaVersion: 1,
         stage,
         workflowCommit: "c".repeat(40),
+        workflowInputPath: "docs/evidence/deployments/workflow-input.json",
         workflowPath: ".github/workflows/docs-preview.yml",
         workflowReceiptPath: "docs/evidence/deployments/workflow-preview.json",
         workflowRunId: "123",
@@ -352,6 +397,16 @@ describe("docs deployment automation admission", () => {
       workflowName: "Docs Preview Deployment",
       workflowRunId: receipt.workflowRunId,
     };
+    const workflowInput = {
+      candidateCommit: receipt.candidateCommit,
+      operation: "deploy" as const,
+      prNumber: 15,
+      sourceRef: "refs/heads/main" as const,
+      workflowCommit: receipt.workflowCommit,
+      workflowName: "Docs Preview Deployment",
+      workflowPath: receipt.workflowPath,
+      workflowRunId: receipt.workflowRunId,
+    };
     const established = automations.map((entry) =>
       entry.id === preview.id
         ? {
@@ -377,6 +432,7 @@ describe("docs deployment automation admission", () => {
               plan,
               provider,
               receipt,
+              workflowInput,
               workflowRun,
             },
           ],
@@ -398,7 +454,67 @@ describe("docs deployment automation admission", () => {
               plan,
               provider,
               receipt,
+              workflowInput,
               workflowRun: { ...workflowRun, headSha: "d".repeat(40) },
+            },
+          ],
+        ])
+      ).map((item) => item.invariant)
+    ).toContain("external-proof");
+
+    expect(
+      inspectDeploymentAutomationRegisters(
+        established,
+        controls,
+        new Map([[preview.id, receipt]]),
+        new Map([
+          [
+            preview.id,
+            {
+              hosted,
+              orphanReport: null,
+              plan,
+              provider,
+              receipt,
+              workflowInput: {
+                ...workflowInput,
+                candidateCommit: "d".repeat(40),
+              },
+              workflowRun,
+            },
+          ],
+        ])
+      ).map((item) => item.invariant)
+    ).toContain("external-proof");
+
+    expect(
+      inspectDeploymentAutomationRegisters(
+        established,
+        controls,
+        new Map([[preview.id, receipt]]),
+        new Map([
+          [
+            preview.id,
+            {
+              hosted,
+              orphanReport: null,
+              plan: {
+                ...plan,
+                projection: {
+                  ...plan.projection,
+                  logicalResources: [
+                    {
+                      ...plan.projection.logicalResources[0],
+                      action: "delete" as const,
+                    },
+                    plan.projection.logicalResources[1],
+                  ],
+                },
+              },
+              provider,
+              receipt,
+              workflowInput,
+              workflowRun,
             },
           ],
         ])
@@ -419,6 +535,7 @@ describe("docs deployment automation admission", () => {
               plan: { ...plan, replanSha256: null },
               provider,
               receipt,
+              workflowInput,
               workflowRun,
             },
           ],
@@ -440,6 +557,7 @@ describe("docs deployment automation admission", () => {
               plan,
               provider,
               receipt,
+              workflowInput,
               workflowRun: {
                 ...workflowRun,
                 candidateCommit: "d".repeat(40),
@@ -468,6 +586,7 @@ describe("docs deployment automation admission", () => {
               plan,
               provider,
               receipt,
+              workflowInput,
               workflowRun,
             },
           ],
@@ -541,6 +660,8 @@ describe("docs deployment automation admission", () => {
         schemaVersion: 1,
         stage: "prod",
         workflowCommit,
+        workflowInputPath:
+          "docs/evidence/deployments/workflow-orphan-input.json",
         workflowPath: ".github/workflows/docs-orphan-inventory.yml",
         workflowReceiptPath: "docs/evidence/deployments/workflow-orphan.json",
         workflowRunId: "42",
@@ -570,6 +691,16 @@ describe("docs deployment automation admission", () => {
             plan: null,
             provider: null,
             receipt,
+            workflowInput: {
+              candidateCommit,
+              operation: "report",
+              prNumber: null,
+              sourceRef: "refs/heads/main",
+              workflowCommit,
+              workflowName: "Docs Orphan Inventory (Report Only)",
+              workflowPath: receipt.workflowPath,
+              workflowRunId: receipt.workflowRunId,
+            },
             workflowRun: {
               candidateCommit,
               conclusion: "success" as const,
@@ -615,6 +746,16 @@ describe("docs deployment automation admission", () => {
             plan: null,
             provider: null,
             receipt: admittedReceipt,
+            workflowInput: {
+              candidateCommit,
+              operation: "report",
+              prNumber: null,
+              sourceRef: "refs/heads/main",
+              workflowCommit,
+              workflowName: "Docs Orphan Inventory (Report Only)",
+              workflowPath: admittedReceipt.workflowPath,
+              workflowRunId: admittedReceipt.workflowRunId,
+            },
             workflowRun: {
               candidateCommit,
               conclusion: "success" as const,

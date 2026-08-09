@@ -571,15 +571,17 @@ Before marking its `externalState` as `established`, require all of:
 6. state/provider and hosted postcondition readback; and
 7. a retained dated receipt named in `externalState.receipt`.
 
-The receipt must also name a Schema-decoded workflow-run readback under the
-owned evidence route. That readback must show the expected workflow name,
-exact workflow path, a successful completed run, `refs/heads/main`,
-`headBranch: main`, and a head SHA equal to the workflow source commit recorded
-by the outer receipt. It records the exact deployment candidate input
-separately, and that input must equal the outer receipt's candidate. The source
-head and candidate are intentionally distinct when a reviewed default-branch
-workflow builds a PR head. Promotion rejects branch-only or synthetic run
-metadata. The named plan receipt is decoded and its operation, projection
+The receipt must also name Schema-decoded `workflowRunPath` and
+`workflowInputPath` files under the owned evidence route. The workflow-run
+readback must show the expected workflow name, exact workflow path, a successful
+completed run, `refs/heads/main`, `headBranch: main`, and a head SHA equal to
+the workflow source commit recorded by the outer receipt. The separate
+workflow-input readback is emitted by the reviewed workflow from its dispatch
+inputs and must bind the same run/path/source commit, operation and exact
+deployment candidate input to the outer receipt. The source head and candidate
+are intentionally distinct when a reviewed default-branch workflow builds a PR
+head. Promotion rejects branch-only, synthetic or detached input metadata. The
+named plan receipt is decoded and its operation, projection
 digest, candidate, stage and equal-replan identity are checked again during
 external-state promotion; a teardown projection may contain only two deletes
 or two no-ops, never a mixed or unexpected action. Hosted promotion additionally

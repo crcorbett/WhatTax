@@ -30,7 +30,7 @@ permissions:
 
 concurrency:
   group: taxkit-docs-preview-pr-${{ inputs.pr_number }}
-  cancel-in-progress: false
+  cancel-in-progress: ${{ inputs.operation == 'plan' }}
 
 jobs:
   preview:
@@ -53,6 +53,9 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/docs-deployment"
+          test "$GITHUB_REF" = "refs/heads/main"
+          test "$GITHUB_SHA" = "$(gh api "repos/${GITHUB_REPOSITORY}/git/ref/heads/main" --jq .object.sha)"
           printf '%s' "$PR_NUMBER" | grep -Eq '^[1-9][0-9]*$'
           pr_json="$(gh api "repos/${GITHUB_REPOSITORY}/pulls/${PR_NUMBER}")"
           test "$(jq -r .base.ref <<<"$pr_json")" = "main"
@@ -68,6 +71,14 @@ jobs:
           fi
           test "$(jq -r .head.repo.full_name <<<"$pr_json")" = "$GITHUB_REPOSITORY"
           test "$(jq -r .head.sha <<<"$pr_json")" = "$CANDIDATE_SHA"
+          jq -nS \
+            --arg candidate "$CANDIDATE_SHA" \
+            --arg operation "$OPERATION" \
+            --arg pr "$PR_NUMBER" \
+            --arg workflow "$GITHUB_SHA" \
+            --arg run "$GITHUB_RUN_ID" \
+            '{candidateCommit:$candidate,operation:$operation,prNumber:($pr|tonumber),sourceRef:"refs/heads/main",workflowCommit:$workflow,workflowName:"Docs Preview Deployment",workflowPath:".github/workflows/docs-preview.yml",workflowRunId:$run}' \
+            > "$RUNNER_TEMP/docs-deployment/workflow-input.json"
           checks="$(gh api "repos/${GITHUB_REPOSITORY}/commits/${CANDIDATE_SHA}/check-runs?per_page=100")"
           jq -e '[.check_runs[] | select((.name | test("quality"; "i"))) | .conclusion] | length > 0 and all(. == "success")' <<<"$checks" >/dev/null
 
@@ -88,6 +99,17 @@ jobs:
 
       - name: Install frozen dependencies
         run: bun install --frozen-lockfile
+
+      - name: Schema-check workflow source and candidate input
+        env:
+          TAXKIT_WORKFLOW_INPUT_RECEIPT: ${{ runner.temp }}/docs-deployment/workflow-input.json
+          TAXKIT_WORKFLOW_INPUT_CANDIDATE_COMMIT: ${{ inputs.candidate_sha }}
+          TAXKIT_WORKFLOW_INPUT_WORKFLOW_COMMIT: ${{ github.sha }}
+          TAXKIT_WORKFLOW_INPUT_RUN_ID: ${{ github.run_id }}
+          TAXKIT_WORKFLOW_INPUT_WORKFLOW_PATH: .github/workflows/docs-preview.yml
+          TAXKIT_WORKFLOW_INPUT_OPERATION: ${{ inputs.operation }}
+          TAXKIT_WORKFLOW_INPUT_PR_NUMBER: ${{ inputs.pr_number }}
+        run: bun run check:docs-deployment-workflow-input
 
       - name: Install pinned Playwright browser
         run: apps/docs/node_modules/.bin/playwright install --with-deps chromium
@@ -112,17 +134,16 @@ jobs:
           stage="pr-${PR_NUMBER}"
           ALCHEMY_PLAIN=1 CI=1 bunx alchemy plan --stage "$stage" --profile "$ALCHEMY_PROFILE" > "$RUNNER_TEMP/docs-deployment/alchemy-plan.txt"
           sed -E $'s/\\033\\[[0-9;]*m//g' "$RUNNER_TEMP/docs-deployment/alchemy-plan.txt" > "$RUNNER_TEMP/docs-deployment/alchemy-plan.clean.txt"
-          resources="$(grep -E '^\[(DocsBuild|DocsWebsite)\] (create|update|noop|delete)$' "$RUNNER_TEMP/docs-deployment/alchemy-plan.clean.txt" || true)"
+          all_resource_lines="$(grep -E '^\[[^]]+\] ' "$RUNNER_TEMP/docs-deployment/alchemy-plan.clean.txt" || true)"
+          unexpected_resource_lines="$(printf '%s\n' "$all_resource_lines" | grep -Ev '^\[(DocsBuild|DocsWebsite)\] (create|update|noop)$' || true)"
+          test -z "$unexpected_resource_lines"
+          resources="$(printf '%s\n' "$all_resource_lines" | grep -E '^\[(DocsBuild|DocsWebsite)\] (create|update|noop)$' || true)"
           resource_count="$(printf '%s\n' "$resources" | sed '/^$/d' | wc -l | tr -d ' ')"
           test "$resource_count" -eq 2
           first_resource="$(printf '%s\n' "$resources" | sed -n '1p')"
           second_resource="$(printf '%s\n' "$resources" | sed -n '2p')"
           case "$first_resource" in "[DocsBuild] "*) ;; *) echo "Unexpected first resource: $first_resource" >&2; exit 1 ;; esac
           case "$second_resource" in "[DocsWebsite] "*) ;; *) echo "Unexpected second resource: $second_resource" >&2; exit 1 ;; esac
-          if grep -E '^\[[^]]+\] (create|update|noop|delete)$' "$RUNNER_TEMP/docs-deployment/alchemy-plan.clean.txt" | grep -Ev '^\[(DocsBuild|DocsWebsite)\] (create|update|noop|delete)$' | grep -q .; then
-            echo "Unexpected resource in Alchemy plan" >&2
-            exit 1
-          fi
           build_action="$(printf '%s\n' "$first_resource" | sed -E 's/^\[[^]]+\] //')"
           website_action="$(printf '%s\n' "$second_resource" | sed -E 's/^\[[^]]+\] //')"
           lockfile_sha256="$(shasum -a 256 bun.lock | cut -d ' ' -f1)"
@@ -168,10 +189,10 @@ jobs:
           stage="pr-${PR_NUMBER}"
           ALCHEMY_PLAIN=1 CI=1 bunx alchemy plan --stage "$stage" --profile "$ALCHEMY_PROFILE" > "$RUNNER_TEMP/docs-deployment/alchemy-replan.txt"
           sed -E $'s/\\033\\[[0-9;]*m//g' "$RUNNER_TEMP/docs-deployment/alchemy-replan.txt" > "$RUNNER_TEMP/docs-deployment/alchemy-replan.clean.txt"
-          all_replan_resources="$(grep -E '^\[[^]]+\] (create|update|noop|delete)$' "$RUNNER_TEMP/docs-deployment/alchemy-replan.clean.txt" || true)"
-          unexpected_replan_resources="$(printf '%s\n' "$all_replan_resources" | grep -Ev '^\[(DocsBuild|DocsWebsite)\] (create|update|noop|delete)$' || true)"
+          all_replan_resources="$(grep -E '^\[[^]]+\] ' "$RUNNER_TEMP/docs-deployment/alchemy-replan.clean.txt" || true)"
+          unexpected_replan_resources="$(printf '%s\n' "$all_replan_resources" | grep -Ev '^\[(DocsBuild|DocsWebsite)\] (create|update|noop)$' || true)"
           test -z "$unexpected_replan_resources"
-          replan_resources="$(printf '%s\n' "$all_replan_resources" | grep -E '^\[(DocsBuild|DocsWebsite)\] (create|update|noop|delete)$' || true)"
+          replan_resources="$(printf '%s\n' "$all_replan_resources" | grep -E '^\[(DocsBuild|DocsWebsite)\] (create|update|noop)$' || true)"
           replan_resource_count="$(printf '%s\n' "$replan_resources" | sed '/^$/d' | wc -l | tr -d ' ')"
           test "$replan_resource_count" -eq 2
           replan_first_resource="$(printf '%s\n' "$replan_resources" | sed -n '1p')"

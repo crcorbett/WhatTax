@@ -529,7 +529,7 @@
       "dependsOn": ["DCD-002"],
       "goal": "Under Cooper's recorded 2026-07-30 bounded authority, deploy the accepted Preview source/config/dependency identity to the fixed Production workers.dev URL and prove normal rollback/redeploy.",
       "scope": [
-        "extend existing deployment Schemas/commands/runbook only for Production plan, deploy, provider readback, proof and normal rollback",
+        "extend existing deployment Schemas/commands/runbook only for Production plan, deploy, provider readback, proof and normal rollback; admit production-rollback explicitly in the Production automation authority rather than treating it as deploy-only",
         "require the exact accepted Preview source, lock, package, Alchemy and configuration identities",
         "use one fixed prod stage, one stable Worker identity, an accepted non-mutating plan and a distinct exclusive Production mutation window under the recorded envelope",
         "create and backfill the exact verified Production plan/deploy/readback/proof and rollback invocations",
@@ -656,6 +656,7 @@
         "require Production accepted_preview_run_id to identify a successful main-branch Preview run whose downloaded provider and hosted receipts pass the shared proof checker; caller-supplied commit or digest alone is insufficient",
         "require accepted_preview_pr_number, the Preview workflow path and exact deterministic pr-N stage binding; reject a valid-looking receipt from another workflow or stage",
         "reject unexpected action/resource lines on every equal replan and emit a separate Schema-decoded teardown absence readback with exact stage and Worker postconditions",
+        "bind external receipts to the automation-specific stage (Preview pr-N, Production/rollback prod, teardown pr-N), reject deploy projections containing deletes, cross-check teardown config/deployment/lockfile and plan self-path, and reject hidden receipts on not-established entries",
         "retain the dated manual and current protected Preview/Production/rollback receipts as provider evidence; the current branch-bound report-only receipt does not satisfy default-branch automation establishment",
         "allow one source-bound default-branch bootstrap dispatch after the reviewed workflow lands on main because GitHub cannot dispatch a workflow file that exists only on a pull-request branch; bind the merged PR head and deterministic pr-N stage exactly, then require an open trusted draft PR for every later Preview dispatch",
         "read the live pull request and require closed state, main base and same-repository head for both automatic and manual teardown dispatches; reject create/update actions on teardown projections",

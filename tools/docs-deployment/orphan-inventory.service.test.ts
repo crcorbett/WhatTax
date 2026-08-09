@@ -90,6 +90,7 @@ const pullRequestFixture = [
   {
     headRefOid: "1111111111111111111111111111111111111111",
     isCrossRepository: false,
+    isDraft: true,
     number: 1,
     state: "OPEN",
     url: "https://github.com/crcorbett/taxkit/pull/1",
@@ -97,6 +98,7 @@ const pullRequestFixture = [
   {
     headRefOid: "2222222222222222222222222222222222222222",
     isCrossRepository: true,
+    isDraft: true,
     number: 2,
     state: "OPEN",
     url: "https://github.com/crcorbett/taxkit/pull/2",
@@ -104,6 +106,7 @@ const pullRequestFixture = [
   {
     headRefOid: "4444444444444444444444444444444444444444",
     isCrossRepository: false,
+    isDraft: false,
     number: 4,
     state: "OPEN",
     url: "https://github.com/crcorbett/taxkit/pull/4",

@@ -53,6 +53,14 @@ jobs:
             test "$(jq -r .pull_request.head.repo.full_name "$GITHUB_EVENT_PATH")" = "$GITHUB_REPOSITORY"
           fi
           test "$REVIEWED_WORKFLOW_SHA" = "$(gh api "repos/${GITHUB_REPOSITORY}/git/ref/heads/main" --jq .object.sha)"
+          mkdir -p "$RUNNER_TEMP/docs-deployment"
+          jq -nS \
+            --arg candidate "$REVIEWED_WORKFLOW_SHA" \
+            --arg pr "$PR_NUMBER" \
+            --arg workflow "$REVIEWED_WORKFLOW_SHA" \
+            --arg run "$GITHUB_RUN_ID" \
+            '{candidateCommit:$candidate,operation:"destroy",prNumber:($pr|tonumber),sourceRef:"refs/heads/main",workflowCommit:$workflow,workflowName:"Docs Preview Teardown",workflowPath:".github/workflows/docs-preview-teardown.yml",workflowRunId:$run}' \
+            > "$RUNNER_TEMP/docs-deployment/workflow-input.json"
 
       - name: Check out reviewed default-branch implementation
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.2.0
@@ -71,6 +79,17 @@ jobs:
 
       - name: Install frozen dependencies
         run: bun install --frozen-lockfile
+
+      - name: Schema-check teardown workflow input
+        env:
+          TAXKIT_WORKFLOW_INPUT_RECEIPT: ${{ runner.temp }}/docs-deployment/workflow-input.json
+          TAXKIT_WORKFLOW_INPUT_CANDIDATE_COMMIT: ${{ env.REVIEWED_WORKFLOW_SHA }}
+          TAXKIT_WORKFLOW_INPUT_WORKFLOW_COMMIT: ${{ env.REVIEWED_WORKFLOW_SHA }}
+          TAXKIT_WORKFLOW_INPUT_RUN_ID: ${{ github.run_id }}
+          TAXKIT_WORKFLOW_INPUT_WORKFLOW_PATH: .github/workflows/docs-preview-teardown.yml
+          TAXKIT_WORKFLOW_INPUT_OPERATION: destroy
+          TAXKIT_WORKFLOW_INPUT_PR_NUMBER: ${{ env.PR_NUMBER }}
+        run: bun run check:docs-deployment-workflow-input
 
       - name: Install pinned Playwright browser
         run: apps/docs/node_modules/.bin/playwright install --with-deps chromium
@@ -95,8 +114,12 @@ jobs:
           ALCHEMY_PROFILE="$ALCHEMY_PROFILE" CI=1 bun run check:docs-deployment-inventory > "$RUNNER_TEMP/docs-deployment/provider-inventory-before.json"
           stage_count_before="$(jq --arg stage "$stage" '[.stages[] | select(.stage == $stage)] | length' "$RUNNER_TEMP/docs-deployment/provider-inventory-before.json")"
           test "$stage_count_before" -eq 0 || test "$stage_count_before" -eq 1
+          previous_worker_name=""
+          previous_worker_url=""
           if [ "$stage_count_before" -eq 1 ]; then
             jq -e --arg stage "$stage" '([.stages[] | select(.stage == $stage) | .resources | map(.logicalId) | sort] == [["DocsBuild", "DocsWebsite"]]) and ([.providerWorkers[] | select(.stage == $stage and .logicalId == "DocsWebsite")] | length == 1)' "$RUNNER_TEMP/docs-deployment/provider-inventory-before.json" > /dev/null
+            previous_worker_name="$(jq -er --arg stage "$stage" '.stages[] | select(.stage == $stage) | .resources[] | select(.logicalId == "DocsWebsite") | .workerName' "$RUNNER_TEMP/docs-deployment/provider-inventory-before.json")"
+            previous_worker_url="$(jq -er --arg stage "$stage" '.stages[] | select(.stage == $stage) | .resources[] | select(.logicalId == "DocsWebsite") | .workerUrl' "$RUNNER_TEMP/docs-deployment/provider-inventory-before.json")"
           fi
           for attempt in one two; do
             ALCHEMY_PLAIN=1 CI=1 bunx alchemy destroy --dry-run --stage "$stage" --profile "$ALCHEMY_PROFILE" --yes > "$RUNNER_TEMP/docs-deployment/destroy-${attempt}.txt"
@@ -163,9 +186,12 @@ jobs:
             --arg config "$config_sha256" \
             --arg deployment "$deployment_input_sha256" \
             --arg lockfile "$lockfile_sha256" \
+            --arg formerWorkerName "$previous_worker_name" \
+            --arg formerWorkerUrl "$previous_worker_url" \
             --arg stage "$stage" \
             --arg stateStoreId "$state_store_id" \
-            '{accountId:$account,candidateCommit:$candidate,configSha256:$config,deploymentInputSha256:$deployment,lockfileSha256:$lockfile,providerWorkerAbsent:true,schemaVersion:1,stage:$stage,stateStoreId:$stateStoreId,stateStageAbsent:true}' \
+            --argjson preexistingStage "$stage_count_before" \
+            '{accountId:$account,candidateCommit:$candidate,configSha256:$config,deploymentInputSha256:$deployment,formerWorkerName:(if $formerWorkerName == "" then null else $formerWorkerName end),formerWorkerUrl:(if $formerWorkerUrl == "" then null else $formerWorkerUrl end),lockfileSha256:$lockfile,preexistingStage:($preexistingStage == 1),providerWorkerAbsent:true,schemaVersion:1,stage:$stage,stateStoreId:$stateStoreId,stateStageAbsent:true}' \
             > "$RUNNER_TEMP/docs-deployment/provider-readback.json"
           TAXKIT_WORKFLOW_TEARDOWN_READBACK="$RUNNER_TEMP/docs-deployment/provider-readback.json" \
           TAXKIT_WORKFLOW_CANDIDATE_COMMIT="$REVIEWED_WORKFLOW_SHA" \

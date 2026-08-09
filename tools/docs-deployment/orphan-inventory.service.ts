@@ -28,7 +28,7 @@ const githubArgs = [
   "--limit",
   "1000",
   "--json",
-  "headRefOid,isCrossRepository,number,state,url",
+  "headRefOid,isCrossRepository,isDraft,number,state,url",
 ] as const;
 
 const previewStageNumber = (stage: string): number =>
@@ -57,7 +57,10 @@ export const makeDocsDeploymentOrphanInventoryReceipt = (
         | "orphan-candidate" = "active-trusted-preview";
       if (pullRequest === null) {
         classification = "orphan-candidate";
-      } else if (pullRequest.isCrossRepository) {
+      } else if (
+        pullRequest.isCrossRepository ||
+        pullRequest.isDraft === false
+      ) {
         classification = "untrusted-preview-stage";
       }
       return {

@@ -21,7 +21,26 @@ const ReceiptPath = Schema.String.check(
     /^docs\/evidence\/deployments\/(?!.*\.\.(?:\/|$))[A-Za-z0-9._/-]+$/u
   )
 );
-const WorkflowRunId = Schema.String.check(Schema.isPattern(/^\d+$/u));
+const WorkflowRunId = Schema.String.check(Schema.isPattern(/^[1-9]\d*$/u));
+
+export const DeploymentWorkflowInputReadback = Schema.Struct({
+  candidateCommit: CommitSha,
+  operation: Schema.Literals([
+    "deploy",
+    "destroy",
+    "plan",
+    "report",
+    "rollback",
+  ]),
+  prNumber: Schema.NullOr(PositivePrNumber),
+  sourceRef: Schema.Literal("refs/heads/main"),
+  workflowCommit: CommitSha,
+  workflowName: Schema.NonEmptyString,
+  workflowPath: Schema.NonEmptyString,
+  workflowRunId: WorkflowRunId,
+});
+export type DeploymentWorkflowInputReadback =
+  typeof DeploymentWorkflowInputReadback.Type;
 
 export const DeploymentWorkflowRunReadback = Schema.Struct({
   candidateCommit: CommitSha,
@@ -102,7 +121,10 @@ export const DeploymentWorkflowTeardownReadback = Schema.Struct({
   candidateCommit: CommitSha,
   configSha256: Sha256,
   deploymentInputSha256: Sha256,
+  formerWorkerName: Schema.NullOr(ProviderIdentity),
+  formerWorkerUrl: Schema.NullOr(WorkersDevUrl),
   lockfileSha256: Sha256,
+  preexistingStage: Schema.Boolean,
   providerWorkerAbsent: Schema.Literal(true),
   schemaVersion: Schema.Literal(1),
   stage: Schema.String.check(Schema.isPattern(/^pr-[1-9]\d*$/u)),
@@ -154,6 +176,7 @@ export const DeploymentWorkflowExternalReceipt = Schema.Struct({
   schemaVersion: Schema.Literal(1),
   stage: DocsDeploymentStage,
   workflowCommit: CommitSha,
+  workflowInputPath: ReceiptPath,
   workflowPath: Schema.NonEmptyString,
   workflowReceiptPath: ReceiptPath,
   workflowRunId: WorkflowRunId,
@@ -171,5 +194,6 @@ export interface DeploymentWorkflowExternalEvidence {
     | DeploymentWorkflowTeardownReadback
     | null;
   readonly receipt: DeploymentWorkflowExternalReceipt;
+  readonly workflowInput: DeploymentWorkflowInputReadback | null;
   readonly workflowRun: DeploymentWorkflowRunReadback | null;
 }
