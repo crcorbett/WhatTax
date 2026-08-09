@@ -5,6 +5,17 @@ import type {
   DeploymentControl,
 } from "./automation.schemas.js";
 import { DeploymentAutomationFinding } from "./automation.schemas.js";
+import { docsDeploymentOpenPullRequestsCommand } from "./orphan-inventory.schemas.js";
+import { inspectDocsDeploymentOrphanInventoryReceipt } from "./orphan-inventory.service.js";
+import { inspectDeploymentPlanReceipt } from "./policy.js";
+import type {
+  DeploymentWorkflowExternalEvidence,
+  DeploymentWorkflowExternalReceipt,
+  DeploymentWorkflowProviderReadback,
+  DeploymentWorkflowInputReadback,
+  DeploymentWorkflowRunReadback,
+  DeploymentWorkflowTeardownReadback,
+} from "./workflow-receipts.schemas.js";
 
 const expectedAutomationIds = [
   "docs-preview-delivery",
@@ -18,6 +29,7 @@ const expectedControlIds = [
   "docs-workflow-mutation-lock",
   "docs-preview-teardown-safety",
   "docs-orphan-report-only",
+  "docs-workflow-receipt-reconciliation",
 ] as const;
 
 const finding = (
@@ -122,7 +134,12 @@ const inspectMutation = (
     automation.lock.group === expected.group,
     automation.lock.scope === "stage",
     automation.lock.cancelInProgress === false,
-    hasExactStrings(automation.authority.operations, [expected.operation]),
+    hasExactStrings(
+      automation.authority.operations,
+      automation.id === "docs-production-delivery"
+        ? ["production-deploy", "production-rollback"]
+        : [expected.operation]
+    ),
   ].every(Boolean);
   const findings = lockMismatch
     ? [
@@ -178,7 +195,15 @@ const inspectMutation = (
 // oxlint-disable-next-line eslint/complexity -- one bounded cross-register policy keeps the exact automation graph visible
 export const inspectDeploymentAutomationRegisters = (
   automations: readonly DeploymentAutomation[],
-  controls: readonly DeploymentControl[]
+  controls: readonly DeploymentControl[],
+  externalReceipts: ReadonlyMap<
+    DeploymentAutomation["id"],
+    DeploymentWorkflowExternalReceipt
+  > = new Map(),
+  externalEvidence: ReadonlyMap<
+    DeploymentAutomation["id"],
+    DeploymentWorkflowExternalEvidence
+  > = new Map()
 ): readonly DeploymentAutomationFinding[] => {
   const findings: DeploymentAutomationFinding[] = [];
   if (
@@ -211,14 +236,343 @@ export const inspectDeploymentAutomationRegisters = (
   }
   for (const automation of automations) {
     findings.push(...inspectMutation(automation));
-    if (automation.externalState.status === "established") {
+    if (
+      (automation.externalState.status === "not-established" &&
+        automation.externalState.receipt !== null) ||
+      (automation.externalState.status === "established" &&
+        automation.externalState.receipt === null)
+    ) {
       findings.push(
         finding(
           "external-proof",
           `tools/docs-deployment/automation-register.json:${automation.id}.externalState`,
-          "Keep external state not-established until a Schema-decoded hosted receipt owner verifies the exact workflow, environment, principal, candidate, lock, plan and provider identities."
+          "Keep a non-established entry receipt-free, or establish it only with a named decoded workflow receipt."
         )
       );
+    }
+    if (automation.externalState.status === "established") {
+      const receipt =
+        automation.externalState.receipt === null
+          ? undefined
+          : externalReceipts.get(automation.id);
+      const evidence = externalEvidence.get(automation.id);
+      const plan = evidence?.plan ?? null;
+      const orphanReport = evidence?.orphanReport ?? null;
+      const provider = evidence?.provider ?? null;
+      const hosted = evidence?.hosted ?? null;
+      const workflowRun: DeploymentWorkflowRunReadback | null =
+        evidence?.workflowRun ?? null;
+      const workflowInput: DeploymentWorkflowInputReadback | null =
+        evidence?.workflowInput ?? null;
+      const workflowPath = (
+        {
+          "docs-orphan-inventory":
+            ".github/workflows/docs-orphan-inventory.yml",
+          "docs-preview-delivery": ".github/workflows/docs-preview.yml",
+          "docs-preview-teardown":
+            ".github/workflows/docs-preview-teardown.yml",
+          "docs-production-delivery": ".github/workflows/docs-production.yml",
+        } as const
+      )[automation.id];
+      const workflowName = (
+        {
+          "docs-orphan-inventory": "Docs Orphan Inventory (Report Only)",
+          "docs-preview-delivery": "Docs Preview Deployment",
+          "docs-preview-teardown": "Docs Preview Teardown",
+          "docs-production-delivery": "Docs Production Deployment",
+        } as const
+      )[automation.id];
+      let operationMismatch = receipt === undefined;
+      if (!operationMismatch && receipt !== undefined) {
+        if (automation.id === "docs-production-delivery") {
+          operationMismatch = ![
+            "production-deploy",
+            "production-rollback",
+          ].includes(receipt.operation);
+        } else {
+          let expectedOperation = "preview-destroy";
+          if (automation.id === "docs-orphan-inventory") {
+            expectedOperation = "orphan-inventory-read";
+          } else if (automation.id === "docs-preview-delivery") {
+            expectedOperation = "preview-deploy";
+          }
+          operationMismatch = receipt.operation !== expectedOperation;
+        }
+      }
+      const isOrphan = automation.id === "docs-orphan-inventory";
+      const isTeardown = automation.id === "docs-preview-teardown";
+      const workflowProvider: DeploymentWorkflowProviderReadback | null =
+        provider !== null && "acceptedPlanSha256" in provider ? provider : null;
+      const teardownProvider: DeploymentWorkflowTeardownReadback | null =
+        provider !== null && "providerWorkerAbsent" in provider
+          ? provider
+          : null;
+      let providerIdentityMismatch = false;
+      if (isOrphan) {
+        providerIdentityMismatch =
+          provider !== null ||
+          hosted !== null ||
+          plan !== null ||
+          orphanReport === null ||
+          orphanReport.repository !== "crcorbett/taxkit" ||
+          orphanReport.mutationCapability !== "none" ||
+          orphanReport.automaticDeletion !== "prohibited" ||
+          orphanReport.sources.github.command !==
+            docsDeploymentOpenPullRequestsCommand ||
+          orphanReport.sources.github.openPullRequests.length >= 1000 ||
+          orphanReport.previewStages.some(
+            (entry) =>
+              entry.classification === "active-trusted-preview" &&
+              entry.pullRequest?.isDraft !== true
+          ) ||
+          orphanReport.sources.deploymentInventory.report.agreement !==
+            "state-provider-agree" ||
+          inspectDocsDeploymentOrphanInventoryReceipt(orphanReport).length !==
+            0;
+      } else if (isTeardown) {
+        providerIdentityMismatch =
+          teardownProvider === null ||
+          teardownProvider.candidateCommit !== receipt?.candidateCommit ||
+          teardownProvider.stage !== receipt?.stage ||
+          !/^pr-[1-9]\d*$/u.test(teardownProvider.stage) ||
+          teardownProvider.accountId !== receipt?.accountId ||
+          teardownProvider.stateStoreId.length === 0 ||
+          (teardownProvider.preexistingStage
+            ? teardownProvider.formerWorkerName === null ||
+              teardownProvider.formerWorkerUrl === null
+            : teardownProvider.formerWorkerName !== null ||
+              teardownProvider.formerWorkerUrl !== null) ||
+          teardownProvider.configSha256 !== receipt?.configSha256 ||
+          teardownProvider.deploymentInputSha256 !==
+            receipt?.deploymentInputSha256 ||
+          teardownProvider.lockfileSha256 !== receipt?.lockfileSha256;
+      } else {
+        providerIdentityMismatch =
+          workflowProvider === null ||
+          workflowProvider.candidateCommit !== receipt?.candidateCommit ||
+          workflowProvider.stage !== receipt?.stage ||
+          workflowProvider.acceptedPlanSha256 !== receipt?.acceptedPlanSha256 ||
+          workflowProvider.accountId !== receipt?.accountId ||
+          workflowProvider.configSha256 !== receipt?.configSha256 ||
+          workflowProvider.deploymentInputSha256 !==
+            receipt?.deploymentInputSha256 ||
+          workflowProvider.lockfileSha256 !== receipt?.lockfileSha256 ||
+          workflowProvider.previousVersionId !== receipt?.previousVersionId ||
+          workflowProvider.rollbackRecoveryIdentity !==
+            receipt?.rollbackRecoveryIdentity ||
+          (automation.id === "docs-preview-delivery"
+            ? workflowProvider.previewPrNumber === null ||
+              workflowProvider.stage !==
+                `pr-${workflowProvider.previewPrNumber}`
+            : workflowProvider.previewPrNumber !== null ||
+              workflowProvider.stage !== "prod");
+      }
+      let expectedPlanOperation = "production-equal-replan";
+      if (receipt?.operation === "preview-deploy") {
+        expectedPlanOperation = "preview-equal-replan";
+      } else if (receipt?.operation === "preview-destroy") {
+        expectedPlanOperation = "preview-destroy";
+      }
+      const teardownActionMismatch =
+        receipt?.operation === "preview-destroy" &&
+        plan !== null &&
+        !(
+          plan.projection.logicalResources.every(
+            ({ action }) => action === "delete"
+          ) ||
+          plan.projection.logicalResources.every(
+            ({ action }) => action === "noop"
+          )
+        );
+      const deployActionMismatch =
+        receipt?.operation !== "preview-destroy" &&
+        plan !== null &&
+        plan.projection.logicalResources.some(
+          ({ action }) => action === "delete"
+        );
+      const planContractMismatch =
+        plan === null ||
+        inspectDeploymentPlanReceipt(plan).length !== 0 ||
+        teardownActionMismatch ||
+        deployActionMismatch;
+      const planMismatch = isOrphan
+        ? plan !== null
+        : planContractMismatch ||
+          receipt === undefined ||
+          plan.operation !== expectedPlanOperation ||
+          plan.receiptPath !== receipt.planPath ||
+          plan.acceptedPlanSha256 !== receipt.acceptedPlanSha256 ||
+          plan.projection.candidate.exactCommit !== receipt.candidateCommit ||
+          plan.projection.stage !== receipt.stage ||
+          plan.projection.configSha256 !== receipt.configSha256 ||
+          plan.projection.candidate.deploymentInputSha256 !==
+            receipt.deploymentInputSha256 ||
+          plan.projection.candidate.lockfileSha256 !== receipt.lockfileSha256;
+      let hostedIdentityMismatch = false;
+      if (isOrphan) {
+        hostedIdentityMismatch = hosted !== null;
+      } else if (isTeardown) {
+        hostedIdentityMismatch = hosted !== null;
+      } else if (
+        hosted === null ||
+        receipt === undefined ||
+        workflowProvider === null
+      ) {
+        hostedIdentityMismatch = true;
+      } else {
+        let expectedHostedEnvironment = "preview";
+        if (receipt.operation === "production-rollback") {
+          expectedHostedEnvironment = "rollback";
+        } else if (workflowProvider.stage === "prod") {
+          expectedHostedEnvironment = "production";
+        }
+        const screenshotKinds = new Set(
+          hosted.screenshots.map(({ kind }) => kind)
+        );
+        hostedIdentityMismatch = [
+          hosted.accountId !== workflowProvider.accountId,
+          hosted.stateStoreId !== workflowProvider.stateStoreId,
+          hosted.candidateCommit !== receipt.candidateCommit,
+          hosted.stage !== workflowProvider.stage,
+          hosted.acceptedPlanSha256 !== workflowProvider.acceptedPlanSha256,
+          hosted.configSha256 !== workflowProvider.configSha256,
+          hosted.deploymentInputSha256 !==
+            workflowProvider.deploymentInputSha256,
+          hosted.lockfileSha256 !== workflowProvider.lockfileSha256,
+          hosted.previousVersionId !== workflowProvider.previousVersionId,
+          hosted.previewPrNumber !== workflowProvider.previewPrNumber,
+          hosted.rollbackRecoveryIdentity !==
+            workflowProvider.rollbackRecoveryIdentity,
+          receipt.operation === "production-rollback" &&
+            (workflowProvider.previousVersionId === null ||
+              workflowProvider.versionId ===
+                workflowProvider.previousVersionId),
+          hosted.deploymentId !== workflowProvider.deploymentId,
+          hosted.versionId !== workflowProvider.versionId,
+          hosted.workerName !== workflowProvider.workerName,
+          hosted.url !== workflowProvider.url,
+          hosted.diagnostics.length !== 0,
+          hosted.environment !== expectedHostedEnvironment,
+          hosted.screenshots.length !== 2,
+          screenshotKinds.size !== 2,
+          !screenshotKinds.has("desktop"),
+          !screenshotKinds.has("mobile"),
+        ].some(Boolean);
+      }
+      let workflowRunMismatch = workflowRun === null || receipt === undefined;
+      if (
+        !workflowRunMismatch &&
+        workflowRun !== null &&
+        receipt !== undefined
+      ) {
+        let allowedEvents: readonly string[] = ["workflow_dispatch"];
+        if (isOrphan) {
+          allowedEvents = ["schedule", "workflow_dispatch"];
+        } else if (isTeardown) {
+          allowedEvents = ["pull_request", "workflow_dispatch"];
+        }
+        workflowRunMismatch =
+          workflowRun.workflowRunId !== receipt.workflowRunId ||
+          workflowRun.candidateCommit !== receipt.candidateCommit ||
+          workflowRun.workflowCommit !== receipt.workflowCommit ||
+          workflowRun.path !== receipt.workflowPath ||
+          workflowRun.workflowName !== workflowName ||
+          workflowRun.ref !== "refs/heads/main" ||
+          workflowRun.status !== "completed" ||
+          workflowRun.conclusion !== "success" ||
+          !allowedEvents.includes(workflowRun.event) ||
+          (isTeardown
+            ? workflowRun.headBranch.length === 0 ||
+              workflowRun.headSha.length !== 40
+            : workflowRun.headBranch !== "main" ||
+              workflowRun.headSha !== receipt.workflowCommit);
+      }
+      let workflowInputMismatch =
+        workflowInput === null || receipt === undefined;
+      if (
+        !workflowInputMismatch &&
+        workflowInput !== null &&
+        receipt !== undefined
+      ) {
+        let expectedInputOperation:
+          | "deploy"
+          | "destroy"
+          | "report"
+          | "rollback";
+        if (
+          receipt.operation === "preview-deploy" ||
+          receipt.operation === "production-deploy"
+        ) {
+          expectedInputOperation = "deploy";
+        } else if (receipt.operation === "production-rollback") {
+          expectedInputOperation = "rollback";
+        } else if (receipt.operation === "preview-destroy") {
+          expectedInputOperation = "destroy";
+        } else {
+          expectedInputOperation = "report";
+        }
+        let expectedPrNumber: number | null = null;
+        if (
+          automation.id === "docs-preview-delivery" ||
+          automation.id === "docs-preview-teardown"
+        ) {
+          expectedPrNumber = Number.parseInt(receipt.stage.slice(3), 10);
+        }
+        workflowInputMismatch =
+          workflowInput.candidateCommit !== receipt.candidateCommit ||
+          workflowInput.workflowCommit !== receipt.workflowCommit ||
+          workflowInput.workflowRunId !== receipt.workflowRunId ||
+          workflowInput.workflowPath !== receipt.workflowPath ||
+          workflowInput.workflowName !== workflowName ||
+          workflowInput.sourceRef !== "refs/heads/main" ||
+          workflowInput.operation !== expectedInputOperation ||
+          workflowInput.prNumber !== expectedPrNumber;
+      }
+      const receiptMismatch =
+        receipt === undefined ||
+        evidence === undefined ||
+        automation.externalState.receipt !== receipt?.workflowReceiptPath ||
+        receipt.automationId !== automation.id ||
+        receipt.environment !== automation.environment.id ||
+        receipt.principal !== automation.authority.principal ||
+        receipt.lockGroup !== automation.lock.group ||
+        operationMismatch ||
+        receipt.workflowPath !== workflowPath ||
+        (isOrphan
+          ? receipt.acceptedPlanSha256 !== null ||
+            receipt.accountId !== null ||
+            receipt.configSha256 !== null ||
+            receipt.deploymentInputSha256 !== null ||
+            receipt.planPath !== null ||
+            receipt.providerReadbackPath !== null ||
+            receipt.hostedProofPath !== null ||
+            receipt.lockfileSha256 !== null ||
+            receipt.previousVersionId !== null ||
+            receipt.rollbackRecoveryIdentity !== null ||
+            receipt.reportPath === null
+          : receipt.acceptedPlanSha256 === null ||
+            receipt.planPath === null ||
+            receipt.providerReadbackPath === null ||
+            receipt.reportPath !== null ||
+            (isTeardown
+              ? receipt.hostedProofPath !== null
+              : receipt.hostedProofPath === null)) ||
+        receipt.workflowRunPath.length === 0 ||
+        workflowRunMismatch ||
+        receipt.workflowInputPath.length === 0 ||
+        workflowInputMismatch ||
+        providerIdentityMismatch ||
+        planMismatch ||
+        hostedIdentityMismatch;
+      if (receiptMismatch) {
+        findings.push(
+          finding(
+            "external-proof",
+            `tools/docs-deployment/automation-register.json:${automation.id}.externalState`,
+            "Decode the named workflow receipt and verify exact workflow, environment, principal, stage lock, candidate, plan and provider/hosted postconditions before establishing external state."
+          )
+        );
+      }
     }
   }
   const teardown = automations.find(
@@ -260,6 +614,7 @@ export const inspectDeploymentAutomationRegisters = (
     orphan.authority.operations[0] !== "orphan-inventory-read" ||
     !hasExactStrings(orphan.authority.credentialIdentities, [
       "CLOUDFLARE_READ_API_TOKEN",
+      "ALCHEMY_STATE_STORE_CREDENTIALS_JSON",
     ]) ||
     !hasExactStrings(orphan.authority.resources, [
       "open TaxKit pull-request identities",
@@ -273,6 +628,7 @@ export const inspectDeploymentAutomationRegisters = (
       "deployment",
       "provider-write",
       "release-or-publication",
+      "state-store-write",
     ]) ||
     orphan.plan.acceptedDigestRequired ||
     orphan.plan.equalReplanRequired ||

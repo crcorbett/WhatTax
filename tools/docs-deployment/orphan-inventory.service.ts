@@ -17,6 +17,7 @@ import {
 } from "./orphan-inventory.schemas.js";
 
 const repository = "crcorbett/taxkit" as const;
+const githubPullRequestResultLimit = 1000;
 const githubArgs = [
   "pr",
   "list",
@@ -25,13 +26,18 @@ const githubArgs = [
   "--state",
   "open",
   "--limit",
-  "100",
+  "1000",
   "--json",
-  "headRefOid,isCrossRepository,number,state,url",
+  "headRefOid,isCrossRepository,isDraft,number,state,url",
 ] as const;
 
 const previewStageNumber = (stage: string): number =>
   Number.parseInt(stage.slice("pr-".length), 10);
+
+const decodeProcessBytes = (bytes: readonly Uint8Array[]) =>
+  new TextDecoder().decode(
+    Uint8Array.from(bytes.flatMap((chunk) => [...chunk]))
+  );
 
 export const makeDocsDeploymentOrphanInventoryReceipt = (
   observedAt: string,
@@ -51,7 +57,10 @@ export const makeDocsDeploymentOrphanInventoryReceipt = (
         | "orphan-candidate" = "active-trusted-preview";
       if (pullRequest === null) {
         classification = "orphan-candidate";
-      } else if (pullRequest.isCrossRepository) {
+      } else if (
+        pullRequest.isCrossRepository ||
+        pullRequest.isDraft === false
+      ) {
         classification = "untrusted-preview-stage";
       }
       return {
@@ -163,6 +172,7 @@ export const DocsDeploymentOrphanSourcesLive = Layer.effect(
       | DocsDeploymentOrphanInventoryReadError,
       Scope.Scope
     > =>
+      // oxlint-disable-next-line eslint/complexity -- one bounded process ingress keeps command identity and safe failure decoding together
       Effect.gen(function* readJsonCommandOutput() {
         if ([command, ...args].join(" ") !== expectedCommand) {
           return yield* new DocsDeploymentOrphanInventoryInputError({
@@ -173,6 +183,10 @@ export const DocsDeploymentOrphanSourcesLive = Layer.effect(
           .spawn(
             ChildProcess.make(command, args, {
               cwd: repositoryRoot,
+              env: {
+                ALCHEMY_PROFILE: process.env["ALCHEMY_PROFILE"],
+                HOME: process.env["HOME"],
+              },
               extendEnv: true,
               forceKillAfter: "2 seconds",
               stderr: "pipe",
@@ -185,18 +199,52 @@ export const DocsDeploymentOrphanSourcesLive = Layer.effect(
               () => new DocsDeploymentOrphanInventoryReadError({ operation })
             )
           );
-        const [stdout, [exitCode]] = yield* Effect.all(
-          [
-            Stream.runCollect(handle.stdout),
-            Effect.zip(handle.exitCode, Stream.runDrain(handle.stderr), {
-              concurrent: true,
-            }),
-          ],
+        const [stdout, stderr] = yield* Effect.all(
+          [Stream.runCollect(handle.stdout), Stream.runCollect(handle.stderr)],
           { concurrency: "unbounded" }
         );
+        const exitCode = yield* handle.exitCode;
+        const stdoutText = decodeProcessBytes([...stdout]);
+        const stderrText = decodeProcessBytes([...stderr]);
+        const outputText = `${stdoutText}\n${stderrText}`;
         if (Number(exitCode) !== 0) {
+          const cacheShape = outputText.match(
+            /FAIL \[inventory-input\] target=missing cached Cloudflare state-store credentials fileVisible=(true|false) fileJsonObject=(true|false)/u
+          );
+          const safeFailure = outputText.match(
+            /FAIL \[(inventory-input|inventory-read|inventory-disagreement)\](?: operation=([A-Za-z0-9:_-]+)| target=(CI=1|missing cached Cloudflare state-store credentials|invalid cached Cloudflare state-store credentials|cached state-store account identity))?/u
+          );
+          let inputSuffix: string | undefined;
+          if (safeFailure?.[3] === "CI=1") {
+            inputSuffix = "ci";
+          } else if (
+            safeFailure?.[3] === "cached state-store account identity"
+          ) {
+            inputSuffix = "account";
+          } else if (
+            safeFailure?.[3] ===
+            "missing cached Cloudflare state-store credentials"
+          ) {
+            inputSuffix = "missing-cache";
+          } else if (
+            safeFailure?.[3] ===
+            "invalid cached Cloudflare state-store credentials"
+          ) {
+            inputSuffix = "invalid-cache";
+          } else if (safeFailure?.[3] !== undefined) {
+            inputSuffix = "credentials";
+          }
+          const failureSuffix =
+            safeFailure?.[2] ??
+            inputSuffix ??
+            safeFailure?.[1]?.replace("inventory-", "");
+          const cacheShapeSuffix = cacheShape
+            ? `-file-visible-${cacheShape[1]}-json-object-${cacheShape[2]}`
+            : "";
           return yield* new DocsDeploymentOrphanInventoryReadError({
-            operation,
+            operation: failureSuffix
+              ? `${operation}:${failureSuffix}${cacheShapeSuffix}`
+              : operation,
           });
         }
         const text = yield* Effect.try({
@@ -206,10 +254,10 @@ export const DocsDeploymentOrphanSourcesLive = Layer.effect(
             }),
           try: () =>
             new TextDecoder("utf-8", { fatal: true }).decode(
-              Uint8Array.from([...stdout].flatMap((bytes) => [...bytes]))
+              new TextEncoder().encode(stdoutText)
             ),
         });
-        return yield* Schema.decodeUnknownEffect(
+        const decoded = yield* Schema.decodeUnknownEffect(
           Schema.fromJsonString(schema),
           {
             onExcessProperty: "error",
@@ -222,6 +270,16 @@ export const DocsDeploymentOrphanSourcesLive = Layer.effect(
               })
           )
         );
+        if (
+          operation === "github-open-pull-requests" &&
+          Array.isArray(decoded) &&
+          decoded.length >= githubPullRequestResultLimit
+        ) {
+          return yield* new DocsDeploymentOrphanInventoryInputError({
+            target: "incomplete GitHub pull-request inventory",
+          });
+        }
+        return decoded;
       }).pipe(
         Effect.catchTag(
           "PlatformError",

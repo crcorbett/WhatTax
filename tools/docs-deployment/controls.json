@@ -42,5 +42,16 @@
     "retirementCondition": "A separately accepted lifecycle owner replaces report-only classification without weakening non-mutation.",
     "reviewTrigger": "Inventory source, schedule, credential, classification, teardown or retirement change.",
     "signal": "Scheduled or manual orphan inventory runs."
+  },
+  {
+    "evidence": "bun run check:docs-deployment-automation",
+    "fixture": "tools/docs-deployment/workflow.contract.test.ts and workflow-run-check.runtime.ts",
+    "id": "docs-workflow-receipt-reconciliation",
+    "owner": "taxkit-docs-deployment-automation-owner",
+    "preventedFailure": "A triggering deployment run or detached artifact is promoted as a completed external receipt without completed Actions API readback, exact workflow/input identity and bounded failure metadata.",
+    "recovery": "Retain the reconciliation stop, preserve the source artifact and rerun the read-only workflow_run reconciler against the exact completed run.",
+    "retirementCondition": "A stronger provider-independent receipt reconciler preserves completed-run, artifact, source/input and failure-readback coverage.",
+    "reviewTrigger": "Workflow_run trigger, receipt schema/checker, artifact naming, source checkout or external-state promotion change.",
+    "signal": "A named Preview, Production, teardown or report-only workflow completes."
   }
 ]

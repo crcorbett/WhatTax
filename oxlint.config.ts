@@ -46,6 +46,11 @@ const decodingBoundaryFiles = [
   "tools/docs-deployment/input.boundary.ts",
   "tools/docs-deployment/automation.check.runtime.ts",
   "tools/docs-deployment/automation.policy.test.ts",
+  "tools/docs-deployment/workflow-proof-check.runtime.ts",
+  "tools/docs-deployment/workflow-input-check.runtime.ts",
+  "tools/docs-deployment/workflow-run-check.runtime.ts",
+  "tools/docs-deployment/workflow-plan-check.runtime.ts",
+  "tools/docs-deployment/workflow-teardown-proof-check.runtime.ts",
   "tools/docs-deployment/inventory.runtime.ts",
   "tools/docs-deployment/inventory.service.test.ts",
   "tools/docs-deployment/inventory.service.ts",
@@ -210,6 +215,11 @@ const runtimeBoundaryFiles = [
   "tools/docs-deployment/orphan-inventory.service.test.ts",
   "tools/docs-deployment/orphan-inventory.service.ts",
   "tools/docs-deployment/policy.test.ts",
+  "tools/docs-deployment/workflow-proof-check.runtime.ts",
+  "tools/docs-deployment/workflow-input-check.runtime.ts",
+  "tools/docs-deployment/workflow-run-check.runtime.ts",
+  "tools/docs-deployment/workflow-plan-check.runtime.ts",
+  "tools/docs-deployment/workflow-teardown-proof-check.runtime.ts",
 ];
 
 const processBoundaryFiles = [
@@ -231,6 +241,11 @@ const processBoundaryFiles = [
   "tools/docs-deployment/inventory.runtime.ts",
   "tools/docs-deployment/orphan-inventory.runtime.ts",
   "tools/docs-deployment/orphan-inventory.service.ts",
+  "tools/docs-deployment/workflow-proof-check.runtime.ts",
+  "tools/docs-deployment/workflow-input-check.runtime.ts",
+  "tools/docs-deployment/workflow-run-check.runtime.ts",
+  "tools/docs-deployment/workflow-plan-check.runtime.ts",
+  "tools/docs-deployment/workflow-teardown-proof-check.runtime.ts",
 ];
 
 const consoleBoundaryFiles = [
@@ -253,6 +268,11 @@ const consoleBoundaryFiles = [
   "tools/docs-deployment/automation.check.runtime.ts",
   "tools/docs-deployment/inventory.runtime.ts",
   "tools/docs-deployment/orphan-inventory.runtime.ts",
+  "tools/docs-deployment/workflow-proof-check.runtime.ts",
+  "tools/docs-deployment/workflow-input-check.runtime.ts",
+  "tools/docs-deployment/workflow-run-check.runtime.ts",
+  "tools/docs-deployment/workflow-plan-check.runtime.ts",
+  "tools/docs-deployment/workflow-teardown-proof-check.runtime.ts",
 ];
 
 const bunAdapterFiles = [
@@ -278,6 +298,11 @@ const bunAdapterFiles = [
   "tools/docs-deployment/automation.check.runtime.ts",
   "tools/docs-deployment/inventory.runtime.ts",
   "tools/docs-deployment/orphan-inventory.runtime.ts",
+  "tools/docs-deployment/workflow-proof-check.runtime.ts",
+  "tools/docs-deployment/workflow-input-check.runtime.ts",
+  "tools/docs-deployment/workflow-run-check.runtime.ts",
+  "tools/docs-deployment/workflow-plan-check.runtime.ts",
+  "tools/docs-deployment/workflow-teardown-proof-check.runtime.ts",
 ];
 
 const bunRuntimeEntrypointFiles = [
@@ -301,6 +326,9 @@ const bunRuntimeEntrypointFiles = [
   "tools/docs-deployment/automation.check.runtime.ts",
   "tools/docs-deployment/inventory.runtime.ts",
   "tools/docs-deployment/orphan-inventory.runtime.ts",
+  "tools/docs-deployment/workflow-proof-check.runtime.ts",
+  "tools/docs-deployment/workflow-plan-check.runtime.ts",
+  "tools/docs-deployment/workflow-teardown-proof-check.runtime.ts",
 ];
 
 export default defineConfig({

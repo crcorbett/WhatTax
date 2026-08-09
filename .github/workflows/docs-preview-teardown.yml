@@ -32,8 +32,6 @@ jobs:
     environment: taxkit-docs-preview-teardown
     env:
       ALCHEMY_PROFILE: default
-      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       PR_NUMBER: ${{ github.event.pull_request.number || inputs.pr_number }}
       REVIEWED_WORKFLOW_SHA: ${{ inputs.reviewed_workflow_sha || github.sha }}
     steps:
@@ -42,13 +40,27 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          test "$PR_NUMBER" -gt 0
+          printf '%s' "$PR_NUMBER" | grep -Eq '^[1-9][0-9]*$'
+          pr_json="$(gh api "repos/${GITHUB_REPOSITORY}/pulls/${PR_NUMBER}")"
+          test "$(jq -r .state <<<"$pr_json")" = "closed"
+          test "$(jq -r .base.ref <<<"$pr_json")" = "main"
+          test "$(jq -r .head.repo.full_name <<<"$pr_json")" = "$GITHUB_REPOSITORY"
           if [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
             test "$(jq -r .pull_request.base.ref "$GITHUB_EVENT_PATH")" = "main"
             test "$(jq -r .pull_request.state "$GITHUB_EVENT_PATH")" = "closed"
             test "$(jq -r .pull_request.head.repo.full_name "$GITHUB_EVENT_PATH")" = "$GITHUB_REPOSITORY"
+          else
+            test "$GITHUB_REF" = "refs/heads/main"
           fi
           test "$REVIEWED_WORKFLOW_SHA" = "$(gh api "repos/${GITHUB_REPOSITORY}/git/ref/heads/main" --jq .object.sha)"
+          mkdir -p "$RUNNER_TEMP/docs-deployment"
+          jq -nS \
+            --arg candidate "$REVIEWED_WORKFLOW_SHA" \
+            --arg pr "$PR_NUMBER" \
+            --arg workflow "$REVIEWED_WORKFLOW_SHA" \
+            --arg run "$GITHUB_RUN_ID" \
+            '{candidateCommit:$candidate,operation:"destroy",prNumber:($pr|tonumber),sourceRef:"refs/heads/main",workflowCommit:$workflow,workflowName:"Docs Preview Teardown",workflowPath:".github/workflows/docs-preview-teardown.yml",workflowRunId:$run}' \
+            > "$RUNNER_TEMP/docs-deployment/workflow-input.json"
 
       - name: Check out reviewed default-branch implementation
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.2.0
@@ -68,6 +80,17 @@ jobs:
       - name: Install frozen dependencies
         run: bun install --frozen-lockfile
 
+      - name: Schema-check teardown workflow input
+        env:
+          TAXKIT_WORKFLOW_INPUT_RECEIPT: ${{ runner.temp }}/docs-deployment/workflow-input.json
+          TAXKIT_WORKFLOW_INPUT_CANDIDATE_COMMIT: ${{ env.REVIEWED_WORKFLOW_SHA }}
+          TAXKIT_WORKFLOW_INPUT_WORKFLOW_COMMIT: ${{ env.REVIEWED_WORKFLOW_SHA }}
+          TAXKIT_WORKFLOW_INPUT_RUN_ID: ${{ github.run_id }}
+          TAXKIT_WORKFLOW_INPUT_WORKFLOW_PATH: .github/workflows/docs-preview-teardown.yml
+          TAXKIT_WORKFLOW_INPUT_OPERATION: destroy
+          TAXKIT_WORKFLOW_INPUT_PR_NUMBER: ${{ env.PR_NUMBER }}
+        run: bun run check:docs-deployment-workflow-input
+
       - name: Install pinned Playwright browser
         run: apps/docs/node_modules/.bin/playwright install --with-deps chromium
 
@@ -78,19 +101,38 @@ jobs:
         run: bun run --filter=docs build:cloudflare
 
       - name: Materialize ephemeral Alchemy state-store credential cache
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
         run: |
           set -euo pipefail
           ALCHEMY_PLAIN=1 CI=1 bunx alchemy login --profile "$ALCHEMY_PROFILE" > /dev/null
           ALCHEMY_PLAIN=1 CI=0 bunx alchemy cloudflare bootstrap --profile "$ALCHEMY_PROFILE" --worker-name alchemy-state-store
 
       - name: Equal dry-run and destroy exact Preview stage
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
         run: |
           set -euo pipefail
           mkdir -p "$RUNNER_TEMP/docs-deployment"
           stage="pr-${PR_NUMBER}"
+          ALCHEMY_PROFILE="$ALCHEMY_PROFILE" CI=1 bun run check:docs-deployment-inventory > "$RUNNER_TEMP/docs-deployment/provider-inventory-before.json"
+          stage_count_before="$(jq --arg stage "$stage" '[.stages[] | select(.stage == $stage)] | length' "$RUNNER_TEMP/docs-deployment/provider-inventory-before.json")"
+          test "$stage_count_before" -eq 0 || test "$stage_count_before" -eq 1
+          previous_worker_name=""
+          previous_worker_url=""
+          if [ "$stage_count_before" -eq 1 ]; then
+            jq -e --arg stage "$stage" '([.stages[] | select(.stage == $stage) | .resources | map(.logicalId) | sort] == [["DocsBuild", "DocsWebsite"]]) and ([.providerWorkers[] | select(.stage == $stage and .logicalId == "DocsWebsite")] | length == 1)' "$RUNNER_TEMP/docs-deployment/provider-inventory-before.json" > /dev/null
+            previous_worker_name="$(jq -er --arg stage "$stage" '.stages[] | select(.stage == $stage) | .resources[] | select(.logicalId == "DocsWebsite") | .workerName' "$RUNNER_TEMP/docs-deployment/provider-inventory-before.json")"
+            previous_worker_url="$(jq -er --arg stage "$stage" '.stages[] | select(.stage == $stage) | .resources[] | select(.logicalId == "DocsWebsite") | .workerUrl' "$RUNNER_TEMP/docs-deployment/provider-inventory-before.json")"
+          fi
           for attempt in one two; do
             ALCHEMY_PLAIN=1 CI=1 bunx alchemy destroy --dry-run --stage "$stage" --profile "$ALCHEMY_PROFILE" --yes > "$RUNNER_TEMP/docs-deployment/destroy-${attempt}.txt"
-            sed -E $'s/\\033\\[[0-9;]*m//g' "$RUNNER_TEMP/docs-deployment/destroy-${attempt}.txt" | grep -E '^\[(DocsBuild|DocsWebsite)\] delete$' > "$RUNNER_TEMP/docs-deployment/destroy-${attempt}.resources.txt" || true
+            destroy_resource_lines="$(sed -E $'s/\\033\\[[0-9;]*m//g' "$RUNNER_TEMP/docs-deployment/destroy-${attempt}.txt" | grep -E '^\\[[^]]+\\] ' || true)"
+            unexpected_destroy_resources="$(printf '%s\\n' "$destroy_resource_lines" | grep -Ev '^\\[(DocsBuild|DocsWebsite)\\] (delete|noop)$' || true)"
+            test -z "$unexpected_destroy_resources"
+            printf '%s\\n' "$destroy_resource_lines" | grep -E '^\\[(DocsBuild|DocsWebsite)\\] delete$' > "$RUNNER_TEMP/docs-deployment/destroy-${attempt}.resources.txt" || true
             resource_count="$(wc -l < "$RUNNER_TEMP/docs-deployment/destroy-${attempt}.resources.txt" | tr -d ' ')"
             test "$resource_count" -eq 0 || test "$resource_count" -eq 2
           done
@@ -114,10 +156,6 @@ jobs:
             '{candidate:{deploymentInputSha256:$deployment,exactCommit:$commit,lockfileSha256:$lockfile},configSha256:$config,logicalResources:[{action:$action,logicalId:"DocsBuild",resourceType:"Command.Build"},{action:$action,logicalId:"DocsWebsite",resourceType:"Cloudflare.Worker"}],redaction:{ansiRemoved:true,secretValuesIncluded:false,timestampsExcludedFromDigest:true},schemaVersion:1,stack:"TaxKitDocsCloudflare",stage:$stage}' \
             > "$RUNNER_TEMP/docs-deployment/projection.json"
           destroy_sha256="$(jq -cS . "$RUNNER_TEMP/docs-deployment/projection.json" | tr -d '\n' | shasum -a 256 | cut -d ' ' -f1)"
-          if [ "$resource_count" -eq 2 ]; then
-            ALCHEMY_PLAIN=1 CI=1 bunx alchemy destroy --stage "$stage" --profile "$ALCHEMY_PROFILE" --yes
-          fi
-          ALCHEMY_PROFILE="$ALCHEMY_PROFILE" CI=1 bun run check:docs-deployment-inventory > "$RUNNER_TEMP/docs-deployment/provider-inventory.json"
           jq -nS \
             --arg acceptedBy "$GITHUB_ACTOR" \
             --arg acceptedPlanSha256 "$destroy_sha256" \
@@ -125,6 +163,48 @@ jobs:
             --slurpfile projection "$RUNNER_TEMP/docs-deployment/projection.json" \
             '{acceptedBy:$acceptedBy,acceptedPlanSha256:$acceptedPlanSha256,observedAt:$observedAt,operation:"preview-destroy",projection:$projection[0],receiptPath:("docs/evidence/deployments/workflow-" + env.GITHUB_RUN_ID + "/destroy-plan.json"),replanSha256:$acceptedPlanSha256,schemaVersion:1}' \
             > "$RUNNER_TEMP/docs-deployment/destroy-plan.json"
+          TAXKIT_WORKFLOW_PLAN_RECEIPT="$RUNNER_TEMP/docs-deployment/destroy-plan.json" \
+          TAXKIT_WORKFLOW_PLAN_CANDIDATE_COMMIT="$REVIEWED_WORKFLOW_SHA" \
+          TAXKIT_WORKFLOW_PLAN_OPERATION=preview-destroy \
+          TAXKIT_WORKFLOW_PLAN_STAGE="$stage" \
+          TAXKIT_WORKFLOW_PLAN_SHA256="$destroy_sha256" \
+          TAXKIT_WORKFLOW_PLAN_REQUIRE_REPLAN=1 \
+            bun run check:docs-deployment-workflow-plan
+          ALCHEMY_PROFILE="$ALCHEMY_PROFILE" CI=1 bun run check:docs-deployment-inventory > "$RUNNER_TEMP/docs-deployment/provider-inventory-pre-destroy.json"
+          jq -e --arg stage "$stage" --argjson expected "$stage_count_before" --arg worker "$previous_worker_name" --arg url "$previous_worker_url" '
+            ([.stages[] | select(.stage == $stage)] | length == $expected) and
+            (if $expected == 0 then true else
+              ([.stages[] | select(.stage == $stage) | .resources | map(.logicalId) | sort] == [["DocsBuild", "DocsWebsite"]]) and
+              ([.providerWorkers[] | select(.stage == $stage and .logicalId == "DocsWebsite" and .workerName == $worker and .workerUrl == $url)] | length == 1)
+            end)
+          ' "$RUNNER_TEMP/docs-deployment/provider-inventory-pre-destroy.json" > /dev/null
+          if [ "$resource_count" -eq 2 ]; then
+            ALCHEMY_PLAIN=1 CI=1 bunx alchemy destroy --stage "$stage" --profile "$ALCHEMY_PROFILE" --yes
+          fi
+          ALCHEMY_PROFILE="$ALCHEMY_PROFILE" CI=1 bun run check:docs-deployment-inventory > "$RUNNER_TEMP/docs-deployment/provider-inventory.json"
+          jq -e --arg stage "$stage" '(.agreement == "state-provider-agree") and ([.stages[] | select(.stage == $stage)] | length == 0) and ([.providerWorkers[] | select(.stage == $stage and .logicalId == "DocsWebsite")] | length == 0)' "$RUNNER_TEMP/docs-deployment/provider-inventory.json" > /dev/null
+          if [ "$stage_count_before" -eq 1 ]; then
+            worker_url_before="$(jq -er --arg stage "$stage" '.stages[] | select(.stage == $stage) | .resources[] | select(.logicalId == "DocsWebsite") | .workerUrl' "$RUNNER_TEMP/docs-deployment/provider-inventory-before.json")"
+            test "$(curl --silent --show-error --output /dev/null --write-out '%{http_code}' "$worker_url_before")" = "404"
+          fi
+          state_store_id="$(jq -er '.stateStore.id' "$RUNNER_TEMP/docs-deployment/provider-inventory.json")"
+          jq -nS \
+            --arg account "$CLOUDFLARE_ACCOUNT_ID" \
+            --arg candidate "$REVIEWED_WORKFLOW_SHA" \
+            --arg config "$config_sha256" \
+            --arg deployment "$deployment_input_sha256" \
+            --arg lockfile "$lockfile_sha256" \
+            --arg formerWorkerName "$previous_worker_name" \
+            --arg formerWorkerUrl "$previous_worker_url" \
+            --arg stage "$stage" \
+            --arg stateStoreId "$state_store_id" \
+            --argjson preexistingStage "$stage_count_before" \
+            '{accountId:$account,candidateCommit:$candidate,configSha256:$config,deploymentInputSha256:$deployment,formerWorkerName:(if $formerWorkerName == "" then null else $formerWorkerName end),formerWorkerUrl:(if $formerWorkerUrl == "" then null else $formerWorkerUrl end),lockfileSha256:$lockfile,preexistingStage:($preexistingStage == 1),providerWorkerAbsent:true,schemaVersion:1,stage:$stage,stateStoreId:$stateStoreId,stateStageAbsent:true}' \
+            > "$RUNNER_TEMP/docs-deployment/provider-readback.json"
+          TAXKIT_WORKFLOW_TEARDOWN_READBACK="$RUNNER_TEMP/docs-deployment/provider-readback.json" \
+          TAXKIT_WORKFLOW_CANDIDATE_COMMIT="$REVIEWED_WORKFLOW_SHA" \
+          TAXKIT_WORKFLOW_STAGE="$stage" \
+            bun run check:docs-deployment-workflow-teardown-proof
 
       - name: Upload sanitized Preview teardown evidence
         if: always()

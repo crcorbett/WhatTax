@@ -3,7 +3,7 @@ document_type: standard
 lifecycle: current
 authority: canonical
 owner: taxkit-ci-release-maintainer
-last_reviewed: 2026-08-05
+last_reviewed: 2026-08-10
 review_trigger: public boundary, workflow, action, release graph, or repeated-review finding change
 ---
 
@@ -44,6 +44,7 @@ Its Schema and negative fixtures admit only these controls:
 | Preview, Production or teardown mutation; cancellable or weak stage locking bypasses equal replan or readback | `docs-workflow-mutation-lock`; deployment policy check; restore the non-cancellable stage lock and accepted/equal plan contract | Concurrency, plan, approval, state or provider change | Stronger provider-aware distributed lock replaces repository orchestration locking. |
 | Pull request closes; teardown executes candidate code or derives a target other than exact `pr-N` | `docs-preview-teardown-safety`; stop and return to reviewed default-branch code plus manual exact-stage recovery | Close trigger, checkout, stage derivation or destroy change | Stronger accepted Preview lifecycle preserves reviewed-code and exact-stage proof. |
 | Orphan inventory; partial inventory gains provider mutation or automatic deletion | `docs-orphan-report-only`; retain an inconclusive report and require separate teardown authority | Inventory source, schedule, credential, classification or retirement change | Separately accepted lifecycle owner replaces report-only classification without weakening non-mutation. |
+| Named deployment workflow completes; a self-authored or detached run/artifact is promoted without completed Actions API readback, exact source/input identity or bounded failure metadata | `docs-workflow-receipt-reconciliation`; `workflow.contract.test.ts`, `workflow-run-check.runtime.ts`, and the read-only `workflow_run` reconciler; retain the source artifact and reconciliation stop, then retry against the exact completed run | Workflow_run trigger, receipt schema/checker, artifact naming, source checkout or external-state promotion change | A stronger provider-independent receipt reconciler preserves completed-run, artifact, source/input and failure-readback coverage. |
 
 `bun run check:docs-deployment-automation` proves these local records and
 cross-field invariants only. It currently reports zero externally established
@@ -74,3 +75,21 @@ Alchemy beta.64 state-store bearer without the mutation bootstrap path; no
 provider mutation occurred. Consequently the aggregate deployment register
 remains `not-established`, and orphan detection remains an inconclusive
 report-only signal rather than deletion or teardown authority.
+
+The current b59e4ee epoch adds claim-matched protected Preview, exact-stage
+teardown, fixed Production and normal rollback receipts under
+`docs/evidence/deployments/2026-08-10-*`; those receipts do not change the
+automation register's external-state status. Report-only run `31319845724`
+passed on the open branch and proved only the separate state/provider read. A
+reviewed default-branch source readback remains the control admission gate.
+
+The workflow owners now fail closed on unexpected actions/resources in the
+equal replan, assert exact provider stage/Worker/deployment/version identity,
+run the shared hosted proof checker (including its candidate-bound screenshots)
+before retaining a mutation artifact, and require a successful Schema-decoded
+Preview artifact before Production mutation. Teardown requires exact
+preflight and post-destroy state/Worker absence and emits a separate absence
+readback. These are executable controls; a workflow artifact is still only a
+dated observation until its outer receipt is promoted and admitted by the
+positive external-state path. Report-only scheduling remains reviewer-gated,
+and the 1,000-row pull-request bound fails closed at incomplete inventory.

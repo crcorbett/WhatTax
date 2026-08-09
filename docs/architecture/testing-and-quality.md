@@ -3,7 +3,7 @@ document_type: architecture
 lifecycle: current
 authority: canonical
 owner: taxkit-quality-owner
-last_reviewed: 2026-07-30
+last_reviewed: 2026-08-09
 review_trigger: verification graph, proof boundary, CI, deployment, or test-owner change
 ---
 
@@ -124,35 +124,36 @@ route UI, framework error boundaries and console cleanliness, but it does not
 prove SSR or hydration. Prove initial SSR, hydration and client navigation
 separately against the built app on `https://docs.taxkit.localhost`, including
 a successful server-function response and no document request during the client
-transition. `bun run --filter=docs test:built` is that built-production HTTP
-and Playwright proof: it serves the generated Nitro/Vercel function and static
-assets on an ephemeral local port, asserts SSR response content and HTTP 404
-before browser inspection, then proves clean hydration, server-function
-navigation through real sidebar and authored-MDX links, browser history,
-pending and client not-found behavior without another document request. It
-also asserts that initial hydration does not steal focus, client navigation
-focuses the destination heading, the skip link reaches the main landmark,
-navigation is labelled and current, the mobile disclosure is operable,
-representative interactive colours meet the owned contrast threshold, reduced
-motion removes no required information, and the console is clean. The command
-owns server/browser cleanup. Its screenshot mode is supplemental visual
-evidence only: a visually correct image does not prove SSR content, hydration,
-request resource type, HTTP status, keyboard or focus behavior, contrast,
-motion suppression or console cleanliness.
+transition. `bun run --filter=docs test:built` is that built-production HTTP,
+workerd and Playwright proof: it serves the generated Cloudflare no-bundle
+Worker and static assets on an ephemeral local port, asserts SSR response
+content and HTTP 404 before browser inspection, then proves clean hydration,
+server-function navigation through real sidebar and authored-MDX links, browser
+history, pending and client not-found behavior without another document
+request. It also asserts that initial hydration does not steal focus, client
+navigation focuses the destination heading, the skip link reaches the main
+landmark, navigation is labelled and current, the mobile disclosure is
+operable, representative interactive colours meet the owned contrast
+threshold, reduced motion removes no required information, immutable asset
+headers, runtime reuse and compressed upload limits, and the console is clean.
+The command owns workerd/browser cleanup. `test:cloudflare-built` is an
+explicit alias. Its screenshot mode is supplemental visual evidence only: a
+visually correct image does not prove SSR content, hydration, request resource
+type, HTTP status, keyboard or focus behavior, contrast, motion suppression or
+console cleanliness.
 
-`bun run --filter=docs test:cloudflare-built` independently builds the official
-Cloudflare target, verifies Wrangler's no-bundle dry-run without credentials or
-bindings, and copies only `dist/server` and `dist/client` to an isolated
-temporary directory before starting Wrangler/workerd. It proves initial SSR,
-static assets and immutable cache headers, direct and client not-found
-behavior, hydration, server-function transport, no-document client navigation,
-sequential/concurrent request isolation, representative accessibility and
-console/page cleanliness. It also checks the gzip upload against the 3 MiB
-Workers Free limit and records local process-to-first-response and
-first-response-request timing. Those timings are readiness observations, not
-Cloudflare CPU-startup-limit validation. The provider must establish the
-account plan, upload acceptance, deployment/runtime identity and applicable
-startup-limit readback.
+The built proof independently builds the official Cloudflare target, verifies
+Wrangler's no-bundle dry-run without credentials or bindings, and copies only
+`dist/server` and `dist/client` to an isolated temporary directory before
+starting Wrangler/workerd. It proves initial SSR, static assets and immutable
+cache headers, direct and client not-found behavior, hydration, server-function
+transport, no-document client navigation, sequential/concurrent request
+isolation, representative accessibility and console/page cleanliness. It also
+checks the gzip upload against the 3 MiB Workers Free limit and records local
+process-to-first-response and first-response-request timing. Those timings are
+readiness observations, not Cloudflare CPU-startup-limit validation. The
+provider must establish the account plan, upload acceptance, deployment/runtime
+identity and applicable startup-limit readback.
 
 The separate
 `docs/verification/docs-deployment-journeys.json` inventory owns only four
@@ -262,7 +263,8 @@ inherits it without duplicating execution or widening workflow authority.
 
 Deployment automation is intentionally outside Quality. The local
 `check:docs-deployment-automation` command Schema-decodes four target-owned
-automation records plus four controls and runs focused negative fixtures for
+automation records plus five controls (including the read-only completed-run
+receipt reconciler) and runs focused negative fixtures for
 candidate trust, mutation locking, equal replans, teardown safety,
 credential/environment denial and report-only orphan handling. This proves
 repository desired state only. A hosted workflow claim additionally requires

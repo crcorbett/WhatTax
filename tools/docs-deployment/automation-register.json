@@ -100,7 +100,7 @@
       ],
       "durationOrRevocation": "One protected fixed Production operation for the accepted exact candidate; revoke on completion, explicit revocation or identity/safety mismatch.",
       "environment": "taxkit-docs-production",
-      "operations": ["production-deploy"],
+      "operations": ["production-deploy", "production-rollback"],
       "principal": "taxkit-docs-production-workflow",
       "resources": [
         "TaxKitDocsCloudflare/prod/DocsBuild",
@@ -268,14 +268,18 @@
   },
   {
     "authority": {
-      "credentialIdentities": ["CLOUDFLARE_READ_API_TOKEN"],
+      "credentialIdentities": [
+        "CLOUDFLARE_READ_API_TOKEN",
+        "ALCHEMY_STATE_STORE_CREDENTIALS_JSON"
+      ],
       "denied": [
         "automatic-orphan-deletion",
         "credential-write",
         "custom-domain-or-dns",
         "deployment",
         "provider-write",
-        "release-or-publication"
+        "release-or-publication",
+        "state-store-write"
       ],
       "durationOrRevocation": "One bounded scheduled or manual report; revoke after receipt, explicit revocation or identity mismatch.",
       "environment": "github-actions-report-only",

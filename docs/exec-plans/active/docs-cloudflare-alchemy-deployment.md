@@ -3,7 +3,7 @@ document_type: execution-plan
 lifecycle: current
 authority: supporting
 owner: taxkit-docs-deployment-implementation-owner
-last_reviewed: 2026-08-05
+last_reviewed: 2026-08-10
 review_trigger: DCD task transition, implementation discovery, proof result, authority stop, or rollback
 successor: null
 tombstone: false
@@ -21,8 +21,10 @@ Task list:
 
 Implement `DCD-001` through `DCD-005` sequentially so the docs app has a
 qualified Cloudflare Worker artifact, isolated Preview, fixed Production,
-bounded delivery automation, and an accepted rollback path before the temporary
-Nitro/Vercel bridge is retired.
+bounded delivery automation, and an accepted rollback path. The docs-app
+Nitro/Vercel bridge is now retired locally after parity; final lifecycle
+acceptance still requires claim-matched hosted requalification and the
+report-only state boundary.
 
 One thread goal coordinates the whole accepted SPEC. The sibling ledger remains
 the milestone and acceptance owner.
@@ -34,8 +36,8 @@ the milestone and acceptance owner.
 | `DCD-001` | completed   | Accepted at `669a8f3…` after exact dependency/integrity readback, both built-app oracles, docs-maintainer reconciliation, focused Changeset, independent closure, and all change-owned gates. |
 | `DCD-002` | completed   | Accepted candidate `d9cb894…` passed fresh pre-deploy and pre-destroy state/provider readback, equal plans, Preview apply, the complete hosted/browser/screenshot contract, exact-stage teardown/absence, all gates and corrected-boundary independent review. |
 | `DCD-003` | completed   | Accepted after fixed Production, separately Preview-qualified successor, successor Production, restored-source rollback, provider/hosted/screenshot readback, owner reconciliation, full verification and corrected-boundary independent review. |
-| `DCD-004` | in_progress | Mutation workflow plan/deploy/teardown receipts now pass on the default branch, including Preview, fixed Production, rollback and PR-close no-op; report-only inventory remains an explicit capability stop because the read-only token cannot derive Alchemy's state-store bearer. The automation register remains `not-established` as an aggregate claim. |
-| `DCD-005` | pending     | Waits for the report-only state boundary, final parity/retirement proof, fresh independent review and complete closeout evidence. |
+| `DCD-004` | in_progress | Mutation workflows now reject unexpected equal-replan resources, Schema-check provider/hosted artifacts, require an accepted Preview run for Production, and prove exact teardown absence. Protected report-only run `31319845724` remains branch-bound; default-branch source readback and promoted outer receipts are still required before the aggregate register can advance from `not-established`. |
+| `DCD-005` | pending     | Docs-app bridge-retirement implementation is present and locally qualified at `d649a14…`; waits for exact-candidate hosted Preview/Production/rollback requalification through the corrected workflow receipt contract, the report-only state boundary, fresh independent review and complete closeout evidence. |
 
 ## Baseline
 
@@ -82,13 +84,13 @@ authority envelope upfront on 2026-07-30 Australia/Melbourne:
   provider readback path.
 
 Custom-domain/DNS work, unrelated resources, credential disclosure/rotation or
-scope expansion, third-party observability, package publication/release,
-merge, force-push, branch deletion, PR-ready conversion and unrelated mutation
-remain unauthorized. The exact branch, push, draft PR/readback and later
-accepted-slice pushes are admitted by the dated successor Git receipt. Wrong
-identity or account, unsafe drift, secret-exposure risk, destructive scope
-beyond the named resources, or provider contradiction remains a mandatory
-safety stop.
+scope expansion, third-party observability, and package publication/release
+remain unauthorized. Cooper's later 2026-08-10 approval also admits PR-ready
+conversion and merge for this accepted SPEC after all claim-matched gates pass;
+it does not waive exact identity, account, stage, plan, secret, provider or
+postcondition checks. Wrong identity or account, unsafe drift, secret-exposure
+risk, destructive scope beyond the named resources, or provider contradiction
+remains a mandatory safety stop.
 The target-owned runbook and first provider receipt must restate this envelope
 before DCD-002 mutates anything.
 
@@ -715,15 +717,15 @@ default branch and the named protected environments and secret identities are
 available. Creating or weakening those GitHub resources is not inferred from
 repository-edit or branch-push authority.
 
-Read-only installed-version proof showed that the public `Cloudflare.state()`
-Layer can inventory the exact stack without evaluating `alchemy.run.ts` under
-the rejected `placeholder` stage. With state version `7`, it observed stack
-`TaxKitDocsCloudflare`, only stage `prod`, and the two expected logical
-resources. A separate authorized Production dry-run selected exactly
-`DocsBuild` and `DocsWebsite` for update and performed no mutation. These
-observations prove a viable DCD-004 readback implementation route; they do not
-admit a workflow, refresh Cloudflare Worker/deployment/version availability or
-replace the dated DCD-003 receipts.
+Read-only installed-version proof showed that the report-only public
+`makeHttpStateStore` plus Worker Provider can inventory the exact stack without
+evaluating `alchemy.run.ts` under the rejected `placeholder` stage. With state
+version `7`, it observed stack `TaxKitDocsCloudflare`, only stage `prod`, and
+the two expected logical resources. A separate authorized Production dry-run
+selected exactly `DocsBuild` and `DocsWebsite` for update and performed no
+mutation. These observations prove a viable DCD-004 readback implementation
+route; they do not admit a workflow, refresh Cloudflare Worker/deployment/
+version availability or replace the dated DCD-003 receipts.
 
 The smallest unresolved capability is external rather than architectural:
 
@@ -770,7 +772,7 @@ The first local DCD-004 owner is now concrete:
   Quality's provider-free, read-only authority remains preserved.
 
 Focused acceptance currently passes the deployment tool typecheck, the new
-automation validator and `27` deployment-policy tests with `61` expectations.
+automation validator and `37` deployment tests with `133` expectations.
 This admits local desired state only; it is neither a hosted workflow receipt
 nor DCD-004 completion.
 
@@ -780,9 +782,10 @@ The task-created provider-bound command is now exactly
 identities, tagged input/read/disagreement errors and one-time Schema decoding
 of state and provider ingress. Its test Layer accepts agreement and rejects a
 different physical Worker. The live command fails before state initialization
-unless `CI=1`, cached state-store credentials exist and their account identity
-matches the authenticated Cloudflare environment; it never emits credential
-or account values.
+unless `CI=1`, the protected state-store credential is available through the
+materialized cache or the bounded nested-process environment fallback, and its
+account identity matches the authenticated Cloudflare environment; it never
+emits credential or account values.
 
 The latest authorized execution observed state store `cloudflare-http` version
 `7`, only stage `prod`, logical resources `DocsBuild` and `DocsWebsite`, and
@@ -1155,3 +1158,215 @@ disclosure occurred. Scheduled orphan detection remains an inconclusive
 report-only path; the deployment register stays `not-established`, DCD-004
 stays `in_progress`, and DCD-005 stays `pending` until this boundary and the
 remaining parity/retirement proof are resolved.
+
+### 2026-08-09 — docs-app bridge-retirement implementation candidate
+
+The exact committed candidate `d649a14fe49122387e33a6de0547468e6a3e4967`
+removes the docs app's Nitro/Vercel preset, `.vercel/output` harness,
+`TAXKIT_DOCS_BUILD_TARGET` selector and docs-only Nitro dependency. `test:built`
+now invokes the Cloudflare/workerd production-artifact proof;
+`test:cloudflare-built` remains an explicit alias. The root Nitro catalog,
+shared output declarations and any unrelated `apps/web` Nitro owner remain
+preserved.
+
+The clean-candidate receipt is
+`docs/evidence/deployments/2026-08-09-local-bridge-retirement/receipt.json`.
+`bun run --filter=docs test:built` passed SSR, assets/cache headers, direct and
+client 404, hydration, server-function transport, no-document navigation,
+accessibility, console/page cleanliness, runtime reuse, filesystem isolation
+and local upload limits under the pinned Cloudflare Vite/workerd/Wrangler
+graph. This is a local implementation and parity observation; it does not
+establish hosted Preview/Production/rollback for this exact candidate or the
+report-only Alchemy state boundary. DCD-004 remains `in_progress`, DCD-005
+remains `pending`, and no completion claim is made. The first repository-wide
+verification pass then identified the now-unreachable
+`apps/docs/test/fixtures/visual-states.ts` after the bridge deletion; the
+change-owned Knip finding was corrected by removing that fixture in
+`117bbc4cf2866efbc19f50ccabb4013c39c120a8`, after which the full verification
+graph passed.
+
+### 2026-08-09 — report-only state-read boundary candidate
+
+The installed Alchemy beta.64 state store has one bearer for both read and
+write HTTP routes, and its `loginWithCloudflare` path uploads an ephemeral
+edge-preview Worker to read the bearer from `StateStoreSecrets`. The separate
+Cloudflare read token therefore cannot derive that bearer. The workflow
+candidate now admits a protected `ALCHEMY_STATE_STORE_CREDENTIALS_JSON` secret
+only in `github-actions-report-only`; it materializes the account-matched
+cache and invokes only the existing inventory reader. The workflow contains
+no Alchemy login, bootstrap, plan, deploy, destroy or state-write command.
+This is an operational-read-only boundary, not a cryptographically read-only
+state credential; the limitation and denied operations remain explicit. No
+secret value is present in the repository. The candidate is not accepted until
+the secret names/configuration and exact report-only run retain a dated
+state/provider-agreement receipt; the automation register remains
+`not-established` until then.
+
+### 2026-08-09 — report-only cache-ingress stop
+
+The exact pushed candidate `39f389c24f819046b2bd57e7cb3bd8674eed0941` passed
+the hosted Quality check `31312829854`. The protected report-only run
+`31313055223` checked out that SHA, materialized the account-matched
+`ALCHEMY_STATE_STORE_CREDENTIALS_JSON` cache and emitted only the safe
+metadata `{bunHome, cacheExists}` plus the validated key/account/host/length
+shape. The inventory reader then returned
+`deployment-inventory:missing-cache` from installed Alchemy beta.64's
+`CredentialsStore.read`.
+
+The successor failure receipt is
+`docs/evidence/deployments/2026-08-09-orphan-inventory/failed-31313055223.json`.
+It preserves the earlier failed receipts and proves neither Alchemy state nor
+provider agreement. No mutation, teardown, deletion, hosted proof or secret
+disclosure occurred. DCD-004 remains `in_progress`, DCD-005 remains `pending`,
+and `tools/docs-deployment/automation-register.json` remains
+`externalState.status: not-established`. The capability gap is now narrowed to
+the installed beta.64 CI cache-ingress boundary, not token scope or approval.
+The next owner must provide a supported non-mutating state-read path or repair
+the cache ingress, then rerun from a fresh candidate; do not broaden credentials
+or copy the local OAuth profile. The active goal remains open.
+
+### 2026-08-09 — public report-only state client and hosted runner stop
+
+The exact candidate `9dd779d70ccf661081856c3b5f07474b406db7ba` replaces the
+report-only inventory's nested `Cloudflare.state()` construction with Alchemy
+beta.64's public `makeHttpStateStore`. The existing Schema-decoded,
+account-matched cache is primary; a nested process may decode the same
+protected JSON credential only when it cannot see that cache. The state client
+exposes the inventory read operations and cannot bootstrap, write or delete
+state. Local `bun run check:docs-deployment-inventory` returned
+`state-provider-agree`, version `7`, one `prod` stage and one provider Worker.
+
+The exact hosted successor run `31315231020` checked out this candidate but
+remained queued without a runner or pending environment request and was
+cancelled after the bounded wait. The cancellation receipt is
+`docs/evidence/deployments/2026-08-09-orphan-inventory/cancelled-31315231020.json`.
+This supersedes the cache-ingress repair as the implementation owner, but no
+hosted state/provider agreement was produced. The automation register remains
+`externalState.status: not-established`, DCD-004 remains `in_progress`,
+DCD-005 remains `pending`, and the next action is a fresh protected run when
+hosted runner admission is available. No provider mutation or secret
+disclosure occurred.
+
+### 2026-08-09 — report-only hosted successor
+
+Candidate `70be77e64c93d20cd82c5e02e33db9c92a94f0d7` passed the protected
+`github-actions-report-only` run `31316752464`. Cache materialization and its
+names-only shape check passed; the nested inventory command used the bounded
+protected-JSON fallback when its child process could not see the home-relative
+cache. The report returned state/provider agreement, state-store version `7`,
+one `prod` stage, one matching Worker, no Preview stages and no orphan
+candidates. The claim-matched receipt is
+`docs/evidence/deployments/2026-08-09-orphan-inventory/report-31316752464.json`.
+
+This proves the exact branch-bound report-only read and no mutation. The
+automation register remains `externalState.status: not-established` because
+the workflow source is not the reviewed default-branch commit; DCD-004 remains
+`in_progress`, DCD-005 remains `pending`, and no hosted application,
+deployment/version, teardown or rollback claim is made from this receipt.
+
+### 2026-08-10 — current candidate hosted and lifecycle receipts
+
+Candidate `b59e4eec907c4af017ebac32cda81fab71bf08b4` passed the protected
+`pr-15` Preview plan/equal-replan, provider readback, hosted HTTP/browser and
+bounded desktop/mobile screenshot contract. The provider receipt binds Alchemy
+state instance `7aaa384073855328183ecd4ef099fcdb`, Worker
+`taxkitdocscloudflare-docswebsi5hvoqqnppkvdqqdtqvjsqgb6`, deployment
+`c324a6ba-1d44-4a04-96df-b4fa8bee7279`, version
+`a7159ebe-2e59-4cd3-9720-cf7c39164a94`, and the read-back workers.dev URL under
+`docs/evidence/deployments/2026-08-10-preview-pr-15/`. The protected teardown
+run `31318663989` proved the exact stage and former URL absent. Its dedicated
+workflow receipt records the removed candidate separately from reviewed
+default-branch teardown code (`6947dab…`), avoiding a false single-SHA claim.
+
+The same b59e4ee source was deployed to fixed Production with equal digest
+`ca91f96b767f2f26f8c9db0aad3e7015aa7d45ec6701e2fadbd0801cf5b8d934`. Final
+readback binds deployment `b6cfeca4-956d-4b7f-a0c5-6e94e61050a4`, version
+`efeb7e83-399f-4cc8-a972-a749b5954319`, the stable Worker
+`taxkitdocscloudflare-docswebsite-prod-ujphggiaxw5ryjev` and its workers.dev
+URL. Hosted Production proof and bounded screenshots passed. A normal
+source-bound rollback to eafeaad used digest
+`f4b15d25b488918582b1dcf07a26838d700ed34e370b2959c57dd07376386123`, read back
+deployment `41ef66dc-c455-4818-8893-bc878ea0c365` and version
+`7ffbcf8a-b7f6-4085-990b-574512a1cb63`, passed the same hosted contract, and
+was followed by the final b59e4ee redeploy. These receipts establish only the
+named provider account, stages and workers.dev observations: no custom-domain,
+DNS, paid-plan, release, publication or byte-promotion claim is made.
+
+Protected report-only run `31319845724` passed for the open b59e4ee branch
+candidate and returned state/provider agreement, one prod stage, one Worker and
+no Preview/orphan candidates. Its receipt is
+`docs/evidence/deployments/2026-08-09-orphan-inventory/report-31319845724.json`.
+The automation register remains `not-established` until the same workflow is
+read back from reviewed default-branch source. DCD-004 and DCD-005 remain open
+for that source-bound lifecycle gate, fresh review and final closeout; no
+receipt is promoted across candidates or source epochs.
+
+### 2026-08-10 — workflow receipt correction slice
+
+The post-review correction keeps DCD-004 in progress and adds the missing
+positive-boundary owners: raw-versus-strict hosted receipt filtering, artifact
+PNG retention and digest recomputation, account/state and pre-mutation version
+readback, exact Preview workflow/path/`pr-N` admission, all-action teardown
+projection rejection, live closed-PR checks for manual teardown, a dedicated
+Schema-decoded teardown checker, and plan/provider/hosted cross-file identity
+reconciliation before external-state establishment. No current provider or
+default-branch workflow receipt is promoted by this local correction; b59e4ee
+and the branch-bound report-only receipt remain historical as recorded above.
+
+### 2026-08-10 — workflow admission correction slice
+
+The next correction adds a live operation-bound Schema-decoded plan checker to Preview,
+Production and teardown before any provider mutation. Production now downloads
+and checks the canonical Preview plan/replan artifact in addition to its
+provider/hosted artifact. Established external receipts must name a strict
+Schema-decoded GitHub run readback whose expected workflow name, path,
+successful conclusion and `main` ref/head agree with the outer workflow source
+commit, while its separately recorded candidate input agrees with the outer
+candidate. Promotion reruns the plan digest/equal-replan invariants and rejects
+mixed teardown actions, then checks hosted environment semantics and exactly
+one desktop plus one mobile screenshot.
+Report-only dispatch is forced to the reviewed default branch before dependency
+installation or state-bearer materialisation, and Preview PR numbers are
+validated as positive integers before provider bootstrap. Rollback identity is
+bound to the accepted Preview provider receipt rather than caller text alone.
+The report-only positive boundary also requires a dedicated `reportPath`
+decoded as `DocsDeploymentOrphanInventoryReceipt`; the mutation
+`providerReadbackPath` remains null for that class and cannot stand in for
+state/provider inventory proof.
+The Production automation authority now admits both `production-deploy` and
+the separately recorded `production-rollback` operation under the same fixed
+stage lock; rollback receipts cannot pass through deploy-only authority.
+External admission also binds Preview to `pr-N`, Production/rollback to `prod`,
+teardown absence to `pr-N`, rejects deploy plans containing deletes, checks
+teardown config/deployment/lockfile identities and plan self-path, rejects
+hidden receipts on `not-established` entries, and requires the current
+1,000-row/draft-aware report command for a positive orphan admission while
+preserving legacy dated receipts as historical evidence.
+The workflow receipt contract now names a separate Schema-decoded
+`workflowInputPath` alongside `workflowRunPath`: the former binds the reviewed
+default-branch source, run, operation and dispatch candidate input, while the
+latter is produced by the read-only `workflow_run` reconciler after GitHub marks
+the source run complete. Triggering workflows retain their input and provider/
+hosted artifacts; the reconciler fetches the completed Actions API run and the
+matching artifact before it emits `workflow-run.json`, checking out the exact
+reviewed implementation commit used by the source workflow. Preview, Production
+and report-only API heads are `main`; automatic PR-close teardown records the
+pull-request API head separately from its reviewed `workflowCommit` and accepts
+it only when that commit is an ancestor of current `main`. Failed or cancelled
+runs, artifact mismatch or schema/provider disagreement retain bounded failure
+metadata and cannot establish external state. The
+manual teardown dispatch rejects a selected ref other than
+`refs/heads/main` before provider credentials are exposed, and credentials are
+step-scoped after the reviewed checkout rather than job-scoped. The
+Preview and Production plan shells also reject every resource-like line outside
+the two owned resources and reject `delete` before a deploy apply. Teardown
+performs a final state/Worker identity readback after equal dry-runs and before
+any destroy.
+The workflow hosted receipt remains a bounded automation supplement: it retains
+PNG identity/bytes and the two viewport classes, but does not yet replace the
+full manual screenshot-manifest/oracle packet or guarantee an early failure
+receipt when a runner stops before the artifact directory is created. Those are
+explicit DCD-004 closeout limitations, not established claims.
+DCD-004 remains `in_progress`, DCD-005 remains `pending`, and no current
+provider or default-branch receipt is established until a fresh workflow epoch
+and dated promotion satisfy these checks.

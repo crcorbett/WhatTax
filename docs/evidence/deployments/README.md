@@ -3,7 +3,7 @@ document_type: deployment-evidence-index
 lifecycle: current
 authority: canonical
 owner: taxkit-docs-deployment-proof-owner
-last_reviewed: 2026-08-05
+last_reviewed: 2026-08-10
 review_trigger: docs deployment candidate, provider, stage, URL, proof, screenshot, teardown or rollback receipt change
 ---
 
@@ -205,3 +205,109 @@ success receipts.
 Secrets, raw tokens, request bodies, credential values and unsanitized provider
 output are forbidden. Historical release and harness evidence remains
 unchanged.
+
+## 2026-08-09 local bridge-retirement candidate
+
+`2026-08-09-local-bridge-retirement/receipt.json` binds the clean committed
+candidate `d649a14fe49122387e33a6de0547468e6a3e4967` to the docs-app
+Cloudflare/workerd built proof. The candidate removes the docs-app Nitro/Vercel
+bridge, makes `test:built` the canonical built proof, and preserves the
+independent `apps/web` Nitro owner. SSR, assets, cache headers, 404 behavior,
+hydration, server-function transport, no-document navigation, accessibility,
+console cleanliness, runtime reuse, filesystem isolation and local upload
+limits passed. This is local evidence only; it does not establish hosted
+requalification for this candidate or the report-only Alchemy state boundary.
+
+## 2026-08-09 report-only state-read candidate
+
+The successor workflow candidate uses the protected
+`ALCHEMY_STATE_STORE_CREDENTIALS_JSON` secret only in
+`github-actions-report-only` to materialize the account-matched Alchemy cache
+before the report-only inventory command. The workflow has no Alchemy login,
+bootstrap, plan, deploy, destroy or state-write path. Beta.64's bearer is not
+cryptographically read-only, so this candidate carries an explicit
+operational-read-only limitation. A dated workflow receipt is required before
+the automation register can advance from `not-established`; no state,
+provider, absence or teardown claim is made by this candidate alone.
+
+## 2026-08-09 report-only cache-ingress stop
+
+The exact candidate `39f389c24f819046b2bd57e7cb3bd8674eed0941` passed Quality
+and the protected report-only materialization step. The job's names-only probe
+confirmed the expected home-relative cache file, keys, account-id length, URL
+host and bearer length without exposing a value. The inventory process then
+stopped at `deployment-inventory:missing-cache` because installed Alchemy
+beta.64 returned no value from `CredentialsStore.read`.
+
+The bounded failure receipt is
+`2026-08-09-orphan-inventory/failed-31313055223.json`; the full workflow log and
+artifact remain at run `31313055223`. This does not establish Alchemy state,
+Cloudflare/provider agreement, an orphan set, teardown, hosted behavior or any
+mutation. The report-only automation register therefore remains
+`not-established`. The next owner is the Alchemy beta.64 cache-ingress boundary:
+repair or replace it with a supported non-mutating state-read path, then rerun
+from a fresh candidate. The earlier failed receipts remain unchanged.
+
+## 2026-08-09 report-only public state-client successor
+
+Candidate `9dd779d70ccf661081856c3b5f07474b406db7ba` replaces the nested
+`Cloudflare.state()` construction in the report-only inventory owner with
+Alchemy beta.64's public `makeHttpStateStore` service. The cache is decoded once
+through the existing Schema boundary; a nested process may decode the same
+protected JSON credential only when it cannot see that cache. The state client
+exposes the inventory's read operations only, and the mutation/bootstrap
+workflows are unchanged.
+The local `bun run check:docs-deployment-inventory` proof returned
+`state-provider-agree`, state-store version `7`, one `prod` stage and one
+provider Worker. No credential value is retained.
+
+The exact hosted successor run `31315231020` checked out this candidate but
+remained queued without a runner or pending environment request and was
+cancelled after the bounded wait. Its cancellation receipt is
+`2026-08-09-orphan-inventory/cancelled-31315231020.json`. This supersedes the
+cache-ingress repair as the current implementation owner, but it does not
+establish hosted state/provider agreement; the report-only automation register
+remains `not-established` and scheduled orphan detection remains inconclusive.
+
+## 2026-08-09 report-only hosted successor
+
+Candidate `70be77e64c93d20cd82c5e02e33db9c92a94f0d7` passed the protected
+`github-actions-report-only` workflow in run `31316752464`. Cache materialization
+and its names-only shape check passed, and the nested inventory command used the
+bounded protected-JSON fallback when its process could not see the home-relative
+cache. The Schema-decoded report returned `state-provider-agree`, state-store
+version `7`, one `prod` stage, one matching Worker, no Preview stages and no
+orphan candidates; the read-only artifact was uploaded successfully.
+
+The claim-matched receipt is
+`2026-08-09-orphan-inventory/report-31316752464.json`. This proves the exact
+branch-bound report-only read and no mutation, not hosted application behavior,
+deployment/version identity, teardown, rollback or future availability. The
+automation register remains `not-established` until the reviewed workflow runs
+from the default branch source; DCD-004 and DCD-005 therefore remain open.
+
+## 2026-08-10 current candidate hosted epoch
+
+The current b59e4ee candidate has separate dated Preview and Production
+evidence. Preview `pr-15` includes equal plan/replan, Alchemy and Cloudflare
+readback, hosted HTTP/browser/accessibility/console/cache-header proof and one
+desktop/mobile screenshot pair under
+`2026-08-10-preview-pr-15/`. The protected teardown run `31318663989` proves
+the exact stage and former workers.dev URL absent. Because teardown executes
+reviewed default-branch code, `teardown-workflow-b59e4ee.json` keeps the removed
+candidate and reviewed implementation SHA as distinct identities.
+
+Production uses fixed `prod` and retains the final b59e4ee deployment/readback,
+hosted proof and screenshot pair under `2026-08-10-production-prod/`. The
+`rollback/` directory retains the normal source-bound eafeaad redeploy,
+provider/version readback, hosted proof and screenshot pair. The final
+Production URL is the provider workers.dev URL; custom-domain, DNS, paid-plan,
+release, publication and byte-promotion claims remain outside this evidence
+epoch.
+
+Protected report-only run `31319845724` passed for the open branch candidate and
+returned state/provider agreement for one prod stage and Worker with no Preview
+orphan. The wrapper receipt is
+`2026-08-09-orphan-inventory/report-31319845724.json`; it remains branch-bound
+until the reviewed default-branch workflow source is read back. No secret value
+is retained in any evidence file.

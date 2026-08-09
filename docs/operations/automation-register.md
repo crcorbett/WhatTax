@@ -3,7 +3,7 @@ document_type: automation-register
 lifecycle: current
 authority: canonical
 owner: taxkit-ci-release-maintainer
-last_reviewed: 2026-08-05
+last_reviewed: 2026-08-10
 review_trigger: workflow, signal, authority, proof, stopping, escalation, rollback, or retirement change
 ---
 
@@ -51,6 +51,12 @@ postconditions. The preceding `alchemy login` command persists only the
 environment-method selector; the token remains a GitHub environment secret.
 That preparation is bounded to the named state-store control plane and is not
 available to report-only inventory; no local OAuth profile is copied into CI.
+The report-only workflow instead materializes the separately scoped
+`ALCHEMY_STATE_STORE_CREDENTIALS_JSON` cache beside its Cloudflare read token.
+It invokes only the inventory reader and has no login, bootstrap, deploy,
+destroy or state-write command. Beta.64 does not expose a cryptographically
+read-only state bearer, so this operational read-only boundary is retained as
+an explicit limitation and must not be reused by mutation workflows.
 
 The local operator command `bun run check:docs-deployment-orphans` now proves
 the report-only data path against one dated observation. It compared the exact
@@ -73,3 +79,72 @@ retained. Until a separately reviewed non-mutating state boundary exists, the
 aggregate register must remain `not-established`; the report-only workflow has
 no teardown or deletion authority. Quality remains independently cancellable
 and without provider credentials or provider mutation authority.
+
+### 2026-08-10 current candidate readback
+
+The protected report-only workflow run `31319845724` passed for branch candidate
+b59e4ee and retained state/provider agreement for one fixed `prod` stage and
+Worker with no Preview/orphan candidates at
+`docs/evidence/deployments/2026-08-09-orphan-inventory/report-31319845724.json`.
+This receipt is intentionally branch-bound. The four register entries remain
+`externalState.status: not-established` until the same workflow file and
+report-only owner are read back from the reviewed default branch; no provider
+mutation, state write, teardown or credential-scope expansion is inferred.
+
+Each admitted mutation workflow now enforces the remaining boundary in its
+own YAML: the initial plan and equal replan reject every action/resource outside
+`DocsBuild` and `DocsWebsite`; provider inventory and the latest Wrangler
+deployment are bound to the candidate, stage, plan, account, Alchemy state,
+Worker, URL, version and pre-mutation version; and the shared hosted proof
+checker must pass after strict receipt filtering and screenshot-byte digest
+recomputation before the provider artifact is accepted.
+Production downloads and Schema-checks a successful `main` Preview receipt
+identified by `accepted_preview_run_id`, its workflow path and exact
+`accepted_preview_pr_number`/`pr-N` stage. Teardown records a separate
+Schema-decoded absence readback, checks the live PR is closed for both event and
+manual dispatch, and rejects a false no-op or unexpected action. These workflow
+artifacts still require promotion into a dated repository receipt before an
+entry can move to `externalState.status: established`.
+
+The positive admission path is explicit: decode one outer
+`DeploymentWorkflowExternalReceipt`, then decode its plan/provider/hosted (or
+teardown absence) paths; for `docs-orphan-inventory`, decode its dedicated
+`reportPath` as `DocsDeploymentOrphanInventoryReceipt` rather than treating the
+report as a provider deployment receipt. Recompute retained screenshot bytes
+and cross-check workflow path, source SHA, environment, principal, stage lock,
+plan/config/deployment/lockfile identity, account/state identity, deterministic
+PR stage, provider/hosted identity and postconditions. A stale branch-bound
+receipt remains historical and cannot establish the current default-branch
+automation class. The report-only schedule is protected by a reviewer gate;
+until that gate is intentionally removed, scheduled inventory is manual/report
+only and must not be described as unattended detection. The orphan reader
+requests at most 1,000 pull requests and fails closed at the bound.
+
+Production's authority record admits `production-deploy` and
+`production-rollback` as separate operations under the same protected
+principal and fixed-stage lock; a rollback receipt cannot be promoted through
+deploy-only authority.
+
+The live workflow owners also Schema-decode the plan/replan or teardown
+projection before mutation. Production accepts both the Preview provider/
+hosted artifact and its canonical plan artifact. The separate read-only
+`workflow_run` receipt workflow fetches the completed source run and matching
+artifact after the triggering workflow ends; a triggering job cannot assert its
+own completed status. A future established receipt must name strict workflow-run
+and workflow-input readbacks proving the expected workflow name and exact
+workflow path. Preview, Production and report-only API heads must be `main` and
+match the outer workflow commit; automatic PR-close teardown instead records the
+pull-request API head separately while its `workflowCommit` and
+`refs/heads/main` identify the reviewed implementation that was checked out.
+The reconciler must verify that reviewed commit exists and is an ancestor of
+current `main` before validating the artifact. The workflow input must bind the
+same run/path/source, operation and exact deployment candidate input to the
+outer candidate. Synthetic workflow IDs or branch-bound output cannot establish
+external state. Promotion checks hosted environment/stage semantics,
+one desktop and one mobile screenshot with retained bytes, positive numeric PR
+identity before Preview bootstrap, and a rollback identity sourced from the
+accepted Preview provider receipt. Report-only dispatch is rejected unless its
+ref and SHA are the reviewed default branch before bearer materialisation.
+The reconciler is governed by `docs-workflow-receipt-reconciliation` in the
+deployment control register; it adds no provider mutation or credential
+authority and does not create a fifth deployment automation entry.

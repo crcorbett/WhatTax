@@ -3,7 +3,7 @@ document_type: product-spec
 lifecycle: proposed
 authority: supporting
 owner: taxkit-product-owner
-last_reviewed: 2026-08-05
+last_reviewed: 2026-08-10
 review_trigger: accepted TK-CF finding, dependency constraint, Cloudflare or Alchemy contract, deployment authority, proof boundary, or implementation discovery
 successor: null
 tombstone: false
@@ -82,14 +82,76 @@ state/provider postcondition are retained under
 `docs/evidence/deployments/2026-08-05-preview-pr-13/`. This does not change the
 report-only stop or close either DCD task.
 
+The 2026-08-09 local bridge-retirement candidate removes the docs app's Nitro
+Vercel preset, `.vercel/output` harness, dual build-target signal and docs-only
+Nitro dependency. `test:built` now runs the Cloudflare/workerd built contract;
+`test:cloudflare-built` remains an explicit alias. Nitro remains only in the
+independently owned `apps/web` build graph, so the root Nitro catalog and
+shared output ignore entries are preserved. This implementation observation
+does not establish hosted requalification for the retirement candidate, a
+current Production URL, or the report-only Alchemy state boundary; DCD-004
+remains in progress and DCD-005 remains pending until those claims are
+resolved.
+
+The 2026-08-09 report-only successor candidate
+`9dd779d70ccf661081856c3b5f07474b406db7ba` now uses Alchemy beta.64's public
+`makeHttpStateStore` after the existing Schema-decoded, account-matched cache
+ingress. A nested process may decode the same protected JSON credential only
+when it cannot see that cache, avoiding the nested `Cloudflare.state()` layer
+while leaving all mutation/bootstrap paths unchanged. Local inventory proof
+returned state/provider agreement, state-store version `7`, one `prod` stage
+and one provider Worker. The exact hosted successor run `31315231020` remained
+queued without a runner or pending environment request and was cancelled; its
+receipt is retained under `docs/evidence/deployments/2026-08-09-orphan-inventory/`.
+Hosted report-only state/provider agreement remains unestablished, so DCD-004
+and DCD-005 stay open and the automation register remains `not-established`.
+
+The corrected branch-bound successor `70be77e64c93d20cd82c5e02e33db9c92a94f0d7`
+passed the protected report-only workflow `31316752464`. It materialized and
+validated the state credential, decoded the account-matched report through the
+public Alchemy HTTP state client, returned state/provider agreement for one
+`prod` stage and one Worker, and found no Preview stages or orphan candidates.
+The receipt is retained at
+`docs/evidence/deployments/2026-08-09-orphan-inventory/report-31316752464.json`.
+This proves only the exact branch-bound report-only read and no mutation. The
+automation register remains `not-established` until the reviewed workflow runs
+from the default-branch source; hosted application behavior, deployment/version
+identity, teardown and rollback remain separate claims, so DCD-004 and DCD-005
+stay open.
+
+The current b59e4ee candidate has now passed the complete provider-bound
+Preview, teardown, Production and normal rollback/redeploy observations. The
+Preview receipts under `docs/evidence/deployments/2026-08-10-preview-pr-15/`
+bind equal plan/replan, Alchemy state, Worker/deployment/version, hosted
+HTTP/browser/accessibility/console/cache-header proof and bounded desktop/mobile
+screenshots; teardown run `31318663989` proves the exact `pr-15` stage and
+former workers.dev URL absent. The Production receipts under
+`docs/evidence/deployments/2026-08-10-production-prod/` bind fixed `prod` to
+the stable provider Worker and URL, with the same hosted/screenshot contract,
+normal rollback to eafeaad and final b59e4ee redeploy. The teardown receipt
+explicitly separates the deployed candidate from the reviewed default-branch
+implementation commit used by the PR-close workflow. These are dated
+workers.dev observations only; they do not establish custom-domain, DNS,
+paid-plan, release, publication or byte-promotion behavior.
+
+The protected report-only workflow run `31319845724` also passed for b59e4ee on
+the open branch and returned state/provider agreement, one prod stage, one
+Worker and no Preview/orphan candidates. Its wrapper receipt is
+`docs/evidence/deployments/2026-08-09-orphan-inventory/report-31319845724.json`.
+The aggregate automation register remains `not-established` until that same
+workflow is read back from reviewed default-branch source; DCD-004 and DCD-005
+remain open for that source-bound lifecycle gate, fresh independent review and
+final closeout. No receipt is promoted across candidates or source epochs.
+
 ## Target and comparative evidence
 
 TaxKit planning target:
 
 - `origin/main`:
   `9c82bf9613b1342375ff670c46ee34cc8347af1d`;
-- current local proof: Nitro/Vercel generated output and the implemented
-  `taxkit-docs-runtime` local journey; and
+- current local proof: Cloudflare/workerd generated output and the implemented
+  `taxkit-docs-runtime` local journey; the historical Nitro/Vercel receipt is
+  retained only as migration evidence; and
 - current dependency baseline: Effect/Platform `4.0.0-beta.98`, TanStack Start
   `1.167.65`, TanStack Router `1.169.2`, Vite `8.0.14` from the lockfile, and
   Nitro `3.0.260429-beta`.
@@ -234,6 +296,48 @@ browser and build the Cloudflare deployment input before hashing `dist`.
 These corrections preserve the no-op-versus-delete teardown contract and add
 no provider resource or authority.
 
+The workflow receipt boundary is strict. Raw hosted output is retained only as
+diagnostic artifact material; the promoted receipt is filtered to the
+`DeploymentWorkflowHostedProbe` Schema, and the workflow copies the referenced
+desktop/mobile PNG bytes into the artifact route before recomputing their
+digests. Provider readback carries account and state-store identity plus the
+pre-mutation version where present. Production accepts only a successful
+Preview run from the named workflow whose `accepted_preview_pr_number` exactly
+matches the deterministic `pr-N` stage. Teardown checks live PR closure for
+both event and manual dispatch, rejects every unexpected action, and invokes a
+dedicated Schema-decoded absence checker. External-state admission decodes the
+plan as well as provider/hosted/teardown receipts and rejects any cross-file
+candidate, stage, plan, config, dependency, account/state, Worker, URL,
+deployment/version, rollback or screenshot-byte mismatch.
+
+The live mutation jobs and external-state admission invoke the same
+operation-bound plan Schema checker before any apply or destroy. Plan-only receipts use `preview-plan` or
+`production-plan`; a mutating equal-replan receipt switches to
+`preview-equal-replan` or `production-equal-replan` before apply. Production
+downloads and checks the accepted Preview plan/replan
+artifact rather than trusting a caller-supplied digest. A promoted external
+receipt must also name Schema-decoded GitHub run and workflow-input readbacks.
+Preview, Production and report-only runs require a successful completed run
+with the expected workflow name, exact workflow path, `refs/heads/main`,
+`headBranch: main`, and `headSha` equal to the recorded workflow source commit.
+Automatic PR-close teardown is the explicit source identity exception: its API
+`headBranch`/`headSha` identify the closed PR run, while its `workflowCommit` and
+`refs/heads/main` identify the reviewed implementation checked out by teardown;
+the read-only reconciler verifies that commit exists and is an ancestor of
+current `main` before it checks the artifact. The workflow-input readback binds
+the same run/path, source commit, operation and exact deployment candidate
+input; that input must equal the outer receipt's candidate. A default-branch
+run may build a reviewed PR head, so the two identities are intentionally
+distinct. Promotion rejects
+hosted environment/stage mismatches
+and any screenshot set other than exactly one desktop and one mobile image.
+Report-only dispatch verifies the reviewed
+default branch before installing dependencies or materialising its state bearer;
+Preview validates a positive numeric PR number before provider bootstrap. A
+normal rollback binds its recovery identity to the accepted Preview provider
+receipt, making the accepted Preview target explicit rather than trusting
+caller text alone.
+
 The successor teardown runs `30896950134` (automatic PR-close) and
 `30896963746` (manual `pr-1`) passed source checkout, frozen install, browser
 setup, docs validation, exact build and equal destroy dry-runs, then stopped at
@@ -243,8 +347,12 @@ mutation. The mutation workflows now materialize that account-matched cache
 with the installed Alchemy `login` environment selector followed by the
 Cloudflare bootstrap command under `CI=0` before planning or teardown, then run
 inventory under `CI=1`; this keeps the postcondition readback read-only and
-does not copy the local OAuth profile.
-The report-only workflow remains separately credentialed and unestablished.
+does not copy the local OAuth profile. The report-only workflow uses its
+separate Cloudflare read token plus an account-matched
+`ALCHEMY_STATE_STORE_CREDENTIALS_JSON` cache. Because beta.64 exposes one
+bearer for both state reads and writes, this is an operational read-only
+boundary enforced by the workflow's reachable commands and tests, not a
+cryptographically read-only state token; that limitation remains explicit.
 
 ## Goals
 
@@ -343,13 +451,13 @@ Root `alchemy.run.ts` owns:
   `bundle: false`, compatibility date `2026-06-24`, `nodejs_compat`, default
   asset-first full-stack routing, and the initial observability policy.
 
-The app Schema-decodes `TAXKIT_DOCS_BUILD_TARGET`, defaulting to `nitro`, and
-selects the exact official `@cloudflare/vite-plugin@1.47.0` only for the
-`cloudflare` target. The root `Command.Build` supplies that semantic signal.
-TaxKit does not use the reference implementation's command-line heuristic, Alchemy's private Distilled
-plugin, or the unsupported injected Website signal. The compatibility date is
-a TaxKit candidate pin only after DCD-001 proves it under workerd; the reference
-use is comparative evidence, not acceptance.
+The app always selects the exact official `@cloudflare/vite-plugin@1.47.0`;
+`build:cloudflare` remains a compatibility alias for the canonical `build`
+script. The root `Command.Build` consumes that emitted output. TaxKit does not
+use the reference implementation's command-line heuristic, Alchemy's private
+Distilled plugin, or the unsupported injected Website signal. The compatibility
+date is a TaxKit candidate pin only after DCD-001 proves it under workerd; the
+reference use is comparative evidence, not acceptance.
 
 Initial observability uses only Cloudflare's built-in invocation logs, with
 traces disabled, no custom fields, no request body, header, cookie, credential
@@ -688,7 +796,34 @@ requests through a protected environment. Forks and untrusted candidates stop,
 and no candidate code runs through `pull_request_target`. PR-close teardown
 may use that event only if it checks out a reviewed default-branch
 implementation commit, never the pull-request head, derives only the numeric
-PR stage, and performs exact state/provider readback before destroy.
+PR stage, and performs exact state/provider readback before destroy. A manual
+teardown dispatch must first prove `GITHUB_REF=refs/heads/main` and the live
+default-branch SHA; its Cloudflare credentials are step-scoped only after the
+reviewed checkout, never job-scoped before source validation.
+
+The equal replan applies the same exact-resource projection as the initial
+plan and rejects every action/resource outside `DocsBuild` and `DocsWebsite`.
+After mutation, the workflow Schema-checks provider inventory and the latest
+Wrangler deployment/version against candidate, stage, plan, config, lockfile,
+deployment-input, Worker and URL identities, then runs the shared hosted
+HTTP/browser/screenshot proof owner. Production additionally requires a
+successful `accepted_preview_run_id` from the default branch and decodes its
+provider/hosted artifacts before its own plan or mutation. Teardown records a
+separate exact stage/Worker absence receipt; an empty action list is accepted
+only after target-specific preflight proves the stage was already absent. The
+report-only inventory remains reviewer-gated/manual and fails closed at the
+1,000-pull-request completeness bound. A future positive report-only admission
+must name a dedicated `reportPath` decoded as
+`DocsDeploymentOrphanInventoryReceipt`; the mutation provider-readback path is
+not a substitute for that state/provider report. Its current GitHub source must
+be the 1,000-row `isDraft`-aware command and remain below the completeness
+bound; the historical 100-row report remains immutable evidence only.
+
+The initial plan, equal replan and teardown projection are Schema-decoded in
+the mutation job itself before the provider operation. Production preflight
+downloads both the Preview provider/hosted artifact and its canonical plan
+artifact, then checks their candidate, deterministic `pr-N` stage and digest
+identity before it builds or mutates fixed Production.
 
 ### `DCD-009` — authority, state, config and secrets
 
@@ -701,7 +836,8 @@ authority envelopes for:
 - Preview plan/deploy/readback;
 - Preview destroy;
 - Production plan/deploy/readback;
-- normal rollback;
+- normal rollback, admitted as a separate `production-rollback` operation on
+  the same protected Production principal and stage lock;
 - break-glass version rollback; and
 - Alchemy reconciliation.
 
@@ -769,20 +905,29 @@ Hosted false-green failures include:
 
 ### `DCD-011` — bridge lifetime and retirement
 
-The dual Nitro/Cloudflare path is temporary. Its carrying cost is two build
-graphs, two artifact contracts and duplicate built-proof maintenance. Review
-it after every adapter, TanStack, Vite, Effect, Alchemy or docs runtime change.
+The docs-app Nitro/Cloudflare path was temporary. Its carrying cost was two
+build graphs, two artifact contracts and duplicate built-proof maintenance.
+The 2026-08-09 candidate retires that docs-app bridge after local parity. Nitro
+and shared output entries remain only where `apps/web` still owns them; those
+references are not docs deployment policy. Review the preserved app-owned
+Nitro path after every adapter, TanStack, Vite, Effect, Alchemy or runtime
+change.
 
-Retire Nitro, its Vercel preset, `.vercel/output`, `.output`, related Turbo and
-clean-script entries, and the temporary dual-path policy only when:
+The implementation retirement is accepted locally only when:
 
 - the workerd journey covers all relevant built-harness behavior;
 - accepted exact-candidate Preview and Production receipts exist;
 - normal rollback/redeploy is accepted;
 - Worker runtime, assets, headers/cache and console proof reach parity;
-- the Cloudflare built harness becomes the sole local production-artifact
-  oracle; and
-- no package/content owner depends on the Vercel path.
+- the Cloudflare built harness becomes the sole docs-app local
+  production-artifact oracle; and
+- no docs package/content owner depends on the Vercel path.
+
+The final DCD-005 lifecycle gate still requires a clean committed candidate's
+hosted Preview/Production/rollback requalification and the remaining
+report-only state-boundary decision. Until those are claim-matched, the SPEC
+and ledger remain open even though the docs-app bridge implementation is
+present.
 
 Disconfirming evidence is a Cloudflare path that cannot reproduce an accepted
 SSR, server-function, navigation, accessibility, error or lifecycle behavior
@@ -812,13 +957,13 @@ draft creates no active plan.
 Current
 apps/docs/
   package.json
-  vite.config.ts                  # TanStack + Nitro Vercel preset
+  vite.config.ts                  # TanStack + Cloudflare Vite plugin
   src/server.ts                   # Web Fetch handler
   src/lib/runtime.server.ts       # module-scoped ManagedRuntime
-  scripts/test-built.tsx          # .vercel/output oracle
+  scripts/test-cloudflare-built.tsx # workerd production-artifact oracle
 packages/docs-content/            # deployment-neutral content/runtime owner
 packages/docs-fumadocs/           # deployment-neutral Fumadocs owner
-turbo.json                        # .output/.vercel outputs
+turbo.json                        # shared app output declarations
 knip.production.json              # docs Vite entries, no Alchemy entry
 ```
 
@@ -831,10 +976,8 @@ apps/docs/
   wrangler.jsonc
   public/_headers
   src/server.ts
-  src/lib/build/docs-build-target.ts
   src/lib/build/cloudflare-stack.ts
   scripts/test-cloudflare-built.tsx
-  scripts/test-built.tsx            # retained Nitro oracle until DCD-005
   package.json
 packages/docs-content/
   src/navigation.ts                 # bundled navigation owner
@@ -848,6 +991,7 @@ tools/docs-deployment/
   docs-preview.yml
   docs-production.yml
   docs-preview-teardown.yml
+  docs-deployment-workflow-receipts.yml # completed-run read-only reconciliation
 docs/runbooks/docs-deployment.md
 docs/verification/docs-deployment-journeys.json
 docs/evidence/deployments/
@@ -862,7 +1006,7 @@ invocations are backfilled by the task that proves them.
 Local workerd: target
 
 exact source + frozen lock
-  -> Schema-decoded TAXKIT_DOCS_BUILD_TARGET=cloudflare
+  -> apps/docs build (or build:cloudflare compatibility alias)
     -> @cloudflare/vite-plugin@1.47.0
       -> dist/server/index.js + dist/client
         -> Alchemy Command.Build("DocsBuild")
@@ -974,10 +1118,14 @@ executing identity, account, plan, Workers subdomain, credential scope or
 revocation, state/resource identity, unsafe drift, secret-exposure risk,
 destroy scope beyond the named stage, or provider contradiction still stops
 mutation. Custom-domain/DNS, unrelated resources, third-party observability,
-package publication/release and merge remain outside the provider envelope.
-Cooper's successor Git envelope admits only the exact DCD-001 candidate branch,
-push, draft pull request/readback and later coherent accepted-slice pushes;
-force-push, branch deletion and conversion to ready remain excluded.
+package publication/release remains outside the provider envelope. Cooper's
+2026-08-10 approval admits PR-ready conversion and merge after all
+claim-matched gates pass; it does not waive exact identity or postcondition
+checks.
+Cooper's successor Git envelope admits only the exact candidate branch, push,
+draft pull request/readback and later coherent accepted-slice pushes. The
+2026-08-10 approval also admits PR-ready conversion and merge after every
+claim-matched gate passes; force-push and branch deletion remain excluded.
 Each DCD-002/DCD-003 receipt must restate and Schema-decode the applicable
 operation, principal, resource, environment, duration, revocation, readback,
 rollback and postconditions before mutation.
@@ -1013,12 +1161,12 @@ Raw provider logs, credentials and mutable dashboards remain outside Git.
 | Architecture                      | Change required            | `docs/architecture/deployment.md`, `frontend.md`, `testing-and-quality.md`, `package-ownership.md`; migrate materially edited legacy metadata.                                                                                                                                                                                                                                                                                                                                                                           |
 | Root/app/package READMEs          | Change required / Preserve | Update `apps/docs/README.md`; preserve root `README.md` because its existing `docs/README.md` pointer remains sufficient, and preserve docs-content/docs-fumadocs READMEs unless their runtime contract changes.                                                                                                                                                                                                                                                                                                 |
 | Runbooks/router/profile           | Change required            | `docs/runbooks/docs-deployment.md`, `docs/runbooks/README.md`, `docs/runbooks/recovery.md`, `docs/README.md`, `docs/standards/tooling.md`, `tools/documentation/runbook-contract.json`, runbook Schemas/policy/tests, `.agents/skills/docs-maintainer/references/repository-profile.md`, `docs/verification/repository-harness-profile.json`, `docs/verification/effectiveness.md`, `tools/skills/canonical-skill-baseline.json`, and a proportional successor entry in `docs/verification/harness-epochs.md`; preserve prior epoch and HFI receipts. |
-| Authority                         | Change required            | `docs/operations/authority-model.md` and machine-checked runbook authority records.                                                                                                                                                                                                                                                                                                                                                                                                                                      |
-| Automation/controls/CI            | Change required / Preserve | Deployment-only Schema/policy/fixtures under `tools/docs-deployment/**`, `docs/operations/automation-register.md`, `docs/standards/controls.md`, `.github/workflows/docs-*.yml`. Preserve Quality's independent read-only/cancellable authority; DCD-004 may narrowly correct `.github/workflows/quality.yml` and `tools/quality-workflow/**` when exact hosted receipts prove a prerequisite defect, without adding provider credentials or deployment steps.                                                                 |
+| Authority                         | Change required            | `docs/operations/authority-model.md` and machine-checked runbook authority records; the report-only state bearer is an operational-read-only boundary and is denied state writes by workflow contract.                                                                                                                                                                                                                                                                                                                          |
+| Automation/controls/CI            | Change required / Preserve | Deployment-only Schema/policy/fixtures under `tools/docs-deployment/**`, `docs/operations/automation-register.md`, `docs/standards/controls.md`, `.github/workflows/docs-*.yml`; `github-actions-report-only` materializes only `ALCHEMY_STATE_STORE_CREDENTIALS_JSON` before the inventory reader. Preserve Quality's independent read-only/cancellable authority; DCD-004 may narrowly correct `.github/workflows/quality.yml` and `tools/quality-workflow/**` when exact hosted receipts prove a prerequisite defect, without adding provider credentials or deployment steps. |
 | Local/browser proof               | Change required            | Existing docs tests plus task-created workerd/provider commands under `tools/docs-deployment/**`; reuse the implemented browser harness.                                                                                                                                                                                                                                                                                                                                                                                 |
 | Deployment journeys/evidence      | Change required            | New `docs/verification/docs-deployment-journeys.json` and `docs/evidence/deployments/**`; preserve current release journeys and immutable evidence.                                                                                                                                                                                                                                                                                                                                                                      |
 | Screenshots                       | Change required            | Bounded Preview/Production PNGs plus Schema-decoded manifests under the dated deployment evidence route.                                                                                                                                                                                                                                                                                                                                                                                                                 |
-| Secrets/config                    | Change required / N/A      | Add deployment/receipt Schemas and authority metadata; application runtime secret or binding is N/A until evidenced. Never store values.                                                                                                                                                                                                                                                                                                                                                                                 |
+| Secrets/config                    | Change required / N/A      | Add deployment/receipt Schemas and authority metadata; the report-only state credential is a protected GitHub environment secret, never repository/application runtime configuration. Application runtime secret or binding is N/A until evidenced. Never store values.                                                                                                                                                                                                                                              |
 | DNS/custom domain                 | N/A                        | No zone, route, domain, certificate, hostname, DNS workflow or task. Preserve the future identity boundary in architecture only.                                                                                                                                                                                                                                                                                                                                                                                         |
 | Application stateful services     | N/A                        | No KV, D1, R2, application Durable Object, Queue, Hyperdrive or Cron. Alchemy remote state is control-plane state only.                                                                                                                                                                                                                                                                                                                                                                                                  |
 | Observability                     | Change required / N/A      | Root Worker composition explicitly enables bounded built-in invocation logs with persistence, while traces remain disabled; DCD-002 provider readback confirmed those exact settings. Custom telemetry and third-party destinations are N/A.                                                                                                                                                                                                                                                                        |

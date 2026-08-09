@@ -2,12 +2,25 @@ import * as BunRuntime from "@effect/platform-bun/BunRuntime";
 import * as BunServices from "@effect/platform-bun/BunServices";
 import { AlchemyContextLive, AuthProviders } from "alchemy";
 import { ArtifactStore, createArtifactStore } from "alchemy/Artifacts";
-import { CredentialsStore } from "alchemy/Auth/Credentials";
+import {
+  CredentialsStore,
+  credentialsFilePath,
+} from "alchemy/Auth/Credentials";
 import { LoggingCli } from "alchemy/Cli/LoggingCli";
 import * as Cloudflare from "alchemy/Cloudflare";
 import { Stack } from "alchemy/Stack";
 import { Stage } from "alchemy/Stage";
-import { Config, Console, Effect, Layer, Match, Schema } from "effect";
+import { makeHttpStateStore, State } from "alchemy/State";
+import {
+  Config,
+  Console,
+  Effect,
+  FileSystem,
+  Layer,
+  Match,
+  Redacted,
+  Schema,
+} from "effect";
 import * as FetchHttpClient from "effect/unstable/http/FetchHttpClient";
 
 import { docsCloudflareStackName } from "../../apps/docs/src/lib/build/cloudflare-stack.js";
@@ -53,16 +66,38 @@ const runtimeLayer = Layer.merge(
 const cloudflareApiLayer = Cloudflare.CloudflareApiLive().pipe(
   Layer.provideMerge(runtimeLayer)
 );
-const inventoryDependencies = Layer.merge(
-  Cloudflare.state().pipe(Layer.provideMerge(runtimeLayer)),
-  Cloudflare.Workers.LiveWorkerProvider().pipe(
-    Layer.provideMerge(cloudflareApiLayer)
-  )
-);
-const inventoryLayer = Layer.merge(
-  DocsDeploymentInventoryLive,
-  inventoryDependencies
-);
+// `Cloudflare.state()` builds its own Cloudflare API layer and may refresh or
+// delete cached credentials. The report-only path decodes its account-matched
+// cache (or the same protected JSON credential when a nested process cannot
+// see that cache) once, then uses Alchemy's public HTTP State service directly;
+// this keeps the inventory read-only and leaves mutation/bootstrap ownership
+// with the deployment workflows.
+const makeReadOnlyStateLayer = (
+  credentials: typeof CachedStateStoreCredentials.Type
+) =>
+  Layer.effect(
+    State,
+    Effect.succeed(
+      makeHttpStateStore({
+        authToken: Redacted.value(credentials.authToken),
+        id: "cloudflare-http",
+        url: credentials.url.toString(),
+      }).pipe(Effect.provide(FetchHttpClient.layer))
+    )
+  );
+
+const makeInventoryLayer = (
+  credentials: typeof CachedStateStoreCredentials.Type
+) =>
+  Layer.merge(
+    DocsDeploymentInventoryLive,
+    Layer.merge(
+      makeReadOnlyStateLayer(credentials),
+      Cloudflare.Workers.LiveWorkerProvider().pipe(
+        Layer.provideMerge(cloudflareApiLayer)
+      )
+    )
+  );
 
 const readInventoryProgram = Effect.gen(function* readInventoryProgram() {
   const inventory = yield* DocsDeploymentInventory;
@@ -88,13 +123,56 @@ const program = Effect.gen(function* inventoryProgram() {
     profile,
     "cloudflare-state-store"
   );
+  const environmentStateCredentials = yield* Config.string(
+    "ALCHEMY_STATE_STORE_CREDENTIALS_JSON"
+  ).pipe(
+    Effect.flatMap((value) =>
+      Effect.try({
+        catch: () => null,
+        try: () => {
+          const parsed: unknown = JSON.parse(value);
+          return parsed;
+        },
+      })
+    ),
+    Effect.catch(() => Effect.succeed(null))
+  );
+  const rawStateCredentials =
+    cachedStateCredentials ?? environmentStateCredentials;
+  if (rawStateCredentials === undefined || rawStateCredentials === null) {
+    const fileSystem = yield* FileSystem.FileSystem;
+    const fileShape = yield* fileSystem
+      .readFileString(credentialsFilePath(profile, "cloudflare-state-store"))
+      .pipe(
+        Effect.map((contents) => {
+          try {
+            const parsed: unknown = JSON.parse(contents);
+            return {
+              fileJsonObject: parsed !== null && typeof parsed === "object",
+              fileVisible: true,
+            };
+          } catch {
+            return { fileJsonObject: false, fileVisible: true };
+          }
+        }),
+        Effect.catch(() =>
+          Effect.succeed({ fileJsonObject: false, fileVisible: false })
+        )
+      );
+    yield* Console.error(
+      `FAIL [inventory-input] target=missing cached Cloudflare state-store credentials fileVisible=${fileShape.fileVisible} fileJsonObject=${fileShape.fileJsonObject}`
+    );
+    return yield* new DocsDeploymentInventoryInputError({
+      target: "missing cached Cloudflare state-store credentials",
+    });
+  }
   const decodedStateCredentials = yield* Schema.decodeUnknownEffect(
     CachedStateStoreCredentials
-  )(cachedStateCredentials).pipe(
+  )(rawStateCredentials).pipe(
     Effect.mapError(
       () =>
         new DocsDeploymentInventoryInputError({
-          target: "matching cached Cloudflare state-store credentials",
+          target: "invalid cached Cloudflare state-store credentials",
         })
     )
   );
@@ -103,7 +181,9 @@ const program = Effect.gen(function* inventoryProgram() {
       target: "cached state-store account identity",
     });
   }
-  return yield* readInventoryProgram.pipe(Effect.provide(inventoryLayer));
+  return yield* readInventoryProgram.pipe(
+    Effect.provide(makeInventoryLayer(decodedStateCredentials))
+  );
 }).pipe(
   Effect.tapErrorTag("DocsDeploymentInventoryInputError", (error) =>
     Console.error(`FAIL [inventory-input] target=${error.target}`)

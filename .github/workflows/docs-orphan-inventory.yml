@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: read
+  actions: read
 
 concurrency:
   group: taxkit-docs-orphan-inventory
@@ -21,11 +22,24 @@ jobs:
     environment: github-actions-report-only
     permissions:
       contents: read
+      actions: read
     env:
-      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_READ_API_TOKEN }}
+      ALCHEMY_PROFILE: default
       GH_TOKEN: ${{ github.token }}
     steps:
+      - name: Require reviewed default branch source
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF" = "refs/heads/main"
+          test "$GITHUB_REF_NAME" = "main"
+          test "$GITHUB_SHA" = "$(gh api "repos/${GITHUB_REPOSITORY}/git/ref/heads/main" --jq .object.sha)"
+          mkdir -p "$RUNNER_TEMP/docs-deployment"
+          jq -nS \
+            --arg candidate "$GITHUB_SHA" \
+            --arg run "$GITHUB_RUN_ID" \
+            '{candidateCommit:$candidate,operation:"report",prNumber:null,sourceRef:"refs/heads/main",workflowCommit:$candidate,workflowName:"Docs Orphan Inventory (Report Only)",workflowPath:".github/workflows/docs-orphan-inventory.yml",workflowRunId:$run}' \
+            > "$RUNNER_TEMP/docs-deployment/workflow-input.json"
+
       - name: Check out reviewed default branch
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.2.0
         with:
@@ -41,7 +55,39 @@ jobs:
       - name: Install frozen dependencies
         run: bun install --frozen-lockfile
 
+      - name: Schema-check report-only workflow input
+        env:
+          TAXKIT_WORKFLOW_INPUT_RECEIPT: ${{ runner.temp }}/docs-deployment/workflow-input.json
+          TAXKIT_WORKFLOW_INPUT_CANDIDATE_COMMIT: ${{ github.sha }}
+          TAXKIT_WORKFLOW_INPUT_WORKFLOW_COMMIT: ${{ github.sha }}
+          TAXKIT_WORKFLOW_INPUT_RUN_ID: ${{ github.run_id }}
+          TAXKIT_WORKFLOW_INPUT_WORKFLOW_PATH: .github/workflows/docs-orphan-inventory.yml
+          TAXKIT_WORKFLOW_INPUT_OPERATION: report
+        run: bun run check:docs-deployment-workflow-input
+
+      - name: Materialize the reviewed state-read cache
+        env:
+          ALCHEMY_STATE_STORE_CREDENTIALS_JSON: ${{ secrets.ALCHEMY_STATE_STORE_CREDENTIALS_JSON }}
+        run: |
+          set -euo pipefail
+          umask 077
+          alchemy_home="$(bun -e 'import os from "node:os"; process.stdout.write(os.homedir())')"
+          state_dir="$alchemy_home/.alchemy/credentials/$ALCHEMY_PROFILE"
+          mkdir -p "$state_dir"
+          printf '%s' "$ALCHEMY_STATE_STORE_CREDENTIALS_JSON" > "$state_dir/cloudflare-state-store.json"
+          printf 'HOME=%s\n' "$alchemy_home" >> "$GITHUB_ENV"
+          printf 'alchemy-home=%s\n' "$alchemy_home"
+          bun -e 'import os from "node:os"; import { existsSync } from "node:fs"; const path = `${os.homedir()}/.alchemy/credentials/${process.env.ALCHEMY_PROFILE}/cloudflare-state-store.json`; console.log(JSON.stringify({ bunHome: os.homedir(), cacheExists: existsSync(path) }));'
+          bun -e 'import * as BunRuntime from "@effect/platform-bun/BunRuntime"; import * as BunServices from "@effect/platform-bun/BunServices"; import { CredentialsStore, CredentialsStoreLive } from "alchemy/Auth/Credentials"; import { Effect, Layer, Console } from "effect"; const program = Effect.gen(function*(){ const store = yield* CredentialsStore; const value = yield* store.read("default", "cloudflare-state-store"); yield* Console.log(JSON.stringify({ cacheCredentialsDefined: value !== undefined, cacheKeys: value !== undefined && typeof value === "object" ? Object.keys(value).sort() : [] })); }).pipe(Effect.provide(CredentialsStoreLive.pipe(Layer.provide(BunServices.layer)))); BunRuntime.runMain(program);'
+          jq -e '(.accountId | type == "string" and length > 0) and (.url | type == "string" and startswith("https://")) and (.authToken | type == "string" and length > 0)' \
+            "$state_dir/cloudflare-state-store.json" > /dev/null
+          jq -r '{keys:(keys | sort | join(",")), accountIdLength:(.accountId | length), urlHost:(.url | capture("https://(?<host>[^/]+)").host), authTokenLength:(.authToken | length)}' \
+            "$state_dir/cloudflare-state-store.json"
+
       - name: Run report-only orphan inventory
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_READ_API_TOKEN }}
         run: |
           set -euo pipefail
           mkdir -p "$RUNNER_TEMP/docs-deployment"
@@ -52,6 +98,8 @@ jobs:
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: taxkit-docs-orphan-inventory-${{ github.run_id }}
-          path: ${{ runner.temp }}/docs-deployment/orphan-report.json
+          path: |
+            ${{ runner.temp }}/docs-deployment/orphan-report.json
+            ${{ runner.temp }}/docs-deployment/workflow-input.json
           retention-days: 30
           if-no-files-found: error

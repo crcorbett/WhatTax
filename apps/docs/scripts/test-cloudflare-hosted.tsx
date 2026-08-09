@@ -16,6 +16,14 @@ const acceptedPlanSha256 = process.env.TAXKIT_DOCS_PLAN_SHA256;
 const configSha256 = process.env.TAXKIT_DOCS_CONFIG_SHA256;
 const deploymentInputSha256 = process.env.TAXKIT_DOCS_DEPLOYMENT_INPUT_SHA256;
 const lockfileSha256 = process.env.TAXKIT_DOCS_LOCKFILE_SHA256;
+const accountId = process.env.TAXKIT_DOCS_ACCOUNT_ID;
+const stateStoreId = process.env.TAXKIT_DOCS_STATE_STORE_ID;
+const previousVersionId = process.env.TAXKIT_DOCS_PREVIOUS_VERSION_ID ?? null;
+const previewPrNumberValue = process.env.TAXKIT_DOCS_PREVIEW_PR_NUMBER;
+const previewPrNumber =
+  previewPrNumberValue === undefined
+    ? null
+    : Number.parseInt(previewPrNumberValue, 10);
 const rollbackRecoveryIdentity =
   process.env.TAXKIT_DOCS_ROLLBACK_RECOVERY_IDENTITY;
 const environment = process.env.TAXKIT_DOCS_ENVIRONMENT;
@@ -25,6 +33,8 @@ assert.ok(
   origin !== undefined && /^https:\/\/[^/]+\.workers\.dev$/u.test(origin)
 );
 assert.match(candidateCommit ?? "", /^[a-f0-9]{40}$/u);
+assert.match(accountId ?? "", /^[a-f0-9]{32}$/u);
+assert.ok(stateStoreId !== undefined && stateStoreId.length > 0);
 assert.ok(deploymentId !== undefined && deploymentId.length > 0);
 assert.ok(versionId !== undefined && versionId.length > 0);
 assert.ok(workerName !== undefined && workerName.length > 0);
@@ -40,7 +50,11 @@ for (const digest of [
 assert.ok(
   rollbackRecoveryIdentity !== undefined && rollbackRecoveryIdentity.length > 0
 );
-assert.match(environment ?? "", /^(?:preview|production)$/u);
+assert.match(environment ?? "", /^(?:preview|production|rollback)$/u);
+assert.ok(
+  previewPrNumber === null ||
+    (Number.isInteger(previewPrNumber) && previewPrNumber > 0)
+);
 assert.match(
   evidenceDirectory ?? "",
   /^docs\/evidence\/deployments\/[A-Za-z0-9._/-]+$/u
@@ -318,6 +332,7 @@ process.stdout.write(
         labelledNavigation: true,
         skipLinkFocus: true,
       },
+      accountId,
       asset: {
         cacheControl: assetResponse.headers.get("cache-control"),
         contentType: assetResponse.headers.get("content-type"),
@@ -341,6 +356,8 @@ process.stdout.write(
         documentRequestsAdded: 0,
         serverFunctionResponses: serverFunctionResponses.length,
       },
+      previewPrNumber,
+      previousVersionId,
       rollbackRecoveryIdentity,
       runtime: {
         constructionCounts: [1, 1],
@@ -363,6 +380,7 @@ process.stdout.write(
         },
       ],
       stage,
+      stateStoreId,
       url: origin,
       versionId,
       workerName,

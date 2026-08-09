@@ -337,7 +337,7 @@ export const DeploymentScreenshotManifest = Schema.Struct({
   ),
   deploymentId: ProviderIdentity,
   deploymentInputSha256: Sha256,
-  environment: Schema.Literals(["preview", "production"]),
+  environment: Schema.Literals(["preview", "production", "rollback"]),
   expectedState: Schema.NonEmptyString,
   imagePath: RepositoryEvidencePath,
   imageSha256: Sha256,
@@ -751,7 +751,7 @@ export const DeploymentPreviewTeardownReceipt = Schema.Struct({
   rollback: Schema.NonEmptyString,
   schemaVersion: Schema.Literal(1),
   stack: Schema.Literal("TaxKitDocsCloudflare"),
-  stage: Schema.Literal("pr-1"),
+  stage: DocsDeploymentStage,
   state: Schema.Struct({
     id: Schema.Literal("cloudflare-http"),
     outputReadback: Schema.Literal("empty-object-after-stage-delete"),
@@ -763,6 +763,59 @@ export const DeploymentPreviewTeardownReceipt = Schema.Struct({
 });
 export type DeploymentPreviewTeardownReceipt =
   typeof DeploymentPreviewTeardownReceipt.Type;
+
+/**
+ * PR-close teardown runs reviewed default-branch code.  Its destroy projection
+ * therefore identifies the reviewed implementation commit, while the
+ * provider/state absence readback identifies the previously deployed
+ * candidate.  Keep those identities explicit instead of pretending they are
+ * one source revision.
+ */
+export const DeploymentPreviewWorkflowTeardownReceipt = Schema.Struct({
+  accountId: CloudflareAccountId,
+  candidateCommit: CommitSha,
+  destroyPlanSha256: Sha256,
+  destroyedResources: Schema.Tuple([
+    Schema.Struct({
+      logicalId: Schema.Literal("DocsBuild"),
+      resourceType: Schema.Literal("Command.Build"),
+    }),
+    Schema.Struct({
+      logicalId: Schema.Literal("DocsWebsite"),
+      resourceType: Schema.Literal("Cloudflare.Worker"),
+    }),
+  ]),
+  limitations: Schema.NonEmptyArray(Schema.NonEmptyString),
+  nonClaims: Schema.NonEmptyArray(Schema.NonEmptyString),
+  observedAt: Schema.String.check(
+    Schema.isPattern(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/u)
+  ),
+  operation: Schema.Literal("preview-destroy-and-absence-readback-workflow"),
+  physicalWorkerName: ProviderIdentity,
+  postcondition: Schema.Literal("preview-worker-and-stage-resources-absent"),
+  provider: Schema.Struct({
+    exactSettingsStatus: Schema.Literal(404),
+    hostedUrlStatus: Schema.Literal(404),
+    matchingWorkerCount: Schema.Literal(0),
+  }),
+  reviewedWorkflowCommit: CommitSha,
+  rollback: Schema.NonEmptyString,
+  runId: Schema.NonEmptyString,
+  schemaVersion: Schema.Literal(1),
+  stack: Schema.Literal("TaxKitDocsCloudflare"),
+  stage: DocsDeploymentStage,
+  state: Schema.Struct({
+    id: Schema.Literal("cloudflare-http"),
+    outputReadback: Schema.Literal("empty-object-after-stage-delete"),
+    previewResourceCount: Schema.Literal(0),
+    stagePresent: Schema.Literal(false),
+    version: Schema.Literal(7),
+  }),
+  url: WorkersDevUrl,
+  workflowPath: Schema.NonEmptyString,
+});
+export type DeploymentPreviewWorkflowTeardownReceipt =
+  typeof DeploymentPreviewWorkflowTeardownReceipt.Type;
 
 export const DeploymentAuthorityPreflightReceipt = Schema.Struct({
   approval: Schema.Struct({

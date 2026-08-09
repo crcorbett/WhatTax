@@ -3,7 +3,7 @@ document_type: runbook
 lifecycle: current
 authority: canonical
 owner: taxkit-docs-deployment-operation-owner
-last_reviewed: 2026-08-05
+last_reviewed: 2026-08-10
 review_trigger: docs deployment candidate, Cloudflare or Alchemy identity/state, stage, plan, provider readback, teardown, rollback, credential or authority change
 ---
 
@@ -191,6 +191,42 @@ hosted or teardown success until a default-branch run retains its dated,
 candidate-bound receipts. The current automation register remains
 `not-established`.
 
+### Workflow proof and receipt contract
+
+The protected Preview and Production workflows build the exact candidate, run
+the existing `test:cloudflare-hosted` owner (including HTTP, browser,
+accessibility, console, cache/header and bounded desktop/mobile screenshot
+proof), then run `bun run check:docs-deployment-workflow-proof` against the
+sanitized provider and hosted identities. The workflow retains the raw hosted
+output separately, filters a strict Schema receipt, copies the PNG bytes into
+the artifact-owned `docs/evidence/deployments/` subtree, and recomputes each
+image digest before success. Provider readback includes the account and
+Alchemy state-store identities plus the pre-mutation version when one exists;
+the latter is required for source-bound rollback. A workflow observation is
+not a durable deployment claim until its exact candidate, run, environment,
+plan, provider, hosted, screenshot-byte and postcondition receipt is promoted
+under `docs/evidence/deployments/` and Schema-decoded by the automation owner.
+
+Production mutation additionally requires `accepted_preview_run_id`. That run
+must be a successful `Docs Preview Deployment` from `main` for the exact
+candidate; the downloaded provider and hosted receipts are Schema-checked and
+must agree on candidate, the exact deterministic `pr-N` Preview stage, plan
+digest, Worker, URL, deployment, version and zero diagnostics before the
+Production plan is admitted. A caller-supplied commit, digest or `pr-*` prefix
+without that receipt and exact PR binding is not Preview acceptance.
+
+Teardown reads the exact `pr-N` stage and Worker before mutation, rejects any
+unexpected action/resource projection, and requires both Alchemy stage absence
+and provider Worker absence afterward. A zero-action projection is a valid
+convergent no-op only when the preflight already proved the exact stage absent;
+it is never inferred from an empty or malformed plan. The teardown provider
+readback is a separate absence Schema, not an application deployment receipt.
+
+The report-only inventory bounds the GitHub pull-request read to 1,000 rows and
+fails closed at that bound because completeness is then unknown. Its scheduled
+workflow remains reviewer-protected and therefore report-only/manual rather
+than unattended automation; no automatic orphan deletion is admitted.
+
 The first post-merge observations are retained as failure evidence: run
 `30894963411` stopped before any provider step because the checkout action ref
 was abbreviated; the full ref correction is `4fb8ea3…`, merged to `main` as
@@ -257,15 +293,17 @@ The supported repeatable state/provider readback invocation is:
 bun run check:docs-deployment-inventory
 ```
 
-It uses only the public installed `Cloudflare.state()` and Worker Provider
-`list()` operations. It requires `CI=1`, a cached state-store credential and
-agreement between that credential's account identity and the current
-Cloudflare environment before state initialization. It decodes state and
-provider output once, filters provider inventory by exact Alchemy stack tags,
-and fails on state/Worker disagreement. It prints no account ID, token or raw
-provider response. Do not place it in root verification: it is a
-credentialed, provider-bound observation whose exact execution belongs in an
-authorized operation or report-only workflow.
+It uses Alchemy's public `makeHttpStateStore` plus the public Cloudflare Worker
+Provider `list()` operation. It requires `CI=1`, the protected state-store
+credential and agreement between that credential's account identity and the
+current Cloudflare environment before state initialization. The workflow
+materializes the cache as the primary ingress; the nested report-only process
+may decode the same protected JSON credential directly only when it cannot see
+that cache. It decodes state and provider output once, filters provider
+inventory by exact Alchemy stack tags, and fails on state/Worker disagreement.
+It prints no account ID, token or raw provider response. Do not place it in
+root verification: it is a credentialed, provider-bound observation whose
+exact execution belongs in an authorized operation or report-only workflow.
 
 Mutation workflows must first materialize the ephemeral cache with the
 installed Alchemy Cloudflare bootstrap command recorded above. The command is
@@ -322,8 +360,11 @@ values, the verified hosted proof invocation is:
 ```sh
 TAXKIT_DOCS_HOSTED_URL="${READ_BACK_WORKERS_DEV_URL}" \
 TAXKIT_DOCS_CANDIDATE_COMMIT="${EXACT_CANDIDATE_COMMIT}" \
+TAXKIT_DOCS_ACCOUNT_ID="${READ_BACK_ACCOUNT_ID}" \
+TAXKIT_DOCS_STATE_STORE_ID="${READ_BACK_STATE_STORE_ID}" \
 TAXKIT_DOCS_DEPLOYMENT_ID="${READ_BACK_DEPLOYMENT_ID}" \
 TAXKIT_DOCS_VERSION_ID="${READ_BACK_VERSION_ID}" \
+TAXKIT_DOCS_PREVIOUS_VERSION_ID="${READ_BACK_PREVIOUS_VERSION_ID}" \
 TAXKIT_DOCS_WORKER_NAME="${READ_BACK_WORKER_NAME}" \
 TAXKIT_DOCS_STAGE="${READ_BACK_STAGE}" \
 TAXKIT_DOCS_ENVIRONMENT="${ACCEPTED_ENVIRONMENT}" \
@@ -384,12 +425,16 @@ and only the provider/state-agreed URL and deployment/version identity.
 ### Normal rollback
 
 Select the retained last-known-good source, keep the same stack, `prod` stage
-and physical Worker identity, run the normal build/plan/equal-replan/deploy
-path, then prove provider version and hosted postcondition. A prior version ID
-or successful API response alone is insufficient.
+and physical Worker identity, read the current Production version immediately
+before mutation, and require the source-bound recovery identity and expected
+current version to match. Run the normal build/plan/equal-replan/deploy path,
+then prove the resulting provider version and hosted postcondition. A prior
+version ID or successful API response alone is insufficient.
 
-The verified rollback used the same two invocations above with the restored
-source candidate and environment `rollback` for hosted proof. It required a
+The verified rollback uses the same two invocations above with the restored
+source candidate and `TAXKIT_DOCS_ENVIRONMENT=rollback` for hosted proof. The
+hosted harness explicitly accepts that bounded rollback environment and emits
+a rollback screenshot manifest; it required a
 distinct deployment/version after apply, the same Worker name, URL and Alchemy
 instance, and the target's expected state bundle. Requalify any successor in
 isolated Preview first and remove that Preview only after retaining its proof.
@@ -526,8 +571,40 @@ Before marking its `externalState` as `established`, require all of:
 6. state/provider and hosted postcondition readback; and
 7. a retained dated receipt named in `externalState.receipt`.
 
+The receipt must also name Schema-decoded `workflowRunPath` and
+`workflowInputPath` files under the owned evidence route. The read-only
+`Docs Deployment Workflow Receipts` workflow runs from the `workflow_run`
+completion event, fetches the source run through the Actions API and downloads
+the matching artifact; it must emit the strict readback only after the source
+run is completed and successful. For Preview, Production and report-only runs,
+the API `headBranch`/`headSha` must be `main` and equal the workflow source
+commit recorded by the outer receipt. Automatic PR-close teardown is the
+intentional exception: its API head identifies the closed pull-request run,
+while the separately recorded `workflowCommit` and `refs/heads/main` identify
+the reviewed implementation that the teardown checked out; the reconciler
+must verify that reviewed commit exists and is an ancestor of the current
+default branch before validating the artifact. The separate
+workflow-input readback is emitted by the reviewed workflow from its dispatch
+inputs and must bind the same run/path/source commit, operation and exact
+deployment candidate input to the outer receipt. The source head and candidate
+are intentionally distinct when a reviewed default-branch workflow builds a PR
+head. Promotion rejects branch-only, synthetic or detached input metadata. The
+reconciler retains bounded failure metadata for failed or cancelled runs,
+artifact mismatch or schema/provider disagreement; those runs have no success
+readback and cannot be promoted. The
+named plan receipt is decoded and its operation, projection
+digest, candidate, stage and equal-replan identity are checked again during
+external-state promotion; a teardown projection may contain only two deletes
+or two no-ops, never a mixed or unexpected action. Hosted promotion additionally
+requires `preview` with `pr-N` for Preview, `production` or `rollback` with
+`prod` for Production, and exactly one desktop plus one mobile screenshot whose
+retained PNG bytes hash to the manifest.
+
 The current register intentionally records all four entries as
 `not-established` until each record's complete receipt contract is satisfied.
+The read-only reconciler is governed by the separate
+`docs-workflow-receipt-reconciliation` control; it does not add provider
+authority or a fifth mutation automation.
 The 2026-08-04 capability receipt records the exact protected environment
 identities and redacted narrow credential readback; the current workflow epoch
 below records successful mutation-class runs, while the report-only state
@@ -536,6 +613,13 @@ environment, copy the broad local OAuth credential into GitHub, or invent an
 unexecuted command merely to advance the task. Continue to use this manual
 runbook under the exact authority envelope until every required workflow
 receipt and read-only state boundary is retained.
+
+For a future positive report-only admission, the outer workflow receipt must
+name a dedicated `reportPath` decoded as
+`DocsDeploymentOrphanInventoryReceipt`. `providerReadbackPath` is reserved for
+mutation provider identity or teardown absence receipts and must remain null
+for orphan inventory; a report that is merely present in an artifact, or is
+decoded as a mutation provider receipt, is not state/provider proof.
 
 The 2026-08-02 successor readback at draft-PR head `aabe7b6…` confirmed
 repository-admin capability but still found zero GitHub environments, zero
@@ -547,19 +631,41 @@ secret. The smallest CI prerequisite is an independently provisioned narrow
 Cloudflare principal whose concrete values can be stored without disclosure as
 `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_API_TOKEN` in `taxkit-docs-preview`,
 `taxkit-docs-production` and `taxkit-docs-preview-teardown`, plus a separately
-read-only `CLOUDFLARE_READ_API_TOKEN` in `github-actions-report-only`. Before
+read-only `CLOUDFLARE_READ_API_TOKEN` and the separately scoped
+`ALCHEMY_STATE_STORE_CREDENTIALS_JSON` in `github-actions-report-only`. The
+latter is a redacted JSON credential cache containing only the account-matched
+state-store URL, account identity and bearer; it is materialized ephemerally
+and used only by the read-only inventory command. Installed Alchemy beta.64
+has no cryptographic read-only state bearer, so this is an operational
+read-only boundary: the workflow has no login, bootstrap, deploy, destroy or
+state-write path, and the limitation remains an explicit non-claim. Before
 storage, read back the account, allowed operation/resource set, duration and
 revocation owner against the matching automation record. Creating empty
-environments, substituting local OAuth/cache state or widening the principal
-is not recovery. PR-close teardown also remains gated on reviewed workflow code
-being present on the default branch; merge and PR-ready authority are separate.
+environments, substituting the broad local OAuth profile or widening the
+Cloudflare principal is not recovery. PR-close teardown also remains gated on
+reviewed workflow code being present on the default branch; merge and PR-ready
+authority are separate.
 
 PR-close teardown must run reviewed default-branch implementation code, derive
 only exact `pr-N`, share that stage's non-cancellable mutation lock, and prove
-state/provider/URL absence. Scheduled orphan inventory is report-only: it may
+state/provider/URL absence. Manual teardown dispatch must reject any selected
+ref other than `refs/heads/main` before any provider credential is available;
+Cloudflare credentials are scoped to the post-checkout provider steps. Scheduled
+orphan inventory is report-only: it may
 compare open pull requests, exact TaxKit stages and exact TaxKit Workers, but
-has no write or automatic-deletion authority. An incomplete inventory is an
-inconclusive report, not destroy permission.
+has no provider-write, state-write or automatic-deletion authority. An
+incomplete inventory is an inconclusive report, not destroy permission.
+
+The report-only workflow is permitted to materialise its read-only state bearer
+only after it verifies `refs/heads/main`, `GITHUB_REF_NAME=main`, and that
+`GITHUB_SHA` equals the live default-branch ref. Manual dispatch on another
+branch is rejected before dependency installation or secret use. Preview and
+teardown reject a non-positive or non-numeric PR number before Alchemy cache
+bootstrap. A normal rollback must use the accepted Preview provider receipt's
+source-bound recovery identity; a caller-supplied identity or expected version
+alone is not a last-known-good proof. The rollback provider/hosted receipt must
+also show a non-null pre-mutation version and a different resulting deployment
+version; a no-op version readback is not rollback proof.
 
 The exact authorized operator invocation is:
 
@@ -608,12 +714,111 @@ read-only Cloudflare token cannot derive Alchemy beta.64's HTTP state-store
 bearer without the mutation-capable bootstrap path. The two failed receipts
 are retained under
 `docs/evidence/deployments/2026-08-05-orphan-inventory/`. Do not copy a
-mutation token, local OAuth profile or state cache into report-only inventory;
-until a separately reviewed read-only state boundary exists, the scheduled
-inventory is an inconclusive report-only report and grants no teardown or
-deletion authority. The executable deployment register therefore remains
+mutation token or local OAuth profile into report-only inventory. A later
+successor may materialize the separately reviewed
+`ALCHEMY_STATE_STORE_CREDENTIALS_JSON` cache, but only with the workflow's
+read-only command path and an explicit limitation that beta.64's bearer is not
+cryptographically read-only. Until that successor receipt exists, the
+scheduled inventory is inconclusive and grants no teardown or deletion
+authority. The executable deployment register therefore remains
 `not-established` as an aggregate claim despite the dated mutation workflow
 successes.
+
+### 2026-08-09 — operational report-only state-read candidate
+
+The exact report-only workflow candidate materializes
+`ALCHEMY_STATE_STORE_CREDENTIALS_JSON` into the default Alchemy credential
+cache after frozen installation, validates account identity, URL and bearer
+shape with `jq`, and then invokes only `bun run check:docs-deployment-orphans`.
+It does not run `alchemy login`, `alchemy cloudflare bootstrap`, `alchemy
+plan`, `alchemy deploy`, `alchemy destroy` or any state-write operation. The
+secret is scoped only to `github-actions-report-only`, alongside
+`CLOUDFLARE_READ_API_TOKEN`; no value is stored in the repository. This is an
+operational-read-only boundary because beta.64's bearer has no native read-only
+scope. The candidate remains unaccepted until a names-only environment
+readback and exact workflow receipt prove state/provider agreement.
+
+### 2026-08-09 — report-only Alchemy cache-ingress stop
+
+The protected job for exact candidate `39f389c24f819046b2bd57e7cb3bd8674eed0941`
+materialized `ALCHEMY_STATE_STORE_CREDENTIALS_JSON` under the runner's expected
+home-relative Alchemy cache. Its names-only preflight observed the expected
+keys, account-id length, URL host and bearer length, while retaining no secret
+value. The inventory command nevertheless stopped with
+`deployment-inventory:missing-cache`: installed Alchemy beta.64's
+`CredentialsStore.read` returned no cached value.
+
+Retain the bounded receipt at
+`docs/evidence/deployments/2026-08-09-orphan-inventory/failed-31313055223.json`
+and the full workflow log/artifact under run `31313055223`. This is a capability
+stop, not an approval stop. Do not broaden the report-only token, copy the local
+OAuth profile, invoke login/bootstrap, or infer an orphan, state, provider,
+teardown or deletion result. The report-only register remains
+`not-established`. The next operation is a supported non-mutating Alchemy
+beta.64 cache-ingress repair or replacement, followed by a fresh exact-candidate
+run and successor receipt; until then scheduled orphan detection stays
+report-only and inconclusive.
+
+### 2026-08-09 — public state-client successor and hosted runner stop
+
+Candidate `9dd779d70ccf661081856c3b5f07474b406db7ba` now constructs the
+report-only state reader with Alchemy beta.64's public `makeHttpStateStore`
+after the existing Schema-decoded, account-matched cache ingress. The nested
+process has a bounded fallback to decode the same protected JSON credential
+when cache visibility differs, avoiding the nested `Cloudflare.state()` layer
+while retaining the public Cloudflare Worker Provider read and leaving all
+mutation/bootstrap paths unchanged. The local inventory command returned
+state/provider agreement, state-store version `7`, one `prod` stage and one
+Worker.
+
+The exact hosted successor run `31315231020` checked out this candidate but
+remained queued without a runner or pending environment request and was
+cancelled after the bounded wait. Retain
+`docs/evidence/deployments/2026-08-09-orphan-inventory/cancelled-31315231020.json`.
+This is a hosted capability stop, not an approval or provider-state result:
+the report-only automation register remains `not-established`, no orphan or
+teardown claim is made, and the next action is to retry the protected workflow
+when hosted runner admission is available.
+
+### 2026-08-09 — report-only hosted successor
+
+Candidate `70be77e64c93d20cd82c5e02e33db9c92a94f0d7` passed the protected
+`github-actions-report-only` workflow `31316752464`. Cache materialization and
+the names-only shape check passed; the nested inventory command then used the
+bounded protected-JSON fallback when its child process could not see the
+home-relative cache. The report returned state/provider agreement, state-store
+version `7`, one `prod` stage, one matching Worker, no Preview stages and no
+orphan candidates. The artifact was uploaded and the receipt is
+`docs/evidence/deployments/2026-08-09-orphan-inventory/report-31316752464.json`.
+
+This establishes the exact branch-bound report-only read and no mutation. It
+does not establish hosted application behavior, deployment/version identity,
+teardown, rollback or future availability. The automation register remains
+`not-established` until this workflow runs from the reviewed default-branch
+source; keep DCD-004 and DCD-005 open until that source-bound lifecycle is
+accepted.
+
+### 2026-08-10 — current provider evidence epoch
+
+Candidate b59e4ee has claim-matched Preview `pr-15`, exact-stage teardown,
+fixed Production and normal rollback/redeploy receipts under
+`docs/evidence/deployments/2026-08-10-preview-pr-15/` and
+`docs/evidence/deployments/2026-08-10-production-prod/`. The Preview hosted
+contract and bounded desktop/mobile screenshots passed before run
+`31318663989` proved state/provider and former workers.dev URL absence. The
+Production receipt binds the stable provider Worker and URL; rollback to
+eafeaad changed deployment/version identity, passed the hosted contract, and
+was followed by the final b59e4ee redeploy. These are provider workers.dev
+observations only: custom-domain, DNS, billing tier/cost, release, publication
+and byte-promotion claims remain excluded.
+
+The PR-close teardown receipt records the reviewed default-branch implementation
+SHA separately from the deployed candidate because the workflow intentionally
+does not execute pull-request code. The protected report-only run
+`31319845724` passed for the open branch candidate and returned state/provider
+agreement with no Preview/orphan candidates; it remains branch-bound until the
+reviewed default-branch source is read back. Do not advance the aggregate
+automation register or close DCD-004 from this branch-bound receipt.
 
 ## Stop conditions
 
@@ -647,16 +852,17 @@ rejects. DCD-002 therefore used direct Schema-decoded state-store and
 Cloudflare readback. Do not admit that internal sentinel into deployable stage
 identity or use the failing generic command as an absence oracle; DCD-004 must
 provide a supported repeatable readback owner before workflow admission.
-Historical receipts cannot establish current provider state. The public
-`Cloudflare.state()` Layer and Worker Provider `list()` now back the supported
-`check:docs-deployment-inventory` command without evaluating `alchemy.run.ts`
-under the rejected placeholder stage. Its latest local authorized read
-observed state/provider agreement for only `prod`, `DocsBuild` and
-`DocsWebsite`. This does not establish hosted workflow execution,
-deployment/version identity, application behavior or future availability. The earlier
-`0d714e6…` chain is not accepted because it lacked exact pre-mutation
-state/provider receipts and complete hosted/screenshot/state false-green
-oracles.
+Historical receipts cannot establish current provider state. The report-only
+`check:docs-deployment-inventory` command now uses Alchemy's public
+`makeHttpStateStore` after Schema-decoding the account-matched cache, with the
+same protected JSON credential as a bounded nested-process fallback, plus the
+Worker Provider `list()` operation; the mutation composition retains its
+separate `Cloudflare.state()` layer. Its latest local authorized read observed
+state/provider agreement for only `prod`, `DocsBuild` and `DocsWebsite`. This
+does not establish hosted workflow execution, deployment/version identity,
+application behavior or future availability. The earlier `0d714e6…` chain is
+not accepted because it lacked exact pre-mutation state/provider receipts and
+complete hosted/screenshot/state false-green oracles.
 
 The DCD-003 fixed Production readback is bound to restored source
 `d9cb8945529fb72158e59ca0daf02a98e1e4de1a`, Worker
