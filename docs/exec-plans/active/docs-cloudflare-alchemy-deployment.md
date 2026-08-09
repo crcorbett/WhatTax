@@ -3,7 +3,7 @@ document_type: execution-plan
 lifecycle: current
 authority: supporting
 owner: taxkit-docs-deployment-implementation-owner
-last_reviewed: 2026-08-09
+last_reviewed: 2026-08-10
 review_trigger: DCD task transition, implementation discovery, proof result, authority stop, or rollback
 successor: null
 tombstone: false
@@ -36,7 +36,7 @@ the milestone and acceptance owner.
 | `DCD-001` | completed   | Accepted at `669a8f3…` after exact dependency/integrity readback, both built-app oracles, docs-maintainer reconciliation, focused Changeset, independent closure, and all change-owned gates. |
 | `DCD-002` | completed   | Accepted candidate `d9cb894…` passed fresh pre-deploy and pre-destroy state/provider readback, equal plans, Preview apply, the complete hosted/browser/screenshot contract, exact-stage teardown/absence, all gates and corrected-boundary independent review. |
 | `DCD-003` | completed   | Accepted after fixed Production, separately Preview-qualified successor, successor Production, restored-source rollback, provider/hosted/screenshot readback, owner reconciliation, full verification and corrected-boundary independent review. |
-| `DCD-004` | in_progress | Mutation workflow plan/deploy/teardown receipts now pass on the default branch, including Preview, fixed Production, rollback and PR-close no-op; report-only inventory remains an explicit capability stop because the read-only token cannot derive Alchemy's state-store bearer. The automation register remains `not-established` as an aggregate claim. |
+| `DCD-004` | in_progress | Mutation workflow plan/deploy/teardown receipts now pass for the current candidate, and protected report-only run `31319845724` passes on the open branch; default-branch source readback is still required before the aggregate automation register can advance from `not-established`. |
 | `DCD-005` | pending     | Docs-app bridge-retirement implementation is present and locally qualified at `d649a14…`; waits for exact-candidate hosted Preview/Production/rollback requalification, the report-only state boundary, fresh independent review and complete closeout evidence. |
 
 ## Baseline
@@ -84,13 +84,13 @@ authority envelope upfront on 2026-07-30 Australia/Melbourne:
   provider readback path.
 
 Custom-domain/DNS work, unrelated resources, credential disclosure/rotation or
-scope expansion, third-party observability, package publication/release,
-merge, force-push, branch deletion, PR-ready conversion and unrelated mutation
-remain unauthorized. The exact branch, push, draft PR/readback and later
-accepted-slice pushes are admitted by the dated successor Git receipt. Wrong
-identity or account, unsafe drift, secret-exposure risk, destructive scope
-beyond the named resources, or provider contradiction remains a mandatory
-safety stop.
+scope expansion, third-party observability, and package publication/release
+remain unauthorized. Cooper's later 2026-08-10 approval also admits PR-ready
+conversion and merge for this accepted SPEC after all claim-matched gates pass;
+it does not waive exact identity, account, stage, plan, secret, provider or
+postcondition checks. Wrong identity or account, unsafe drift, secret-exposure
+risk, destructive scope beyond the named resources, or provider contradiction
+remains a mandatory safety stop.
 The target-owned runbook and first provider receipt must restate this envelope
 before DCD-002 mutates anything.
 
@@ -1263,3 +1263,40 @@ automation register remains `externalState.status: not-established` because
 the workflow source is not the reviewed default-branch commit; DCD-004 remains
 `in_progress`, DCD-005 remains `pending`, and no hosted application,
 deployment/version, teardown or rollback claim is made from this receipt.
+
+### 2026-08-10 — current candidate hosted and lifecycle receipts
+
+Candidate `b59e4eec907c4af017ebac32cda81fab71bf08b4` passed the protected
+`pr-15` Preview plan/equal-replan, provider readback, hosted HTTP/browser and
+bounded desktop/mobile screenshot contract. The provider receipt binds Alchemy
+state instance `7aaa384073855328183ecd4ef099fcdb`, Worker
+`taxkitdocscloudflare-docswebsi5hvoqqnppkvdqqdtqvjsqgb6`, deployment
+`c324a6ba-1d44-4a04-96df-b4fa8bee7279`, version
+`a7159ebe-2e59-4cd3-9720-cf7c39164a94`, and the read-back workers.dev URL under
+`docs/evidence/deployments/2026-08-10-preview-pr-15/`. The protected teardown
+run `31318663989` proved the exact stage and former URL absent. Its dedicated
+workflow receipt records the removed candidate separately from reviewed
+default-branch teardown code (`6947dab…`), avoiding a false single-SHA claim.
+
+The same b59e4ee source was deployed to fixed Production with equal digest
+`ca91f96b767f2f26f8c9db0aad3e7015aa7d45ec6701e2fadbd0801cf5b8d934`. Final
+readback binds deployment `b6cfeca4-956d-4b7f-a0c5-6e94e61050a4`, version
+`efeb7e83-399f-4cc8-a972-a749b5954319`, the stable Worker
+`taxkitdocscloudflare-docswebsite-prod-ujphggiaxw5ryjev` and its workers.dev
+URL. Hosted Production proof and bounded screenshots passed. A normal
+source-bound rollback to eafeaad used digest
+`f4b15d25b488918582b1dcf07a26838d700ed34e370b2959c57dd07376386123`, read back
+deployment `41ef66dc-c455-4818-8893-bc878ea0c365` and version
+`7ffbcf8a-b7f6-4085-990b-574512a1cb63`, passed the same hosted contract, and
+was followed by the final b59e4ee redeploy. These receipts establish only the
+named provider account, stages and workers.dev observations: no custom-domain,
+DNS, paid-plan, release, publication or byte-promotion claim is made.
+
+Protected report-only run `31319845724` passed for the open b59e4ee branch
+candidate and returned state/provider agreement, one prod stage, one Worker and
+no Preview/orphan candidates. Its receipt is
+`docs/evidence/deployments/2026-08-09-orphan-inventory/report-31319845724.json`.
+The automation register remains `not-established` until the same workflow is
+read back from reviewed default-branch source. DCD-004 and DCD-005 remain open
+for that source-bound lifecycle gate, fresh review and final closeout; no
+receipt is promoted across candidates or source epochs.

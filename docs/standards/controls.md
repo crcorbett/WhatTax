@@ -3,7 +3,7 @@ document_type: standard
 lifecycle: current
 authority: canonical
 owner: taxkit-ci-release-maintainer
-last_reviewed: 2026-08-05
+last_reviewed: 2026-08-10
 review_trigger: public boundary, workflow, action, release graph, or repeated-review finding change
 ---
 
@@ -74,3 +74,10 @@ Alchemy beta.64 state-store bearer without the mutation bootstrap path; no
 provider mutation occurred. Consequently the aggregate deployment register
 remains `not-established`, and orphan detection remains an inconclusive
 report-only signal rather than deletion or teardown authority.
+
+The current b59e4ee epoch adds claim-matched protected Preview, exact-stage
+teardown, fixed Production and normal rollback receipts under
+`docs/evidence/deployments/2026-08-10-*`; those receipts do not change the
+automation register's external-state status. Report-only run `31319845724`
+passed on the open branch and proved only the separate state/provider read. A
+reviewed default-branch source readback remains the control admission gate.

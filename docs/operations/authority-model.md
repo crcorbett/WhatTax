@@ -3,7 +3,7 @@ document_type: authority-model
 lifecycle: current
 authority: canonical
 owner: taxkit-authority-model-owner
-last_reviewed: 2026-08-09
+last_reviewed: 2026-08-10
 review_trigger: identity, release, Git, registry, deployment, provider, credential, or recovery change
 ---
 
@@ -184,3 +184,22 @@ contract. No mutation or secret disclosure occurred in the failed epoch. The
 deployment register remains `not-established` until a successor run retains
 the complete read-only receipt; this is a capability boundary, not a license
 to widen the Cloudflare principal.
+
+### 2026-08-10 — current provider and report-only readback
+
+The current authorized implementation epoch retains claim-matched Preview,
+exact-stage teardown, fixed Production and normal source-bound rollback
+receipts under `docs/evidence/deployments/2026-08-10-*`. The receipts bind the
+TaxKit account, exact stage/resource, equal plan digest, Alchemy state, Worker,
+deployment/version, workers.dev URL and hosted/screenshot postconditions. The
+PR-close teardown receipt keeps its reviewed default-branch implementation SHA
+separate from the removed candidate; this is a required authority distinction,
+not a second deployment resource.
+
+Protected report-only run `31319845724` passed with the separate read-only
+Cloudflare token and protected state-store credential, but its workflow source
+was the open branch. It therefore remains an operational-read-only observation
+and does not establish the aggregate automation class. A default-branch
+readback is required before `externalState` can advance; no authority is
+inferred for state bootstrap, deploy, destroy, rollback, DNS, release or
+publication from this report.

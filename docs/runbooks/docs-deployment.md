@@ -3,7 +3,7 @@ document_type: runbook
 lifecycle: current
 authority: canonical
 owner: taxkit-docs-deployment-operation-owner
-last_reviewed: 2026-08-09
+last_reviewed: 2026-08-10
 review_trigger: docs deployment candidate, Cloudflare or Alchemy identity/state, stage, plan, provider readback, teardown, rollback, credential or authority change
 ---
 
@@ -701,6 +701,28 @@ teardown, rollback or future availability. The automation register remains
 `not-established` until this workflow runs from the reviewed default-branch
 source; keep DCD-004 and DCD-005 open until that source-bound lifecycle is
 accepted.
+
+### 2026-08-10 — current provider evidence epoch
+
+Candidate b59e4ee has claim-matched Preview `pr-15`, exact-stage teardown,
+fixed Production and normal rollback/redeploy receipts under
+`docs/evidence/deployments/2026-08-10-preview-pr-15/` and
+`docs/evidence/deployments/2026-08-10-production-prod/`. The Preview hosted
+contract and bounded desktop/mobile screenshots passed before run
+`31318663989` proved state/provider and former workers.dev URL absence. The
+Production receipt binds the stable provider Worker and URL; rollback to
+eafeaad changed deployment/version identity, passed the hosted contract, and
+was followed by the final b59e4ee redeploy. These are provider workers.dev
+observations only: custom-domain, DNS, billing tier/cost, release, publication
+and byte-promotion claims remain excluded.
+
+The PR-close teardown receipt records the reviewed default-branch implementation
+SHA separately from the deployed candidate because the workflow intentionally
+does not execute pull-request code. The protected report-only run
+`31319845724` passed for the open branch candidate and returned state/provider
+agreement with no Preview/orphan candidates; it remains branch-bound until the
+reviewed default-branch source is read back. Do not advance the aggregate
+automation register or close DCD-004 from this branch-bound receipt.
 
 ## Stop conditions
 

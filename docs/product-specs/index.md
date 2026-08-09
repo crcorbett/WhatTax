@@ -3,7 +3,7 @@ document_type: product-spec-index
 lifecycle: current
 authority: canonical
 owner: taxkit-product-owner
-last_reviewed: 2026-08-09
+last_reviewed: 2026-08-10
 review_trigger: product-spec admission, lifecycle, evidence, or successor change
 successor: null
 tombstone: false
@@ -21,7 +21,7 @@ Specs:
 
 | Spec | Status | Notes |
 | --- | --- | --- |
-| [Docs Cloudflare and Alchemy deployment](./docs-cloudflare-alchemy-deployment.md) | Active — DCD-004 in progress | Mutation workflow and rollback receipts are retained; the docs-app Nitro bridge is locally retired at `d649a14…`, and the corrected branch-bound report-only state read passed at `70be77e…`; default-branch automation establishment and exact-candidate hosted requalification remain explicit stops, so DCD-004 and DCD-005 are not closed. |
+| [Docs Cloudflare and Alchemy deployment](./docs-cloudflare-alchemy-deployment.md) | Active — DCD-004 in progress | Current b59e4ee Preview/teardown/Production/rollback provider and hosted receipts are retained under the dated deployment evidence routes; branch-bound report-only run `31319845724` passed, while reviewed default-branch automation establishment and final independent closeout remain explicit gates. |
 | [TaxKit docs application architecture](./docs-application-architecture.md) | Implemented | The three-owner docs migration, native route outcomes, production graph and candidate-bound local proof are implemented; search remains deferred. |
 | [Harness foundation improvements](./harness-foundation-improvements.md) | Implemented | The portable six-skill baseline, stable TaxKit profile, deterministic governance gate, five retained journeys, and fail-closed epoch `7c8a96e` are implemented and locally verified. |
 | [Harness-governance documentation](./harness-governance-documentation.md) | Implemented | HGI-200 through HGI-208 are accepted locally; HGI-206 records the bounded repository epoch and closeout without claiming release, provider, or public actuality. |

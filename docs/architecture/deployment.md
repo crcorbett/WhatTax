@@ -3,7 +3,7 @@ document_type: architecture
 lifecycle: current
 authority: canonical
 owner: taxkit-architecture-owner
-last_reviewed: 2026-08-09
+last_reviewed: 2026-08-10
 review_trigger: deployment target, runtime adapter, provider resource, state, domain, or rollback change
 ---
 
@@ -184,6 +184,22 @@ owner and shared root output declarations remain. The bounded local receipt is
 It proves the local artifact and behavior contract only. It does not establish
 hosted requalification for this candidate or resolve the separate report-only
 Alchemy state-store boundary.
+
+## 2026-08-10 current hosted deployment epoch
+
+The current b59e4ee candidate has claim-matched provider and hosted evidence
+for isolated Preview `pr-15`, exact-stage teardown, fixed Production and a
+normal source-bound rollback/redeploy. Preview and Production both use the
+provider-owned workers.dev URL; the stable Production Worker identity is
+retained through rollback and final redeploy. The teardown workflow's reviewed
+implementation SHA is recorded separately from the removed PR candidate
+because PR-close recovery intentionally executes default-branch code.
+
+This epoch does not establish custom-domain/DNS routing, a paid plan or cost,
+byte promotion, release/publication or future availability. The report-only
+workflow's branch-bound state/provider receipt remains separate from hosted
+application proof and does not advance the automation register until a
+reviewed default-branch source readback exists.
 
 ## Local runtime shape
 

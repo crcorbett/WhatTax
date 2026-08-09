@@ -285,3 +285,29 @@ branch-bound report-only read and no mutation, not hosted application behavior,
 deployment/version identity, teardown, rollback or future availability. The
 automation register remains `not-established` until the reviewed workflow runs
 from the default branch source; DCD-004 and DCD-005 therefore remain open.
+
+## 2026-08-10 current candidate hosted epoch
+
+The current b59e4ee candidate has separate dated Preview and Production
+evidence. Preview `pr-15` includes equal plan/replan, Alchemy and Cloudflare
+readback, hosted HTTP/browser/accessibility/console/cache-header proof and one
+desktop/mobile screenshot pair under
+`2026-08-10-preview-pr-15/`. The protected teardown run `31318663989` proves
+the exact stage and former workers.dev URL absent. Because teardown executes
+reviewed default-branch code, `teardown-workflow-b59e4ee.json` keeps the removed
+candidate and reviewed implementation SHA as distinct identities.
+
+Production uses fixed `prod` and retains the final b59e4ee deployment/readback,
+hosted proof and screenshot pair under `2026-08-10-production-prod/`. The
+`rollback/` directory retains the normal source-bound eafeaad redeploy,
+provider/version readback, hosted proof and screenshot pair. The final
+Production URL is the provider workers.dev URL; custom-domain, DNS, paid-plan,
+release, publication and byte-promotion claims remain outside this evidence
+epoch.
+
+Protected report-only run `31319845724` passed for the open branch candidate and
+returned state/provider agreement for one prod stage and Worker with no Preview
+orphan. The wrapper receipt is
+`2026-08-09-orphan-inventory/report-31319845724.json`; it remains branch-bound
+until the reviewed default-branch workflow source is read back. No secret value
+is retained in any evidence file.

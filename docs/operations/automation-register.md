@@ -3,7 +3,7 @@ document_type: automation-register
 lifecycle: current
 authority: canonical
 owner: taxkit-ci-release-maintainer
-last_reviewed: 2026-08-09
+last_reviewed: 2026-08-10
 review_trigger: workflow, signal, authority, proof, stopping, escalation, rollback, or retirement change
 ---
 
@@ -79,3 +79,14 @@ retained. Until a separately reviewed non-mutating state boundary exists, the
 aggregate register must remain `not-established`; the report-only workflow has
 no teardown or deletion authority. Quality remains independently cancellable
 and without provider credentials or provider mutation authority.
+
+### 2026-08-10 current candidate readback
+
+The protected report-only workflow run `31319845724` passed for branch candidate
+b59e4ee and retained state/provider agreement for one fixed `prod` stage and
+Worker with no Preview/orphan candidates at
+`docs/evidence/deployments/2026-08-09-orphan-inventory/report-31319845724.json`.
+This receipt is intentionally branch-bound. The four register entries remain
+`externalState.status: not-established` until the same workflow file and
+report-only owner are read back from the reviewed default branch; no provider
+mutation, state write, teardown or credential-scope expansion is inferred.

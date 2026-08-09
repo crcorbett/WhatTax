@@ -17,6 +17,7 @@ import type {
   DeploymentPreviewCredentialReadbackReceipt,
   DeploymentPreviewMutationPreflightReceipt,
   DeploymentPreviewTeardownReceipt,
+  DeploymentPreviewWorkflowTeardownReceipt,
   DeploymentResumePreflightReceipt,
   DeploymentScreenshotManifest,
 } from "./schemas.js";
@@ -368,6 +369,48 @@ export const inspectPreviewEvidenceChain = (
   ) {
     findings.push(
       "preview-evidence-chain: Git, plan, provider, hosted and screenshot receipts must bind one Preview candidate and stage"
+    );
+  }
+  return findings;
+};
+
+export const inspectPreviewHostedEvidenceChain = (
+  plan: DeploymentPlanReceipt,
+  provider: DeploymentProviderReadback,
+  hosted: DeploymentHostedProofReceipt,
+  screenshots: readonly DeploymentScreenshotManifest[]
+): readonly string[] => {
+  const findings = [
+    ...inspectDeploymentPlanReceipt(plan),
+    ...inspectDeploymentPlanActions(plan, "create"),
+    ...inspectHostedDeploymentProof(hosted),
+    ...Array.flatMap(screenshots, (manifest) =>
+      inspectScreenshotProviderBinding(manifest, provider)
+    ),
+  ];
+  if (
+    plan.projection.candidate.exactCommit !== provider.candidateCommit ||
+    plan.acceptedPlanSha256 !== provider.acceptedPlanSha256 ||
+    plan.projection.configSha256 !== provider.configSha256 ||
+    plan.projection.candidate.deploymentInputSha256 !==
+      provider.deploymentInputSha256 ||
+    plan.projection.candidate.lockfileSha256 !== provider.lockfileSha256 ||
+    plan.projection.stage !== provider.stage ||
+    hosted.candidateCommit !== provider.candidateCommit ||
+    hosted.url !== provider.url ||
+    deploymentRecordDigest(hosted.provider) !==
+      deploymentRecordDigest(provider) ||
+    hosted.environment !== "preview" ||
+    screenshots.length !== 2 ||
+    HashSet.size(
+      HashSet.fromIterable(
+        screenshots.map((manifest) => manifest.viewport.kind)
+      )
+    ) !== 2 ||
+    Array.some(screenshots, (manifest) => manifest.environment !== "preview")
+  ) {
+    findings.push(
+      "preview-hosted-evidence-chain: plan, provider, hosted and two-viewport screenshot receipts must bind one exact Preview candidate and stage"
     );
   }
   return findings;
@@ -769,6 +812,35 @@ export const inspectPreviewTeardownReceipt = (
   ) {
     findings.push(
       "preview-teardown-binding: destroy plan, deployed identity, provider absence and state absence must bind one exact Preview"
+    );
+  }
+  return findings;
+};
+
+export const inspectPreviewWorkflowTeardownReceipt = (
+  receipt: DeploymentPreviewWorkflowTeardownReceipt,
+  plan: DeploymentPlanReceipt,
+  provider: DeploymentProviderReadback
+): readonly string[] => {
+  const findings = [
+    ...inspectDeploymentPlanReceipt(plan),
+    ...inspectDeploymentPlanActions(plan, "delete"),
+  ];
+  if (
+    plan.operation !== "preview-destroy" ||
+    receipt.destroyPlanSha256 !== plan.acceptedPlanSha256 ||
+    receipt.reviewedWorkflowCommit !== plan.projection.candidate.exactCommit ||
+    receipt.stage !== plan.projection.stage ||
+    receipt.candidateCommit !== provider.candidateCommit ||
+    receipt.stage !== provider.stage ||
+    receipt.physicalWorkerName !== provider.physicalWorkerName ||
+    receipt.url !== provider.url ||
+    receipt.provider.matchingWorkerCount !== 0 ||
+    receipt.state.stagePresent ||
+    receipt.state.previewResourceCount !== 0
+  ) {
+    findings.push(
+      "preview-workflow-teardown-binding: reviewed teardown source, deployed candidate, destroy plan, provider absence and state absence must remain separate and claim-matched"
     );
   }
   return findings;

@@ -3,7 +3,7 @@ document_type: product-spec
 lifecycle: proposed
 authority: supporting
 owner: taxkit-product-owner
-last_reviewed: 2026-08-09
+last_reviewed: 2026-08-10
 review_trigger: accepted TK-CF finding, dependency constraint, Cloudflare or Alchemy contract, deployment authority, proof boundary, or implementation discovery
 successor: null
 tombstone: false
@@ -118,6 +118,30 @@ automation register remains `not-established` until the reviewed workflow runs
 from the default-branch source; hosted application behavior, deployment/version
 identity, teardown and rollback remain separate claims, so DCD-004 and DCD-005
 stay open.
+
+The current b59e4ee candidate has now passed the complete provider-bound
+Preview, teardown, Production and normal rollback/redeploy observations. The
+Preview receipts under `docs/evidence/deployments/2026-08-10-preview-pr-15/`
+bind equal plan/replan, Alchemy state, Worker/deployment/version, hosted
+HTTP/browser/accessibility/console/cache-header proof and bounded desktop/mobile
+screenshots; teardown run `31318663989` proves the exact `pr-15` stage and
+former workers.dev URL absent. The Production receipts under
+`docs/evidence/deployments/2026-08-10-production-prod/` bind fixed `prod` to
+the stable provider Worker and URL, with the same hosted/screenshot contract,
+normal rollback to eafeaad and final b59e4ee redeploy. The teardown receipt
+explicitly separates the deployed candidate from the reviewed default-branch
+implementation commit used by the PR-close workflow. These are dated
+workers.dev observations only; they do not establish custom-domain, DNS,
+paid-plan, release, publication or byte-promotion behavior.
+
+The protected report-only workflow run `31319845724` also passed for b59e4ee on
+the open branch and returned state/provider agreement, one prod stage, one
+Worker and no Preview/orphan candidates. Its wrapper receipt is
+`docs/evidence/deployments/2026-08-09-orphan-inventory/report-31319845724.json`.
+The aggregate automation register remains `not-established` until that same
+workflow is read back from reviewed default-branch source; DCD-004 and DCD-005
+remain open for that source-bound lifecycle gate, fresh independent review and
+final closeout. No receipt is promoted across candidates or source epochs.
 
 ## Target and comparative evidence
 
