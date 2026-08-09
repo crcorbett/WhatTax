@@ -5,6 +5,7 @@ import type {
   DeploymentControl,
 } from "./automation.schemas.js";
 import { DeploymentAutomationFinding } from "./automation.schemas.js";
+import { inspectDeploymentPlanReceipt } from "./policy.js";
 import type {
   DeploymentWorkflowExternalEvidence,
   DeploymentWorkflowExternalReceipt,
@@ -316,9 +317,24 @@ export const inspectDeploymentAutomationRegisters = (
       } else if (receipt?.operation === "preview-destroy") {
         expectedPlanOperation = "preview-destroy";
       }
+      const teardownActionMismatch =
+        receipt?.operation === "preview-destroy" &&
+        plan !== null &&
+        !(
+          plan.projection.logicalResources.every(
+            ({ action }) => action === "delete"
+          ) ||
+          plan.projection.logicalResources.every(
+            ({ action }) => action === "noop"
+          )
+        );
+      const planContractMismatch =
+        plan === null ||
+        inspectDeploymentPlanReceipt(plan).length !== 0 ||
+        teardownActionMismatch;
       const planMismatch = isOrphan
         ? plan !== null
-        : plan === null ||
+        : planContractMismatch ||
           receipt === undefined ||
           plan.operation !== expectedPlanOperation ||
           plan.acceptedPlanSha256 !== receipt.acceptedPlanSha256 ||

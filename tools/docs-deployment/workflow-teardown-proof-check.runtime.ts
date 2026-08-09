@@ -14,7 +14,8 @@ const program = Effect.gen(function* workflowTeardownProofCheck() {
     return yield* Effect.fail("workflow teardown proof inputs are incomplete");
   }
   const readback = yield* Schema.decodeUnknownEffect(
-    DeploymentWorkflowTeardownReadback
+    DeploymentWorkflowTeardownReadback,
+    { onExcessProperty: "error" }
   )(yield* Effect.promise(() => Bun.file(readbackPath).json())).pipe(
     Effect.mapError(() => "teardown readback failed Schema decoding")
   );

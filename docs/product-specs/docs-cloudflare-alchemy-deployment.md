@@ -310,8 +310,8 @@ plan as well as provider/hosted/teardown receipts and rejects any cross-file
 candidate, stage, plan, config, dependency, account/state, Worker, URL,
 deployment/version, rollback or screenshot-byte mismatch.
 
-The live mutation jobs invoke the same operation-bound plan Schema checker
-before any apply or destroy. Plan-only receipts use `preview-plan` or
+The live mutation jobs and external-state admission invoke the same
+operation-bound plan Schema checker before any apply or destroy. Plan-only receipts use `preview-plan` or
 `production-plan`; a mutating equal-replan receipt switches to
 `preview-equal-replan` or `production-equal-replan` before apply. Production
 downloads and checks the accepted Preview plan/replan

@@ -580,8 +580,9 @@ separately, and that input must equal the outer receipt's candidate. The source
 head and candidate are intentionally distinct when a reviewed default-branch
 workflow builds a PR head. Promotion rejects branch-only or synthetic run
 metadata. The named plan receipt is decoded and its operation, projection
-digest, candidate, stage and equal-replan identity are checked
-before any Production acceptance or mutation. Hosted promotion additionally
+digest, candidate, stage and equal-replan identity are checked again during
+external-state promotion; a teardown projection may contain only two deletes
+or two no-ops, never a mixed or unexpected action. Hosted promotion additionally
 requires `preview` with `pr-N` for Preview, `production` or `rollback` with
 `prod` for Production, and exactly one desktop plus one mobile screenshot whose
 retained PNG bytes hash to the manifest.

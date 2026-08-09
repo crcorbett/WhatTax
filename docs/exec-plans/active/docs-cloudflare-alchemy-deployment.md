@@ -1322,8 +1322,9 @@ provider/hosted artifact. Established external receipts must name a strict
 Schema-decoded GitHub run readback whose expected workflow name, path,
 successful conclusion and `main` ref/head agree with the outer workflow source
 commit, while its separately recorded candidate input agrees with the outer
-candidate. Promotion also checks hosted environment semantics and exactly one
-desktop plus one mobile screenshot.
+candidate. Promotion reruns the plan digest/equal-replan invariants and rejects
+mixed teardown actions, then checks hosted environment semantics and exactly
+one desktop plus one mobile screenshot.
 Report-only dispatch is forced to the reviewed default branch before dependency
 installation or state-bearer materialisation, and Preview PR numbers are
 validated as positive integers before provider bootstrap. Rollback identity is

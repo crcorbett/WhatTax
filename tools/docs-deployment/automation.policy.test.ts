@@ -9,6 +9,7 @@ import {
   DeploymentControlRegister,
 } from "./automation.schemas.js";
 import controlsJson from "./controls.json";
+import { deploymentRecordDigest } from "./policy.js";
 import { DeploymentPlanReceipt } from "./schemas.js";
 import {
   DeploymentWorkflowExternalReceipt,
@@ -204,12 +205,43 @@ describe("docs deployment automation admission", () => {
     const lockfileSha256 = "e".repeat(64);
     const accountId = "f".repeat(32);
     const rollbackRecoveryIdentity = "preview-recovery";
+    const candidateCommit = "b".repeat(40);
+    const stage = "pr-15";
+    const projection = {
+      candidate: {
+        deploymentInputSha256,
+        exactCommit: candidateCommit,
+        lockfileSha256,
+      },
+      configSha256,
+      logicalResources: [
+        {
+          action: "create" as const,
+          logicalId: "DocsBuild" as const,
+          resourceType: "Command.Build" as const,
+        },
+        {
+          action: "create" as const,
+          logicalId: "DocsWebsite" as const,
+          resourceType: "Cloudflare.Worker" as const,
+        },
+      ],
+      redaction: {
+        ansiRemoved: true as const,
+        secretValuesIncluded: false as const,
+        timestampsExcludedFromDigest: true as const,
+      },
+      schemaVersion: 1 as const,
+      stack: "TaxKitDocsCloudflare" as const,
+      stage,
+    };
+    const acceptedPlanSha256 = deploymentRecordDigest(projection);
     const receipt = await Effect.runPromise(
       Schema.decodeUnknownEffect(DeploymentWorkflowExternalReceipt)({
-        acceptedPlanSha256: "a".repeat(64),
+        acceptedPlanSha256,
         accountId,
         automationId: preview.id,
-        candidateCommit: "b".repeat(40),
+        candidateCommit,
         configSha256,
         deploymentInputSha256,
         environment: preview.environment.id,
@@ -227,7 +259,7 @@ describe("docs deployment automation admission", () => {
           "docs/evidence/deployments/workflow-provider.json",
         rollbackRecoveryIdentity,
         schemaVersion: 1,
-        stage: "pr-15",
+        stage,
         workflowCommit: "c".repeat(40),
         workflowPath: ".github/workflows/docs-preview.yml",
         workflowReceiptPath: "docs/evidence/deployments/workflow-preview.json",
@@ -241,34 +273,7 @@ describe("docs deployment automation admission", () => {
         acceptedPlanSha256: receipt.acceptedPlanSha256,
         observedAt: "2026-08-10T00:00:00Z",
         operation: "preview-equal-replan",
-        projection: {
-          candidate: {
-            deploymentInputSha256,
-            exactCommit: receipt.candidateCommit,
-            lockfileSha256,
-          },
-          configSha256,
-          logicalResources: [
-            {
-              action: "create",
-              logicalId: "DocsBuild",
-              resourceType: "Command.Build",
-            },
-            {
-              action: "create",
-              logicalId: "DocsWebsite",
-              resourceType: "Cloudflare.Worker",
-            },
-          ],
-          redaction: {
-            ansiRemoved: true,
-            secretValuesIncluded: false,
-            timestampsExcludedFromDigest: true,
-          },
-          schemaVersion: 1,
-          stack: "TaxKitDocsCloudflare",
-          stage: receipt.stage,
-        },
+        projection,
         receiptPath: receipt.planPath ?? "docs/evidence/deployments/plan.json",
         replanSha256: receipt.acceptedPlanSha256,
         schemaVersion: 1,
@@ -377,6 +382,26 @@ describe("docs deployment automation admission", () => {
               provider,
               receipt,
               workflowRun: { ...workflowRun, headSha: "d".repeat(40) },
+            },
+          ],
+        ])
+      ).map((item) => item.invariant)
+    ).toContain("external-proof");
+
+    expect(
+      inspectDeploymentAutomationRegisters(
+        established,
+        controls,
+        new Map([[preview.id, receipt]]),
+        new Map([
+          [
+            preview.id,
+            {
+              hosted,
+              plan: { ...plan, replanSha256: null },
+              provider,
+              receipt,
+              workflowRun,
             },
           ],
         ])

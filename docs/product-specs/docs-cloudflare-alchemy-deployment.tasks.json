@@ -715,7 +715,7 @@
         "run the live workflow plan checker for initial plans, equal replans and teardown projections before any provider mutation",
         "download and Schema-check the accepted Preview plan artifact before Production build or mutation",
         "retain and Schema-check a successful default-branch workflow-run readback, including the workflow source commit and exact deployment candidate input, then cross-check workflow name/path/ref/head/run identity and candidate binding during external-state promotion",
-        "Schema-decode the named plan receipt, cross-check outer/provider/hosted account, state-store, candidate, stage, plan/config/deployment/lockfile, Worker, URL, deployment/version and rollback identities, and recompute retained screenshot bytes",
+        "Schema-decode the named plan receipt, re-run its digest/equal-replan invariants, reject mixed or unexpected teardown actions, cross-check outer/provider/hosted account, state-store, candidate, stage, plan/config/deployment/lockfile, Worker, URL, deployment/version and rollback identities, and recompute retained screenshot bytes",
         "Schema-check the accepted Preview artifact by run ID before any Production mutation and reject stale, detached or caller-only identity",
         "prove every equal replan rejects unexpected resources/actions and teardown proves exact pre/post stage and Worker absence",
         "run the dedicated workflow teardown-proof checker and retain the source-bound pre-mutation Production version for normal rollback",
