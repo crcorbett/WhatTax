@@ -181,6 +181,10 @@ jobs:
             '{candidate:{deploymentInputSha256:$deployment,exactCommit:$commit,lockfileSha256:$lockfile},configSha256:$config,logicalResources:[{action:$build_action,logicalId:"DocsBuild",resourceType:"Command.Build"},{action:$website_action,logicalId:"DocsWebsite",resourceType:"Cloudflare.Worker"}],redaction:{ansiRemoved:true,secretValuesIncluded:false,timestampsExcludedFromDigest:true},schemaVersion:1,stack:"TaxKitDocsCloudflare",stage:$stage}' \
             > "$RUNNER_TEMP/docs-deployment/replan-projection.json"
           replan_sha256="$(jq -cS . "$RUNNER_TEMP/docs-deployment/replan-projection.json" | tr -d '\n' | shasum -a 256 | cut -d ' ' -f1)"
+          echo "accepted_plan_sha256=$ACCEPTED_PLAN_SHA256"
+          echo "replan_sha256=$replan_sha256"
+          jq -cS . "$RUNNER_TEMP/docs-deployment/replan-projection.json"
+          find "$RUNNER_TEMP/docs-deployment" -maxdepth 1 -type f -print | LC_ALL=C sort
           test "$ACCEPTED_PLAN_SHA256" = "${{ steps.plan.outputs.plan_sha256 }}"
           test "$ACCEPTED_PLAN_SHA256" = "$replan_sha256"
           jq --arg replan "$replan_sha256" '.replanSha256=$replan' "$RUNNER_TEMP/docs-deployment/plan.json" > "$RUNNER_TEMP/docs-deployment/plan.with-replan.json"
