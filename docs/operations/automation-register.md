@@ -127,13 +127,15 @@ deploy-only authority.
 
 The live workflow owners also Schema-decode the plan/replan or teardown
 projection before mutation. Production accepts both the Preview provider/
-hosted artifact and its canonical plan artifact. A future established receipt
-must name strict workflow-run and workflow-input readbacks proving the expected
-workflow name, a successful `main` ref/head and exact workflow path. The
-workflow-run source head must match the outer workflow commit; the workflow
-input must bind the same run/path/source, operation and exact deployment
-candidate input to the outer candidate. Synthetic workflow IDs or branch-bound
-output cannot establish external state. Promotion checks hosted environment/stage semantics,
+hosted artifact and its canonical plan artifact. The separate read-only
+`workflow_run` receipt workflow fetches the completed source run and matching
+artifact after the triggering workflow ends; a triggering job cannot assert its
+own completed status. A future established receipt must name strict workflow-run
+and workflow-input readbacks proving the expected workflow name, a successful
+`main` ref/head and exact workflow path. The workflow-run source head must match
+the outer workflow commit; the workflow input must bind the same run/path/source,
+operation and exact deployment candidate input to the outer candidate. Synthetic
+workflow IDs or branch-bound output cannot establish external state. Promotion checks hosted environment/stage semantics,
 one desktop and one mobile screenshot with retained bytes, positive numeric PR
 identity before Preview bootstrap, and a rollback identity sourced from the
 accepted Preview provider receipt. Report-only dispatch is rejected unless its

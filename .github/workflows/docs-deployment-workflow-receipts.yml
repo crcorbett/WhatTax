@@ -1,0 +1,164 @@
+name: Docs Deployment Workflow Receipts
+
+on:
+  workflow_run:
+    workflows:
+      - Docs Preview Deployment
+      - Docs Production Deployment
+      - Docs Preview Teardown
+      - Docs Orphan Inventory (Report Only)
+    types: [completed]
+    branches: [main]
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: taxkit-docs-workflow-receipt-${{ github.event.workflow_run.id }}
+  cancel-in-progress: false
+
+jobs:
+  reconcile:
+    name: Reconcile completed deployment run
+    if: github.repository == 'crcorbett/taxkit'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      GH_TOKEN: ${{ github.token }}
+      SOURCE_RUN_ID: ${{ github.event.workflow_run.id }}
+      SOURCE_RUN_CONCLUSION: ${{ github.event.workflow_run.conclusion }}
+    steps:
+      - name: Initialise bounded receipt directory
+        run: mkdir -p "$RUNNER_TEMP/docs-deployment"
+
+      - name: Read completed GitHub run and retain source metadata
+        run: |
+          set -euo pipefail
+          run_json="$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${SOURCE_RUN_ID}")"
+          test "$(jq -r .status <<<"$run_json")" = "completed"
+          test "$(jq -r .head_branch <<<"$run_json")" = "main"
+          test "$(jq -r .head_repository.full_name <<<"$run_json")" = "$GITHUB_REPOSITORY"
+          workflow_path="$(jq -er .path <<<"$run_json")"
+          workflow_name="$(jq -er .name <<<"$run_json")"
+          case "$workflow_path" in
+            .github/workflows/docs-preview.yml)
+              artifact_name="taxkit-docs-preview-${SOURCE_RUN_ID}"
+              expected_name="Docs Preview Deployment"
+              ;;
+            .github/workflows/docs-production.yml)
+              artifact_name="taxkit-docs-production-${SOURCE_RUN_ID}"
+              expected_name="Docs Production Deployment"
+              ;;
+            .github/workflows/docs-preview-teardown.yml)
+              artifact_name="taxkit-docs-preview-teardown-${SOURCE_RUN_ID}"
+              expected_name="Docs Preview Teardown"
+              ;;
+            .github/workflows/docs-orphan-inventory.yml)
+              artifact_name="taxkit-docs-orphan-inventory-${SOURCE_RUN_ID}"
+              expected_name="Docs Orphan Inventory (Report Only)"
+              ;;
+            *)
+              echo "Unexpected deployment workflow path: $workflow_path" >&2
+              exit 1
+              ;;
+          esac
+          test "$workflow_name" = "$expected_name"
+          jq -nS \
+            --argjson run "$run_json" \
+            '{conclusion:$run.conclusion,event:$run.event,headBranch:$run.head_branch,headSha:$run.head_sha,id:$run.id,name:$run.name,path:$run.path,status:$run.status}' \
+            > "$RUNNER_TEMP/docs-deployment/workflow-run-api.json"
+          printf '%s' "$run_json" > "$RUNNER_TEMP/docs-deployment/workflow-run-api.raw.json"
+          printf 'TAXKIT_WORKFLOW_RUN_PATH=%s\n' "$workflow_path" >> "$GITHUB_ENV"
+          printf 'TAXKIT_WORKFLOW_RUN_NAME=%s\n' "$workflow_name" >> "$GITHUB_ENV"
+          printf 'TAXKIT_WORKFLOW_ARTIFACT_NAME=%s\n' "$artifact_name" >> "$GITHUB_ENV"
+          printf 'TAXKIT_WORKFLOW_RUN_CONCLUSION=%s\n' "$(jq -er .conclusion <<<"$run_json")" >> "$GITHUB_ENV"
+
+      - name: Retain failed or cancelled run metadata without positive proof
+        if: github.event.workflow_run.conclusion != 'success'
+        run: |
+          set -euo pipefail
+          jq -nS \
+            --arg conclusion "$SOURCE_RUN_CONCLUSION" \
+            --arg run "$SOURCE_RUN_ID" \
+            '{conclusion:$conclusion,nonClaim:"This run is not a successful deployment receipt and cannot establish external state.",schemaVersion:1,workflowRunId:$run}' \
+            > "$RUNNER_TEMP/docs-deployment/workflow-run-failure.json"
+
+      - name: Check out the reviewed default branch for receipt schemas
+        if: github.event.workflow_run.conclusion == 'success'
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.2.0
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+          ref: main
+
+      - name: Set up Bun for receipt validation
+        if: github.event.workflow_run.conclusion == 'success'
+        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.0.2
+        with:
+          bun-version-file: .bun-version
+
+      - name: Install frozen dependencies for receipt validation
+        if: github.event.workflow_run.conclusion == 'success'
+        run: bun install --frozen-lockfile
+
+      - name: Download the completed workflow artifact
+        if: github.event.workflow_run.conclusion == 'success'
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/docs-deployment/source"
+          gh run download "$SOURCE_RUN_ID" \
+            --repo "$GITHUB_REPOSITORY" \
+            --name "$TAXKIT_WORKFLOW_ARTIFACT_NAME" \
+            --dir "$RUNNER_TEMP/docs-deployment/source"
+          input_path="$(find "$RUNNER_TEMP/docs-deployment/source" -type f -name workflow-input.json -print -quit)"
+          test -n "$input_path"
+          cp "$input_path" "$RUNNER_TEMP/docs-deployment/workflow-input.json"
+          candidate_commit="$(jq -er .candidateCommit "$input_path")"
+          workflow_commit="$(jq -er .workflowCommit "$input_path")"
+          workflow_input_run_id="$(jq -er .workflowRunId "$input_path")"
+          test "$workflow_input_run_id" = "$SOURCE_RUN_ID"
+          test "$workflow_commit" = "$(jq -er .headSha "$RUNNER_TEMP/docs-deployment/workflow-run-api.json")"
+          jq -nS \
+            --arg candidate "$candidate_commit" \
+            --arg conclusion "$(jq -er .conclusion "$RUNNER_TEMP/docs-deployment/workflow-run-api.json")" \
+            --arg event "$(jq -er .event "$RUNNER_TEMP/docs-deployment/workflow-run-api.json")" \
+            --arg headBranch "$(jq -er .headBranch "$RUNNER_TEMP/docs-deployment/workflow-run-api.json")" \
+            --arg headSha "$(jq -er .headSha "$RUNNER_TEMP/docs-deployment/workflow-run-api.json")" \
+            --arg path "$(jq -er .path "$RUNNER_TEMP/docs-deployment/workflow-run-api.json")" \
+            --arg run "$SOURCE_RUN_ID" \
+            --arg status "$(jq -er .status "$RUNNER_TEMP/docs-deployment/workflow-run-api.json")" \
+            --arg workflowName "$(jq -er .name "$RUNNER_TEMP/docs-deployment/workflow-run-api.json")" \
+            '{candidateCommit:$candidate,conclusion:$conclusion,event:$event,headBranch:$headBranch,headSha:$headSha,path:$path,ref:"refs/heads/main",status:$status,workflowName:$workflowName,workflowRunId:$run}' \
+            > "$RUNNER_TEMP/docs-deployment/workflow-run.json"
+
+      - name: Validate completed workflow input and run identity
+        if: github.event.workflow_run.conclusion == 'success'
+        env:
+          TAXKIT_WORKFLOW_INPUT_RECEIPT: ${{ runner.temp }}/docs-deployment/workflow-input.json
+          TAXKIT_WORKFLOW_INPUT_RUN_ID: ${{ github.event.workflow_run.id }}
+          TAXKIT_WORKFLOW_RUN_RECEIPT: ${{ runner.temp }}/docs-deployment/workflow-run.json
+          TAXKIT_WORKFLOW_RUN_ID: ${{ github.event.workflow_run.id }}
+        run: |
+          set -euo pipefail
+          input="$RUNNER_TEMP/docs-deployment/workflow-input.json"
+          export TAXKIT_WORKFLOW_INPUT_CANDIDATE_COMMIT="$(jq -er .candidateCommit "$input")"
+          export TAXKIT_WORKFLOW_INPUT_WORKFLOW_COMMIT="$(jq -er .workflowCommit "$input")"
+          export TAXKIT_WORKFLOW_INPUT_WORKFLOW_PATH="$(jq -er .workflowPath "$input")"
+          export TAXKIT_WORKFLOW_INPUT_OPERATION="$(jq -er .operation "$input")"
+          export TAXKIT_WORKFLOW_INPUT_PR_NUMBER="$(jq -r '.prNumber // empty' "$input")"
+          export TAXKIT_WORKFLOW_RUN_CANDIDATE_COMMIT="$TAXKIT_WORKFLOW_INPUT_CANDIDATE_COMMIT"
+          export TAXKIT_WORKFLOW_RUN_WORKFLOW_COMMIT="$TAXKIT_WORKFLOW_INPUT_WORKFLOW_COMMIT"
+          export TAXKIT_WORKFLOW_RUN_WORKFLOW_PATH="$TAXKIT_WORKFLOW_RUN_PATH"
+          export TAXKIT_WORKFLOW_RUN_WORKFLOW_NAME="$TAXKIT_WORKFLOW_RUN_NAME"
+          bun run check:docs-deployment-workflow-input
+          bun run check:docs-deployment-workflow-run
+
+      - name: Upload reconciled workflow receipt
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: taxkit-docs-workflow-receipt-${{ github.event.workflow_run.id }}
+          path: ${{ runner.temp }}/docs-deployment
+          retention-days: 30
+          if-no-files-found: error

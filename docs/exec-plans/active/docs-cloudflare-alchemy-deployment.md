@@ -1345,13 +1345,15 @@ preserving legacy dated receipts as historical evidence.
 The workflow receipt contract now names a separate Schema-decoded
 `workflowInputPath` alongside `workflowRunPath`: the former binds the reviewed
 default-branch source, run, operation and dispatch candidate input, while the
-latter is the GitHub API run readback. The Preview and Production plan shells
-also reject every resource-like line outside the two owned resources and reject
-`delete` before a deploy apply.
-Successful Preview, Production, teardown and report-only runs now materialise
-the strict `workflow-run.json` readback beside the input receipt; the report-only
-artifact retains both files. Teardown performs a final state/Worker identity
-readback after equal dry-runs and before any destroy.
+latter is produced by the read-only `workflow_run` reconciler after GitHub marks
+the source run complete. Triggering workflows retain their input and provider/
+hosted artifacts; the reconciler fetches the completed Actions API run and the
+matching artifact before it emits `workflow-run.json`. Failed or cancelled runs
+retain bounded failure metadata and cannot establish external state. The
+Preview and Production plan shells also reject every resource-like line outside
+the two owned resources and reject `delete` before a deploy apply. Teardown
+performs a final state/Worker identity readback after equal dry-runs and before
+any destroy.
 The workflow hosted receipt remains a bounded automation supplement: it retains
 PNG identity/bytes and the two viewport classes, but does not yet replace the
 full manual screenshot-manifest/oracle packet or guarantee an early failure

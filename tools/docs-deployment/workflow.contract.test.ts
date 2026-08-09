@@ -5,13 +5,18 @@ const workflowPaths = {
   orphan: ".github/workflows/docs-orphan-inventory.yml",
   preview: ".github/workflows/docs-preview.yml",
   production: ".github/workflows/docs-production.yml",
+  receipts: ".github/workflows/docs-deployment-workflow-receipts.yml",
   teardown: ".github/workflows/docs-preview-teardown.yml",
 } as const;
 
 const readWorkflow = (path: string) => readFile(path, "utf-8");
-const githubRepositoryExpression = ["$", "{GITHUB_REPOSITORY}"].join("");
-const githubRunIdExpression = ["$", "{GITHUB_RUN_ID}"].join("");
-const workflowRunApiReadback = `run_json="$(gh api "repos/${githubRepositoryExpression}/actions/runs/${githubRunIdExpression}")"`;
+const workflowRunApiReadback = [
+  'run_json="$(gh api "repos/',
+  "$",
+  "{GITHUB_REPOSITORY}/actions/runs/",
+  "$",
+  '{SOURCE_RUN_ID}")"',
+].join("");
 
 describe("docs deployment workflow admission", () => {
   test("keeps every deployment workflow exact-SHA and pinned", async () => {
@@ -100,9 +105,7 @@ describe("docs deployment workflow admission", () => {
       expect(source).toContain("TAXKIT_WORKFLOW_SCREENSHOT_ROOT");
       expect(source).toContain("check:docs-deployment-workflow-input");
       expect(source).toContain("workflow-input.json");
-      expect(source).toContain("workflow-run.json");
-      expect(source).toContain(workflowRunApiReadback);
-      expect(source).toContain('jq -er .head_sha <<<"$run_json"');
+      expect(source).not.toContain("Materialize successful");
       expect(source).toContain("all_replan_resources");
       expect(source).toContain("docs/evidence/deployments");
       expect(source).toContain("configSha256");
@@ -130,8 +133,7 @@ describe("docs deployment workflow admission", () => {
     expect(teardown).toContain("(delete|noop)");
     expect(teardown).toContain("check:docs-deployment-workflow-teardown-proof");
     expect(teardown).toContain("check:docs-deployment-workflow-input");
-    expect(teardown).toContain("workflow-run.json");
-    expect(teardown).toContain(workflowRunApiReadback);
+    expect(teardown).not.toContain("Materialize successful");
     expect(teardown).toContain(
       "TAXKIT_WORKFLOW_PLAN_OPERATION=preview-destroy"
     );
@@ -163,8 +165,7 @@ describe("docs deployment workflow admission", () => {
     expect(orphan).not.toContain("alchemy login");
     expect(orphan).not.toContain("alchemy cloudflare bootstrap");
     expect(orphan).toContain("check:docs-deployment-workflow-input");
-    expect(orphan).toContain("workflow-run.json");
-    expect(orphan).toContain(workflowRunApiReadback);
+    expect(orphan).not.toContain("Materialize successful");
     expect(orphan).not.toContain("alchemy plan");
     expect(orphan).not.toContain("alchemy destroy");
   });
@@ -233,5 +234,18 @@ describe("docs deployment workflow admission", () => {
     expect(checker).toContain('{ onExcessProperty: "error" }');
     expect(checker).toContain("providerWorkerAbsent");
     expect(checker).toContain("stateStageAbsent");
+  });
+
+  test("reconciles completed workflow runs outside the triggering run", async () => {
+    const receipts = await readWorkflow(workflowPaths.receipts);
+    expect(receipts).toContain("workflow_run:");
+    expect(receipts).toContain("types: [completed]");
+    expect(receipts).toContain(workflowRunApiReadback);
+    expect(receipts).toContain("gh run download");
+    expect(receipts).toContain("check:docs-deployment-workflow-input");
+    expect(receipts).toContain("check:docs-deployment-workflow-run");
+    expect(receipts).toContain("workflow-run-failure.json");
+    expect(receipts).toContain("actions: read");
+    expect(receipts).not.toContain("secrets.");
   });
 });

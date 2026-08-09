@@ -93,31 +93,6 @@ jobs:
           mkdir -p "$RUNNER_TEMP/docs-deployment"
           bun run check:docs-deployment-orphans > "$RUNNER_TEMP/docs-deployment/orphan-report.json"
 
-      - name: Materialize successful report-only workflow-run readback
-        if: success()
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          set -euo pipefail
-          run_json="$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}")"
-          test "$(jq -r .status <<<"$run_json")" = "completed"
-          test "$(jq -r .conclusion <<<"$run_json")" = "success"
-          test "$(jq -r .head_branch <<<"$run_json")" = "main"
-          test "$(jq -r .path <<<"$run_json")" = ".github/workflows/docs-orphan-inventory.yml"
-          candidate="$(jq -er .candidateCommit "$RUNNER_TEMP/docs-deployment/workflow-input.json")"
-          jq -nS \
-            --arg candidate "$candidate" \
-            --arg conclusion "$(jq -er .conclusion <<<"$run_json")" \
-            --arg event "$(jq -er .event <<<"$run_json")" \
-            --arg headBranch "$(jq -er .head_branch <<<"$run_json")" \
-            --arg headSha "$(jq -er .head_sha <<<"$run_json")" \
-            --arg path "$(jq -er .path <<<"$run_json")" \
-            --arg run "$(jq -er '.id | tostring' <<<"$run_json")" \
-            --arg status "$(jq -er .status <<<"$run_json")" \
-            --arg workflowName "$(jq -er .name <<<"$run_json")" \
-            '{candidateCommit:$candidate,conclusion:$conclusion,event:$event,headBranch:$headBranch,headSha:$headSha,path:$path,ref:"refs/heads/main",status:$status,workflowName:$workflowName,workflowRunId:$run}' \
-            > "$RUNNER_TEMP/docs-deployment/workflow-run.json"
-
       - name: Upload report-only receipt
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
@@ -126,6 +101,5 @@ jobs:
           path: |
             ${{ runner.temp }}/docs-deployment/orphan-report.json
             ${{ runner.temp }}/docs-deployment/workflow-input.json
-            ${{ runner.temp }}/docs-deployment/workflow-run.json
           retention-days: 30
           if-no-files-found: error

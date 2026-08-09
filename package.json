@@ -45,6 +45,7 @@
     "check:docs-deployment-orphans": "CI=1 bun --conditions=source run tools/docs-deployment/orphan-inventory.runtime.ts",
     "check:docs-deployment-workflow-proof": "bun --conditions=source run tools/docs-deployment/workflow-proof-check.runtime.ts",
     "check:docs-deployment-workflow-input": "bun --conditions=source run tools/docs-deployment/workflow-input-check.runtime.ts",
+    "check:docs-deployment-workflow-run": "bun --conditions=source run tools/docs-deployment/workflow-run-check.runtime.ts",
     "check:docs-deployment-workflow-plan": "bun --conditions=source run tools/docs-deployment/workflow-plan-check.runtime.ts",
     "check:docs-deployment-workflow-teardown-proof": "bun --conditions=source run tools/docs-deployment/workflow-teardown-proof-check.runtime.ts",
     "check:docs-deployment:types": "tsc --noEmit -p tsconfig.alchemy.json",

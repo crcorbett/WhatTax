@@ -8,7 +8,7 @@
     "packages/api/http/src/client/service.ts": ["duplicates"],
     "packages/api/http/src/groups/health.ts": ["exports", "types"]
   },
-  "ignoreBinaries": ["gh", "oxfmt", "oxlint"],
+  "ignoreBinaries": ["gh", "jq", "oxfmt", "oxlint"],
   "workspaces": {
     ".": {
       "entry": [
