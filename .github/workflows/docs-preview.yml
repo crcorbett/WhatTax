@@ -249,7 +249,7 @@ jobs:
             ([.providerWorkers[] | select(.stage == $stage and .logicalId == "DocsWebsite")] | length == 1)
           ' "$RUNNER_TEMP/docs-deployment/provider-inventory.json" > /dev/null
           worker_name="$(jq -er --arg stage "$stage" '.stages[] | select(.stage == $stage) | .resources[] | select(.logicalId == "DocsWebsite") | .workerName' "$RUNNER_TEMP/docs-deployment/provider-inventory.json")"
-          worker_url="$(jq -er --arg stage "$stage" '.stages[] | select(.stage == $stage) | .resources[] | select(.logicalId == "DocsWebsite") | .workerUrl' "$RUNNER_TEMP/docs-deployment/provider-inventory.json")"
+          worker_url="$(jq -er --arg stage "$stage" '.stages[] | select(.stage == $stage) | .resources[] | select(.logicalId == "DocsWebsite") | .workerUrl' "$RUNNER_TEMP/docs-deployment/provider-inventory.json" | sed -E 's:/*$::')"
           deployments="$(bunx wrangler deployments list --name "$worker_name" --json)"
           deployment_id="$(jq -er '.[-1].id // .[-1].deployment_id' <<<"$deployments")"
           version_id="$(jq -er '.[-1].versions[0].version_id' <<<"$deployments")"

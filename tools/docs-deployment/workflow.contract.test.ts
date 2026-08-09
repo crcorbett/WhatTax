@@ -103,6 +103,7 @@ describe("docs deployment workflow admission", () => {
       expect(source).toContain("hosted-proof.raw.json");
       expect(source).toContain("hosted-proof.json");
       expect(source).toContain("TAXKIT_WORKFLOW_SCREENSHOT_ROOT");
+      expect(source).toContain("sed -E 's:/*$::'");
       expect(source).toContain("check:docs-deployment-workflow-input");
       expect(source).toContain("workflow-input.json");
       expect(source).not.toContain("Materialize successful");
