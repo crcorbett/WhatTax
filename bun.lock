@@ -60,7 +60,6 @@
         "@types/react-dom": "catalog:",
         "@vitejs/plugin-react": "catalog:",
         "@vitest/browser-playwright": "4.1.7",
-        "nitro": "catalog:",
         "playwright": "^1.60.0",
         "typescript": "catalog:",
         "vite": "catalog:",

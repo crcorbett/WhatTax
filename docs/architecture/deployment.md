@@ -28,10 +28,10 @@ intent and task state belong in the active SPEC and execution plan.
 
 - `apps/api` runs as a Bun HTTP server and serves `/api/*`.
 - `apps/web` builds through Vite/TanStack Start and calls `apps/api` over HTTP.
-- `apps/docs` owns two temporary build modes. The default Nitro/Vercel output
-  remains an independent migration oracle. `TAXKIT_DOCS_BUILD_TARGET=cloudflare`
-  selects exact `@cloudflare/vite-plugin@1.47.0`, which emits
-  `dist/server/index.js`, its server modules and `dist/client` assets.
+- `apps/docs` owns one Cloudflare build mode. Exact
+  `@cloudflare/vite-plugin@1.47.0` emits `dist/server/index.js`, its server
+  modules and `dist/client` assets. The former docs-app Nitro/Vercel bridge was
+  retired after local parity; `apps/web` remains a separate Nitro owner.
 - Root `alchemy.run.ts` owns one `TaxKitDocsCloudflare` stack, branded
   `pr-<number>` or `prod` stage admission, `Cloudflare.state()`, one
   `Command.Build`, and one logical `DocsWebsite` Worker. It uploads the
@@ -60,7 +60,7 @@ intent and task state belong in the active SPEC and execution plan.
 
 ```text
 frozen source and lock
-  -> apps/docs build:cloudflare
+  -> apps/docs build (or build:cloudflare compatibility alias)
     -> Cloudflare Vite plugin
       -> dist/server/index.js plus modules
       -> dist/client assets
@@ -188,12 +188,13 @@ equivalent API base URL environment values explicitly.
 The focused Cloudflare candidate proof is:
 
 ```sh
-bun run --filter=docs test:cloudflare-built
+bun run --filter=docs test:built
 ```
 
-It proves the emitted no-bundle Worker and assets locally under real workerd.
-The retained Nitro oracle is `bun run --filter=docs test:built`. Agreement
-between them is migration evidence, not provider or public-availability proof.
+It proves the emitted no-bundle Worker and assets locally under real workerd;
+`test:cloudflare-built` is an explicit alias. The former Nitro/Vercel receipt
+remains historical migration evidence, not a live build path. Local agreement
+does not prove provider or public availability.
 
 ## Guardrails
 

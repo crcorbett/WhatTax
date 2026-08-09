@@ -7,7 +7,7 @@ export default defineConfig({
   },
   test: {
     environment: "node",
-    exclude: ["**/node_modules/**", "**/.output/**", "**/.tanstack/**"],
+    exclude: ["**/node_modules/**", "**/.tanstack/**"],
     globals: false,
     include: ["src/**/*.server.test.ts"],
     passWithNoTests: false,

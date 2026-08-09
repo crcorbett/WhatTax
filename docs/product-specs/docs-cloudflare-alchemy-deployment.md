@@ -82,14 +82,26 @@ state/provider postcondition are retained under
 `docs/evidence/deployments/2026-08-05-preview-pr-13/`. This does not change the
 report-only stop or close either DCD task.
 
+The 2026-08-09 local bridge-retirement candidate removes the docs app's Nitro
+Vercel preset, `.vercel/output` harness, dual build-target signal and docs-only
+Nitro dependency. `test:built` now runs the Cloudflare/workerd built contract;
+`test:cloudflare-built` remains an explicit alias. Nitro remains only in the
+independently owned `apps/web` build graph, so the root Nitro catalog and
+shared output ignore entries are preserved. This implementation observation
+does not establish hosted requalification for the retirement candidate, a
+current Production URL, or the report-only Alchemy state boundary; DCD-004
+remains in progress and DCD-005 remains pending until those claims are
+resolved.
+
 ## Target and comparative evidence
 
 TaxKit planning target:
 
 - `origin/main`:
   `9c82bf9613b1342375ff670c46ee34cc8347af1d`;
-- current local proof: Nitro/Vercel generated output and the implemented
-  `taxkit-docs-runtime` local journey; and
+- current local proof: Cloudflare/workerd generated output and the implemented
+  `taxkit-docs-runtime` local journey; the historical Nitro/Vercel receipt is
+  retained only as migration evidence; and
 - current dependency baseline: Effect/Platform `4.0.0-beta.98`, TanStack Start
   `1.167.65`, TanStack Router `1.169.2`, Vite `8.0.14` from the lockfile, and
   Nitro `3.0.260429-beta`.
@@ -343,13 +355,13 @@ Root `alchemy.run.ts` owns:
   `bundle: false`, compatibility date `2026-06-24`, `nodejs_compat`, default
   asset-first full-stack routing, and the initial observability policy.
 
-The app Schema-decodes `TAXKIT_DOCS_BUILD_TARGET`, defaulting to `nitro`, and
-selects the exact official `@cloudflare/vite-plugin@1.47.0` only for the
-`cloudflare` target. The root `Command.Build` supplies that semantic signal.
-TaxKit does not use the reference implementation's command-line heuristic, Alchemy's private Distilled
-plugin, or the unsupported injected Website signal. The compatibility date is
-a TaxKit candidate pin only after DCD-001 proves it under workerd; the reference
-use is comparative evidence, not acceptance.
+The app always selects the exact official `@cloudflare/vite-plugin@1.47.0`;
+`build:cloudflare` remains a compatibility alias for the canonical `build`
+script. The root `Command.Build` consumes that emitted output. TaxKit does not
+use the reference implementation's command-line heuristic, Alchemy's private
+Distilled plugin, or the unsupported injected Website signal. The compatibility
+date is a TaxKit candidate pin only after DCD-001 proves it under workerd; the
+reference use is comparative evidence, not acceptance.
 
 Initial observability uses only Cloudflare's built-in invocation logs, with
 traces disabled, no custom fields, no request body, header, cookie, credential
@@ -769,20 +781,29 @@ Hosted false-green failures include:
 
 ### `DCD-011` — bridge lifetime and retirement
 
-The dual Nitro/Cloudflare path is temporary. Its carrying cost is two build
-graphs, two artifact contracts and duplicate built-proof maintenance. Review
-it after every adapter, TanStack, Vite, Effect, Alchemy or docs runtime change.
+The docs-app Nitro/Cloudflare path was temporary. Its carrying cost was two
+build graphs, two artifact contracts and duplicate built-proof maintenance.
+The 2026-08-09 candidate retires that docs-app bridge after local parity. Nitro
+and shared output entries remain only where `apps/web` still owns them; those
+references are not docs deployment policy. Review the preserved app-owned
+Nitro path after every adapter, TanStack, Vite, Effect, Alchemy or runtime
+change.
 
-Retire Nitro, its Vercel preset, `.vercel/output`, `.output`, related Turbo and
-clean-script entries, and the temporary dual-path policy only when:
+The implementation retirement is accepted locally only when:
 
 - the workerd journey covers all relevant built-harness behavior;
 - accepted exact-candidate Preview and Production receipts exist;
 - normal rollback/redeploy is accepted;
 - Worker runtime, assets, headers/cache and console proof reach parity;
-- the Cloudflare built harness becomes the sole local production-artifact
-  oracle; and
-- no package/content owner depends on the Vercel path.
+- the Cloudflare built harness becomes the sole docs-app local
+  production-artifact oracle; and
+- no docs package/content owner depends on the Vercel path.
+
+The final DCD-005 lifecycle gate still requires a clean committed candidate's
+hosted Preview/Production/rollback requalification and the remaining
+report-only state-boundary decision. Until those are claim-matched, the SPEC
+and ledger remain open even though the docs-app bridge implementation is
+present.
 
 Disconfirming evidence is a Cloudflare path that cannot reproduce an accepted
 SSR, server-function, navigation, accessibility, error or lifecycle behavior
@@ -812,13 +833,13 @@ draft creates no active plan.
 Current
 apps/docs/
   package.json
-  vite.config.ts                  # TanStack + Nitro Vercel preset
+  vite.config.ts                  # TanStack + Cloudflare Vite plugin
   src/server.ts                   # Web Fetch handler
   src/lib/runtime.server.ts       # module-scoped ManagedRuntime
-  scripts/test-built.tsx          # .vercel/output oracle
+  scripts/test-cloudflare-built.tsx # workerd production-artifact oracle
 packages/docs-content/            # deployment-neutral content/runtime owner
 packages/docs-fumadocs/           # deployment-neutral Fumadocs owner
-turbo.json                        # .output/.vercel outputs
+turbo.json                        # shared app output declarations
 knip.production.json              # docs Vite entries, no Alchemy entry
 ```
 
@@ -831,10 +852,8 @@ apps/docs/
   wrangler.jsonc
   public/_headers
   src/server.ts
-  src/lib/build/docs-build-target.ts
   src/lib/build/cloudflare-stack.ts
   scripts/test-cloudflare-built.tsx
-  scripts/test-built.tsx            # retained Nitro oracle until DCD-005
   package.json
 packages/docs-content/
   src/navigation.ts                 # bundled navigation owner
@@ -862,7 +881,7 @@ invocations are backfilled by the task that proves them.
 Local workerd: target
 
 exact source + frozen lock
-  -> Schema-decoded TAXKIT_DOCS_BUILD_TARGET=cloudflare
+  -> apps/docs build (or build:cloudflare compatibility alias)
     -> @cloudflare/vite-plugin@1.47.0
       -> dist/server/index.js + dist/client
         -> Alchemy Command.Build("DocsBuild")

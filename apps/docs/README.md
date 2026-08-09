@@ -109,29 +109,30 @@ It proves success, expected failures, malformed transport and framework error
 boundaries after `Route.useLoaderData`; it does not prove SSR or hydration. Use
 the built app for initial SSR, hydration and real client-navigation proof.
 
-`test:built` builds the production app and executes the generated Nitro/Vercel
-function plus static assets through a command-owned ephemeral local server. It
+`test:built` builds the production Cloudflare Worker/assets output and executes
+the generated no-bundle Worker through a command-owned local workerd server. It
 asserts a known page in the HTTP response before browser JavaScript, hydration
 without warnings or errors, real sidebar and authored-MDX client transitions
 with zero document requests, browser back/forward, heading focus without
 stealing initial-hydration focus, pending state, framework-native client
 not-found behavior and a direct HTTP 404. It also checks the skip link,
 landmarks, labelled/current navigation, mobile disclosure, representative
-contrast and reduced-motion rendering. The command owns browser/server cleanup.
-Add `-- --screenshots` for the bounded provisional DAR-013 PNG/manifest set;
-final evidence additionally supplies the exact candidate with
-`--candidate=<full-candidate-commit>`. Screenshot review supplements these
+contrast, reduced-motion rendering, immutable asset headers, runtime reuse,
+filesystem isolation and compressed upload size. The command owns
+browser/workerd cleanup. `test:cloudflare-built` remains an explicit alias for
+the same canonical proof command. Add `-- --screenshots` for the bounded
+candidate-bound PNG/manifest set; screenshot review supplements these
 behavioral assertions and cannot prove request type, focus behavior, contrast,
 motion suppression, HTTP status, hydration or console cleanliness.
 
-`build:cloudflare` selects the exact official Cloudflare Vite adapter and emits
-the deployable no-bundle Worker at `dist/server/index.js` plus `dist/client`
-assets. `test:cloudflare-built` rebuilds that target, strips provider
-credentials from the child environment, performs a Wrangler dry-run, and runs
-an isolated output-only copy under real workerd. It reuses the built-app
-behavioral contract for SSR, assets, server functions, 404, hydration,
-no-document navigation, accessibility and console cleanliness, and adds
-concurrent-isolate, filesystem, binding, compressed-upload-size, local
+`build` and its compatibility alias `build:cloudflare` select the exact
+official Cloudflare Vite adapter and emit the deployable no-bundle Worker at
+`dist/server/index.js` plus `dist/client` assets. The canonical built proof
+strips provider credentials from the child environment, performs a Wrangler
+dry-run, and runs an isolated output-only copy under real workerd. It reuses the
+built-app behavioral contract for SSR, assets, server functions, 404,
+hydration, no-document navigation, accessibility and console cleanliness, and
+adds concurrent-isolate, filesystem, binding, compressed-upload-size, local
 readiness-timing and immutable asset-header oracles. The local timing is not a
 Cloudflare CPU-startup-limit receipt. The exact verified invocation is:
 
@@ -141,8 +142,10 @@ bun run --filter=docs test:cloudflare-built
 
 This is local workerd evidence only. It does not prove Alchemy state, a
 Cloudflare deployment, a `workers.dev` URL, Preview, Production or rollback.
-The Nitro `test:built` path remains an independent migration oracle until the
-accepted deployment SPEC retires it.
+The former docs-app Nitro/Vercel bridge has been removed after local parity;
+Nitro remains an independent owner only where another application still uses
+it. Final hosted requalification of the exact retirement candidate and the
+report-only Alchemy state boundary remain separate claims.
 
 Root `alchemy.run.ts` composes the same output through public Alchemy
 `Command.Build` and `Cloudflare.Worker({ bundle: false })`. `apps/docs` owns

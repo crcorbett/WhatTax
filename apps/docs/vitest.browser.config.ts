@@ -21,7 +21,7 @@ export default defineConfig({
       instances: [{ browser: "chromium" }],
       provider: playwright(),
     },
-    exclude: ["**/node_modules/**", "**/.output/**", "**/.tanstack/**"],
+    exclude: ["**/node_modules/**", "**/.tanstack/**"],
     globals: false,
     include: ["src/**/*.browser.test.ts", "src/**/*.browser.test.tsx"],
     passWithNoTests: false,
