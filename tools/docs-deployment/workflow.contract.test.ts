@@ -264,6 +264,11 @@ describe("docs deployment workflow admission", () => {
     expect(production).toContain(
       "TAXKIT_WORKFLOW_PLAN_OPERATION: preview-equal-replan"
     );
+    expect(production.indexOf("Check out exact candidate")).toBeLessThan(
+      production.indexOf(
+        "Schema-check accepted Preview provider and hosted proof"
+      )
+    );
   });
 
   test("keeps teardown promotion strict at the receipt decoder", async () => {
