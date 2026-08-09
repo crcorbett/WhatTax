@@ -1177,4 +1177,9 @@ and local upload limits under the pinned Cloudflare Vite/workerd/Wrangler
 graph. This is a local implementation and parity observation; it does not
 establish hosted Preview/Production/rollback for this exact candidate or the
 report-only Alchemy state boundary. DCD-004 remains `in_progress`, DCD-005
-remains `pending`, and no completion claim is made.
+remains `pending`, and no completion claim is made. The first repository-wide
+verification pass then identified the now-unreachable
+`apps/docs/test/fixtures/visual-states.ts` after the bridge deletion; the
+change-owned Knip finding was corrected by removing that fixture in
+`117bbc4cf2866efbc19f50ccabb4013c39c120a8`, after which the full verification
+graph passed.
