@@ -202,8 +202,12 @@ describe("docs deployment workflow admission", () => {
     expect(teardown).toContain(`REVIEWED_WORKFLOW_SHA: ${githubExpression}`);
     expect(teardown).not.toContain("github.event.pull_request.base.sha");
     expect(teardown).toContain('test "$GITHUB_REF" = "refs/heads/main"');
+    const cloudflareTokenExpression = [
+      "$",
+      "{{ secrets.CLOUDFLARE_API_TOKEN }}",
+    ].join("");
     expect(teardown).not.toContain(
-      "CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}\n      PR_NUMBER:"
+      `CLOUDFLARE_API_TOKEN: ${cloudflareTokenExpression}\n      PR_NUMBER:`
     );
   });
 
