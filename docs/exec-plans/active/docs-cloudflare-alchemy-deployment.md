@@ -1370,3 +1370,25 @@ explicit DCD-004 closeout limitations, not established claims.
 DCD-004 remains `in_progress`, DCD-005 remains `pending`, and no current
 provider or default-branch receipt is established until a fresh workflow epoch
 and dated promotion satisfy these checks.
+
+### 2026-08-10 — hosted workflow stdout correction
+
+Default-branch Preview plan run `31329854314` for candidate
+`429698cbfe8931aed225e59268dfb10b9e5b5ae1` produced equal plan digest
+`a3ba3c0213eb9a8556fd2f08808cb87945ae39b2063ad401282cc9e6fa7c6935` for only
+`DocsBuild` and `DocsWebsite`. The successor deploy run `31329950865` reached
+the same provider/state and hosted contract successfully, including the
+candidate-bound HTTP, browser, runtime, navigation, accessibility, cache,
+console and desktop/mobile screenshot assertions, but its `jq` filter rejected
+the workspace-filtered Bun output because `bun run --filter=docs
+test:cloudflare-hosted` prefixes each line and appends `Exited with code 0`.
+The provider and hosted artifacts are retained as a failed workflow attempt;
+no hosted or external-state establishment claim is made from that run.
+
+The workflow owner is corrected to invoke the existing script directly as
+`bun apps/docs/scripts/test-cloudflare-hosted.tsx`, which emits strict JSON;
+the package-level command remains the documented local/operator invocation.
+The workflow contract test now pins this exact command in both Preview and
+Production. DCD-004 remains `in_progress`, DCD-005 remains `pending`, and a
+fresh default-branch deploy run is required to produce a positive reconciled
+receipt before the automation register can advance.
