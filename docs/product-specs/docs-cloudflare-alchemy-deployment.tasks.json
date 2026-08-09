@@ -720,7 +720,7 @@
         "Schema-decode the report-only workflow report through its dedicated reportPath and require the report-only mutationCapability/automaticDeletion/state-provider agreement invariants before any externalState establishment",
         "run the live workflow plan checker for initial plans, equal replans and teardown projections before any provider mutation",
         "download and Schema-check the accepted Preview plan artifact before Production build or mutation",
-        "execute the workflow-owned direct hosted proof command `bun apps/docs/scripts/test-cloudflare-hosted.tsx` so its captured stdout remains strict JSON before filtering and Schema-checking the receipt",
+        "execute the workflow-owned direct hosted proof command `bun apps/docs/scripts/test-cloudflare-hosted.tsx`, normalize first-create empty previousVersionId to JSON null, and Schema-check the filtered receipt",
         "retain and Schema-check a successful default-branch workflow-run readback, including the workflow source commit and exact deployment candidate input, then cross-check workflow name/path/ref/head/run identity and candidate binding during external-state promotion",
         "run the read-only workflow_run reconciliation path for successful, failed and cancelled Preview, Production, automatic teardown and report-only source runs; retain exact API/source/input identity and bounded failure metadata",
         "bun run check:docs-deployment-workflow-run",
