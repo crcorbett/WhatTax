@@ -3,7 +3,7 @@ document_type: deployment-evidence-index
 lifecycle: current
 authority: canonical
 owner: taxkit-docs-deployment-proof-owner
-last_reviewed: 2026-08-05
+last_reviewed: 2026-08-09
 review_trigger: docs deployment candidate, provider, stage, URL, proof, screenshot, teardown or rollback receipt change
 ---
 
@@ -205,3 +205,15 @@ success receipts.
 Secrets, raw tokens, request bodies, credential values and unsanitized provider
 output are forbidden. Historical release and harness evidence remains
 unchanged.
+
+## 2026-08-09 local bridge-retirement candidate
+
+`2026-08-09-local-bridge-retirement/receipt.json` binds the clean committed
+candidate `d649a14fe49122387e33a6de0547468e6a3e4967` to the docs-app
+Cloudflare/workerd built proof. The candidate removes the docs-app Nitro/Vercel
+bridge, makes `test:built` the canonical built proof, and preserves the
+independent `apps/web` Nitro owner. SSR, assets, cache headers, 404 behavior,
+hydration, server-function transport, no-document navigation, accessibility,
+console cleanliness, runtime reuse, filesystem isolation and local upload
+limits passed. This is local evidence only; it does not establish hosted
+requalification for this candidate or the report-only Alchemy state boundary.

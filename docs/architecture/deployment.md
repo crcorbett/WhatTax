@@ -3,7 +3,7 @@ document_type: architecture
 lifecycle: current
 authority: canonical
 owner: taxkit-architecture-owner
-last_reviewed: 2026-08-05
+last_reviewed: 2026-08-09
 review_trigger: deployment target, runtime adapter, provider resource, state, domain, or rollback change
 ---
 
@@ -167,6 +167,18 @@ token. The mutation bootstrap path is not permitted for report-only inventory.
 Therefore the deployment register remains `not-established` as an aggregate
 state claim, and scheduled orphan detection remains an inconclusive,
 non-mutating report rather than an absence or teardown signal.
+
+## 2026-08-09 docs-app bridge-retirement observation
+
+The clean candidate `d649a14fe49122387e33a6de0547468e6a3e4967` is the first
+docs-app revision whose canonical `test:built` proof runs the Cloudflare Vite
+output under local workerd. The docs-app Nitro/Vercel preset, target selector
+and `.vercel/output` harness are removed; the independent `apps/web` Nitro
+owner and shared root output declarations remain. The bounded local receipt is
+`docs/evidence/deployments/2026-08-09-local-bridge-retirement/receipt.json`.
+It proves the local artifact and behavior contract only. It does not establish
+hosted requalification for this candidate or resolve the separate report-only
+Alchemy state-store boundary.
 
 ## Local runtime shape
 

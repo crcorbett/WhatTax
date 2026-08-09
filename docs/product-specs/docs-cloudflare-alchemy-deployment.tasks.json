@@ -3,7 +3,7 @@
   "spec": "docs/product-specs/docs-cloudflare-alchemy-deployment.md",
   "title": "Docs Cloudflare and Alchemy Deployment Tasks",
   "status": "active",
-  "last_reviewed": "2026-08-05",
+  "last_reviewed": "2026-08-09",
   "principles": [
     "Deliver one complete consumer/operator outcome in each vertical slice; do not build a horizontal infrastructure or governance platform first.",
     "Upgrade Effect/Platform and Alchemy together to exact 4.0.0-beta.100 and 2.0.0-beta.64 pins in the first slice; do not propose beta.63 or latest.",

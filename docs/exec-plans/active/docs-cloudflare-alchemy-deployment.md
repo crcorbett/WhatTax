@@ -3,7 +3,7 @@ document_type: execution-plan
 lifecycle: current
 authority: supporting
 owner: taxkit-docs-deployment-implementation-owner
-last_reviewed: 2026-08-05
+last_reviewed: 2026-08-09
 review_trigger: DCD task transition, implementation discovery, proof result, authority stop, or rollback
 successor: null
 tombstone: false
@@ -21,8 +21,10 @@ Task list:
 
 Implement `DCD-001` through `DCD-005` sequentially so the docs app has a
 qualified Cloudflare Worker artifact, isolated Preview, fixed Production,
-bounded delivery automation, and an accepted rollback path before the temporary
-Nitro/Vercel bridge is retired.
+bounded delivery automation, and an accepted rollback path. The docs-app
+Nitro/Vercel bridge is now retired locally after parity; final lifecycle
+acceptance still requires claim-matched hosted requalification and the
+report-only state boundary.
 
 One thread goal coordinates the whole accepted SPEC. The sibling ledger remains
 the milestone and acceptance owner.
@@ -35,7 +37,7 @@ the milestone and acceptance owner.
 | `DCD-002` | completed   | Accepted candidate `d9cb894…` passed fresh pre-deploy and pre-destroy state/provider readback, equal plans, Preview apply, the complete hosted/browser/screenshot contract, exact-stage teardown/absence, all gates and corrected-boundary independent review. |
 | `DCD-003` | completed   | Accepted after fixed Production, separately Preview-qualified successor, successor Production, restored-source rollback, provider/hosted/screenshot readback, owner reconciliation, full verification and corrected-boundary independent review. |
 | `DCD-004` | in_progress | Mutation workflow plan/deploy/teardown receipts now pass on the default branch, including Preview, fixed Production, rollback and PR-close no-op; report-only inventory remains an explicit capability stop because the read-only token cannot derive Alchemy's state-store bearer. The automation register remains `not-established` as an aggregate claim. |
-| `DCD-005` | pending     | Waits for the report-only state boundary, final parity/retirement proof, fresh independent review and complete closeout evidence. |
+| `DCD-005` | pending     | Docs-app bridge-retirement implementation is present and locally qualified at `d649a14…`; waits for exact-candidate hosted Preview/Production/rollback requalification, the report-only state boundary, fresh independent review and complete closeout evidence. |
 
 ## Baseline
 
@@ -1155,3 +1157,24 @@ disclosure occurred. Scheduled orphan detection remains an inconclusive
 report-only path; the deployment register stays `not-established`, DCD-004
 stays `in_progress`, and DCD-005 stays `pending` until this boundary and the
 remaining parity/retirement proof are resolved.
+
+### 2026-08-09 — docs-app bridge-retirement implementation candidate
+
+The exact committed candidate `d649a14fe49122387e33a6de0547468e6a3e4967`
+removes the docs app's Nitro/Vercel preset, `.vercel/output` harness,
+`TAXKIT_DOCS_BUILD_TARGET` selector and docs-only Nitro dependency. `test:built`
+now invokes the Cloudflare/workerd production-artifact proof;
+`test:cloudflare-built` remains an explicit alias. The root Nitro catalog,
+shared output declarations and any unrelated `apps/web` Nitro owner remain
+preserved.
+
+The clean-candidate receipt is
+`docs/evidence/deployments/2026-08-09-local-bridge-retirement/receipt.json`.
+`bun run --filter=docs test:built` passed SSR, assets/cache headers, direct and
+client 404, hydration, server-function transport, no-document navigation,
+accessibility, console/page cleanliness, runtime reuse, filesystem isolation
+and local upload limits under the pinned Cloudflare Vite/workerd/Wrangler
+graph. This is a local implementation and parity observation; it does not
+establish hosted Preview/Production/rollback for this exact candidate or the
+report-only Alchemy state boundary. DCD-004 remains `in_progress`, DCD-005
+remains `pending`, and no completion claim is made.

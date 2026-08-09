@@ -3,7 +3,7 @@ document_type: architecture
 lifecycle: current
 authority: canonical
 owner: taxkit-quality-owner
-last_reviewed: 2026-07-30
+last_reviewed: 2026-08-09
 review_trigger: verification graph, proof boundary, CI, deployment, or test-owner change
 ---
 
