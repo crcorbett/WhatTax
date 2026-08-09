@@ -336,3 +336,33 @@ the Worker remains present. The earlier hosted-harness failure
 `31336102494` and cancelled duplicate teardown dispatch `31336476804` remain
 disconfirming/non-mutating history. Production and rollback were not attempted
 after this stop. No secret value is retained in any evidence file.
+
+## 2026-08-10 current main-sourced Preview promotion
+
+After the merge of the reviewed workflow correction at default-branch SHA
+`bc2ac82f48cce67a6ee5b1b6caf9e8903bf9c182`, Preview candidate
+`cbcb86878379cc2a126a8e48bee256aa33096c79` was planned as deterministic
+`pr-24`. Plan run `31337945701` produced the update projection and accepted
+digest `1a9492fb7a656ddab44565fcc224e502d56dbd04287a31d53aefdb343af0278f`.
+Deploy run `31338052297` completed the equal replan, provider/state readback and
+hosted HTTP/browser contract. It binds deployment
+`bd7c847d-150a-4f27-8d12-e5f5549f0186`, version
+`e763909b-22ca-4ef2-a6f9-3de826291526`, prior version
+`6b831c22-9f93-47a9-b0da-8227b56017a9`, stage `pr-24`, account/state identity
+and the provider workers.dev URL. Hosted diagnostics were empty; SSR/assets,
+server-function transport, malformed input, 404, no-reload navigation,
+accessibility, cache/header, console and module-scoped runtime checks passed.
+The retained desktop/mobile PNG digests are
+`128c8f300d1911111fd3fc22a89289efc6961df29582421a53bd77e9ff8c82cf` and
+`9ebc4108397d334eedff97d8ae79ddc103ee61a62bf87a995becf3715b32c945`.
+
+The completion reconciler `31338154055` API-read the completed `main` workflow
+and retained the exact workflow input/run, plan, provider, hosted and screenshot
+artifacts. The promoted receipt is
+`2026-08-10-preview-pr-24/workflow-receipt-31338052297.json`; it is the first
+current default-branch positive Preview automation receipt and advances only
+`docs-preview-delivery`. The `pr-24` teardown attempt
+`31337384729` remains a failed/non-claim beta.64 dry-run with no destroy or
+absence readback, so Production, rollback, teardown and report-only automation
+entries remain unestablished. No secret value is retained in this evidence
+epoch.

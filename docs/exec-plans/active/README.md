@@ -3,7 +3,7 @@ document_type: execution-plan-index
 lifecycle: current
 authority: canonical
 owner: taxkit-documentation-owner
-last_reviewed: 2026-07-30
+last_reviewed: 2026-08-10
 review_trigger: active execution-plan admission, lifecycle, dependency, or successor change
 successor: null
 tombstone: false
@@ -21,9 +21,11 @@ Current implementation:
   DCD-001 is accepted locally after both built-app oracles, documentation
   reconciliation, independent closure and change-owned gates passed for the
   official Cloudflare Vite output plus public Alchemy prebuilt-Worker
-  composition. The earlier unsupported Website.Vite seam and Worker-first
-  asset failure remain retained evidence; DCD-002 starts after the coherent
-  DCD-001 commit.
+  composition. DCD-004 now has one promoted main-sourced Preview receipt for
+  `pr-24`; Production, teardown, rollback and report-only remain separately
+  gated. The earlier unsupported Website.Vite seam and Worker-first asset
+  failure remain retained evidence; DCD-002 starts after the coherent DCD-001
+  commit.
 
 Completed harness work is retained under
 [`../completed/harness-foundation-improvements.md`](../completed/harness-foundation-improvements.md)

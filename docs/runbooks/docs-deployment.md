@@ -614,8 +614,10 @@ requires `preview` with `pr-N` for Preview, `production` or `rollback` with
 `prod` for Production, and exactly one desktop plus one mobile screenshot whose
 retained PNG bytes hash to the manifest.
 
-The current register intentionally records all four entries as
-`not-established` until each record's complete receipt contract is satisfied.
+The current register records the main-sourced Preview entry as `established`
+after its complete receipt contract was satisfied; Production, Preview teardown
+and report-only remain `not-established` until each has its own complete
+receipt contract.
 The read-only reconciler is governed by the separate
 `docs-workflow-receipt-reconciliation` control; it does not add provider
 authority or a fifth mutation automation.
@@ -833,6 +835,31 @@ does not execute pull-request code. The protected report-only run
 agreement with no Preview/orphan candidates; it remains branch-bound until the
 reviewed default-branch source is read back. Do not advance the aggregate
 automation register or close DCD-004 from this branch-bound receipt.
+
+## 2026-08-10 — current main-sourced Preview promotion
+
+The reviewed default branch is `bc2ac82f48cce67a6ee5b1b6caf9e8903bf9c182`.
+Preview candidate `cbcb86878379cc2a126a8e48bee256aa33096c79` was planned for
+deterministic `pr-24` by run `31337945701`; its update projection produced
+accepted/equal-replan digest
+`1a9492fb7a656ddab44565fcc224e502d56dbd04287a31d53aefdb343af0278f`.
+Deploy run `31338052297` completed equal replan, provider/state readback and the
+hosted proof contract. It binds deployment
+`bd7c847d-150a-4f27-8d12-e5f5549f0186`, version
+`e763909b-22ca-4ef2-a6f9-3de826291526`, prior version
+`6b831c22-9f93-47a9-b0da-8227b56017a9`, account/state identity, stage `pr-24`
+and the provider workers.dev URL. SSR/assets, server-function transport,
+malformed input, 404, no-reload navigation, accessibility, cache/header,
+console, runtime and bounded desktop/mobile screenshot checks passed.
+
+Completion reconciler `31338154055` API-read the completed source run and
+matching artifact. The durable receipt is
+`docs/evidence/deployments/2026-08-10-preview-pr-24/workflow-receipt-31338052297.json`;
+the automation register therefore establishes only `docs-preview-delivery`.
+The corresponding PR-close teardown attempt `31337384729` stopped at the
+pinned beta.64 dry-run with no destroy or absence readback. Production,
+rollback, teardown and report-only remain unestablished and require their own
+receipts; do not infer them from this Preview promotion.
 
 ## Stop conditions
 

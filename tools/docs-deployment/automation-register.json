@@ -30,8 +30,8 @@
       "trigger": "separately dispatched trusted same-repository pull-request candidate"
     },
     "externalState": {
-      "receipt": null,
-      "status": "not-established"
+      "receipt": "docs/evidence/deployments/2026-08-10-preview-pr-24/workflow-receipt-31338052297.json",
+      "status": "established"
     },
     "failure": {
       "escalationOwner": "taxkit-docs-deployment-operation-owner",
