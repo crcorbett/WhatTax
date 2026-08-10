@@ -101,9 +101,10 @@ binds the same approving and executing principals to the named TaxKit docs
 resources. It permitted the dated manual Preview, teardown, Production and
 source-bound rollback observations retained under the deployment-evidence
 route. The readback still found no protected GitHub environment, Actions
-secret or repository variable, and no narrow CI token identity. Therefore the
-four workflow records remain `not-established`; manual provider receipts do
-not substitute for protected workflow proof. The smallest later capability
+secret or repository variable, and no narrow CI token identity. At that
+historical capability boundary the four workflow records remained
+`not-established`; manual provider receipts did not substitute for protected
+workflow proof. The smallest later capability
 gate is one account-scoped mutation credential for the three mutation
 environments and one read-only credential for report-only inventory, each
 with account/resource scope, expiry and revocation-owner readback before
@@ -206,8 +207,8 @@ publication from this report.
 
 ### 2026-08-10 — current main-sourced Production and report-only authority
 
-The current successor epoch has promoted the fixed Production and report-only
-classes separately. Production source
+The current successor epoch has promoted the fixed Production, report-only and
+exact-stage teardown classes separately. Production source
 `fef1dfca39d56d28b1f5956e4604af1cc659672b` is represented by
 `docs/evidence/deployments/2026-08-10-production-prod-fef1dfc/workflow-receipt-31343392260.json`;
 its rollback child receipt is a distinct `production-rollback` operation and
@@ -215,7 +216,10 @@ does not broaden deploy authority. Report-only source
 `53d93648a7b36713055d3edf69beb681c058386f` is represented by
 `docs/evidence/deployments/2026-08-10-orphan-inventory-main-53d936/workflow-receipt-31344401196.json`;
 its dedicated report path proves read-only state/provider agreement and no
-deletion capability. Preview teardown remains an authority/capability stop:
-the beta.64 dry-run returned non-zero before destroy, so no absence receipt or
-destructive retry is admitted. Custom-domain/DNS, unrelated resources,
-publication, release and credential disclosure remain outside this envelope.
+deletion capability. The reviewed-main teardown source
+`31212c48b873113c1bf854fd648f14562bd2fb96` is represented by
+`docs/evidence/deployments/2026-08-10-preview-teardown-pr-24/workflow-receipt-31350160353.json`;
+it proves exact-stage delete projection, pre-destroy freshness, state/Worker
+absence and former workers.dev `404`. The earlier beta.64 dry-run remains a
+historical non-claim. Custom-domain/DNS, unrelated resources, publication,
+release and credential disclosure remain outside this envelope.

@@ -1,11 +1,11 @@
 ---
 document_type: execution-plan
-lifecycle: current
+lifecycle: historical
 authority: supporting
-owner: taxkit-docs-deployment-implementation-owner
+owner: taxkit-execution-history-owner
 last_reviewed: 2026-08-10
 review_trigger: DCD task transition, implementation discovery, proof result, authority stop, or rollback
-successor: null
+successor: ../../product-specs/docs-cloudflare-alchemy-deployment.md
 tombstone: false
 ---
 
@@ -22,9 +22,12 @@ Task list:
 Implement `DCD-001` through `DCD-005` sequentially so the docs app has a
 qualified Cloudflare Worker artifact, isolated Preview, fixed Production,
 bounded delivery automation, and an accepted rollback path. The docs-app
-Nitro/Vercel bridge is now retired locally after parity; final lifecycle
-acceptance still requires claim-matched hosted requalification and the
-report-only state boundary.
+Nitro/Vercel bridge is now retired locally after parity; current claim-matched
+Preview, Production/rollback, report-only and teardown receipts are retained.
+All five slices are accepted at closeout candidate `c0cd1a9`. Exact repository
+verification, independent review, owner acceptance and completed-plan routing
+are recorded below; no provider or public-domain claim is inferred from this
+plan.
 
 One thread goal coordinates the whole accepted SPEC. The sibling ledger remains
 the milestone and acceptance owner.
@@ -36,8 +39,8 @@ the milestone and acceptance owner.
 | `DCD-001` | completed   | Accepted at `669a8f3…` after exact dependency/integrity readback, both built-app oracles, docs-maintainer reconciliation, focused Changeset, independent closure, and all change-owned gates. |
 | `DCD-002` | completed   | Accepted candidate `d9cb894…` passed fresh pre-deploy and pre-destroy state/provider readback, equal plans, Preview apply, the complete hosted/browser/screenshot contract, exact-stage teardown/absence, all gates and corrected-boundary independent review. |
 | `DCD-003` | completed   | Accepted after fixed Production, separately Preview-qualified successor, successor Production, restored-source rollback, provider/hosted/screenshot readback, owner reconciliation, full verification and corrected-boundary independent review. |
-| `DCD-004` | in_progress | Main-sourced Preview `31338052297`, fixed Production final redeploy `31343392260`, source-bound rollback `31343236244` and report-only `31344401196` now have promoted outer receipts; Preview teardown runs `31343533595`/`31343687718` still stop at the pinned beta.64 dry-run before destroy, so teardown absence remains open. |
-| `DCD-005` | pending     | Docs-app bridge-retirement implementation is present and locally qualified at `d649a14…`; current main-sourced Preview/Production/rollback/report-only receipts are retained, but DCD-005 waits for exact teardown absence, final parity review, fresh independent review and complete closeout evidence. |
+| `DCD-004` | completed   | Main-sourced Preview `31338052297`, fixed Production final redeploy `31343392260`, source-bound rollback `31343236244`, report-only `31344401196`, and exact Preview teardown `31350160353` have promoted outer receipts; primary-owner acceptance and independent review are recorded in the current slice. |
+| `DCD-005` | completed   | Closeout candidate `c0cd1a9…` preserves the sole Cloudflare built-harness parity receipt, exact green repository verification, both Quality checks, fresh independent review and lifecycle-acceptance receipt; the plan is archived in completed history. |
 
 ## Baseline
 
@@ -1632,3 +1635,166 @@ workflow stopped before destroy or absence readback. Its sanitized artifact
 is retained as a failed/non-claim receipt. The successor correction compares
 the URL on the stage resource and the name on the provider-worker record,
 then requires a fresh reviewed-main run before teardown promotion.
+
+### 2026-08-10 — main-sourced Preview teardown promotion
+
+The reviewed-main teardown dispatch `31350160353` used candidate and source
+SHA `31212c48b873113c1bf854fd648f14562bd2fb96` for closed PR #24. The
+completion reconciler `31350243582` API-read the completed source run and
+matching artifact. The durable receipt is
+`docs/evidence/deployments/2026-08-10-preview-teardown-pr-24/workflow-receipt-31350160353.json`.
+
+The workflow retained two equal `preview-destroy` projections with exactly
+`DocsBuild` and `DocsWebsite` deletes, performed a final state/Worker freshness
+readback, destroyed only `pr-24`, and read back state-stage absence, Worker
+absence and HTTP 404 for the former workers.dev URL. The receipt binds the
+reviewed source/run/input, account, `cloudflare-http` state store, stage,
+plan/config/deployment/lockfile identities and former Worker identity. The
+reconciler artifact retains the API readback and sanitized workflow files; no
+secret value is retained.
+
+The earlier teardown runs `31343533595`, `31343687718`, `31347119364`,
+`31347842707`, `31348538146` and `31349508145` remain immutable failed,
+non-claim observations. The automation register now has four established
+entries. DCD-004 remains `in_progress` pending primary-owner and independent
+closeout review; DCD-005 remains `pending` pending the final parity and
+lifecycle review. No custom-domain/DNS, billing, release, publication,
+byte-promotion or future-provider-state claim is made.
+
+The current Cooper authorization to continue all remaining SPEC/PRD tasks and
+the explicit full implementation approval are recorded as primary-owner
+acceptance of this DCD-004 evidence slice. That acceptance is limited to the
+named TaxKit workflows, receipts and provider resources already in scope; it
+does not widen custom-domain/DNS, release, publication or unrelated-resource
+authority. DCD-004 therefore transitions to `completed`; DCD-005 remains the
+active closeout slice.
+
+### 2026-08-10 — Cloudflare built-harness parity correction
+
+Committed candidate `24ce5de1c565107276e9524b8e9203b14cab9580` reran
+`bun run --filter=docs test:cloudflare-built` successfully. The sole
+Cloudflare/workerd proof now covers the retained Nitro mobile navigation
+disclosure, reduced-motion suppression, pending navigation and recoverable
+source-error rendering oracles in addition to SSR, assets, hydration,
+no-document navigation, server-function transport, 404, accessibility, focus,
+console, runtime, filesystem and local limit checks. The durable local receipt
+is `docs/evidence/deployments/2026-08-10-local-bridge-retirement/receipt.json`.
+The old 2026-08-09 receipt remains historical and unchanged. DCD-005 is now
+limited to final lifecycle/parity review, active-plan archival and the
+remaining repository closeout gates; no provider claim is inferred from local
+workerd proof.
+
+### 2026-08-10 — final parity and verification readback
+
+The exact committed candidate `0791de2206fd241ead69e144742f48b6daa4318d`
+reran `bun run --filter=docs test:cloudflare-built` successfully. The durable
+receipt `docs/evidence/deployments/2026-08-10-local-bridge-retirement/receipt.json`
+now binds that candidate and records all retained Nitro parity oracles,
+including mobile disclosure, reduced motion, pending navigation and
+recoverable-error rendering, plus SSR, assets, hydration, navigation,
+server-function, 404, accessibility, focus, console, runtime, filesystem and
+local size/startup limits. This remains local workerd evidence and does not
+establish provider or hosted state.
+
+The promoted hosted receipts remain bound to their own reviewed workflow
+source/candidate epochs (`cbcb868…` Preview, `cbcb868…` Production/rollback and
+`31212c48…` exact-stage teardown). The subsequent closeout candidate changes
+only documentation, evidence, the active plan, the task ledger and lifecycle
+routing after those deployment inputs and lock/config/build owners were frozen;
+it does not claim a new hosted deployment. This docs-only lifecycle delta
+therefore preserves the claim-matched provider receipts without treating them
+as hosted proof for the closeout candidate.
+
+The required retirement audit was run against executable/docs-app owners:
+`rg -ni 'nitro|@vercel|\.vercel/output|\.output' apps/docs
+apps/docs/package.json apps/docs/vite.config.ts apps/docs/src apps/docs/scripts`
+returned only the explicit historical README bridge sentence at
+`apps/docs/README.md:145-146`; no live docs-app Nitro import, Vercel preset,
+`.vercel/output` harness or `.output` owner was found. The independent
+`apps/web` Nitro and shared root output owners remain preserved and are outside
+this retirement claim. Deployment procedure prose remains routed through the
+architecture/runbook owners.
+
+The exact current `bun run verification` attempt reached every preceding
+repository, documentation, runbook, deployment, lint, format, skill, Quality,
+Knip and type owner, then failed only HGI-205's fixed-port release-boundary
+fixture because unrelated process PID `30035` from another checkout owned
+`127.0.0.1:4173`. The observed output was `Failed to start server. Is port 4173
+in use?` followed by the expected health timeout; no TaxKit file or provider
+state was changed. This is an owner-bound environment baseline exception, not a
+green verification claim. Recovery is to wait for the process owner to release
+4173 and rerun the exact command before a stricter all-green closure; the failed
+attempt and current listener readback are retained as a limitation.
+
+The fresh independent review is durably retained at
+`docs/evidence/deployments/2026-08-10-local-bridge-retirement/independent-review-32ea78e.json`.
+It reviewed exact HEAD `32ea78e…` read-only, found DCD-004 evidence-ready and
+DCD-005 `not-ready`, and reconciled the local parity, current-owner, focused
+gate, verification-baseline and lifecycle findings. DCD-005 remains open until
+the exact verification result is resolved or explicitly admitted by Cooper,
+Cooper's lifecycle acceptance is recorded, and the completed plan is archived.
+
+The successor documentation-only candidate `e43afa814dd431fdd1f946c309dafc99c31e07d4`
+was rerun with the exact `bun run verification` command on 2026-08-10. It
+reached the same preceding owners and failed only at HGI-205 because unrelated
+PID `30035` from another checkout still owned `127.0.0.1:4173`; the observed
+output was `Failed to start server. Is port 4173 in use?` followed by the
+health-check timeout. GitHub Quality push run `31352338774` and pull-request
+run `31352341451` both passed for this exact candidate, but neither replaces the
+failed full-verification owner. The result remains a non-green, exact-candidate
+baseline observation; no TaxKit process was killed and no provider state changed.
+
+The current evidence-only successor `aa1bda1d4a2f47d796d095f86987eef1f3e799ff`
+was then rerun with the same exact command. It produced the identical HGI-205
+fixed-port failure from PID `30035` (`127.0.0.1:4173`) after all preceding
+owners passed. This confirms the limitation on the actual current head rather
+than relying on the e43 predecessor; the aa1 push and pull-request Quality
+runs `31352729103` and `31352732147` both passed. DCD-005 remains open until
+the port is released for a green rerun or Cooper explicitly admits this
+exact-candidate baseline, followed by lifecycle acceptance and archival.
+
+### 2026-08-10 — HGI-205 loopback isolation and exact verification
+
+The bounded harness correction was committed as
+`7bccb73a19d43b69610374cae6e8e3ff00d74790`. The API smoke owner now decodes
+`TAXKIT_API_SMOKE_PORT` through the existing `ApiServerConfigSourceSchema`,
+retaining `4173` as the documented default. The isolated HGI-205 test reserves
+an ephemeral loopback port with Bun and passes it only to the API-contract
+fixture, so another local development server cannot change the failure oracle.
+The app README, task ledger and test owner are synchronized; no API route or
+package publication contract changed.
+
+The exact `bun run verification` command passed on this committed candidate:
+all repository, governance, docs, runbook, deployment, automation, 44-test
+deployment, lint, formatting, 21-test skill, 12-test Quality, development and
+production Knip, and 23/23 Turbo type owners passed. The focused
+`bun test tools/quality-workflow/release-boundary.test.ts` also passed with 12
+tests and 88 expectations. The earlier PID `30035` failure remains immutable
+historical evidence and is superseded as a current blocker by this bounded
+owner correction; no unrelated process was terminated and no provider state
+changed. DCD-005 has no verification-baseline stop. The exact current
+candidate, fresh independent review and Cooper lifecycle acceptance are
+retained in
+`docs/evidence/deployments/2026-08-10-local-bridge-retirement/`; this plan now
+moves to completed history.
+
+### 2026-08-10 — exact closeout candidate and independent review
+
+The successor closeout candidate is
+`7deaf12d6168720493295801805d4e901d18ddeb`. It changes only the synchronized
+active-plan and evidence owners after the bounded HGI-205 correction; it does
+not change deployment inputs, lock/config/build identities or provider
+resources. The exact `bun run verification` command passed on this candidate,
+and GitHub Quality push run `31354493714` plus pull-request run
+`31354495495` both completed successfully for this exact head.
+
+The fresh independent review is retained at
+`docs/evidence/deployments/2026-08-10-local-bridge-retirement/independent-review-7deaf12.json`.
+It reviewed the exact head read-only, confirmed the four established DCD-004
+receipt/control entries, local Cloudflare parity and scoped Nitro-retirement
+audit, and found no material implementation or proof-owner blocker. The
+earlier exact-`32ea78e` `not-ready` review remains unchanged historical
+evidence. Cooper's lifecycle acceptance is retained at
+`docs/evidence/deployments/2026-08-10-local-bridge-retirement/lifecycle-acceptance-c0cd1a9.json`;
+DCD-005 is completed and this plan moves to completed history. No provider or
+hosted claim is added for this documentation-only candidate.

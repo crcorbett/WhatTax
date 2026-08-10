@@ -47,19 +47,20 @@ Its Schema and negative fixtures admit only these controls:
 | Named deployment workflow completes; a self-authored or detached run/artifact is promoted without completed Actions API readback, exact source/input identity or bounded failure metadata | `docs-workflow-receipt-reconciliation`; `workflow.contract.test.ts`, `workflow-run-check.runtime.ts`, and the read-only `workflow_run` reconciler; retain the source artifact and reconciliation stop, then retry against the exact completed run | Workflow_run trigger, receipt schema/checker, artifact naming, source checkout or external-state promotion change | A stronger provider-independent receipt reconciler preserves completed-run, artifact, source/input and failure-readback coverage. |
 
 `bun run check:docs-deployment-automation` proves these local records and
-cross-field invariants only. The current repository-promoted epoch reports
-three externally established deployment automations: the exact main-sourced
-Preview receipt, the fixed Production deploy receipt, and the reviewed
-default-branch report-only inventory receipt recorded below. Preview teardown
-remains unestablished because the hosted beta.64 dry-run has not completed
-successfully; no absence or destroy claim is inferred.
+cross-field invariants only. The current repository-promoted epoch reports four
+externally established deployment automations: the exact main-sourced Preview
+receipt, fixed Production deploy/rollback receipt, reviewed default-branch
+report-only inventory receipt, and reviewed-main exact-stage teardown receipt
+recorded below. Future source, candidate, protected-environment or provider
+changes require a fresh receipt promotion; these dated receipts do not imply
+timeless availability or public-domain claims.
 
 The dated manual Preview/Production/rollback receipts under
 `docs/evidence/deployments/` prove the same candidate, plan, provider/state and
 hosted contracts for an authorized operator epoch, but they do not change
-`externalState.status` or establish GitHub workflow enforcement. A protected
-environment and a concrete narrow credential identity must be read back before
-any automation record moves to `established`.
+`externalState.status` for those historical candidates. The current workflow
+receipts below separately establish the four named automation classes after
+protected-environment, credential, source and provider readback.
 
 The separate provider-bound `bun run check:docs-deployment-orphans` command
 executes only the admitted open-PR, state and Worker reads. Its receipt Schema
@@ -78,14 +79,13 @@ provider mutation occurred. Consequently the aggregate deployment register
 remains `not-established`, and orphan detection remains an inconclusive
 report-only signal rather than deletion or teardown authority.
 
-The current b59e4ee epoch adds claim-matched protected Preview, exact-stage
+The historical b59e4ee epoch adds claim-matched protected Preview, exact-stage
 teardown, fixed Production and normal rollback receipts under
-`docs/evidence/deployments/2026-08-10-*`; those receipts do not change the
-automation register's external-state status for those historical candidates.
-Report-only run `31319845724` passed on the open branch and proved only the
-separate state/provider read. The current main-sourced Preview promotion is
-recorded below; a reviewed default-branch source readback remains the control
-admission gate for the remaining classes.
+`docs/evidence/deployments/2026-08-10-*`; those receipts remain separate from
+the current register. Report-only run `31319845724` passed on the open branch
+and proved only a branch-bound state/provider read. The current main-sourced
+promotions are recorded below and are the admission evidence for the four
+classes.
 
 The workflow owners now fail closed on unexpected actions/resources in the
 equal replan, assert exact provider stage/Worker/deployment/version identity,
@@ -139,9 +139,14 @@ after the report credential wiring correction. Its dedicated report receipt is
 `docs/evidence/deployments/2026-08-10-orphan-inventory-main-53d936/workflow-receipt-31344401196.json`.
 It proves state/provider agreement, an empty open-PR set, no mutation
 capability and no automatic deletion; the report-only environment remains
-reviewer-gated rather than unattended. The deployment register therefore has
-three established entries. Preview teardown remains `not-established` after
-runs `31343533595` and `31343687718` stopped at the beta.64 dry-run with no
-destroy or absence readback. These receipts do not establish custom-domain,
-DNS, billing, release, publication, byte-promotion or current public-domain
-claims.
+reviewer-gated rather than unattended.
+
+The reviewed-main Preview teardown run `31350160353` (reconciler
+`31350243582`) now supplies the fourth established automation receipt at
+`docs/evidence/deployments/2026-08-10-preview-teardown-pr-24/workflow-receipt-31350160353.json`.
+It proves two equal exact-resource delete projections, pre-destroy freshness,
+post-destroy state-stage and Worker absence, and HTTP 404 for the former
+workers.dev URL. The failed beta.64 runs remain historical non-claims. The
+deployment register therefore has four established entries; none establishes
+custom-domain, DNS, billing, release, publication, byte-promotion or current
+public-domain claims.

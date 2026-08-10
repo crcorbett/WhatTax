@@ -14,19 +14,12 @@ tombstone: false
 Live implementation plans belong here while work is in progress. Maintainer
 lifecycle is owned by [`../../README.md`](../../README.md).
 
-Current implementation:
-
-- [Docs Cloudflare and Alchemy deployment](./docs-cloudflare-alchemy-deployment.md)
-  executes the accepted five-slice SPEC from its reviewed planning commit.
-  DCD-001 is accepted locally after both built-app oracles, documentation
-  reconciliation, independent closure and change-owned gates passed for the
-  official Cloudflare Vite output plus public Alchemy prebuilt-Worker
-  composition. DCD-004 now has promoted main-sourced Preview `pr-24`, fixed
-  Production and report-only receipts; Preview teardown/absence remains
-  separately gated, while the source-bound rollback receipt is retained under
-  Production. The earlier unsupported Website.Vite seam and Worker-first asset
-  failure remain retained evidence; DCD-002 starts after the coherent DCD-001
-  commit.
+No active implementation plan is open for this route. The Docs Cloudflare and
+Alchemy deployment SPEC completed all five slices at closeout candidate
+`c0cd1a9`; its historical execution plan is retained at
+[`../completed/docs-cloudflare-alchemy-deployment.md`](../completed/docs-cloudflare-alchemy-deployment.md).
+The earlier unsupported Website.Vite seam, Worker-first asset failure and
+beta.64 teardown failures remain retained historical evidence.
 
 Completed harness work is retained under
 [`../completed/harness-foundation-improvements.md`](../completed/harness-foundation-improvements.md)

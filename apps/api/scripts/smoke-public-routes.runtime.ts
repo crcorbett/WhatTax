@@ -29,8 +29,18 @@ import * as HttpClient from "effect/unstable/http/HttpClient";
 import type * as HttpClientResponse from "effect/unstable/http/HttpClientResponse";
 import { ChildProcess } from "effect/unstable/process";
 
+import { ApiServerConfigSourceSchema } from "../src/schemas.js";
+
 const smokeHost = "127.0.0.1";
-const smokePort = 4173;
+const smokePort = Schema.decodeUnknownOption(ApiServerConfigSourceSchema)({
+  host: smokeHost,
+  port: Number(process.env["TAXKIT_API_SMOKE_PORT"] ?? 4173),
+}).pipe(
+  Option.map(({ port }) => port),
+  Option.getOrElse(() => {
+    throw new Error("TAXKIT_API_SMOKE_PORT must be a valid TCP port.");
+  })
+);
 const smokeOrigin = `http://${smokeHost}:${smokePort}`;
 const takeHomeCalculatorId = "au.pay.take-home";
 const annualTaxCalculatorId = "au.income-tax.annual";

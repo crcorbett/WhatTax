@@ -31,11 +31,15 @@ const fixtures = Effect.runSync(
 const run = async (
   cwd: string,
   executable: string,
-  args: readonly string[]
+  args: readonly string[],
+  environment: Record<string, string> = {}
 ) => {
   const process = Bun.spawn([executable, ...args], {
     cwd,
-    env: globalThis.process.env,
+    env: {
+      ...globalThis.process.env,
+      ...environment,
+    },
     stderr: "pipe",
     stdout: "pipe",
   });
@@ -45,6 +49,18 @@ const run = async (
     new Response(process.stdout).text(),
   ]);
   return { exitCode, stderr, stdout };
+};
+
+const findAvailableLoopbackPort = () => {
+  const reservation = Bun.serve({
+    fetch: () => new Response("reserved"),
+    hostname: "127.0.0.1",
+    port: 0,
+  });
+  const { port } = reservation;
+  reservation.stop(true);
+
+  return port;
 };
 
 const prepareWorkspace = async () => {
@@ -185,10 +201,17 @@ describe("HGI-205 isolated release-boundary mutations", () => {
           ]);
           expect(build.exitCode).toBe(0);
         }
+        const environment =
+          fixture.id === "api-contract"
+            ? {
+                TAXKIT_API_SMOKE_PORT: String(findAvailableLoopbackPort()),
+              }
+            : undefined;
         const result = await run(
           workspace,
           fixture.command.executable,
-          fixture.command.args
+          fixture.command.args,
+          environment
         );
         await writeFile(target, source);
 

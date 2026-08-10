@@ -622,21 +622,21 @@ requires `preview` with `pr-N` for Preview, `production` or `rollback` with
 `prod` for Production, and exactly one desktop plus one mobile screenshot whose
 retained PNG bytes hash to the manifest.
 
-The current register records the main-sourced Preview entry as `established`
-after its complete receipt contract was satisfied; Production, Preview teardown
-and report-only remain `not-established` until each has its own complete
-receipt contract.
+The current register records four established entries after their separate
+receipt contracts were satisfied: main-sourced Preview, fixed Production with
+normal rollback, exact-stage Preview teardown and report-only inventory. Each
+receipt remains candidate/source-bound; a later workflow, provider,
+environment, credential or deployment-input change requires fresh promotion.
 The read-only reconciler is governed by the separate
 `docs-workflow-receipt-reconciliation` control; it does not add provider
 authority or a fifth mutation automation.
 The 2026-08-04 capability receipt records the exact protected environment
 identities and redacted narrow credential readback; the current workflow epoch
-below records successful mutation-class runs, while the report-only state
-boundary remains unresolved. Do not create an unprotected or empty
-environment, copy the broad local OAuth credential into GitHub, or invent an
-unexecuted command merely to advance the task. Continue to use this manual
-runbook under the exact authority envelope until every required workflow
-receipt and read-only state boundary is retained.
+below records the successful mutation and report-only runs. Do not create an
+unprotected or empty environment, copy the broad local OAuth credential into
+GitHub, or invent an unexecuted command merely to advance the task. Continue to
+use this manual runbook under the exact authority envelope; the dated receipts
+below are observations, not timeless provider or public-domain availability.
 
 For a future positive report-only admission, the outer workflow receipt must
 name a dedicated `reportPath` decoded as
@@ -899,6 +899,29 @@ unestablished because runs `31343533595` and `31343687718` returned non-zero
 from the pinned beta.64 dry-run before any destroy. No teardown absence,
 custom-domain/DNS, billing, release, publication or public-domain claim is
 made from this epoch.
+
+## 2026-08-10 — current Preview teardown receipt
+
+Reviewed-main teardown run `31350160353` for closed PR #24 completed through
+the direct pinned beta.64 entrypoint after the parser and freshness corrections.
+Completion reconciler `31350243582` API-read the completed source run and
+matching artifact. The canonical receipt is
+`docs/evidence/deployments/2026-08-10-preview-teardown-pr-24/workflow-receipt-31350160353.json`.
+
+The run performed two equal `preview-destroy` projections containing only
+`DocsBuild` and `DocsWebsite` deletes. It read back the exact `pr-24` state and
+Worker before destroy, then read back state-stage absence, Worker absence and
+the former workers.dev URL as HTTP 404 after destroy. The receipt binds the
+reviewed default-branch source/run/input, plan/config/deployment/lockfile,
+account and `cloudflare-http` state identities. The failed runs
+`31343533595`, `31343687718`, `31347119364`, `31347842707`, `31348538146` and
+`31349508145` remain immutable non-claim history.
+
+This advances only the exact `docs-preview-teardown` automation entry. It does
+not establish current Preview availability, Production, rollback,
+custom-domain/DNS, billing, release, publication, byte promotion or future
+provider state. A no-op teardown remains valid only when the same reviewed
+workflow proves the exact stage and provider/state absence.
 
 ## Stop conditions
 

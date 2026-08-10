@@ -49,13 +49,12 @@ intent and task state belong in the active SPEC and execution plan.
   domains, DNS and third-party observability are absent.
 - `tools/docs-deployment/automation-register.json` and `controls.json` own the
   Schema-decoded desired state for three mutating workflow classes and one
-  report-only orphan inventory. Their validator still reports zero externally
-  established automations because the aggregate register is fail-closed. The
-  four workflow owners are on the reviewed default branch and the three
-  mutation classes have dated provider/hosted receipts. The report-only owner
-  has a dated branch-bound state/provider success, but its reviewed
-  default-branch source run is still required before the register can claim
-  complete external establishment.
+  report-only orphan inventory. The current repository-promoted epoch has four
+  externally established entries, each backed by a reviewed default-branch
+  workflow receipt: Preview delivery, Production delivery, exact-stage Preview
+  teardown, and report-only inventory. A later candidate, source, protected
+  environment or provider change requires fresh promotion; the register does
+  not make a timeless availability claim.
 - `@taxkit/api-http` builds as a package and exposes health, generated docs,
   OpenAPI JSON, metadata and public calculation route contracts.
 - `@taxkit/sdk` builds as a private package for local and downstream
@@ -185,9 +184,9 @@ It proves the local artifact and behavior contract only. It does not establish
 hosted requalification for this candidate or resolve the separate report-only
 Alchemy state-store boundary.
 
-## 2026-08-10 current hosted deployment epoch
+## 2026-08-10 historical b59e4ee hosted deployment epoch
 
-The current b59e4ee candidate has claim-matched provider and hosted evidence
+The b59e4ee candidate produced claim-matched provider and hosted evidence
 for isolated Preview `pr-15`, exact-stage teardown, fixed Production and a
 normal source-bound rollback/redeploy. Preview and Production both use the
 provider-owned workers.dev URL; the stable Production Worker identity is
@@ -195,13 +194,13 @@ retained through rollback and final redeploy. The teardown workflow's reviewed
 implementation SHA is recorded separately from the removed PR candidate
 because PR-close recovery intentionally executes default-branch code.
 
-This epoch does not establish custom-domain/DNS routing, a paid plan or cost,
+This historical epoch does not establish custom-domain/DNS routing, a paid plan or cost,
 byte promotion, release/publication or future availability. The report-only
 workflow's branch-bound state/provider receipt remains separate from hosted
 application proof and does not advance the automation register until a
 reviewed default-branch source readback exists.
 
-The workflow contract is intentionally narrower than the application graph:
+The workflow contract used in this historical epoch is intentionally narrower than the application graph:
 Preview and Production derive a canonical plan projection, reject unexpected
 Alchemy resources on both the initial plan and equal replan, then read back the
 exact stage, Worker, account/state identity, deployment, version and
@@ -235,6 +234,23 @@ report-only/manual signal; its 1,000-row pull-request bound fails closed when
 inventory completeness is unknown. These controls are desired-state and
 dated-receipt owners, not claims that the current branch or public domain is
 available.
+
+## 2026-08-10 current main-sourced deployment epoch
+
+The current promoted epoch is represented by the exact Preview receipt
+`docs/evidence/deployments/2026-08-10-preview-pr-24/workflow-receipt-31338052297.json`,
+the fixed Production/rollback receipt
+`docs/evidence/deployments/2026-08-10-production-prod-fef1dfc/workflow-receipt-31343392260.json`,
+the report-only receipt
+`docs/evidence/deployments/2026-08-10-orphan-inventory-main-53d936/workflow-receipt-31344401196.json`,
+and the reviewed-main teardown receipt
+`docs/evidence/deployments/2026-08-10-preview-teardown-pr-24/workflow-receipt-31350160353.json`.
+The deployment register reports four established entries. Their receipts bind
+source/input, stage, plan/configuration/lockfile, Alchemy state, provider
+Worker/version/URL and the relevant hosted or absence postconditions. These
+are dated workers.dev and report-only observations; custom-domain/DNS, billing,
+publication, release, byte-promotion and future public availability remain
+outside the claim envelope.
 
 ## Local runtime shape
 
