@@ -1622,3 +1622,13 @@ readback occurred. This is a failed/non-claim workflow receipt. The current
 correction removes those escape-dependent filters and synthetic newline output
 while preserving the timestamp-diagnostic exclusion and fail-closed unknown
 line rejection; a fresh reviewed-main run is required.
+
+The reviewed-main teardown dispatch `31349508145` at source commit
+`8a8eb6790a5e95f400977b5cb6dfe610c5613e41` reached the corrected parser and
+retained both equal delete projections. Its pre-destroy inventory readback
+agreed with the preflight state, but the freshness check compared a worker URL
+against a `providerWorkers` record that exposes only the worker name; the
+workflow stopped before destroy or absence readback. Its sanitized artifact
+is retained as a failed/non-claim receipt. The successor correction compares
+the URL on the stage resource and the name on the provider-worker record,
+then requires a fresh reviewed-main run before teardown promotion.
