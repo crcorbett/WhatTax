@@ -1,11 +1,11 @@
 ---
 document_type: execution-plan
-lifecycle: current
+lifecycle: historical
 authority: supporting
-owner: taxkit-docs-deployment-implementation-owner
+owner: taxkit-execution-history-owner
 last_reviewed: 2026-08-10
 review_trigger: DCD task transition, implementation discovery, proof result, authority stop, or rollback
-successor: null
+successor: ../../product-specs/docs-cloudflare-alchemy-deployment.md
 tombstone: false
 ---
 
@@ -24,9 +24,10 @@ qualified Cloudflare Worker artifact, isolated Preview, fixed Production,
 bounded delivery automation, and an accepted rollback path. The docs-app
 Nitro/Vercel bridge is now retired locally after parity; current claim-matched
 Preview, Production/rollback, report-only and teardown receipts are retained.
-Final lifecycle acceptance is limited to completed exact verification,
-independent review, owner acceptance and completed-plan archival; no provider
-or public-domain claim is inferred from this plan.
+All five slices are accepted at closeout candidate `c0cd1a9`. Exact repository
+verification, independent review, owner acceptance and completed-plan routing
+are recorded below; no provider or public-domain claim is inferred from this
+plan.
 
 One thread goal coordinates the whole accepted SPEC. The sibling ledger remains
 the milestone and acceptance owner.
@@ -39,7 +40,7 @@ the milestone and acceptance owner.
 | `DCD-002` | completed   | Accepted candidate `d9cb894…` passed fresh pre-deploy and pre-destroy state/provider readback, equal plans, Preview apply, the complete hosted/browser/screenshot contract, exact-stage teardown/absence, all gates and corrected-boundary independent review. |
 | `DCD-003` | completed   | Accepted after fixed Production, separately Preview-qualified successor, successor Production, restored-source rollback, provider/hosted/screenshot readback, owner reconciliation, full verification and corrected-boundary independent review. |
 | `DCD-004` | completed   | Main-sourced Preview `31338052297`, fixed Production final redeploy `31343392260`, source-bound rollback `31343236244`, report-only `31344401196`, and exact Preview teardown `31350160353` have promoted outer receipts; primary-owner acceptance and independent review are recorded in the current slice. |
-| `DCD-005` | in_progress | Committed candidate `24ce5de…` requalifies the retained Nitro mobile, motion, pending and recoverable-error oracles through the sole Cloudflare built harness; committed HGI-205 loopback isolation now makes exact repository verification green. Final independent-review/owner acceptance and active-plan archival remain. |
+| `DCD-005` | completed   | Closeout candidate `c0cd1a9…` preserves the sole Cloudflare built-harness parity receipt, exact green repository verification, both Quality checks, fresh independent review and lifecycle-acceptance receipt; the plan is archived in completed history. |
 
 ## Baseline
 
@@ -1771,9 +1772,11 @@ production Knip, and 23/23 Turbo type owners passed. The focused
 tests and 88 expectations. The earlier PID `30035` failure remains immutable
 historical evidence and is superseded as a current blocker by this bounded
 owner correction; no unrelated process was terminated and no provider state
-changed. DCD-005 now has no verification-baseline stop; lifecycle acceptance,
-fresh independent review of this implementation slice and completed-plan
-archival remain.
+changed. DCD-005 has no verification-baseline stop. The exact current
+candidate, fresh independent review and Cooper lifecycle acceptance are
+retained in
+`docs/evidence/deployments/2026-08-10-local-bridge-retirement/`; this plan now
+moves to completed history.
 
 ### 2026-08-10 — exact closeout candidate and independent review
 
@@ -1791,6 +1794,7 @@ It reviewed the exact head read-only, confirmed the four established DCD-004
 receipt/control entries, local Cloudflare parity and scoped Nitro-retirement
 audit, and found no material implementation or proof-owner blocker. The
 earlier exact-`32ea78e` `not-ready` review remains unchanged historical
-evidence. DCD-005 remains `in_progress` only for Cooper's explicit lifecycle
-acceptance and the completed-plan archival transition; no provider or hosted
-claim is added for this documentation-only candidate.
+evidence. Cooper's lifecycle acceptance is retained at
+`docs/evidence/deployments/2026-08-10-local-bridge-retirement/lifecycle-acceptance-c0cd1a9.json`;
+DCD-005 is completed and this plan moves to completed history. No provider or
+hosted claim is added for this documentation-only candidate.

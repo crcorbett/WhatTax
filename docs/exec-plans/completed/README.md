@@ -3,7 +3,7 @@ document_type: execution-plan-index
 lifecycle: historical
 authority: canonical
 owner: taxkit-execution-history-owner
-last_reviewed: 2026-07-25
+last_reviewed: 2026-08-10
 review_trigger: completed-plan retention, evidence, or successor correction
 successor: null
 tombstone: false
@@ -16,6 +16,7 @@ evidence remains useful.
 
 Completed plans:
 
+- [Docs Cloudflare and Alchemy deployment](./docs-cloudflare-alchemy-deployment.md)
 - [TaxKit docs application architecture](./docs-application-architecture.md)
 - [Repository portability and production contracts](./repository-portability-and-production-contracts.md)
 - [TaxKit hard cutover](./taxkit-hard-cutover.md)

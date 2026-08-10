@@ -2,7 +2,7 @@
   "$schema": "https://taxkit.local/schemas/product-spec-task-plan.v1.json",
   "spec": "docs/product-specs/docs-cloudflare-alchemy-deployment.md",
   "title": "Docs Cloudflare and Alchemy Deployment Tasks",
-  "status": "active",
+  "status": "completed",
   "last_reviewed": "2026-08-10",
   "principles": [
     "Deliver one complete consumer/operator outcome in each vertical slice; do not build a horizontal infrastructure or governance platform first.",
@@ -59,7 +59,7 @@
         "docs/exec-plans/active/README.md",
         "docs/exec-plans/completed/README.md"
       ],
-      "acceptance": "The proposed SPEC/tasks remain the sole current intent owner; an active plan is created only when DCD-001 starts and moves to completed history only after accepted closeout."
+      "acceptance": "The implemented SPEC/tasks remain the completed intent owner; the active plan was created when DCD-001 started and moved to completed history after accepted closeout."
     },
     {
       "surface": "dependency-manifest-lock",
@@ -764,7 +764,7 @@
     },
     {
       "id": "DCD-005",
-      "status": "in_progress",
+      "status": "completed",
       "acceptedFindingIds": [
         "TK-CF-001",
         "TK-CF-002",
@@ -871,12 +871,12 @@
       },
       "completionCriteria": [
         "Cloudflare/workerd is the sole production build-artifact oracle and all retained behavioral assertions pass.",
-        "Completion remains blocked until accepted exact-candidate Preview, Production, teardown and normal rollback receipts exist; current main-sourced receipts for all four automation classes are retained, while final parity, lifecycle and independent-review acceptance remain the closeout gates.",
+        "Accepted exact-candidate Preview, Production, teardown and normal rollback receipts exist; current main-sourced receipts for all four automation classes are retained, and final parity, lifecycle and independent-review acceptance are recorded in the closeout evidence.",
         "All required screenshot manifests are candidate-bound, reviewed and supplemental.",
         "Docs-app Nitro/Vercel and .vercel/.output assumptions are absent from live executable owners; independent apps/web Nitro/output ownership is explicitly preserved.",
         "Runbook, authority, automation, architecture, READMEs and evidence agree without duplicated procedure prose.",
         "Historical evidence remains unchanged and future custom-domain work remains a non-goal.",
-        "Cooper accepts implementation before lifecycle is marked implemented and the active plan moves to completed."
+        "Cooper's lifecycle acceptance is recorded at docs/evidence/deployments/2026-08-10-local-bridge-retirement/lifecycle-acceptance-c0cd1a9.json, and the active plan moves to completed history."
       ],
       "commitAfterPassing": true
     }

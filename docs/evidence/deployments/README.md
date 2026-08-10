@@ -547,7 +547,19 @@ confirms DCD-004's four established automation receipts and five controls,
 the local Cloudflare parity/retirement audit, focused gates and exact
 verification, with no material implementation or proof-owner blocker. The
 prior `independent-review-32ea78e.json` remains immutable historical evidence
-for the earlier `not-ready` candidate. DCD-005 remains `in_progress` only for
-Cooper's explicit lifecycle acceptance and active-plan archival; this receipt
-does not add a new provider, hosted, public-availability, custom-domain, DNS,
-release or publication claim.
+for the earlier `not-ready` candidate. At that review point DCD-005 was still
+`in_progress` pending lifecycle acceptance and archival; the successor
+`c0cd1a9` acceptance is recorded below. This receipt does not add a new
+provider, hosted, public-availability, custom-domain, DNS, release or
+publication claim.
+
+## 2026-08-10 DCD-005 lifecycle acceptance
+
+The product-owner lifecycle acceptance for closeout candidate `c0cd1a9` is
+retained at
+`2026-08-10-local-bridge-retirement/lifecycle-acceptance-c0cd1a9.json`.
+It accepts the completed DCD-005 implementation and active-plan archival after
+exact verification, green remote Quality, fresh independent review, and
+claim-matched DCD-004 receipts. It preserves the exact source/candidate
+identities of existing provider and hosted evidence and adds no new deployment
+or public-availability claim.

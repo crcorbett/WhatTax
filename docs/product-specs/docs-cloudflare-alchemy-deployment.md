@@ -1,6 +1,6 @@
 ---
 document_type: product-spec
-lifecycle: proposed
+lifecycle: implemented
 authority: supporting
 owner: taxkit-product-owner
 last_reviewed: 2026-08-10
@@ -26,7 +26,7 @@ A custom domain is a future successor. It must attach to the same Production
 Worker identity and must not block or redefine the initial deployment
 contract.
 
-This SPEC remains proposed implementation intent until all five slices close.
+This SPEC is implemented after all five slices closed in dependency order.
 DCD-002 dated evidence now establishes the sanitized Cloudflare account and
 Workers subdomain identities, one exact-candidate Alchemy/Worker/assets
 Preview requalification at candidate `d9cb894…`, including exact
@@ -37,9 +37,9 @@ repository gates and fresh independent corrected-boundary review. That
 evidence does not establish a paid plan, future cost, Production deployment,
 public-domain availability, rollback, release, publication or DNS state.
 Implementation began from reviewed commit
-`96a825cebd22798044678389851be6ee9154d1df`; the
-[active execution plan](../exec-plans/active/docs-cloudflare-alchemy-deployment.md)
-records current progress and authority stops.
+`96a825cebd22798044678389851be6ee9154d1df`; the completed
+[execution plan](../exec-plans/completed/docs-cloudflare-alchemy-deployment.md)
+retains the implementation history, authority stops and closeout evidence.
 
 The 2026-08-02 manual evidence epoch supersedes those earlier non-claims for
 its own dated candidate only: candidate `aabe7b6…` was Preview-deployed,
@@ -177,9 +177,18 @@ That report proves state/provider agreement and no mutation/deletion
 capability. Preview, Production, report-only and exact-stage teardown are now
 established in the automation register through their separate current
 receipts; the failed runs `31343533595` and `31343687718` remain historical
-non-claims. DCD-004 is completed and DCD-005 is in progress for final parity,
-lifecycle and archival acceptance; no custom-domain/DNS, billing, release,
-publication, byte-promotion or public-domain claim is made.
+non-claims. DCD-004 and DCD-005 are completed at the accepted closeout
+candidate `c0cd1a9…`; no custom-domain/DNS, billing, release, publication,
+byte-promotion or public-domain claim is made.
+
+The accepted closeout is recorded at
+`docs/evidence/deployments/2026-08-10-local-bridge-retirement/lifecycle-acceptance-c0cd1a9.json`.
+Candidate `c0cd1a9…` is a documentation/evidence successor of the reviewed
+implementation candidate and preserves the frozen deployment inputs and all
+source-bound provider/hosted receipts. Exact repository verification and both
+Quality checks passed, and the fresh independent review at
+`independent-review-7deaf12.json` found no material implementation or
+proof-owner blocker. The execution plan is retained in completed history.
 
 ## Target and comparative evidence
 
@@ -345,10 +354,11 @@ freshness readback, post-destroy state/Worker absence and former workers.dev
 URL `404` readback. Its outer receipt is
 `docs/evidence/deployments/2026-08-10-preview-teardown-pr-24/workflow-receipt-31350160353.json`.
 The four automation entries are now established for their separate claims;
-the failed beta.64 teardown runs remain historical non-claims. DCD-005 still
-requires the final parity, lifecycle and independent-review acceptance before
-the implementation is closed. Custom-domain/DNS, billing, release,
-publication, byte-promotion and future-provider-state claims remain excluded.
+the failed beta.64 teardown runs remain historical non-claims. DCD-004 and
+DCD-005 are completed after the final parity, lifecycle and independent-review
+acceptance recorded in the closeout evidence. Custom-domain/DNS, billing,
+release, publication, byte-promotion and future-provider-state claims remain
+excluded.
 
 The workflow receipt boundary is strict. Raw hosted output is retained only as
 diagnostic artifact material; the promoted receipt is filtered to the
@@ -983,9 +993,10 @@ harness. Its dated local receipt records passing mobile navigation disclosure,
 reduced-motion suppression, pending navigation and recoverable source-error
 rendering in addition to the existing SSR, assets, hydration, navigation,
 server-function, 404, accessibility, focus, console, runtime, filesystem and
-limit oracles. The final DCD-005 lifecycle gate still requires primary-owner
-acceptance, active-plan archival and the final parity/authority review; those
-are lifecycle decisions, not missing browser assertions.
+limit oracles. The final DCD-005 lifecycle gate is satisfied by the
+primary-owner acceptance, active-plan archival and final parity/authority
+review retained in the closeout evidence; those are lifecycle records, not
+missing browser assertions.
 
 Disconfirming evidence is a Cloudflare path that cannot reproduce an accepted
 SSR, server-function, navigation, accessibility, error or lifecycle behavior
@@ -1004,10 +1015,10 @@ runbook owns exact procedures; code/config/Schemas/workflows own desired state;
 dated receipts own provider observations; and this SPEC/tasks own active
 intent. Retire duplicated procedure prose after the runbook owns it.
 
-Implementation begins only after an active execution plan is created and
-routed from `docs/exec-plans/active/README.md`. On accepted completion, move
-that plan to completed history and update SPEC/task/index lifecycle. This
-draft creates no active plan.
+Implementation began only after an active execution plan was created and
+routed from `docs/exec-plans/active/README.md`. On accepted completion, that
+plan moved to completed history and the SPEC/task/index lifecycle was updated;
+this implemented SPEC has no active plan.
 
 ## Current and target trees
 
