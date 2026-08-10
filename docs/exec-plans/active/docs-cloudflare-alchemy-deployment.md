@@ -1570,10 +1570,22 @@ environment remains reviewer-gated/manual and is not unattended scheduling.
 The automation register now establishes Preview, Production and report-only.
 
 Preview teardown runs `31343533595` and `31343687718` read the exact stage and
-Worker and produced the expected two-resource delete projection, but the
-pinned Alchemy beta.64 dry-run returned non-zero before destroy. No absence
-receipt exists and no destructive retry is admitted. DCD-004 therefore remains
+Worker and produced the expected two-resource delete projection. The pinned
+Alchemy beta.64 direct dry-run emitted both expected delete lines and reached
+the subsequent read-only pre-destroy inventory, which returned non-zero with
+no stderr. No destroy or absence receipt exists and no destructive retry is
+admitted. DCD-004 therefore remains
 `in_progress`, DCD-005 remains `pending`, and all current provider claims are
 limited to the named workers.dev observations. This event supersedes earlier
 plan prose that described Production/report-only as unestablished while
 preserving those earlier receipts as historical evidence.
+
+The next correction retries each read-only inventory readback at most twice
+only after an empty-diagnostic process exit, with the same five-second bounded
+delay as the existing Alchemy dry-run retry. Alchemy beta.64's HTTP state
+client remains the transport retry owner; non-empty Schema, disagreement or
+provider diagnostics stop immediately. The workflow retains redacted stderr
+and per-attempt exit metadata and never retries or admits a destroy after a
+failed readback. This is a bounded runner/process correction, not evidence
+that the prior teardown reached provider absence; a fresh reviewed-main run
+is required before updating the teardown automation entry.

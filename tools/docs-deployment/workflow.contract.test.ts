@@ -139,6 +139,11 @@ describe("docs deployment workflow admission", () => {
     expect(teardown).toContain("CLOUDFLARE_API_TOKEN");
     expect(teardown).toContain("provider-inventory-before.json");
     expect(teardown).toContain("provider-inventory-pre-destroy.json");
+    expect(teardown).toContain("provider-inventory-pre-destroy.stderr.txt");
+    expect(teardown).toContain("provider-inventory-pre-destroy.attempts.txt");
+    expect(teardown).toContain("read_inventory");
+    expect(teardown).toContain("inventory_status");
+    expect(teardown).toContain("stderr_bytes");
     expect(teardown).toContain("stage_count_before");
     expect(teardown).toContain("unexpected_destroy_resources");
     expect(teardown).toContain("dry_run_status");
