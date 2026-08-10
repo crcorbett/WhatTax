@@ -1732,3 +1732,13 @@ DCD-005 `not-ready`, and reconciled the local parity, current-owner, focused
 gate, verification-baseline and lifecycle findings. DCD-005 remains open until
 the exact verification result is resolved or explicitly admitted by Cooper,
 Cooper's lifecycle acceptance is recorded, and the completed plan is archived.
+
+The successor documentation-only candidate `e43afa814dd431fdd1f946c309dafc99c31e07d4`
+was rerun with the exact `bun run verification` command on 2026-08-10. It
+reached the same preceding owners and failed only at HGI-205 because unrelated
+PID `30035` from another checkout still owned `127.0.0.1:4173`; the observed
+output was `Failed to start server. Is port 4173 in use?` followed by the
+health-check timeout. GitHub Quality push run `31352338774` and pull-request
+run `31352341451` both passed for this exact candidate, but neither replaces the
+failed full-verification owner. The result remains a non-green, exact-candidate
+baseline observation; no TaxKit process was killed and no provider state changed.

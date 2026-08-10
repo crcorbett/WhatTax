@@ -479,3 +479,21 @@ confirms DCD-004 readiness and local parity, but records DCD-005 as
 `not-ready` until the exact verification result and Cooper's lifecycle
 acceptance are reconciled. It is a review receipt, not provider or publication
 proof.
+
+## 2026-08-10 successor verification readback (`e43afa8`)
+
+The documentation-only successor candidate
+`e43afa814dd431fdd1f946c309dafc99c31e07d4` reran the exact `bun run
+verification` command. Every owner before HGI-205 passed; HGI-205 then failed
+because unrelated PID `30035` from another checkout owned
+`127.0.0.1:4173`, producing `Failed to start server. Is port 4173 in use?`
+and the expected `/api/health` timeout. This is the exact current candidate's
+non-green baseline result, not a waived or successful verification claim.
+
+The exact candidate's GitHub Quality push run `31352338774` and pull-request
+run `31352341451` both succeeded. Remote Quality and focused deployment gates
+therefore pass, while DCD-005 remains open pending either release of the fixed
+port and a green exact-candidate verification rerun or Cooper's explicit
+acceptance of this named baseline exception, followed by lifecycle acceptance
+and completed-plan archival. No process was terminated and no provider state or
+credential was changed by this readback.
