@@ -172,7 +172,7 @@ jobs:
               printf 'alchemy destroy --dry-run exit=%s attempt=%s\n' "$dry_run_status" "$attempt" >&2
               exit "$dry_run_status"
             fi
-            destroy_resource_lines="$(sed -E $'s/\\033\\[[0-9;]*m//g' "$RUNNER_TEMP/docs-deployment/destroy-${attempt}.txt" | grep -E '^\\[[^]]+\\] ' || true)"
+            destroy_resource_lines="$(sed -E $'s/\\033\\[[0-9;]*m//g' "$RUNNER_TEMP/docs-deployment/destroy-${attempt}.txt" | grep -Ev '^\\[[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]+)?\\] [A-Z]+ ' | grep -E '^\\[[^]]+\\] ' || true)"
             unexpected_destroy_resources="$(printf '%s\\n' "$destroy_resource_lines" | grep -Ev '^\\[(DocsBuild|DocsWebsite)\\] (delete|noop)$' || true)"
             test -z "$unexpected_destroy_resources"
             printf '%s\\n' "$destroy_resource_lines" | grep -E '^\\[(DocsBuild|DocsWebsite)\\] delete$' > "$RUNNER_TEMP/docs-deployment/destroy-${attempt}.resources.txt" || true

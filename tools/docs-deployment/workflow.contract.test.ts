@@ -146,6 +146,9 @@ describe("docs deployment workflow admission", () => {
     expect(teardown).toContain("stderr_bytes");
     expect(teardown).toContain("stage_count_before");
     expect(teardown).toContain("unexpected_destroy_resources");
+    expect(teardown).toContain(
+      String.raw`grep -Ev '^\\[[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]+)?\\] [A-Z]+ '`
+    );
     expect(teardown).toContain("dry_run_status");
     expect(teardown).toContain(
       "ALCHEMY_TELEMETRY_DISABLED=1 ALCHEMY_PLAIN=1 CI=1 bun node_modules/alchemy/bin/alchemy.ts destroy --dry-run"

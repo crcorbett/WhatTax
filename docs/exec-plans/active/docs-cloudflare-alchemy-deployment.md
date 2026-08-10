@@ -1589,3 +1589,14 @@ and per-attempt exit metadata and never retries or admits a destroy after a
 failed readback. This is a bounded runner/process correction, not evidence
 that the prior teardown reached provider absence; a fresh reviewed-main run
 is required before updating the teardown automation entry.
+
+The reviewed-main teardown dispatch `31347119364` used candidate and source
+commit `d0498b01c59e8d4796b00b6e6274a44ae485d739` for closed PR #24. Its
+provider inventory readback succeeded and the pinned beta.64 dry-run emitted
+the expected two delete lines, but the workflow's generic bracket-line parser
+mistook Alchemy's timestamped warning (`[time] WARN ...`) for an unexpected
+resource and stopped before the second equal dry-run, destroy or absence
+readback. The sanitized failure artifact is retained at the run URL and is a
+failed/non-claim receipt. The parser correction ignores only recognized
+timestamped uppercase diagnostics and continues to reject all other unknown
+bracketed action/resource lines; a fresh reviewed-main run is required.
