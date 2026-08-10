@@ -1,6 +1,6 @@
 ---
 status: canonical
-last_reviewed: 2026-05-23
+last_reviewed: 2026-08-10
 source_of_truth: package-readme
 confidence: medium
 ---
@@ -100,7 +100,7 @@ process serves the current public API contract:
 bun run --filter=api smoke:public-routes
 ```
 
-The command starts `apps/api` at `http://127.0.0.1:4173`, waits for
+The command starts `apps/api` at `http://127.0.0.1:4173` by default, waits for
 `GET /api/health`, calls the public calculator metadata route, posts one
 take-home-pay calculation and reads the generated OpenAPI document. It then
 creates a temp consumer workspace outside the repo, writes a dependency-free
@@ -118,6 +118,10 @@ lets the app process stop through Effect-scoped child process cleanup on
 success or failure. The external consumer checks minimal public JSON evidence;
 canonical route schema validation stays in this repo-owned smoke script. The
 temp workspace is removed on success and failure.
+
+When the default loopback port is occupied, set `TAXKIT_API_SMOKE_PORT` to an
+available port. The isolated release-boundary harness uses this override so a
+neighbouring local development server cannot change its failure oracle.
 
 Use the failure simulation when you need deterministic cleanup evidence for a
 downstream consumer failure:

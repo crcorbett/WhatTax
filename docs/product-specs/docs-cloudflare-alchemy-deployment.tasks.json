@@ -806,7 +806,7 @@
         "final accepted workerd, Preview, Production, teardown absence and rollback receipts, with report-only remaining report-only",
         "final bounded screenshot manifests and retained mismatches/failures",
         "final architecture/runbook/authority/control/README/evidence alignment",
-        "dated owner-bound HGI-205 fixed-port verification exception with exact failed command, listener identity, recovery and no-green non-claim",
+        "bounded HGI-205 release-boundary loopback isolation with a Schema-validated TAXKIT_API_SMOKE_PORT override, ephemeral-port reservation and preserved historical collision evidence",
         "implemented SPEC/tasks and completed execution plan after explicit acceptance",
         "explicit future custom-domain successor/non-goal"
       ],
@@ -844,6 +844,7 @@
         "verify all applicable screenshot manifests and image digests",
         "rg audit proving no docs-app Nitro import, Vercel preset, .vercel/output, .output or duplicated deployment procedure remains, with any remaining apps/web Nitro/output owner explicitly preserved",
         "bun run test:quality-workflow",
+        "bun test tools/quality-workflow/release-boundary.test.ts",
         "bun run check:quality-workflow",
         "bun run test:skills",
         "bun run check:docs",
