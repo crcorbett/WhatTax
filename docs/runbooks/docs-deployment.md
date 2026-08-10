@@ -187,9 +187,14 @@ projection records `noop` for both logical resources and performs no destroy;
 when both exact `DocsBuild` and `DocsWebsite` resources exist, it records equal
 `delete` actions, destroys only that `pr-N` stage, and requires absence readback.
 The workflow retries each dry-run at most twice after a non-zero Alchemy exit,
-with a five-second bounded delay; it proceeds only after a zero exit and equal
-sanitized resource projection. A final non-zero exit is a stop receipt, not
-permission to destroy, and retains only redacted stderr diagnostics.
+with a five-second bounded delay, and retries each read-only inventory
+readback at most twice only when the inventory process exits with empty
+diagnostics. The installed Alchemy HTTP state client remains the transport
+retry owner; non-empty Schema, disagreement or provider-read errors stop
+immediately. Teardown proceeds only after a zero exit and equal sanitized
+resource projection plus a successful exact-stage freshness readback. A final
+non-zero Alchemy or inventory exit is a stop receipt, not permission to
+destroy, and retains redacted stderr plus per-attempt exit metadata.
 This bootstrap exception and no-op postcondition do not establish workflow,
 hosted or teardown success until a default-branch run retains its dated,
 candidate-bound receipts. The current automation register remains
