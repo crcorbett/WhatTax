@@ -512,3 +512,21 @@ for `aa1bda1`. DCD-005 therefore remains open pending release of the fixed port
 and a green rerun, or Cooper's explicit acceptance of this exact-candidate
 baseline exception, followed by lifecycle acceptance and completed-plan
 archival. No process was terminated and no provider state changed.
+
+## 2026-08-10 HGI-205 loopback isolation and verification
+
+Commit `7bccb73a19d43b69610374cae6e8e3ff00d74790` adds a bounded
+`TAXKIT_API_SMOKE_PORT` override to the API smoke owner, decodes it with the
+existing API configuration Schema, preserves `4173` as the default and makes
+the isolated HGI-205 fixture reserve an ephemeral loopback port. The API smoke
+command was exercised on an alternate port with all public routes and the
+external consumer passing.
+
+The exact committed candidate's `bun run verification` passed every owner,
+including HGI-205 (`12` tests, `88` expectations), production Knip and all
+`23/23` Turbo type tasks. The prior PID `30035`/4173 failure remains immutable
+historical evidence and is no longer a current verification blocker. This
+correction changes only test-harness port isolation and its README/task
+ownership; it makes no provider, credential, DNS, publication or API-route
+claim. DCD-005 now awaits only fresh independent review, Cooper's lifecycle
+acceptance and completed-plan archival.

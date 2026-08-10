@@ -24,7 +24,7 @@ qualified Cloudflare Worker artifact, isolated Preview, fixed Production,
 bounded delivery automation, and an accepted rollback path. The docs-app
 Nitro/Vercel bridge is now retired locally after parity; current claim-matched
 Preview, Production/rollback, report-only and teardown receipts are retained.
-Final lifecycle acceptance is limited to the documented verification baseline,
+Final lifecycle acceptance is limited to completed exact verification,
 independent review, owner acceptance and completed-plan archival; no provider
 or public-domain claim is inferred from this plan.
 
@@ -39,7 +39,7 @@ the milestone and acceptance owner.
 | `DCD-002` | completed   | Accepted candidate `d9cb894…` passed fresh pre-deploy and pre-destroy state/provider readback, equal plans, Preview apply, the complete hosted/browser/screenshot contract, exact-stage teardown/absence, all gates and corrected-boundary independent review. |
 | `DCD-003` | completed   | Accepted after fixed Production, separately Preview-qualified successor, successor Production, restored-source rollback, provider/hosted/screenshot readback, owner reconciliation, full verification and corrected-boundary independent review. |
 | `DCD-004` | completed   | Main-sourced Preview `31338052297`, fixed Production final redeploy `31343392260`, source-bound rollback `31343236244`, report-only `31344401196`, and exact Preview teardown `31350160353` have promoted outer receipts; primary-owner acceptance and independent review are recorded in the current slice. |
-| `DCD-005` | in_progress | Committed candidate `24ce5de…` now requalifies the retained Nitro mobile, motion, pending and recoverable-error oracles through the sole Cloudflare built harness; final parity/lifecycle acceptance, active-plan archival and closeout evidence remain. |
+| `DCD-005` | in_progress | Committed candidate `24ce5de…` requalifies the retained Nitro mobile, motion, pending and recoverable-error oracles through the sole Cloudflare built harness; committed HGI-205 loopback isolation now makes exact repository verification green. Final independent-review/owner acceptance and active-plan archival remain. |
 
 ## Baseline
 
@@ -1751,3 +1751,26 @@ than relying on the e43 predecessor; the aa1 push and pull-request Quality
 runs `31352729103` and `31352732147` both passed. DCD-005 remains open until
 the port is released for a green rerun or Cooper explicitly admits this
 exact-candidate baseline, followed by lifecycle acceptance and archival.
+
+### 2026-08-10 — HGI-205 loopback isolation and exact verification
+
+The bounded harness correction was committed as
+`7bccb73a19d43b69610374cae6e8e3ff00d74790`. The API smoke owner now decodes
+`TAXKIT_API_SMOKE_PORT` through the existing `ApiServerConfigSourceSchema`,
+retaining `4173` as the documented default. The isolated HGI-205 test reserves
+an ephemeral loopback port with Bun and passes it only to the API-contract
+fixture, so another local development server cannot change the failure oracle.
+The app README, task ledger and test owner are synchronized; no API route or
+package publication contract changed.
+
+The exact `bun run verification` command passed on this committed candidate:
+all repository, governance, docs, runbook, deployment, automation, 44-test
+deployment, lint, formatting, 21-test skill, 12-test Quality, development and
+production Knip, and 23/23 Turbo type owners passed. The focused
+`bun test tools/quality-workflow/release-boundary.test.ts` also passed with 12
+tests and 88 expectations. The earlier PID `30035` failure remains immutable
+historical evidence and is superseded as a current blocker by this bounded
+owner correction; no unrelated process was terminated and no provider state
+changed. DCD-005 now has no verification-baseline stop; lifecycle acceptance,
+fresh independent review of this implementation slice and completed-plan
+archival remain.
