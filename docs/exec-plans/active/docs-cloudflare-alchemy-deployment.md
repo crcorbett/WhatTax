@@ -22,9 +22,11 @@ Task list:
 Implement `DCD-001` through `DCD-005` sequentially so the docs app has a
 qualified Cloudflare Worker artifact, isolated Preview, fixed Production,
 bounded delivery automation, and an accepted rollback path. The docs-app
-Nitro/Vercel bridge is now retired locally after parity; final lifecycle
-acceptance still requires claim-matched hosted requalification and the
-report-only state boundary.
+Nitro/Vercel bridge is now retired locally after parity; current claim-matched
+Preview, Production/rollback, report-only and teardown receipts are retained.
+Final lifecycle acceptance is limited to the documented verification baseline,
+independent review, owner acceptance and completed-plan archival; no provider
+or public-domain claim is inferred from this plan.
 
 One thread goal coordinates the whole accepted SPEC. The sibling ledger remains
 the milestone and acceptance owner.

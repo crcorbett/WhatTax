@@ -622,21 +622,21 @@ requires `preview` with `pr-N` for Preview, `production` or `rollback` with
 `prod` for Production, and exactly one desktop plus one mobile screenshot whose
 retained PNG bytes hash to the manifest.
 
-The current register records the main-sourced Preview entry as `established`
-after its complete receipt contract was satisfied; Production, Preview teardown
-and report-only remain `not-established` until each has its own complete
-receipt contract.
+The current register records four established entries after their separate
+receipt contracts were satisfied: main-sourced Preview, fixed Production with
+normal rollback, exact-stage Preview teardown and report-only inventory. Each
+receipt remains candidate/source-bound; a later workflow, provider,
+environment, credential or deployment-input change requires fresh promotion.
 The read-only reconciler is governed by the separate
 `docs-workflow-receipt-reconciliation` control; it does not add provider
 authority or a fifth mutation automation.
 The 2026-08-04 capability receipt records the exact protected environment
 identities and redacted narrow credential readback; the current workflow epoch
-below records successful mutation-class runs, while the report-only state
-boundary remains unresolved. Do not create an unprotected or empty
-environment, copy the broad local OAuth credential into GitHub, or invent an
-unexecuted command merely to advance the task. Continue to use this manual
-runbook under the exact authority envelope until every required workflow
-receipt and read-only state boundary is retained.
+below records the successful mutation and report-only runs. Do not create an
+unprotected or empty environment, copy the broad local OAuth credential into
+GitHub, or invent an unexecuted command merely to advance the task. Continue to
+use this manual runbook under the exact authority envelope; the dated receipts
+below are observations, not timeless provider or public-domain availability.
 
 For a future positive report-only admission, the outer workflow receipt must
 name a dedicated `reportPath` decoded as
