@@ -36,8 +36,8 @@ the milestone and acceptance owner.
 | `DCD-001` | completed   | Accepted at `669a8f3…` after exact dependency/integrity readback, both built-app oracles, docs-maintainer reconciliation, focused Changeset, independent closure, and all change-owned gates. |
 | `DCD-002` | completed   | Accepted candidate `d9cb894…` passed fresh pre-deploy and pre-destroy state/provider readback, equal plans, Preview apply, the complete hosted/browser/screenshot contract, exact-stage teardown/absence, all gates and corrected-boundary independent review. |
 | `DCD-003` | completed   | Accepted after fixed Production, separately Preview-qualified successor, successor Production, restored-source rollback, provider/hosted/screenshot readback, owner reconciliation, full verification and corrected-boundary independent review. |
-| `DCD-004` | in_progress | Main-sourced Preview `31338052297`, fixed Production final redeploy `31343392260`, source-bound rollback `31343236244` and report-only `31344401196` now have promoted outer receipts; Preview teardown runs `31343533595`/`31343687718` still stop at the pinned beta.64 dry-run before destroy, so teardown absence remains open. |
-| `DCD-005` | pending     | Docs-app bridge-retirement implementation is present and locally qualified at `d649a14…`; current main-sourced Preview/Production/rollback/report-only receipts are retained, but DCD-005 waits for exact teardown absence, final parity review, fresh independent review and complete closeout evidence. |
+| `DCD-004` | in_progress | Main-sourced Preview `31338052297`, fixed Production final redeploy `31343392260`, source-bound rollback `31343236244`, report-only `31344401196`, and exact Preview teardown `31350160353` now have promoted outer receipts; final owner acceptance and closeout review remain. |
+| `DCD-005` | pending     | Docs-app bridge-retirement implementation is present and locally qualified at `d649a14…`; current main-sourced Preview/Production/rollback/report-only and exact teardown receipts are retained, but final parity review, fresh independent review and complete closeout evidence remain. |
 
 ## Baseline
 
@@ -1632,3 +1632,28 @@ workflow stopped before destroy or absence readback. Its sanitized artifact
 is retained as a failed/non-claim receipt. The successor correction compares
 the URL on the stage resource and the name on the provider-worker record,
 then requires a fresh reviewed-main run before teardown promotion.
+
+### 2026-08-10 — main-sourced Preview teardown promotion
+
+The reviewed-main teardown dispatch `31350160353` used candidate and source
+SHA `31212c48b873113c1bf854fd648f14562bd2fb96` for closed PR #24. The
+completion reconciler `31350243582` API-read the completed source run and
+matching artifact. The durable receipt is
+`docs/evidence/deployments/2026-08-10-preview-teardown-pr-24/workflow-receipt-31350160353.json`.
+
+The workflow retained two equal `preview-destroy` projections with exactly
+`DocsBuild` and `DocsWebsite` deletes, performed a final state/Worker freshness
+readback, destroyed only `pr-24`, and read back state-stage absence, Worker
+absence and HTTP 404 for the former workers.dev URL. The receipt binds the
+reviewed source/run/input, account, `cloudflare-http` state store, stage,
+plan/config/deployment/lockfile identities and former Worker identity. The
+reconciler artifact retains the API readback and sanitized workflow files; no
+secret value is retained.
+
+The earlier teardown runs `31343533595`, `31343687718`, `31347119364`,
+`31347842707`, `31348538146` and `31349508145` remain immutable failed,
+non-claim observations. The automation register now has four established
+entries. DCD-004 remains `in_progress` pending primary-owner and independent
+closeout review; DCD-005 remains `pending` pending the final parity and
+lifecycle review. No custom-domain/DNS, billing, release, publication,
+byte-promotion or future-provider-state claim is made.

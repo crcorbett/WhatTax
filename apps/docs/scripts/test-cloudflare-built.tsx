@@ -8,7 +8,9 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import { Effect, Record as EffectRecord, Schema } from "effect";
 import { chromium } from "playwright";
 import type { Browser, Page } from "playwright";
+import { renderToStaticMarkup } from "react-dom/server";
 
+import { DocsRecoverableError } from "../src/components/docs-route-states";
 import {
   docsWorkerCompatibilityDate,
   docsWorkerCompatibilityFlags,
@@ -23,6 +25,15 @@ const serverRoot = new URL("server/", builtRoot);
 const workerSizeLimitBytes = 3 * 1024 * 1024;
 const knownPath = "/guides/calculate-australian-take-home-pay";
 const missingPath = "/__docs-evidence__/missing";
+const delayedPageLoad = {
+  delayMs: 800,
+  path: knownPath,
+  visiblePostcondition: "Loading documentation",
+} as const;
+const recoverableSourceError = {
+  message: "The documentation source could not be loaded.",
+  visiblePostcondition: "Docs page is unavailable",
+} as const;
 const runtimeProofHeaders = {
   "x-taxkit-docs-runtime-proof": "construction-count",
 };
@@ -722,6 +733,104 @@ try {
     true
   );
 
+  await page.setViewportSize({ height: 844, width: 390 });
+  await page.goto(`${origin}${knownPath}`, { waitUntil: "networkidle" });
+  const navigationToggle = page.getByRole("button", {
+    name: "Open navigation",
+  });
+  await navigationToggle.click();
+  assert.equal(
+    await page
+      .getByRole("button", { name: "Close navigation" })
+      .getAttribute("aria-expanded"),
+    "true"
+  );
+  await page
+    .getByRole("navigation", { name: "Documentation" })
+    .getByRole("link", { name: "Calculate Australian take-home pay" })
+    .waitFor();
+  await assertComputedContrast(page, ".docs-nav-toggle", ".docs-nav-toggle");
+
+  await page.setViewportSize({ height: 1000, width: 1440 });
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto(`${origin}${knownPath}`, { waitUntil: "networkidle" });
+  const motionStyles = await page
+    .locator(
+      ".docs-page-layout, .docs-nav, .docs-nav-toggle, .docs-article, .docs-route-state"
+    )
+    .evaluateAll((elements) =>
+      elements.map((element) => {
+        const style = getComputedStyle(element);
+
+        return {
+          animationName: style.animationName,
+          transitionDuration: style.transitionDuration,
+        };
+      })
+    );
+  assert.ok(
+    motionStyles.length > 0 &&
+      motionStyles.every(
+        (style) =>
+          style.animationName === "none" && style.transitionDuration === "0s"
+      ),
+    "The docs UI must not depend on visually relevant motion."
+  );
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+
+  await page.goto(`${origin}/start`, { waitUntil: "networkidle" });
+  const pendingDocumentBaseline = documentRequests;
+  await page.route("**/*", async (route) => {
+    const resourceType = route.request().resourceType();
+
+    if (resourceType === "fetch" || resourceType === "xhr") {
+      await Bun.sleep(delayedPageLoad.delayMs);
+    }
+
+    await route.continue();
+  });
+  const pendingNavigation = page.evaluate(async (path) => {
+    const router: unknown = Reflect.get(globalThis, "__TSR_ROUTER__");
+
+    if (typeof router !== "object" || router === null) {
+      throw new Error("The hydrated TanStack router was unavailable.");
+    }
+
+    const navigate: unknown = Reflect.get(router, "navigate");
+
+    if (typeof navigate !== "function") {
+      throw new TypeError(
+        "The hydrated TanStack navigate operation was unavailable."
+      );
+    }
+
+    await Reflect.apply(navigate, router, [{ to: path }]);
+  }, delayedPageLoad.path);
+  await page.getByTestId("route-pending").waitFor();
+  await page
+    .getByRole("heading", { name: delayedPageLoad.visiblePostcondition })
+    .waitFor();
+  await assertComputedContrast(page, ".docs-route-state p", ":root");
+  await pendingNavigation;
+  await page.unroute("**/*");
+  await page
+    .getByRole("heading", {
+      name: "Calculate Australian take-home pay",
+    })
+    .waitFor();
+  assert.equal(documentRequests, pendingDocumentBaseline);
+
+  const recoverableMarkup = renderToStaticMarkup(
+    <DocsRecoverableError
+      message={recoverableSourceError.message}
+      onRetry={() => false}
+    />
+  );
+  assert.match(
+    recoverableMarkup,
+    new RegExp(recoverableSourceError.visiblePostcondition, "u")
+  );
+
   assert.deepEqual(diagnostics, []);
 
   const sourceCommitOutput = await runProcess(
@@ -778,6 +887,10 @@ try {
       consoleAndPageErrors: "passed",
       directNotFound: "passed",
       hydration: "passed",
+      mobileNavigationDisclosure: "passed",
+      pendingNavigation: "passed",
+      recoverableError: "passed",
+      reducedMotion: "passed",
       serverFunctionTransport: "passed",
       ssr: "passed",
     },

@@ -658,7 +658,7 @@
         "require accepted_preview_pr_number, the Preview workflow path and exact deterministic pr-N stage binding; reject a valid-looking receipt from another workflow or stage",
         "reject unexpected action/resource lines on every equal replan and emit a separate Schema-decoded teardown absence readback with exact stage and Worker postconditions",
         "bind external receipts to the automation-specific stage (Preview pr-N, Production/rollback prod, teardown pr-N), reject deploy projections containing deletes, cross-check teardown config/deployment/lockfile and plan self-path, and reject hidden receipts on not-established entries",
-        "retain the dated manual and current protected Preview/Production/rollback receipts as provider evidence; the current main-sourced report-only receipt establishes only the report-only automation entry and Preview teardown remains separately gated",
+        "retain the dated manual and current protected Preview/Production/rollback/teardown receipts as provider evidence; the current main-sourced report-only and exact Preview teardown receipts establish only their separate automation entries and do not widen any claim",
         "allow one source-bound default-branch bootstrap dispatch after the reviewed workflow lands on main because GitHub cannot dispatch a workflow file that exists only on a pull-request branch; bind the merged PR head and deterministic pr-N stage exactly, then require an open trusted draft PR for every later Preview dispatch",
         "read the live pull request and require closed state, main base and same-repository head for both automatic and manual teardown dispatches; reject create/update actions on teardown projections",
         "make PR-close teardown convergent: an absent exact stage produces an equal noop projection and no destroy, while an existing stage requires equal delete plans and exact absence readback",
@@ -681,6 +681,7 @@
         "one current main-sourced Preview outer receipt at docs/evidence/deployments/2026-08-10-preview-pr-24/workflow-receipt-31338052297.json",
         "one current main-sourced Production outer receipt at docs/evidence/deployments/2026-08-10-production-prod-fef1dfc/workflow-receipt-31343392260.json, with its source-bound rollback receipt nested under the same route",
         "one current main-sourced report-only orphan inventory receipt at docs/evidence/deployments/2026-08-10-orphan-inventory-main-53d936/workflow-receipt-31344401196.json, with the branch-bound success retained at docs/evidence/deployments/2026-08-09-orphan-inventory/report-31319845724.json",
+        "one current main-sourced Preview teardown absence receipt at docs/evidence/deployments/2026-08-10-preview-teardown-pr-24/workflow-receipt-31350160353.json, with failed beta.64 dry-run observations retained unchanged",
         "synchronized SPEC/tasks/active plan with exact invocations and observed concurrency semantics"
       ],
       "authorityAndStops": {
@@ -866,7 +867,7 @@
       },
       "completionCriteria": [
         "Cloudflare/workerd is the sole production build-artifact oracle and all retained behavioral assertions pass.",
-        "Completion remains blocked until accepted exact-candidate Preview, Production, teardown and normal rollback receipts exist; current main-sourced Production/rollback/report-only receipts are retained, while teardown remains the open capability gate.",
+        "Completion remains blocked until accepted exact-candidate Preview, Production, teardown and normal rollback receipts exist; current main-sourced receipts for all four automation classes are retained, while final parity, lifecycle and independent-review acceptance remain the closeout gates.",
         "All required screenshot manifests are candidate-bound, reviewed and supplemental.",
         "Docs-app Nitro/Vercel and .vercel/.output assumptions are absent from live executable owners; independent apps/web Nitro/output ownership is explicitly preserved.",
         "Runbook, authority, automation, architecture, READMEs and evidence agree without duplicated procedure prose.",

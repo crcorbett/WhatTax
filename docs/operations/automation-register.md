@@ -211,3 +211,22 @@ report-only workflow remains protected/manual rather than unattended. The four
 register entries therefore now read three `established` and one
 `not-established`; the latter is the exact Preview teardown class, whose
 `31343533595`/`31343687718` dry-runs stopped before destroy.
+
+### 2026-08-10 main-sourced Preview teardown promotion
+
+Reviewed-main teardown run `31350160353` for closed PR #24 completed after the
+parser, direct beta.64 entrypoint and freshness corrections. Its completion
+reconciler `31350243582` API-read the completed source run and matching
+artifact. The promoted receipt is
+`docs/evidence/deployments/2026-08-10-preview-teardown-pr-24/workflow-receipt-31350160353.json`.
+It binds the reviewed source/run/input, exact `pr-24` stage, equal
+`preview-destroy` digest, account/state/config/deployment/lockfile identities,
+and the post-destroy state-stage, Worker and former workers.dev URL absence
+readbacks. The destroy projection contained exactly `DocsBuild` and
+`DocsWebsite` deletes; no other resource or action was admitted.
+
+The automation register now has four established entries. The failed teardown
+runs `31343533595`, `31343687718`, `31347119364`, `31347842707`, `31348538146`
+and `31349508145` remain retained non-claim history. This receipt still does
+not establish current Preview availability, custom-domain/DNS, billing,
+release, publication, byte promotion or future provider state.

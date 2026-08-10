@@ -139,9 +139,14 @@ after the report credential wiring correction. Its dedicated report receipt is
 `docs/evidence/deployments/2026-08-10-orphan-inventory-main-53d936/workflow-receipt-31344401196.json`.
 It proves state/provider agreement, an empty open-PR set, no mutation
 capability and no automatic deletion; the report-only environment remains
-reviewer-gated rather than unattended. The deployment register therefore has
-three established entries. Preview teardown remains `not-established` after
-runs `31343533595` and `31343687718` stopped at the beta.64 dry-run with no
-destroy or absence readback. These receipts do not establish custom-domain,
-DNS, billing, release, publication, byte-promotion or current public-domain
-claims.
+reviewer-gated rather than unattended.
+
+The reviewed-main Preview teardown run `31350160353` (reconciler
+`31350243582`) now supplies the fourth established automation receipt at
+`docs/evidence/deployments/2026-08-10-preview-teardown-pr-24/workflow-receipt-31350160353.json`.
+It proves two equal exact-resource delete projections, pre-destroy freshness,
+post-destroy state-stage and Worker absence, and HTTP 404 for the former
+workers.dev URL. The failed beta.64 runs remain historical non-claims. The
+deployment register therefore has four established entries; none establishes
+custom-domain, DNS, billing, release, publication, byte-promotion or current
+public-domain claims.

@@ -416,3 +416,27 @@ delete projection were read, but the pinned beta.64 dry-run returned non-zero
 before destroy. No Preview absence receipt exists, and the Worker remains
 present. The automation register consequently establishes Preview,
 Production and report-only only; teardown and DCD-005 closeout remain open.
+
+## 2026-08-10 current main-sourced Preview teardown promotion
+
+Reviewed default-branch SHA `31212c48b873113c1bf854fd648f14562bd2fb96`
+ran the exact closed-PR #24 teardown in workflow run `31350160353`; the
+completion reconciler `31350243582` API-read the completed source run and its
+matching artifact. The promoted receipt is
+`2026-08-10-preview-teardown-pr-24/workflow-receipt-31350160353.json`.
+
+The workflow performed two equal `preview-destroy` projections containing only
+`DocsBuild` and `DocsWebsite` deletes, then read back state/provider agreement
+before and after the destroy. The postcondition read back no `pr-24` state
+stage, no `pr-24` Worker, and the former provider workers.dev URL as HTTP 404.
+The receipt binds the exact candidate, reviewed workflow/run/input identities,
+account, `cloudflare-http` state store, stage, plan/config/deployment/lockfile
+digests and former Worker identity. Attempts and stderr metadata are retained
+in the hosted artifact; no secret value is retained here.
+
+This advances the exact `docs-preview-teardown` automation entry and closes
+the prior beta.64 dry-run stop for this dated epoch. The earlier failed runs
+`31343533595`, `31343687718`, `31347119364`, `31347842707`, `31348538146` and
+`31349508145` remain immutable non-claim observations. The receipt does not
+establish Preview availability, Production, rollback, custom-domain/DNS,
+billing, release, publication, byte promotion or future provider state.

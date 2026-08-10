@@ -3,7 +3,7 @@ document_type: app-readme
 lifecycle: current
 authority: canonical
 owner: taxkit-docs-app-owner
-last_reviewed: 2026-08-09
+last_reviewed: 2026-08-10
 review_trigger: docs route, content boundary, build target, runtime, proof or deployment ownership change
 ---
 

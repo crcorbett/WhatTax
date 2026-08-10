@@ -900,6 +900,29 @@ from the pinned beta.64 dry-run before any destroy. No teardown absence,
 custom-domain/DNS, billing, release, publication or public-domain claim is
 made from this epoch.
 
+## 2026-08-10 — current Preview teardown receipt
+
+Reviewed-main teardown run `31350160353` for closed PR #24 completed through
+the direct pinned beta.64 entrypoint after the parser and freshness corrections.
+Completion reconciler `31350243582` API-read the completed source run and
+matching artifact. The canonical receipt is
+`docs/evidence/deployments/2026-08-10-preview-teardown-pr-24/workflow-receipt-31350160353.json`.
+
+The run performed two equal `preview-destroy` projections containing only
+`DocsBuild` and `DocsWebsite` deletes. It read back the exact `pr-24` state and
+Worker before destroy, then read back state-stage absence, Worker absence and
+the former workers.dev URL as HTTP 404 after destroy. The receipt binds the
+reviewed default-branch source/run/input, plan/config/deployment/lockfile,
+account and `cloudflare-http` state identities. The failed runs
+`31343533595`, `31343687718`, `31347119364`, `31347842707`, `31348538146` and
+`31349508145` remain immutable non-claim history.
+
+This advances only the exact `docs-preview-teardown` automation entry. It does
+not establish current Preview availability, Production, rollback,
+custom-domain/DNS, billing, release, publication, byte promotion or future
+provider state. A no-op teardown remains valid only when the same reviewed
+workflow proves the exact stage and provider/state absence.
+
 ## Stop conditions
 
 Stop before unrelated `versioning`, `commit`, `push`, `tag`, `release`,

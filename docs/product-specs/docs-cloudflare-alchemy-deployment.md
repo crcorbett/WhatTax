@@ -332,6 +332,19 @@ browser and build the Cloudflare deployment input before hashing `dist`.
 These corrections preserve the no-op-versus-delete teardown contract and add
 no provider resource or authority.
 
+The current reviewed-main Preview teardown promotion completes that previously
+open automation boundary. Run `31350160353` at source SHA
+`31212c48b873113c1bf854fd648f14562bd2fb96` and reconciler `31350243582`
+retained the exact `pr-24` input, two equal delete projections, pre-destroy
+freshness readback, post-destroy state/Worker absence and former workers.dev
+URL `404` readback. Its outer receipt is
+`docs/evidence/deployments/2026-08-10-preview-teardown-pr-24/workflow-receipt-31350160353.json`.
+The four automation entries are now established for their separate claims;
+the failed beta.64 teardown runs remain historical non-claims. DCD-005 still
+requires the final parity, lifecycle and independent-review acceptance before
+the implementation is closed. Custom-domain/DNS, billing, release,
+publication, byte-promotion and future-provider-state claims remain excluded.
+
 The workflow receipt boundary is strict. Raw hosted output is retained only as
 diagnostic artifact material; the promoted receipt is filtered to the
 `DeploymentWorkflowHostedProbe` Schema, and the workflow copies the referenced
