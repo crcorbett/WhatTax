@@ -54,9 +54,9 @@ credential/environment non-claim is superseded by the dated 2026-08-04
 capability receipt: the four protected environments and two narrow credential
 identities now exist. At that earlier capability epoch workflow execution and
 hosted receipts were still unestablished; the current default-branch workflow
-epoch is recorded below. DCD-004 remains in progress and DCD-005 remains
-pending for the report-only state boundary, final parity and bridge
-retirement.
+epoch is recorded below. At that historical point DCD-004 remained in progress
+and DCD-005 remained pending for the report-only state boundary, final parity
+and bridge retirement.
 
 The 2026-08-05 default-branch workflow epoch now proves the mutation path
 under the protected environments: Preview plan/deploy runs
@@ -71,9 +71,10 @@ Production and teardown observations but does not establish the report-only
 orphan class: `30966300887` stopped before inventory because `GH_TOKEN` was
 missing, and corrected run `30967000841` stopped because the read-only
 Cloudflare credential cannot derive Alchemy beta.64's HTTP state-store bearer
-without the mutation bootstrap path. DCD-004 therefore remains in progress
-with an explicit report-only capability stop; DCD-005 remains pending for the
-remaining parity, evidence and Nitro-bridge retirement requirements.
+without the mutation bootstrap path. At that historical point DCD-004
+therefore remained in progress with an explicit report-only capability stop;
+DCD-005 remained pending for the remaining parity, evidence and Nitro-bridge
+retirement requirements.
 
 The merge-era PR-close run `30968741396` independently converged absent
 `pr-13` at default-branch candidate
@@ -89,9 +90,9 @@ Nitro dependency. `test:built` now runs the Cloudflare/workerd built contract;
 independently owned `apps/web` build graph, so the root Nitro catalog and
 shared output ignore entries are preserved. This implementation observation
 does not establish hosted requalification for the retirement candidate, a
-current Production URL, or the report-only Alchemy state boundary; DCD-004
-remains in progress and DCD-005 remains pending until those claims are
-resolved.
+current Production URL, or the report-only Alchemy state boundary. At that
+historical bridge-retirement point DCD-004 remained in progress and DCD-005
+remained pending until those claims were resolved.
 
 The 2026-08-09 report-only successor candidate
 `9dd779d70ccf661081856c3b5f07474b406db7ba` now uses Alchemy beta.64's public
@@ -103,8 +104,9 @@ returned state/provider agreement, state-store version `7`, one `prod` stage
 and one provider Worker. The exact hosted successor run `31315231020` remained
 queued without a runner or pending environment request and was cancelled; its
 receipt is retained under `docs/evidence/deployments/2026-08-09-orphan-inventory/`.
-Hosted report-only state/provider agreement remains unestablished, so DCD-004
-and DCD-005 stay open and the automation register remains `not-established`.
+At that historical successor point hosted report-only state/provider agreement
+remained unestablished, so DCD-004 and DCD-005 stayed open and the automation
+register remained `not-established`.
 
 The corrected branch-bound successor `70be77e64c93d20cd82c5e02e33db9c92a94f0d7`
 passed the protected report-only workflow `31316752464`. It materialized and
@@ -113,13 +115,13 @@ public Alchemy HTTP state client, returned state/provider agreement for one
 `prod` stage and one Worker, and found no Preview stages or orphan candidates.
 The receipt is retained at
 `docs/evidence/deployments/2026-08-09-orphan-inventory/report-31316752464.json`.
-This proves only the exact branch-bound report-only read and no mutation. The
-automation register remains `not-established` until the reviewed workflow runs
-from the default-branch source; hosted application behavior, deployment/version
-identity, teardown and rollback remain separate claims, so DCD-004 and DCD-005
-stay open.
+This proves only the exact branch-bound report-only read and no mutation. At
+that historical branch-bound point the automation register remained
+`not-established` until the reviewed workflow ran from the default-branch
+source; hosted application behavior, deployment/version identity, teardown and
+rollback remained separate claims, so DCD-004 and DCD-005 stayed open.
 
-The current b59e4ee candidate has now passed the complete provider-bound
+The historical b59e4ee candidate passed the complete provider-bound
 Preview, teardown, Production and normal rollback/redeploy observations. The
 Preview receipts under `docs/evidence/deployments/2026-08-10-preview-pr-15/`
 bind equal plan/replan, Alchemy state, Worker/deployment/version, hosted
@@ -143,6 +145,8 @@ automation class. DCD-004 and DCD-005 remain open for the source-bound
 lifecycle gates, fresh independent review and final closeout. No receipt is
 promoted across candidates or source epochs.
 
+The following paragraph records a superseded historical main-sourced Preview
+epoch; its teardown stop and status are retained as dated trajectory evidence.
 The current main-sourced Preview promotion is recorded in the dated evidence
 route `docs/evidence/deployments/2026-08-10-preview-pr-24/`. Default-branch SHA
 `bc2ac82f48cce67a6ee5b1b6caf9e8903bf9c182` planned and deployed candidate
@@ -153,8 +157,8 @@ desktop/mobile PNG digests. Its strict outer receipt advances only
 `docs-preview-delivery` to `externalState: established`. The corresponding
 teardown run `31337384729` stopped at the pinned beta.64 dry-run without
 destroy or absence readback; Production, rollback, teardown and report-only
-remain unestablished, and DCD-004 remains in progress while DCD-005 remains
-pending.
+remained unestablished at that historical point, and DCD-004 remained in
+progress while DCD-005 remained pending.
 
 The succeeding reviewed default-branch epoch records the current split claim
 boundary. Production source
@@ -170,12 +174,12 @@ reviewed-default-branch receipt: run `31344401196`, reconciler `31344453019`,
 and outer receipt
 `docs/evidence/deployments/2026-08-10-orphan-inventory-main-53d936/workflow-receipt-31344401196.json`.
 That report proves state/provider agreement and no mutation/deletion
-capability. Preview, Production and report-only are therefore established in
-the automation register; Preview teardown remains unestablished because runs
-`31343533595` and `31343687718` stopped at the pinned beta.64 dry-run before
-destroy or absence readback. DCD-004 remains in progress and DCD-005 remains
-pending; no custom-domain/DNS, billing, release, publication, byte-promotion
-or public-domain claim is made.
+capability. Preview, Production, report-only and exact-stage teardown are now
+established in the automation register through their separate current
+receipts; the failed runs `31343533595` and `31343687718` remain historical
+non-claims. DCD-004 is completed and DCD-005 is in progress for final parity,
+lifecycle and archival acceptance; no custom-domain/DNS, billing, release,
+publication, byte-promotion or public-domain claim is made.
 
 ## Target and comparative evidence
 
@@ -317,7 +321,8 @@ has admitted the deployment-only Schema/control desired state, and the
 environments and separate narrow credential identities. The current
 main-sourced Preview receipt establishes the Preview automation entry; the
 later main-sourced Production and report-only receipts establish those two
-entries independently, while teardown remains `not-established`. Quality's
+entries independently, and the later teardown receipt establishes the fourth
+entry. Quality's
 authority remains
 read-only and independently cancellable; its exact runner bootstrap was
 corrected during DCD-004 to use the frozen app-local Playwright executable and

@@ -65,32 +65,29 @@ stage and therefore no orphan candidate, and retained PR `#1` as an open
 trusted PR without a stage. This does not establish the scheduled/manual
 GitHub automation class or grant teardown authority.
 
-The current register has three positive external-state entries: the
-main-sourced Preview receipt for `pr-24`, the fixed Production receipt, and the
-reviewed default-branch report-only receipt. Preview teardown remains
-`externalState.status: "not-established"` because its hosted beta.64 dry-run
-has not reached destroy or absence readback. This is executable desired-state
-admission, not a claim that an unestablished workflow has never run. Historical default-branch
-epochs under `docs/evidence/deployments/2026-08-05-*` and
-`2026-08-10-*` remain separate dated observations. The report-only run
-`30967000841` remains inconclusive because its read-only Cloudflare credential
-cannot derive Alchemy beta.64's HTTP state-store bearer without
-mutation-capable bootstrap. The first report-only failure `30966300887`
-(missing `GH_TOKEN`) and the corrected failure are both retained. The
-report-only workflow has no teardown or deletion authority. Quality remains
-independently cancellable and without provider credentials or provider
-mutation authority.
+The current register has four positive external-state entries: the
+main-sourced Preview receipt for `pr-24`, the fixed Production/rollback receipt,
+the reviewed default-branch report-only receipt, and the reviewed-main
+exact-stage teardown receipt. Historical default-branch epochs under
+`docs/evidence/deployments/2026-08-05-*` and `2026-08-10-*` remain separate
+dated observations. The report-only run `30967000841` remains inconclusive
+because its read-only Cloudflare credential could not derive Alchemy beta.64's
+HTTP state-store bearer without mutation-capable bootstrap; the first
+report-only failure `30966300887` (missing `GH_TOKEN`) and the corrected
+failure are both retained. The report-only workflow has no teardown or
+deletion authority. Quality remains independently cancellable and without
+provider credentials or provider mutation authority. A later source,
+candidate, environment or provider change requires fresh receipt promotion.
 
-### 2026-08-10 current candidate readback
+### 2026-08-10 historical branch-bound candidate readback
 
 The protected report-only workflow run `31319845724` passed for branch candidate
 b59e4ee and retained state/provider agreement for one fixed `prod` stage and
 Worker with no Preview/orphan candidates at
 `docs/evidence/deployments/2026-08-09-orphan-inventory/report-31319845724.json`.
-This receipt is intentionally branch-bound. The four register entries remain
-`externalState.status: not-established` until the same workflow file and
-report-only owner are read back from the reviewed default branch; no provider
-mutation, state write, teardown or credential-scope expansion is inferred.
+This receipt is intentionally branch-bound and cannot alter the current
+register. No provider mutation, state write, teardown or credential-scope
+expansion is inferred from that historical observation.
 
 Each admitted mutation workflow now enforces the remaining boundary in its
 own YAML: the initial plan and equal replan reject every action/resource outside
@@ -207,10 +204,10 @@ The reviewed default-branch report-only run `31344401196` and reconciler
 `31344453019` are promoted through the dedicated `reportPath` receipt at
 `docs/evidence/deployments/2026-08-10-orphan-inventory-main-53d936/workflow-receipt-31344401196.json`.
 It proves state/provider agreement and no mutation/deletion capability. The
-report-only workflow remains protected/manual rather than unattended. The four
-register entries therefore now read three `established` and one
-`not-established`; the latter is the exact Preview teardown class, whose
-`31343533595`/`31343687718` dry-runs stopped before destroy.
+report-only workflow remains protected/manual rather than unattended. Together
+with the Preview, Production and teardown receipts, the register now reads
+four `established` entries; the failed beta.64 dry-runs remain historical
+non-claims.
 
 ### 2026-08-10 main-sourced Preview teardown promotion
 
