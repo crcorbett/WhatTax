@@ -861,6 +861,37 @@ pinned beta.64 dry-run with no destroy or absence readback. Production,
 rollback, teardown and report-only remain unestablished and require their own
 receipts; do not infer them from this Preview promotion.
 
+## 2026-08-10 — current Production, rollback and report-only readback
+
+The next reviewed default-branch workflow epoch used source
+`fef1dfca39d56d28b1f5956e4604af1cc659672b` and the accepted candidate
+`cbcb86878379cc2a126a8e48bee256aa33096c79`. Production plan run `31342982776`
+and deploy run `31343083326` were reconciled by `31343175981`. Normal
+source-bound rollback run `31343236244` was reconciled by `31343339747`, then
+final redeploy run `31343392260` was reconciled by `31343498809`. The promoted
+Production receipt is
+`docs/evidence/deployments/2026-08-10-production-prod-fef1dfc/workflow-receipt-31343392260.json`;
+its nested rollback receipt retains the prior/current version transition and
+the accepted Preview recovery identity. The fixed `prod` Worker URL and
+account/state identities are read back from the provider, not configured in
+the workflow. Hosted HTTP/browser proof covers SSR, assets, server functions,
+404/error, hydration/navigation, accessibility, cache/headers, console and
+the bounded desktop/mobile screenshots. The final redeploy is the current
+state for this dated observation.
+
+Reviewed default-branch report-only run `31344401196` and completion
+reconciler `31344453019` produced the dedicated report receipt
+`docs/evidence/deployments/2026-08-10-orphan-inventory-main-53d936/workflow-receipt-31344401196.json`.
+It proves state/provider agreement, no open trusted orphan candidates,
+`mutationCapability: none` and `automaticDeletion: prohibited`. The
+`github-actions-report-only` environment remains reviewer-gated/manual, so
+this is not unattended orphan detection. The automation register now admits
+Preview, Production and report-only; Preview teardown remains stopped and
+unestablished because runs `31343533595` and `31343687718` returned non-zero
+from the pinned beta.64 dry-run before any destroy. No teardown absence,
+custom-domain/DNS, billing, release, publication or public-domain claim is
+made from this epoch.
+
 ## Stop conditions
 
 Stop before unrelated `versioning`, `commit`, `push`, `tag`, `release`,

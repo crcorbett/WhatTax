@@ -203,3 +203,19 @@ and does not establish the aggregate automation class. A default-branch
 readback is required before `externalState` can advance; no authority is
 inferred for state bootstrap, deploy, destroy, rollback, DNS, release or
 publication from this report.
+
+### 2026-08-10 — current main-sourced Production and report-only authority
+
+The current successor epoch has promoted the fixed Production and report-only
+classes separately. Production source
+`fef1dfca39d56d28b1f5956e4604af1cc659672b` is represented by
+`docs/evidence/deployments/2026-08-10-production-prod-fef1dfc/workflow-receipt-31343392260.json`;
+its rollback child receipt is a distinct `production-rollback` operation and
+does not broaden deploy authority. Report-only source
+`53d93648a7b36713055d3edf69beb681c058386f` is represented by
+`docs/evidence/deployments/2026-08-10-orphan-inventory-main-53d936/workflow-receipt-31344401196.json`;
+its dedicated report path proves read-only state/provider agreement and no
+deletion capability. Preview teardown remains an authority/capability stop:
+the beta.64 dry-run returned non-zero before destroy, so no absence receipt or
+destructive retry is admitted. Custom-domain/DNS, unrelated resources,
+publication, release and credential disclosure remain outside this envelope.
