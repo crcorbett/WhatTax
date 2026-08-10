@@ -1693,6 +1693,15 @@ server-function, 404, accessibility, focus, console, runtime, filesystem and
 local size/startup limits. This remains local workerd evidence and does not
 establish provider or hosted state.
 
+The promoted hosted receipts remain bound to their own reviewed workflow
+source/candidate epochs (`cbcb868…` Preview, `cbcb868…` Production/rollback and
+`31212c48…` exact-stage teardown). The subsequent closeout candidate changes
+only documentation, evidence, the active plan, the task ledger and lifecycle
+routing after those deployment inputs and lock/config/build owners were frozen;
+it does not claim a new hosted deployment. This docs-only lifecycle delta
+therefore preserves the claim-matched provider receipts without treating them
+as hosted proof for the closeout candidate.
+
 The required retirement audit was run against executable/docs-app owners:
 `rg -ni 'nitro|@vercel|\.vercel/output|\.output' apps/docs
 apps/docs/package.json apps/docs/vite.config.ts apps/docs/src apps/docs/scripts`

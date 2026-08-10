@@ -21,12 +21,11 @@ Current implementation:
   DCD-001 is accepted locally after both built-app oracles, documentation
   reconciliation, independent closure and change-owned gates passed for the
   official Cloudflare Vite output plus public Alchemy prebuilt-Worker
-  composition. DCD-004 now has promoted main-sourced Preview `pr-24`, fixed
-  Production and report-only receipts; Preview teardown/absence remains
-  separately gated, while the source-bound rollback receipt is retained under
-  Production. The earlier unsupported Website.Vite seam and Worker-first asset
-  failure remain retained evidence; DCD-002 starts after the coherent DCD-001
-  commit.
+  composition. DCD-004 has promoted main-sourced Preview `pr-24`, fixed
+  Production/rollback, report-only and exact-stage Preview teardown receipts;
+  DCD-005 owns final Cloudflare/Nitro parity, lifecycle acceptance and plan
+  archival. The earlier unsupported Website.Vite seam, Worker-first asset
+  failure and beta.64 teardown failures remain retained historical evidence.
 
 Completed harness work is retained under
 [`../completed/harness-foundation-improvements.md`](../completed/harness-foundation-improvements.md)
