@@ -36,8 +36,8 @@ the milestone and acceptance owner.
 | `DCD-001` | completed   | Accepted at `669a8f3…` after exact dependency/integrity readback, both built-app oracles, docs-maintainer reconciliation, focused Changeset, independent closure, and all change-owned gates. |
 | `DCD-002` | completed   | Accepted candidate `d9cb894…` passed fresh pre-deploy and pre-destroy state/provider readback, equal plans, Preview apply, the complete hosted/browser/screenshot contract, exact-stage teardown/absence, all gates and corrected-boundary independent review. |
 | `DCD-003` | completed   | Accepted after fixed Production, separately Preview-qualified successor, successor Production, restored-source rollback, provider/hosted/screenshot readback, owner reconciliation, full verification and corrected-boundary independent review. |
-| `DCD-004` | in_progress | Main-sourced Preview `31338052297`, fixed Production final redeploy `31343392260`, source-bound rollback `31343236244`, report-only `31344401196`, and exact Preview teardown `31350160353` now have promoted outer receipts; final owner acceptance and closeout review remain. |
-| `DCD-005` | pending     | Docs-app bridge-retirement implementation is present and locally qualified at `d649a14…`; current main-sourced Preview/Production/rollback/report-only and exact teardown receipts are retained, but final parity review, fresh independent review and complete closeout evidence remain. |
+| `DCD-004` | completed   | Main-sourced Preview `31338052297`, fixed Production final redeploy `31343392260`, source-bound rollback `31343236244`, report-only `31344401196`, and exact Preview teardown `31350160353` have promoted outer receipts; primary-owner acceptance and independent review are recorded in the current slice. |
+| `DCD-005` | in_progress | Committed candidate `24ce5de…` now requalifies the retained Nitro mobile, motion, pending and recoverable-error oracles through the sole Cloudflare built harness; final parity/lifecycle acceptance, active-plan archival and closeout evidence remain. |
 
 ## Baseline
 
@@ -1657,3 +1657,26 @@ entries. DCD-004 remains `in_progress` pending primary-owner and independent
 closeout review; DCD-005 remains `pending` pending the final parity and
 lifecycle review. No custom-domain/DNS, billing, release, publication,
 byte-promotion or future-provider-state claim is made.
+
+The current Cooper authorization to continue all remaining SPEC/PRD tasks and
+the explicit full implementation approval are recorded as primary-owner
+acceptance of this DCD-004 evidence slice. That acceptance is limited to the
+named TaxKit workflows, receipts and provider resources already in scope; it
+does not widen custom-domain/DNS, release, publication or unrelated-resource
+authority. DCD-004 therefore transitions to `completed`; DCD-005 remains the
+active closeout slice.
+
+### 2026-08-10 — Cloudflare built-harness parity correction
+
+Committed candidate `24ce5de1c565107276e9524b8e9203b14cab9580` reran
+`bun run --filter=docs test:cloudflare-built` successfully. The sole
+Cloudflare/workerd proof now covers the retained Nitro mobile navigation
+disclosure, reduced-motion suppression, pending navigation and recoverable
+source-error rendering oracles in addition to SSR, assets, hydration,
+no-document navigation, server-function transport, 404, accessibility, focus,
+console, runtime, filesystem and local limit checks. The durable local receipt
+is `docs/evidence/deployments/2026-08-10-local-bridge-retirement/receipt.json`.
+The old 2026-08-09 receipt remains historical and unchanged. DCD-005 is now
+limited to final lifecycle/parity review, active-plan archival and the
+remaining repository closeout gates; no provider claim is inferred from local
+workerd proof.

@@ -218,6 +218,19 @@ console cleanliness, runtime reuse, filesystem isolation and local upload
 limits passed. This is local evidence only; it does not establish hosted
 requalification for this candidate or the report-only Alchemy state boundary.
 
+## 2026-08-10 local bridge-retirement parity correction
+
+Committed candidate `24ce5de1c565107276e9524b8e9203b14cab9580` reran the
+canonical `bun run --filter=docs test:cloudflare-built` proof after adding the
+retained Nitro parity oracles that were absent from the prior receipt. The
+receipt is `2026-08-10-local-bridge-retirement/receipt.json` and records
+passing mobile navigation disclosure, reduced-motion suppression, pending
+navigation and recoverable source-error rendering alongside the existing SSR,
+assets, hydration, no-document navigation, server-function, 404,
+accessibility, focus, console, runtime, filesystem and local limit checks.
+This remains local workerd evidence only; it does not establish any provider,
+hosted, Preview, Production, rollback, public, release or domain claim.
+
 ## 2026-08-09 report-only state-read candidate
 
 The successor workflow candidate uses the protected

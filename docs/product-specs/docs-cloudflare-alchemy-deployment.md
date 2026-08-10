@@ -972,11 +972,15 @@ The implementation retirement is accepted locally only when:
   production-artifact oracle; and
 - no docs package/content owner depends on the Vercel path.
 
-The final DCD-005 lifecycle gate still requires a clean committed candidate's
-hosted Preview/Production/rollback requalification, Preview teardown absence
-and final parity review. Until those are claim-matched, the SPEC
-and ledger remain open even though the docs-app bridge implementation is
-present.
+The committed candidate `24ce5de1c565107276e9524b8e9203b14cab9580` now
+requalifies the retained Nitro parity set through the sole Cloudflare built
+harness. Its dated local receipt records passing mobile navigation disclosure,
+reduced-motion suppression, pending navigation and recoverable source-error
+rendering in addition to the existing SSR, assets, hydration, navigation,
+server-function, 404, accessibility, focus, console, runtime, filesystem and
+limit oracles. The final DCD-005 lifecycle gate still requires primary-owner
+acceptance, active-plan archival and the final parity/authority review; those
+are lifecycle decisions, not missing browser assertions.
 
 Disconfirming evidence is a Cloudflare path that cannot reproduce an accepted
 SSR, server-function, navigation, accessibility, error or lifecycle behavior

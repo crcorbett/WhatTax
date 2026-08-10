@@ -612,7 +612,7 @@
     },
     {
       "id": "DCD-004",
-      "status": "in_progress",
+      "status": "completed",
       "acceptedFindingIds": [
         "TK-CF-003",
         "TK-CF-005",
@@ -764,7 +764,7 @@
     },
     {
       "id": "DCD-005",
-      "status": "pending",
+      "status": "in_progress",
       "acceptedFindingIds": [
         "TK-CF-001",
         "TK-CF-002",
@@ -792,7 +792,7 @@
         "retain the current exact-candidate workerd, Preview, Production, rollback and report-only journeys plus the failed teardown attempts with applicable screenshot sets under the 2026-08-10 evidence epoch",
         "prove the Cloudflare local built harness covers every retained Nitro SSR, assets, hydration, navigation, server-function, 404/error, accessibility, focus, responsive, motion and console oracle",
         "remove the docs-app Nitro dependency, Vercel preset, .vercel/output harness and temporary dual-build policy while preserving Nitro and shared output entries still owned by apps/web",
-        "adapt test:built to the sole Cloudflare/workerd production-artifact contract without weakening its independent assertions",
+        "adapt test:built to the sole Cloudflare/workerd production-artifact contract without weakening its independent assertions; the canonical command is bun run --filter=docs test:cloudflare-built and test:built remains its compatibility alias",
         "remove duplicated deployment procedure prose and leave pointers to architecture, runbook and dated evidence owners",
         "finalize carrying costs, review triggers, retirement conditions, retained failures and explicit non-claims",
         "obtain and reconcile one fresh bounded independent implementation review before closeout",
@@ -801,6 +801,7 @@
       ],
       "outputs": [
         "sole Cloudflare production build and local built-harness contract",
+        "current local bridge-retirement receipt at docs/evidence/deployments/2026-08-10-local-bridge-retirement/receipt.json with retained Nitro parity oracles",
         "removed Nitro/Vercel dependencies and .vercel/.output assumptions",
         "final accepted workerd, Preview, Production, teardown absence and rollback receipts, with report-only remaining report-only",
         "final bounded screenshot manifests and retained mismatches/failures",
@@ -832,6 +833,7 @@
         "bun run --filter=@taxkit/docs-fumadocs test",
         "bun run --filter=docs test",
         "bun run --filter=docs test:browser",
+        "bun run --filter=docs test:cloudflare-built",
         "bun run --filter=docs test:built",
         "bun run --filter=docs check-types",
         "bun run docs:build",
