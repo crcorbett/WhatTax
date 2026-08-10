@@ -530,3 +530,24 @@ correction changes only test-harness port isolation and its README/task
 ownership; it makes no provider, credential, DNS, publication or API-route
 claim. DCD-005 now awaits only fresh independent review, Cooper's lifecycle
 acceptance and completed-plan archival.
+
+## 2026-08-10 exact closeout candidate and independent review
+
+The exact current closeout candidate is
+`7deaf12d6168720493295801805d4e901d18ddeb`. It is a documentation/evidence
+successor after the bounded HGI-205 loopback correction; deployment inputs,
+lock/config/build identities and provider resources are unchanged. The exact
+`bun run verification` command passed, and GitHub Quality push run
+`31354493714` plus pull-request run `31354495495` both completed successfully
+for this head.
+
+The fresh read-only independent review is retained at
+`2026-08-10-local-bridge-retirement/independent-review-7deaf12.json`. It
+confirms DCD-004's four established automation receipts and five controls,
+the local Cloudflare parity/retirement audit, focused gates and exact
+verification, with no material implementation or proof-owner blocker. The
+prior `independent-review-32ea78e.json` remains immutable historical evidence
+for the earlier `not-ready` candidate. DCD-005 remains `in_progress` only for
+Cooper's explicit lifecycle acceptance and active-plan archival; this receipt
+does not add a new provider, hosted, public-availability, custom-domain, DNS,
+release or publication claim.

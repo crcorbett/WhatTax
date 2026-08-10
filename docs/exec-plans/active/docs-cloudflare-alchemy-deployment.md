@@ -1774,3 +1774,23 @@ owner correction; no unrelated process was terminated and no provider state
 changed. DCD-005 now has no verification-baseline stop; lifecycle acceptance,
 fresh independent review of this implementation slice and completed-plan
 archival remain.
+
+### 2026-08-10 — exact closeout candidate and independent review
+
+The successor closeout candidate is
+`7deaf12d6168720493295801805d4e901d18ddeb`. It changes only the synchronized
+active-plan and evidence owners after the bounded HGI-205 correction; it does
+not change deployment inputs, lock/config/build identities or provider
+resources. The exact `bun run verification` command passed on this candidate,
+and GitHub Quality push run `31354493714` plus pull-request run
+`31354495495` both completed successfully for this exact head.
+
+The fresh independent review is retained at
+`docs/evidence/deployments/2026-08-10-local-bridge-retirement/independent-review-7deaf12.json`.
+It reviewed the exact head read-only, confirmed the four established DCD-004
+receipt/control entries, local Cloudflare parity and scoped Nitro-retirement
+audit, and found no material implementation or proof-owner blocker. The
+earlier exact-`32ea78e` `not-ready` review remains unchanged historical
+evidence. DCD-005 remains `in_progress` only for Cooper's explicit lifecycle
+acceptance and the completed-plan archival transition; no provider or hosted
+claim is added for this documentation-only candidate.
