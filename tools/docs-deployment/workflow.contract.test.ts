@@ -170,6 +170,12 @@ describe("docs deployment workflow admission", () => {
     expect(teardown).toContain("[REDACTED]");
     expect(teardown).toContain("sleep 5");
     expect(teardown).toContain("providerWorkers");
+    expect(teardown).toContain(
+      'select(.logicalId == "DocsWebsite" and .workerUrl == $url)'
+    );
+    expect(teardown).toContain(
+      'select(.stage == $stage and .logicalId == "DocsWebsite" and .workerName == $worker)'
+    );
     expect(teardown).toContain("provider-readback.json");
     expect(teardown).toContain("providerWorkerAbsent:true");
     expect(teardown).toContain("formerWorkerName");

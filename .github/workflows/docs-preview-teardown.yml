@@ -218,7 +218,8 @@ jobs:
             ([.stages[] | select(.stage == $stage)] | length == $expected) and
             (if $expected == 0 then true else
               ([.stages[] | select(.stage == $stage) | .resources | map(.logicalId) | sort] == [["DocsBuild", "DocsWebsite"]]) and
-              ([.providerWorkers[] | select(.stage == $stage and .logicalId == "DocsWebsite" and .workerName == $worker and .workerUrl == $url)] | length == 1)
+              ([.stages[] | select(.stage == $stage) | .resources[] | select(.logicalId == "DocsWebsite" and .workerUrl == $url)] | length == 1) and
+              ([.providerWorkers[] | select(.stage == $stage and .logicalId == "DocsWebsite" and .workerName == $worker)] | length == 1)
             end)
           ' "$RUNNER_TEMP/docs-deployment/provider-inventory-pre-destroy.json" > /dev/null
           if [ "$resource_count" -eq 2 ]; then
