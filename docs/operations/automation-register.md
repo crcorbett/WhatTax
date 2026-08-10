@@ -65,12 +65,12 @@ stage and therefore no orphan candidate, and retained PR `#1` as an open
 trusted PR without a stage. This does not establish the scheduled/manual
 GitHub automation class or grant teardown authority.
 
-The current register has one positive external-state entry: the
-main-sourced Preview receipt for `pr-24` is established at the exact dated
-evidence route below. Production, Preview teardown and report-only remain
-`externalState.status: "not-established"`; each still requires its own
-complete receipt contract. This is executable desired-state admission, not a
-claim that an unestablished workflow has never run. Historical default-branch
+The current register has three positive external-state entries: the
+main-sourced Preview receipt for `pr-24`, the fixed Production receipt, and the
+reviewed default-branch report-only receipt. Preview teardown remains
+`externalState.status: "not-established"` because its hosted beta.64 dry-run
+has not reached destroy or absence readback. This is executable desired-state
+admission, not a claim that an unestablished workflow has never run. Historical default-branch
 epochs under `docs/evidence/deployments/2026-08-05-*` and
 `2026-08-10-*` remain separate dated observations. The report-only run
 `30967000841` remains inconclusive because its read-only Cloudflare credential
@@ -188,3 +188,26 @@ This does not advance Production, rollback, Preview teardown or report-only.
 The corresponding `pr-24` teardown run `31337384729` stopped at the pinned
 beta.64 dry-run with no destroy or absence readback, so the Worker remains
 present. The report-only schedule remains reviewer-gated and report-only.
+
+### 2026-08-10 current Production and report-only promotion
+
+The reviewed default-branch Production epoch used source
+`fef1dfca39d56d28b1f5956e4604af1cc659672b` and candidate
+`cbcb86878379cc2a126a8e48bee256aa33096c79`. Plan run `31342982776`, deploy
+run `31343083326`, rollback run `31343236244` and final redeploy
+`31343392260` were each API-reconciled (`31343175981`, `31343339747` and
+`31343498809`). The final Production receipt is
+`docs/evidence/deployments/2026-08-10-production-prod-fef1dfc/workflow-receipt-31343392260.json`;
+the nested rollback receipt preserves the prior/current version transition and
+the accepted Preview recovery identity. The receipt is the only current
+Production external-state admission; it does not imply a custom domain, DNS,
+publication or byte-promotion claim.
+
+The reviewed default-branch report-only run `31344401196` and reconciler
+`31344453019` are promoted through the dedicated `reportPath` receipt at
+`docs/evidence/deployments/2026-08-10-orphan-inventory-main-53d936/workflow-receipt-31344401196.json`.
+It proves state/provider agreement and no mutation/deletion capability. The
+report-only workflow remains protected/manual rather than unattended. The four
+register entries therefore now read three `established` and one
+`not-established`; the latter is the exact Preview teardown class, whose
+`31343533595`/`31343687718` dry-runs stopped before destroy.

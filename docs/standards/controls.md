@@ -47,10 +47,12 @@ Its Schema and negative fixtures admit only these controls:
 | Named deployment workflow completes; a self-authored or detached run/artifact is promoted without completed Actions API readback, exact source/input identity or bounded failure metadata | `docs-workflow-receipt-reconciliation`; `workflow.contract.test.ts`, `workflow-run-check.runtime.ts`, and the read-only `workflow_run` reconciler; retain the source artifact and reconciliation stop, then retry against the exact completed run | Workflow_run trigger, receipt schema/checker, artifact naming, source checkout or external-state promotion change | A stronger provider-independent receipt reconciler preserves completed-run, artifact, source/input and failure-readback coverage. |
 
 `bun run check:docs-deployment-automation` proves these local records and
-cross-field invariants only. It currently reports one externally established
-deployment automation: the exact main-sourced Preview receipt recorded below.
-Production, teardown and report-only still require their own protected
-workflow receipts before those controls can claim operational enforcement.
+cross-field invariants only. The current repository-promoted epoch reports
+three externally established deployment automations: the exact main-sourced
+Preview receipt, the fixed Production deploy receipt, and the reviewed
+default-branch report-only inventory receipt recorded below. Preview teardown
+remains unestablished because the hosted beta.64 dry-run has not completed
+successfully; no absence or destroy claim is inferred.
 
 The dated manual Preview/Production/rollback receipts under
 `docs/evidence/deployments/` prove the same candidate, plan, provider/state and
@@ -111,3 +113,35 @@ passes the positive external-state policy and establishes only
 The corresponding teardown run `31337384729` stopped at the beta.64 dry-run
 with no destroy or absence readback. Production, rollback and report-only
 therefore remain unestablished; no claim is inferred from the Preview receipt.
+
+### 2026-08-10 current Production, rollback and report-only promotion
+
+The subsequent reviewed default-branch workflow epoch used implementation
+source `fef1dfca39d56d28b1f5956e4604af1cc659672b` and candidate
+`cbcb86878379cc2a126a8e48bee256aa33096c79`. Production plan run `31342982776`
+and deploy run `31343083326` were reconciled by `31343175981`; the final
+source-bound rollback run `31343236244` (reconciler `31343339747`) changed the
+fixed Production deployment/version and passed the hosted contract before the
+final redeploy run `31343392260` (reconciler `31343498809`). Its promoted
+receipt is
+`docs/evidence/deployments/2026-08-10-production-prod-fef1dfc/workflow-receipt-31343392260.json`.
+The receipt binds the fixed `prod` Worker, account/state identities, plan,
+configuration, deployment-input and lockfile digests, provider version
+transition, workers.dev URL, SSR/assets/server-function/404/navigation,
+accessibility, cache/header, console, runtime and desktop/mobile screenshot
+proof. The rollback receipt is retained under the same route and remains a
+normal source-bound recovery observation; the final redeploy is the current
+Production state for this dated epoch.
+
+The reviewed default-branch report-only run `31344401196` (reconciler
+`31344453019`) used main source `53d93648a7b36713055d3edf69beb681c058386f`
+after the report credential wiring correction. Its dedicated report receipt is
+`docs/evidence/deployments/2026-08-10-orphan-inventory-main-53d936/workflow-receipt-31344401196.json`.
+It proves state/provider agreement, an empty open-PR set, no mutation
+capability and no automatic deletion; the report-only environment remains
+reviewer-gated rather than unattended. The deployment register therefore has
+three established entries. Preview teardown remains `not-established` after
+runs `31343533595` and `31343687718` stopped at the beta.64 dry-run with no
+destroy or absence readback. These receipts do not establish custom-domain,
+DNS, billing, release, publication, byte-promotion or current public-domain
+claims.

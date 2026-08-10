@@ -156,6 +156,27 @@ destroy or absence readback; Production, rollback, teardown and report-only
 remain unestablished, and DCD-004 remains in progress while DCD-005 remains
 pending.
 
+The succeeding reviewed default-branch epoch records the current split claim
+boundary. Production source
+`fef1dfca39d56d28b1f5956e4604af1cc659672b` deployed accepted candidate
+`cbcb86878379cc2a126a8e48bee256aa33096c79` to the fixed `prod` Worker. Plan
+`31342982776`, deploy `31343083326`, source-bound rollback `31343236244` and
+final redeploy `31343392260` were API-reconciled by `31343175981`,
+`31343339747` and `31343498809`; the promoted receipt is
+`docs/evidence/deployments/2026-08-10-production-prod-fef1dfc/workflow-receipt-31343392260.json`.
+It binds provider/state, version-transition, hosted HTTP/browser and bounded
+desktop/mobile screenshot proof. The report-only workflow also has a
+reviewed-default-branch receipt: run `31344401196`, reconciler `31344453019`,
+and outer receipt
+`docs/evidence/deployments/2026-08-10-orphan-inventory-main-53d936/workflow-receipt-31344401196.json`.
+That report proves state/provider agreement and no mutation/deletion
+capability. Preview, Production and report-only are therefore established in
+the automation register; Preview teardown remains unestablished because runs
+`31343533595` and `31343687718` stopped at the pinned beta.64 dry-run before
+destroy or absence readback. DCD-004 remains in progress and DCD-005 remains
+pending; no custom-domain/DNS, billing, release, publication, byte-promotion
+or public-domain claim is made.
+
 ## Target and comparative evidence
 
 TaxKit planning target:
@@ -294,8 +315,9 @@ mutation workflows plus one cancellable, read-only orphan inventory. DCD-004
 has admitted the deployment-only Schema/control desired state, and the
 2026-08-04 capability receipt now establishes the four protected GitHub
 environments and separate narrow credential identities. The current
-main-sourced Preview receipt establishes only the Preview automation entry;
-Production, teardown and report-only remain `not-established`. Quality's
+main-sourced Preview receipt establishes the Preview automation entry; the
+later main-sourced Production and report-only receipts establish those two
+entries independently, while teardown remains `not-established`. Quality's
 authority remains
 read-only and independently cancellable; its exact runner bootstrap was
 corrected during DCD-004 to use the frozen app-local Playwright executable and
@@ -938,8 +960,8 @@ The implementation retirement is accepted locally only when:
 - no docs package/content owner depends on the Vercel path.
 
 The final DCD-005 lifecycle gate still requires a clean committed candidate's
-hosted Preview/Production/rollback requalification and the remaining
-report-only state-boundary decision. Until those are claim-matched, the SPEC
+hosted Preview/Production/rollback requalification, Preview teardown absence
+and final parity review. Until those are claim-matched, the SPEC
 and ledger remain open even though the docs-app bridge implementation is
 present.
 

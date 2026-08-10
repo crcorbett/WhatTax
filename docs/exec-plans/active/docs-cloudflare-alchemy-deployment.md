@@ -36,8 +36,8 @@ the milestone and acceptance owner.
 | `DCD-001` | completed   | Accepted at `669a8f3…` after exact dependency/integrity readback, both built-app oracles, docs-maintainer reconciliation, focused Changeset, independent closure, and all change-owned gates. |
 | `DCD-002` | completed   | Accepted candidate `d9cb894…` passed fresh pre-deploy and pre-destroy state/provider readback, equal plans, Preview apply, the complete hosted/browser/screenshot contract, exact-stage teardown/absence, all gates and corrected-boundary independent review. |
 | `DCD-003` | completed   | Accepted after fixed Production, separately Preview-qualified successor, successor Production, restored-source rollback, provider/hosted/screenshot readback, owner reconciliation, full verification and corrected-boundary independent review. |
-| `DCD-004` | in_progress | Mutation workflows now reject unexpected equal-replan resources, Schema-check provider/hosted artifacts, require an accepted Preview run for Production, and prove exact teardown absence. Main-sourced Preview `31338052297` now has a promoted outer receipt at `docs/evidence/deployments/2026-08-10-preview-pr-24/`; PR-close teardown `31337384729` remains a claim-matched failure at the pinned Alchemy beta.64 dry-run, so only Preview is established and Production/teardown/report-only remain stopped. |
-| `DCD-005` | pending     | Docs-app bridge-retirement implementation is present and locally qualified at `d649a14…`; waits for exact-candidate hosted Preview/Production/rollback requalification through the corrected workflow receipt contract, the report-only state boundary, fresh independent review and complete closeout evidence. |
+| `DCD-004` | in_progress | Main-sourced Preview `31338052297`, fixed Production final redeploy `31343392260`, source-bound rollback `31343236244` and report-only `31344401196` now have promoted outer receipts; Preview teardown runs `31343533595`/`31343687718` still stop at the pinned beta.64 dry-run before destroy, so teardown absence remains open. |
+| `DCD-005` | pending     | Docs-app bridge-retirement implementation is present and locally qualified at `d649a14…`; current main-sourced Preview/Production/rollback/report-only receipts are retained, but DCD-005 waits for exact teardown absence, final parity review, fresh independent review and complete closeout evidence. |
 
 ## Baseline
 
@@ -1538,3 +1538,42 @@ corresponding PR-close teardown `31337384729` stopped at the pinned beta.64
 dry-run with no destroy or absence readback; Production, rollback, teardown and
 report-only remain unestablished. DCD-004 remains `in_progress` and DCD-005
 remains `pending`.
+
+### 2026-08-10 — current Production, rollback and report-only promotion
+
+The reviewed default-branch source for the current Production epoch is
+`fef1dfca39d56d28b1f5956e4604af1cc659672b`, with accepted candidate
+`cbcb86878379cc2a126a8e48bee256aa33096c79`. Production plan run `31342982776`
+and deploy run `31343083326` were reconciled by `31343175981`. Normal
+source-bound rollback run `31343236244` was reconciled by `31343339747`, then
+final redeploy run `31343392260` was reconciled by `31343498809`. The promoted
+outer Production receipt is
+`docs/evidence/deployments/2026-08-10-production-prod-fef1dfc/workflow-receipt-31343392260.json`;
+the nested rollback receipt retains its distinct operation, prior/current
+version identities and accepted Preview recovery identity. Hosted proof and
+desktop/mobile PNG bytes were recomputed from the retained artifact; the
+Production Worker URL is provider-readback, not configured input.
+
+Earlier same-epoch Production attempts `31341748556` and `31342478741` are
+retained as failed/non-claim workflow observations: provider mutation occurred,
+but hosted proof stopped on missing rollback or accepted-Preview identity. They
+do not establish a deployment receipt or alter the accepted rollback/final
+redeploy chain.
+
+The reviewed default-branch report-only run `31344401196` was reconciled by
+`31344453019` after the report credential wiring correction. Its dedicated
+outer receipt is
+`docs/evidence/deployments/2026-08-10-orphan-inventory-main-53d936/workflow-receipt-31344401196.json`.
+The report has state/provider agreement, an empty open-PR inventory,
+`mutationCapability: none` and `automaticDeletion: prohibited`; the protected
+environment remains reviewer-gated/manual and is not unattended scheduling.
+The automation register now establishes Preview, Production and report-only.
+
+Preview teardown runs `31343533595` and `31343687718` read the exact stage and
+Worker and produced the expected two-resource delete projection, but the
+pinned Alchemy beta.64 dry-run returned non-zero before destroy. No absence
+receipt exists and no destructive retry is admitted. DCD-004 therefore remains
+`in_progress`, DCD-005 remains `pending`, and all current provider claims are
+limited to the named workers.dev observations. This event supersedes earlier
+plan prose that described Production/report-only as unestablished while
+preserving those earlier receipts as historical evidence.

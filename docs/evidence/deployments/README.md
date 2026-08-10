@@ -366,3 +366,53 @@ current default-branch positive Preview automation receipt and advances only
 absence readback, so Production, rollback, teardown and report-only automation
 entries remain unestablished. No secret value is retained in this evidence
 epoch.
+
+## 2026-08-10 current main-sourced Production and report-only epoch
+
+The reviewed workflow source for this epoch is
+`fef1dfca39d56d28b1f5956e4604af1cc659672b`, with accepted candidate
+`cbcb86878379cc2a126a8e48bee256aa33096c79`. Production plan run `31342982776`
+and deploy run `31343083326` were reconciled by `31343175981`. A normal
+source-bound rollback run `31343236244` was reconciled by `31343339747`, and
+final redeploy run `31343392260` was reconciled by `31343498809`. The durable
+Production outer receipt is
+`2026-08-10-production-prod-fef1dfc/workflow-receipt-31343392260.json`; the
+nested rollback route retains the prior/current provider version transition,
+accepted Preview recovery identity and its own hosted/screenshot proof.
+
+The Production receipt binds account `f9f94270a4a5af8af7010d891020922d`, state
+store `cloudflare-http`, fixed `prod` stage, Worker
+`taxkitdocscloudflare-docswebsite-prod-ujphggiaxw5ryjev`, provider workers.dev
+URL, deployment/version identities, plan/configuration/deployment-input and
+lockfile digests. Hosted proof passed SSR/assets, content types and cache
+headers, server-function transport and malformed input, direct/client 404,
+hydration/navigation, accessibility, console cleanliness, runtime reuse and
+bounded desktop/mobile screenshots. The image digests are
+`128c8f300d1911111fd3fc22a89289efc6961df29582421a53bd77e9ff8c82cf` and
+`9ebc4108397d334eedff97d8ae79ddc103ee61a62bf87a995becf3715b32c945`.
+This is a dated workers.dev observation, not a custom-domain, DNS, billing,
+release, publication, byte-promotion or future-state claim.
+
+Two earlier Production attempts in the same source epoch (`31341748556` and
+`31342478741`) reached provider mutation but failed their hosted proof
+preconditions (rollback identity and accepted Preview identity respectively).
+They are retained as failed workflow observations and are not promoted; the
+source-bound rollback and final redeploy receipts above are the accepted
+recovery chain.
+
+The reviewed default-branch report-only run `31344401196` (reconciler
+`31344453019`) used source
+`53d93648a7b36713055d3edf69beb681c058386f` after the report credential wiring
+correction. Its promoted outer receipt is
+`2026-08-10-orphan-inventory-main-53d936/workflow-receipt-31344401196.json`.
+The dedicated report proves state/provider agreement, an empty open-PR set,
+`mutationCapability: none` and `automaticDeletion: prohibited`; it remains a
+reviewer-gated/manual report-only observation, not unattended deletion
+authority.
+
+Preview teardown runs `31343533595` and `31343687718` are retained as failed,
+non-claim observations: the exact stage/Worker inventory and two-resource
+delete projection were read, but the pinned beta.64 dry-run returned non-zero
+before destroy. No Preview absence receipt exists, and the Worker remains
+present. The automation register consequently establishes Preview,
+Production and report-only only; teardown and DCD-005 closeout remain open.

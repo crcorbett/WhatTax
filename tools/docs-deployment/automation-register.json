@@ -119,8 +119,8 @@
       "trigger": "separately dispatched exact candidate after accepted Preview evidence"
     },
     "externalState": {
-      "receipt": null,
-      "status": "not-established"
+      "receipt": "docs/evidence/deployments/2026-08-10-production-prod-fef1dfc/workflow-receipt-31343392260.json",
+      "status": "established"
     },
     "failure": {
       "escalationOwner": "taxkit-docs-deployment-operation-owner",
@@ -303,8 +303,8 @@
       "trigger": "bounded schedule or explicit manual report"
     },
     "externalState": {
-      "receipt": null,
-      "status": "not-established"
+      "receipt": "docs/evidence/deployments/2026-08-10-orphan-inventory-main-53d936/workflow-receipt-31344401196.json",
+      "status": "established"
     },
     "failure": {
       "escalationOwner": "taxkit-docs-deployment-operation-owner",
