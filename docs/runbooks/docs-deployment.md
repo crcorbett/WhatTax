@@ -186,6 +186,9 @@ PR-close teardown is convergent and safe when no stage exists. Its equal dry-run
 projection records `noop` for both logical resources and performs no destroy;
 when both exact `DocsBuild` and `DocsWebsite` resources exist, it records equal
 `delete` actions, destroys only that `pr-N` stage, and requires absence readback.
+The plan parser removes ANSI escapes and ignores only Alchemy's timestamped
+uppercase log-diagnostic lines; every other bracketed action/resource line is
+retained and rejected unless it is one of the two owned `delete`/`noop` lines.
 The workflow retries each dry-run at most twice after a non-zero Alchemy exit,
 with a five-second bounded delay, and retries each read-only inventory
 readback at most twice only when the inventory process exits with empty
