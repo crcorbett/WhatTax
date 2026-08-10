@@ -453,3 +453,22 @@ the prior beta.64 dry-run stop for this dated epoch. The earlier failed runs
 `31349508145` remain immutable non-claim observations. The receipt does not
 establish Preview availability, Production, rollback, custom-domain/DNS,
 billing, release, publication, byte promotion or future provider state.
+
+## 2026-08-10 local parity and verification exception
+
+The local Cloudflare/workerd bridge-retirement receipt
+`2026-08-10-local-bridge-retirement/receipt.json` is bound to committed
+candidate `0791de2206fd241ead69e144742f48b6daa4318d`. The canonical
+`bun run --filter=docs test:cloudflare-built` command passed all retained Nitro
+parity oracles and the receipt records no provider, hosted, public, release or
+domain claim.
+
+The same candidate's exact `bun run verification` reached all preceding
+repository, documentation, runbook, deployment, lint, format, skill, Quality,
+Knip and type owners, then failed only HGI-205's fixed-port release-boundary
+fixture because unrelated process PID `30035` owned `127.0.0.1:4173`. The
+failure output was `Failed to start server. Is port 4173 in use?` followed by
+the expected health timeout. No TaxKit file or provider state changed. This
+dated note is an owner-bound environment baseline exception, not a full-green
+verification claim; rerun the exact command after that process releases the
+port before any stricter all-green closure.

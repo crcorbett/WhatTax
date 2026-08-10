@@ -1680,3 +1680,41 @@ The old 2026-08-09 receipt remains historical and unchanged. DCD-005 is now
 limited to final lifecycle/parity review, active-plan archival and the
 remaining repository closeout gates; no provider claim is inferred from local
 workerd proof.
+
+### 2026-08-10 — final parity and verification readback
+
+The exact committed candidate `0791de2206fd241ead69e144742f48b6daa4318d`
+reran `bun run --filter=docs test:cloudflare-built` successfully. The durable
+receipt `docs/evidence/deployments/2026-08-10-local-bridge-retirement/receipt.json`
+now binds that candidate and records all retained Nitro parity oracles,
+including mobile disclosure, reduced motion, pending navigation and
+recoverable-error rendering, plus SSR, assets, hydration, navigation,
+server-function, 404, accessibility, focus, console, runtime, filesystem and
+local size/startup limits. This remains local workerd evidence and does not
+establish provider or hosted state.
+
+The required retirement audit was run against executable/docs-app owners:
+`rg -ni 'nitro|@vercel|\.vercel/output|\.output' apps/docs
+apps/docs/package.json apps/docs/vite.config.ts apps/docs/src apps/docs/scripts`
+returned only the explicit historical README bridge sentence at
+`apps/docs/README.md:145-146`; no live docs-app Nitro import, Vercel preset,
+`.vercel/output` harness or `.output` owner was found. The independent
+`apps/web` Nitro and shared root output owners remain preserved and are outside
+this retirement claim. Deployment procedure prose remains routed through the
+architecture/runbook owners.
+
+The exact current `bun run verification` attempt reached every preceding
+repository, documentation, runbook, deployment, lint, format, skill, Quality,
+Knip and type owner, then failed only HGI-205's fixed-port release-boundary
+fixture because unrelated process PID `30035` from another checkout owned
+`127.0.0.1:4173`. The observed output was `Failed to start server. Is port 4173
+in use?` followed by the expected health timeout; no TaxKit file or provider
+state was changed. This is an owner-bound environment baseline exception, not a
+green verification claim. Recovery is to wait for the process owner to release
+4173 and rerun the exact command before a stricter all-green closure; the failed
+attempt and current listener readback are retained as a limitation.
+
+The fresh independent review of this candidate is recorded in the thread
+review readback: DCD-004 is evidence-ready with four established automation
+receipts; DCD-005 remains open until this bounded verification exception,
+Cooper's final lifecycle acceptance and completed-plan archival are reconciled.

@@ -1,6 +1,6 @@
 {
   "candidate": {
-    "sourceCommit": "24ce5de1c565107276e9524b8e9203b14cab9580",
+    "sourceCommit": "0791de2206fd241ead69e144742f48b6daa4318d",
     "worktreeCleanBeforeProof": true,
     "assetsSha256": "fbdda0f0394afbb7b2809f5123ca86139d5b7ddd51422b2221fb172b9cff87fd",
     "workerModulesSha256": "eab9ebf6e2e77b76719a86d9bc4a54f4936c57746af4b2e24204be6b2ddc186c",
@@ -49,8 +49,8 @@
       "gzipUploadBytes": 527708.16,
       "rawUploadBytes": 3135641.6,
       "workerSizeLimitBytes": 3145728,
-      "localProcessStartToFirstResponseMs": 877.11,
-      "firstResponseRequestMs": 140.63
+      "localProcessStartToFirstResponseMs": 1474.82,
+      "firstResponseRequestMs": 153.82
     }
   },
   "implementation": {
