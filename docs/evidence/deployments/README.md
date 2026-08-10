@@ -472,3 +472,10 @@ the expected health timeout. No TaxKit file or provider state changed. This
 dated note is an owner-bound environment baseline exception, not a full-green
 verification claim; rerun the exact command after that process releases the
 port before any stricter all-green closure.
+
+The fresh independent review is retained at
+`2026-08-10-local-bridge-retirement/independent-review-32ea78e.json`. It
+confirms DCD-004 readiness and local parity, but records DCD-005 as
+`not-ready` until the exact verification result and Cooper's lifecycle
+acceptance are reconciled. It is a review receipt, not provider or publication
+proof.

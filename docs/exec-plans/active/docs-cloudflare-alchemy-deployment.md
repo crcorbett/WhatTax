@@ -1725,7 +1725,10 @@ green verification claim. Recovery is to wait for the process owner to release
 4173 and rerun the exact command before a stricter all-green closure; the failed
 attempt and current listener readback are retained as a limitation.
 
-The fresh independent review of this candidate is recorded in the thread
-review readback: DCD-004 is evidence-ready with four established automation
-receipts; DCD-005 remains open until this bounded verification exception,
-Cooper's final lifecycle acceptance and completed-plan archival are reconciled.
+The fresh independent review is durably retained at
+`docs/evidence/deployments/2026-08-10-local-bridge-retirement/independent-review-32ea78e.json`.
+It reviewed exact HEAD `32ea78e…` read-only, found DCD-004 evidence-ready and
+DCD-005 `not-ready`, and reconciled the local parity, current-owner, focused
+gate, verification-baseline and lifecycle findings. DCD-005 remains open until
+the exact verification result is resolved or explicitly admitted by Cooper,
+Cooper's lifecycle acceptance is recorded, and the completed plan is archived.
