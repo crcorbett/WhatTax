@@ -149,6 +149,14 @@ describe("docs deployment workflow admission", () => {
     expect(teardown).toContain(
       "grep -Ev '^[[][0-9]{2}:[0-9]{2}:[0-9]{2}([.][0-9]+)?[]] [A-Z]+ '"
     );
+    expect(teardown).toContain("grep -E '^[[][^]]+[]] '");
+    expect(teardown).toContain(
+      "grep -Ev '^[[](DocsBuild|DocsWebsite)[]] (delete|noop)$'"
+    );
+    expect(teardown).toContain(
+      "grep -E '^[[](DocsBuild|DocsWebsite)[]] delete$'"
+    );
+    expect(teardown).toContain("printf '%s' \"$destroy_resource_lines\"");
     expect(teardown).toContain("dry_run_status");
     expect(teardown).toContain(
       "ALCHEMY_TELEMETRY_DISABLED=1 ALCHEMY_PLAIN=1 CI=1 bun node_modules/alchemy/bin/alchemy.ts destroy --dry-run"

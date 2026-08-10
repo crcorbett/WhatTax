@@ -1609,5 +1609,16 @@ double-escaped regular expression did not remove the timestamped warning, so
 the run stopped before the second equal dry-run, destroy or absence readback.
 Its sanitized artifact is retained as another failed/non-claim receipt. The
 successor correction uses bracket expressions rather than escaped brackets or
-periods; it is locally contract-tested and requires a fresh reviewed-main run
-before any teardown automation promotion.
+periods, and emits the extracted lines without a synthetic literal newline; it
+is locally contract-tested and requires a fresh reviewed-main run before any
+teardown automation promotion.
+
+The subsequent reviewed-main teardown dispatch `31348538146` at source commit
+`4775df580ba369b9309098f500c1bc7c65f3a067` again retained only the preflight
+inventory and first dry-run artifact and stopped before destroy. The retained
+artifact showed the remaining inherited double-escaped resource/action filters
+could not form a claim-matched equal projection; no destroy or absence
+readback occurred. This is a failed/non-claim workflow receipt. The current
+correction removes those escape-dependent filters and synthetic newline output
+while preserving the timestamp-diagnostic exclusion and fail-closed unknown
+line rejection; a fresh reviewed-main run is required.
