@@ -187,9 +187,9 @@ describe("docs deployment workflow admission", () => {
     expect(orphan).toContain(stateSecretEnv);
     expect(orphan).toContain("Materialize the reviewed state-read cache");
     expect(orphan).toContain("cloudflare-state-store.json");
-    expect(orphan).not.toContain(
+    expect(orphan).toContain(
       [
-        "    env:\n      ALCHEMY_STATE_STORE_CREDENTIALS_JSON: $",
+        "      - name: Run report-only orphan inventory\n        env:\n          ALCHEMY_STATE_STORE_CREDENTIALS_JSON: $",
         "{{ secrets.ALCHEMY_STATE_STORE_CREDENTIALS_JSON }}",
       ].join("")
     );
