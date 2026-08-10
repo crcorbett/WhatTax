@@ -1742,3 +1742,12 @@ health-check timeout. GitHub Quality push run `31352338774` and pull-request
 run `31352341451` both passed for this exact candidate, but neither replaces the
 failed full-verification owner. The result remains a non-green, exact-candidate
 baseline observation; no TaxKit process was killed and no provider state changed.
+
+The current evidence-only successor `aa1bda1d4a2f47d796d095f86987eef1f3e799ff`
+was then rerun with the same exact command. It produced the identical HGI-205
+fixed-port failure from PID `30035` (`127.0.0.1:4173`) after all preceding
+owners passed. This confirms the limitation on the actual current head rather
+than relying on the e43 predecessor; the aa1 push and pull-request Quality
+runs `31352729103` and `31352732147` both passed. DCD-005 remains open until
+the port is released for a green rerun or Cooper explicitly admits this
+exact-candidate baseline, followed by lifecycle acceptance and archival.

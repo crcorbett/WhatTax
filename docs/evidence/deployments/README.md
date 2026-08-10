@@ -497,3 +497,18 @@ port and a green exact-candidate verification rerun or Cooper's explicit
 acceptance of this named baseline exception, followed by lifecycle acceptance
 and completed-plan archival. No process was terminated and no provider state or
 credential was changed by this readback.
+
+## 2026-08-10 current-head verification readback (`aa1bda1`)
+
+The current evidence-only successor
+`aa1bda1d4a2f47d796d095f86987eef1f3e799ff` reran `bun run verification` on
+the exact current head. All owners before HGI-205 passed; HGI-205 failed with
+the same unrelated PID `30035` holding `127.0.0.1:4173`, reporting `Failed to
+start server. Is port 4173 in use?` and the health timeout. This confirms an
+exact-current non-green baseline, not a successful or waived verification.
+
+Quality push run `31352729103` and pull-request run `31352732147` both passed
+for `aa1bda1`. DCD-005 therefore remains open pending release of the fixed port
+and a green rerun, or Cooper's explicit acceptance of this exact-candidate
+baseline exception, followed by lifecycle acceptance and completed-plan
+archival. No process was terminated and no provider state changed.
