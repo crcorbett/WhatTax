@@ -147,7 +147,7 @@ describe("docs deployment workflow admission", () => {
     expect(teardown).toContain("stage_count_before");
     expect(teardown).toContain("unexpected_destroy_resources");
     expect(teardown).toContain(
-      String.raw`grep -Ev '^\\[[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]+)?\\] [A-Z]+ '`
+      "grep -Ev '^[[][0-9]{2}:[0-9]{2}:[0-9]{2}([.][0-9]+)?[]] [A-Z]+ '"
     );
     expect(teardown).toContain("dry_run_status");
     expect(teardown).toContain(

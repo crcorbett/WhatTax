@@ -1600,3 +1600,14 @@ readback. The sanitized failure artifact is retained at the run URL and is a
 failed/non-claim receipt. The parser correction ignores only recognized
 timestamped uppercase diagnostics and continues to reject all other unknown
 bracketed action/resource lines; a fresh reviewed-main run is required.
+
+The first parser correction was exercised by reviewed-main teardown run
+`31347842707` at source commit
+`0b21b543b714f6122f6b7e83c3f2bb21c8422662` for the same closed PR #24. The
+provider inventory and direct beta.64 dry-run again succeeded, but the
+double-escaped regular expression did not remove the timestamped warning, so
+the run stopped before the second equal dry-run, destroy or absence readback.
+Its sanitized artifact is retained as another failed/non-claim receipt. The
+successor correction uses bracket expressions rather than escaped brackets or
+periods; it is locally contract-tested and requires a fresh reviewed-main run
+before any teardown automation promotion.
