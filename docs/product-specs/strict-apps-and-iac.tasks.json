@@ -231,7 +231,7 @@
     },
     {
       "id": "APP-IAC-004",
-      "status": "in_progress",
+      "status": "complete",
       "acceptedFindingIds": ["FINDING-001", "FINDING-002", "FINDING-003", "FINDING-004"],
       "requirementIds": ["AIR-001", "AIR-002", "AIR-003", "AIR-004"],
       "title": "Prevent strict app and IaC boundary regressions",
@@ -273,7 +273,7 @@
     },
     {
       "id": "APP-IAC-005",
-      "status": "pending",
+      "status": "in_progress",
       "acceptedFindingIds": ["FINDING-001", "FINDING-002", "FINDING-003", "FINDING-004"],
       "requirementIds": ["AIR-005"],
       "title": "Run the terminal audit and close the successor lifecycle",

@@ -408,6 +408,16 @@ supporting gate and cannot replace semantic ownership or call-graph review.
   boundary and `BunRuntime.runMain` while excluding direct environment,
   `Bun.file`, unchecked JSON, raw runtime execution, console and process-exit
   paths.
+- `tools/docs-deployment/strict-boundaries.policy.ts` owns one exact-source
+  architecture contract for the corrected docs runtime, workflow, credential
+  and child-process owners. Its adversarial contract test rejects recurrence
+  of direct environment/file/JSON/runtime execution, raw Promise concurrency,
+  ambient child environments, bypassed shared boundaries and unmanaged docs
+  runtime state/randomness. It permits only the named process-byte adapter and
+  Worker fetch/ManagedRuntime bridge documented by the tool owner. This
+  semantic control runs once inside `test:docs-deployment`; do not duplicate it
+  as another root-verification command or broaden it into a repository-wide
+  text ban.
 - Custom-rule tests must cover prohibited and allowed Effect decoder families,
   imports and aliases, descriptor/member decoders, static computed members,
   factory creation and extraction. They must also cover a TSX decoder attempt,

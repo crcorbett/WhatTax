@@ -40,6 +40,11 @@ operator procedure and authority live in
 - `inventory.runtime.ts` and `orphan-inventory.runtime.ts` are executable
   composition owners. Their services remain report-only unless a separately
   authorized workflow owns mutation.
+- `strict-boundaries.policy.ts` owns the exact corrected app/deployment
+  architecture contract. Its contract test loads the named production owners
+  and rejects direct ambient environment, manual file/JSON, raw runtime or
+  raw-concurrency paths, lost credential/process/workflow boundaries, and
+  unmanaged docs runtime proof state or randomness.
 - `alchemy.run.ts` remains the root Alchemy resource composition; this tool
   directory does not own the Worker graph.
 
@@ -50,6 +55,24 @@ once at ingress and internal failures remain tagged as input, read, mismatch
 or disagreement errors. Host mutation is limited to joining bounded process
 byte chunks before fatal UTF-8 decoding. Logs, errors and receipts contain safe
 identity only, never credential values or raw provider payloads.
+
+Two narrow host adaptations remain explicit:
+
+- `orphan-inventory.process-boundary.ts`, owned by the deployment tool owner,
+  joins bounded child-process byte chunks with local counters and performs one
+  fatal `TextDecoder` restoration. The carrying cost is a small imperative
+  byte adapter; review it when the Effect Platform child-process stream API
+  changes and retire it when the pinned API provides an equally strict byte
+  collection and UTF-8 restoration primitive.
+- `apps/docs/src/server.ts`, owned by the docs app owner, implements the async
+  TanStack/Cloudflare `fetch` contract and crosses into the one app-owned
+  `ManagedRuntime` through `runPromise`. The carrying cost is one Promise host
+  bridge; review it when the TanStack entry contract or Worker lifecycle
+  changes and retire it if the host can accept an Effect-native entrypoint or
+  expose a reliable shutdown scope.
+
+These adaptations are accepted by the focused architecture contract; they are
+not general exemptions for nearby runtime source.
 
 ## Local verification
 
@@ -63,7 +86,10 @@ bun run check:docs-deployment
 The tests include adversarial Config/receipt fixtures, missing and malformed
 credentials, account mismatch, bounded child environments, spawn/exit/UTF-8/
 JSON failures, secret-negative diagnostics, deterministic orphan
-classification and static adapter contracts. The retained-evidence check
-validates historical claim matching. These local commands do not dispatch
-workflows, access providers, deploy, destroy, prove hosted behavior or grant
-operational authority.
+classification and static adapter contracts. `strict-boundaries.contract.test.ts`
+adds accepted exact-source proof plus adversarial mutations for each corrected
+root cause. It runs once through `test:docs-deployment`, which root
+`verification` invokes once. The retained-evidence check validates historical
+claim matching. These local commands do not dispatch workflows, access
+providers, deploy, destroy, prove hosted behavior or grant operational
+authority.

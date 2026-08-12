@@ -42,9 +42,13 @@ DNS, package publication, versioning, tags and releases remain outside scope.
   workerd journey pass, including malformed RPC and visually reviewed,
   digest-bound desktop/mobile screenshots. Evidence:
   [`APP-IAC-003-validation.json`](../../documentation-audit/strict-apps-iac/APP-IAC-003-validation.json).
-- **APP-IAC-004 — active:** add the smallest focused recurrence-prevention
-  control and adversarial fixtures earned by the three root corrections.
-- **APP-IAC-005 — pending:** perform the fresh terminal audit, run all gates,
+- **APP-IAC-004 — complete:** one exact-source architecture contract guards
+  the corrected docs runtime, workflow, credential and child-process owners.
+  Six accepted/adversarial tests reject each evidenced root cause while
+  retaining two named host adapters, and the control runs once through the
+  existing deployment test edge. Evidence:
+  [`APP-IAC-004-validation.json`](../../documentation-audit/strict-apps-iac/APP-IAC-004-validation.json).
+- **APP-IAC-005 — active:** perform the fresh terminal audit, run all gates,
   record bounded residuals, and close lifecycle owners together.
 
 ## Execution rules
