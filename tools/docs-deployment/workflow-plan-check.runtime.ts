@@ -1,75 +1,85 @@
-import { Effect, Match, Schema } from "effect";
+import * as BunRuntime from "@effect/platform-bun/BunRuntime";
+import * as BunServices from "@effect/platform-bun/BunServices";
+import { Config, Console, Effect, Match } from "effect";
 
 import { DeploymentPlanReceipt } from "./schemas.js";
+import {
+  readWorkflowReceipt,
+  workflowSha256,
+} from "./workflow-check.boundary.js";
+import {
+  WorkflowCheckInputError,
+  WorkflowCheckMismatchError,
+  WorkflowPlanCheckConfig,
+} from "./workflow-check.schemas.js";
 
-const program = Effect.gen(function* workflowPlanCheck() {
-  const planPath = process.env["TAXKIT_WORKFLOW_PLAN_RECEIPT"];
-  const candidateCommit = process.env["TAXKIT_WORKFLOW_PLAN_CANDIDATE_COMMIT"];
-  const operation = process.env["TAXKIT_WORKFLOW_PLAN_OPERATION"];
-  const stage = process.env["TAXKIT_WORKFLOW_PLAN_STAGE"];
-  const acceptedPlanSha256 = process.env["TAXKIT_WORKFLOW_PLAN_SHA256"];
-  const requireReplan =
-    process.env["TAXKIT_WORKFLOW_PLAN_REQUIRE_REPLAN"] === "1";
-  if (
-    planPath === undefined ||
-    candidateCommit === undefined ||
-    operation === undefined ||
-    stage === undefined ||
-    acceptedPlanSha256 === undefined
-  ) {
-    return yield* Effect.fail("workflow plan inputs are incomplete");
-  }
-  const plan = yield* Schema.decodeUnknownEffect(DeploymentPlanReceipt, {
-    onExcessProperty: "error",
-  })(yield* Effect.promise(() => Bun.file(planPath).json())).pipe(
-    Effect.mapError(() => "workflow plan failed Schema decoding")
+const check = "workflow-plan" as const;
+
+export const checkWorkflowPlan = Effect.gen(function* workflowPlanCheck() {
+  const config = yield* Config.schema(WorkflowPlanCheckConfig).pipe(
+    Effect.mapError(
+      () => new WorkflowCheckInputError({ check, target: "environment" })
+    )
+  );
+  const plan = yield* readWorkflowReceipt(
+    check,
+    config.TAXKIT_WORKFLOW_PLAN_RECEIPT,
+    "plan-receipt",
+    DeploymentPlanReceipt
   );
   const { projection } = plan;
-  const canonicalProjection = {
-    candidate: {
-      deploymentInputSha256: projection.candidate.deploymentInputSha256,
-      exactCommit: projection.candidate.exactCommit,
-      lockfileSha256: projection.candidate.lockfileSha256,
-    },
-    configSha256: projection.configSha256,
-    logicalResources: projection.logicalResources,
-    redaction: projection.redaction,
-    schemaVersion: projection.schemaVersion,
-    stack: projection.stack,
-    stage: projection.stage,
-  };
-  const projectionDigest = new Bun.CryptoHasher("sha256")
-    .update(JSON.stringify(canonicalProjection))
-    .digest("hex");
+  const projectionDigest = yield* workflowSha256(
+    check,
+    JSON.stringify({
+      candidate: {
+        deploymentInputSha256: projection.candidate.deploymentInputSha256,
+        exactCommit: projection.candidate.exactCommit,
+        lockfileSha256: projection.candidate.lockfileSha256,
+      },
+      configSha256: projection.configSha256,
+      logicalResources: projection.logicalResources,
+      redaction: projection.redaction,
+      schemaVersion: projection.schemaVersion,
+      stack: projection.stack,
+      stage: projection.stage,
+    })
+  );
+  const requireReplan = config.TAXKIT_WORKFLOW_PLAN_REQUIRE_REPLAN === "1";
+
   if (
-    plan.acceptedPlanSha256 !== acceptedPlanSha256 ||
-    plan.operation !== operation ||
-    projectionDigest !== acceptedPlanSha256 ||
-    plan.projection.candidate.exactCommit !== candidateCommit ||
-    plan.projection.stage !== stage ||
-    (requireReplan && plan.replanSha256 !== acceptedPlanSha256)
+    plan.acceptedPlanSha256 !== config.TAXKIT_WORKFLOW_PLAN_SHA256 ||
+    plan.operation !== config.TAXKIT_WORKFLOW_PLAN_OPERATION ||
+    projectionDigest !== config.TAXKIT_WORKFLOW_PLAN_SHA256 ||
+    plan.projection.candidate.exactCommit !==
+      config.TAXKIT_WORKFLOW_PLAN_CANDIDATE_COMMIT ||
+    plan.projection.stage !== config.TAXKIT_WORKFLOW_PLAN_STAGE ||
+    (requireReplan && plan.replanSha256 !== config.TAXKIT_WORKFLOW_PLAN_SHA256)
   ) {
-    return yield* Effect.fail(
-      "workflow plan identity, projection digest or equal-replan postcondition mismatch"
-    );
+    return yield* new WorkflowCheckMismatchError({
+      check,
+      invariant: "identity-projection-equal-replan",
+    });
   }
-  yield* Effect.sync(() =>
-    console.log(
-      `Docs deployment workflow plan: operation=${operation}; candidate=${candidateCommit}; stage=${stage}; digest=${acceptedPlanSha256}; schema=1; equalReplan=${plan.replanSha256 !== null}.`
-    )
+
+  yield* Console.log(
+    `Docs deployment workflow plan: operation=${config.TAXKIT_WORKFLOW_PLAN_OPERATION}; candidate=${config.TAXKIT_WORKFLOW_PLAN_CANDIDATE_COMMIT}; stage=${config.TAXKIT_WORKFLOW_PLAN_STAGE}; digest=${config.TAXKIT_WORKFLOW_PLAN_SHA256}; schema=1; equalReplan=${plan.replanSha256 !== null}.`
   );
 });
 
-const main = async () => {
-  try {
-    await Effect.runPromise(program);
-  } catch (error) {
-    console.error(`FAIL [workflow-plan] ${String(error)}`);
-    process.exitCode = 1;
-  }
-};
+const program = checkWorkflowPlan.pipe(
+  Effect.tapErrorTag("WorkflowCheckInputError", (error) =>
+    Console.error(`FAIL [${error.check}] input=${error.target}`)
+  ),
+  Effect.tapErrorTag("WorkflowCheckReadError", (error) =>
+    Console.error(`FAIL [${error.check}] operation=${error.operation}`)
+  ),
+  Effect.tapErrorTag("WorkflowCheckMismatchError", (error) =>
+    Console.error(`FAIL [${error.check}] invariant=${error.invariant}`)
+  ),
+  Effect.provide(BunServices.layer)
+);
 
 Match.value(import.meta.main).pipe(
-  Match.when(true, () => void main()),
+  Match.when(true, () => BunRuntime.runMain(program)),
   Match.orElse(() => false)
 );

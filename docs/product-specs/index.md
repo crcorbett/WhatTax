@@ -3,7 +3,7 @@ document_type: product-spec-index
 lifecycle: current
 authority: canonical
 owner: taxkit-product-owner
-last_reviewed: 2026-08-10
+last_reviewed: 2026-08-13
 review_trigger: product-spec admission, lifecycle, evidence, or successor change
 successor: null
 tombstone: false
@@ -21,6 +21,7 @@ Specs:
 
 | Spec | Status | Notes |
 | --- | --- | --- |
+| [Strict apps and IaC](./strict-apps-and-iac.md) | Active | APP-IAC-001 through APP-IAC-005 harden docs-app runtime proof and Alchemy/Cloudflare verification and inventory boundaries without changing the deployed resource graph or external state. |
 | [Docs Cloudflare and Alchemy deployment](./docs-cloudflare-alchemy-deployment.md) | Implemented | DCD-001 through DCD-005 are accepted at closeout candidate `c0cd1a9`; main-sourced Preview `pr-24`, fixed Production/rollback, report-only and exact Preview teardown absence receipts remain claim-matched (`31338052297`, `31343392260`, `31343236244`, `31344401196`, `31350160353`). The completed plan retains the full history; custom-domain/DNS remains a successor non-goal. |
 | [TaxKit docs application architecture](./docs-application-architecture.md) | Implemented | The three-owner docs migration, native route outcomes, production graph and candidate-bound local proof are implemented; search remains deferred. |
 | [Harness foundation improvements](./harness-foundation-improvements.md) | Implemented | The portable six-skill baseline, stable TaxKit profile, deterministic governance gate, five retained journeys, and fail-closed epoch `7c8a96e` are implemented and locally verified. |

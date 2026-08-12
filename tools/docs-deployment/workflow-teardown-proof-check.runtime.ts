@@ -1,51 +1,63 @@
-import { Effect, Match, Schema } from "effect";
+import * as BunRuntime from "@effect/platform-bun/BunRuntime";
+import * as BunServices from "@effect/platform-bun/BunServices";
+import { Config, Console, Effect, Match } from "effect";
 
+import { readWorkflowReceipt } from "./workflow-check.boundary.js";
+import {
+  WorkflowCheckInputError,
+  WorkflowCheckMismatchError,
+  WorkflowTeardownProofCheckConfig,
+} from "./workflow-check.schemas.js";
 import { DeploymentWorkflowTeardownReadback } from "./workflow-receipts.schemas.js";
 
-const program = Effect.gen(function* workflowTeardownProofCheck() {
-  const readbackPath = process.env["TAXKIT_WORKFLOW_TEARDOWN_READBACK"];
-  const candidateCommit = process.env["TAXKIT_WORKFLOW_CANDIDATE_COMMIT"];
-  const stage = process.env["TAXKIT_WORKFLOW_STAGE"];
-  if (
-    readbackPath === undefined ||
-    candidateCommit === undefined ||
-    stage === undefined
-  ) {
-    return yield* Effect.fail("workflow teardown proof inputs are incomplete");
-  }
-  const readback = yield* Schema.decodeUnknownEffect(
-    DeploymentWorkflowTeardownReadback,
-    { onExcessProperty: "error" }
-  )(yield* Effect.promise(() => Bun.file(readbackPath).json())).pipe(
-    Effect.mapError(() => "teardown readback failed Schema decoding")
-  );
-  if (
-    readback.candidateCommit !== candidateCommit ||
-    readback.stage !== stage ||
-    !readback.stateStageAbsent ||
-    !readback.providerWorkerAbsent
-  ) {
-    return yield* Effect.fail(
-      "workflow teardown readback does not prove exact stage absence"
+const check = "workflow-teardown-proof" as const;
+
+export const checkWorkflowTeardownProof = Effect.gen(
+  function* workflowTeardownProofCheck() {
+    const config = yield* Config.schema(WorkflowTeardownProofCheckConfig).pipe(
+      Effect.mapError(
+        () => new WorkflowCheckInputError({ check, target: "environment" })
+      )
+    );
+    const readback = yield* readWorkflowReceipt(
+      check,
+      config.TAXKIT_WORKFLOW_TEARDOWN_READBACK,
+      "teardown-readback",
+      DeploymentWorkflowTeardownReadback
+    );
+
+    if (
+      readback.candidateCommit !== config.TAXKIT_WORKFLOW_CANDIDATE_COMMIT ||
+      readback.stage !== config.TAXKIT_WORKFLOW_STAGE ||
+      !readback.stateStageAbsent ||
+      !readback.providerWorkerAbsent
+    ) {
+      return yield* new WorkflowCheckMismatchError({
+        check,
+        invariant: "exact-stage-state-provider-absence",
+      });
+    }
+
+    yield* Console.log(
+      `Docs deployment teardown proof: candidate=${config.TAXKIT_WORKFLOW_CANDIDATE_COMMIT}; stage=${config.TAXKIT_WORKFLOW_STAGE}; state/provider absence agree.`
     );
   }
-  yield* Effect.sync(() =>
-    console.log(
-      `Docs deployment teardown proof: candidate=${candidateCommit}; stage=${stage}; state/provider absence agree.`
-    )
-  );
-});
+);
 
-const main = async () => {
-  try {
-    await Effect.runPromise(program);
-  } catch (error) {
-    console.error(`FAIL [workflow-teardown-proof] ${String(error)}`);
-    process.exitCode = 1;
-  }
-};
+const program = checkWorkflowTeardownProof.pipe(
+  Effect.tapErrorTag("WorkflowCheckInputError", (error) =>
+    Console.error(`FAIL [${error.check}] input=${error.target}`)
+  ),
+  Effect.tapErrorTag("WorkflowCheckReadError", (error) =>
+    Console.error(`FAIL [${error.check}] operation=${error.operation}`)
+  ),
+  Effect.tapErrorTag("WorkflowCheckMismatchError", (error) =>
+    Console.error(`FAIL [${error.check}] invariant=${error.invariant}`)
+  ),
+  Effect.provide(BunServices.layer)
+);
 
 Match.value(import.meta.main).pipe(
-  Match.when(true, () => void main()),
+  Match.when(true, () => BunRuntime.runMain(program)),
   Match.orElse(() => false)
 );

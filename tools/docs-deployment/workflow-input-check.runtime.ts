@@ -1,64 +1,68 @@
-import { Effect, Match, Schema } from "effect";
+import * as BunRuntime from "@effect/platform-bun/BunRuntime";
+import * as BunServices from "@effect/platform-bun/BunServices";
+import { Config, Console, Effect, Match } from "effect";
 
+import { readWorkflowReceipt } from "./workflow-check.boundary.js";
+import {
+  WorkflowCheckInputError,
+  WorkflowCheckMismatchError,
+  WorkflowInputCheckConfig,
+} from "./workflow-check.schemas.js";
 import { DeploymentWorkflowInputReadback } from "./workflow-receipts.schemas.js";
 
-const program = Effect.gen(function* workflowInputCheck() {
-  const inputPath = process.env["TAXKIT_WORKFLOW_INPUT_RECEIPT"];
-  const candidateCommit = process.env["TAXKIT_WORKFLOW_INPUT_CANDIDATE_COMMIT"];
-  const workflowCommit = process.env["TAXKIT_WORKFLOW_INPUT_WORKFLOW_COMMIT"];
-  const workflowRunId = process.env["TAXKIT_WORKFLOW_INPUT_RUN_ID"];
-  const workflowPath = process.env["TAXKIT_WORKFLOW_INPUT_WORKFLOW_PATH"];
-  const operation = process.env["TAXKIT_WORKFLOW_INPUT_OPERATION"];
-  const prNumber = process.env["TAXKIT_WORKFLOW_INPUT_PR_NUMBER"];
-  if (
-    inputPath === undefined ||
-    candidateCommit === undefined ||
-    workflowCommit === undefined ||
-    workflowRunId === undefined ||
-    workflowPath === undefined ||
-    operation === undefined
-  ) {
-    return yield* Effect.fail("workflow input receipt inputs are incomplete");
-  }
-  const input = yield* Schema.decodeUnknownEffect(
-    DeploymentWorkflowInputReadback,
-    { onExcessProperty: "error" }
-  )(yield* Effect.promise(() => Bun.file(inputPath).json())).pipe(
-    Effect.mapError(() => "workflow input receipt failed Schema decoding")
+const check = "workflow-input" as const;
+
+export const checkWorkflowInput = Effect.gen(function* workflowInputCheck() {
+  const config = yield* Config.schema(WorkflowInputCheckConfig).pipe(
+    Effect.mapError(
+      () => new WorkflowCheckInputError({ check, target: "environment" })
+    )
+  );
+  const input = yield* readWorkflowReceipt(
+    check,
+    config.TAXKIT_WORKFLOW_INPUT_RECEIPT,
+    "input-receipt",
+    DeploymentWorkflowInputReadback
   );
   const expectedPrNumber =
-    prNumber === undefined || prNumber.length === 0
+    config.TAXKIT_WORKFLOW_INPUT_PR_NUMBER === undefined ||
+    config.TAXKIT_WORKFLOW_INPUT_PR_NUMBER === ""
       ? null
-      : Number.parseInt(prNumber, 10);
+      : config.TAXKIT_WORKFLOW_INPUT_PR_NUMBER;
+
   if (
-    input.candidateCommit !== candidateCommit ||
-    input.workflowCommit !== workflowCommit ||
-    input.workflowRunId !== workflowRunId ||
-    input.workflowPath !== workflowPath ||
-    input.operation !== operation ||
+    input.candidateCommit !== config.TAXKIT_WORKFLOW_INPUT_CANDIDATE_COMMIT ||
+    input.workflowCommit !== config.TAXKIT_WORKFLOW_INPUT_WORKFLOW_COMMIT ||
+    input.workflowRunId !== config.TAXKIT_WORKFLOW_INPUT_RUN_ID ||
+    input.workflowPath !== config.TAXKIT_WORKFLOW_INPUT_WORKFLOW_PATH ||
+    input.operation !== config.TAXKIT_WORKFLOW_INPUT_OPERATION ||
     input.prNumber !== expectedPrNumber
   ) {
-    return yield* Effect.fail(
-      "workflow input receipt does not match the source, run, operation or candidate"
-    );
+    return yield* new WorkflowCheckMismatchError({
+      check,
+      invariant: "source-run-operation-candidate",
+    });
   }
-  yield* Effect.sync(() =>
-    console.log(
-      `Docs deployment workflow input: candidate=${candidateCommit}; workflow=${workflowCommit}; run=${workflowRunId}; operation=${operation}; source=refs/heads/main.`
-    )
+
+  yield* Console.log(
+    `Docs deployment workflow input: candidate=${config.TAXKIT_WORKFLOW_INPUT_CANDIDATE_COMMIT}; workflow=${config.TAXKIT_WORKFLOW_INPUT_WORKFLOW_COMMIT}; run=${config.TAXKIT_WORKFLOW_INPUT_RUN_ID}; operation=${config.TAXKIT_WORKFLOW_INPUT_OPERATION}; source=refs/heads/main.`
   );
 });
 
-const main = async () => {
-  try {
-    await Effect.runPromise(program);
-  } catch (error) {
-    console.error(`FAIL [workflow-input] ${String(error)}`);
-    process.exitCode = 1;
-  }
-};
+const program = checkWorkflowInput.pipe(
+  Effect.tapErrorTag("WorkflowCheckInputError", (error) =>
+    Console.error(`FAIL [${error.check}] input=${error.target}`)
+  ),
+  Effect.tapErrorTag("WorkflowCheckReadError", (error) =>
+    Console.error(`FAIL [${error.check}] operation=${error.operation}`)
+  ),
+  Effect.tapErrorTag("WorkflowCheckMismatchError", (error) =>
+    Console.error(`FAIL [${error.check}] invariant=${error.invariant}`)
+  ),
+  Effect.provide(BunServices.layer)
+);
 
 Match.value(import.meta.main).pipe(
-  Match.when(true, () => void main()),
+  Match.when(true, () => BunRuntime.runMain(program)),
   Match.orElse(() => false)
 );

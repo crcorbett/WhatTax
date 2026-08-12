@@ -3,7 +3,7 @@ document_type: architecture
 lifecycle: current
 authority: canonical
 owner: taxkit-quality-owner
-last_reviewed: 2026-08-09
+last_reviewed: 2026-08-13
 review_trigger: verification graph, proof boundary, CI, deployment, or test-owner change
 ---
 
@@ -382,6 +382,15 @@ supporting gate and cannot replace semantic ownership or call-graph review.
   filename-pattern exemptions, broad test exemptions or nested configuration.
   Inline `oxlint-disable` and `eslint-disable` comments naming the rule are
   forbidden and must be checked from comment tokens, not raw repository text.
+- Deployment workflow receipt decoding is allowed only in
+  `tools/docs-deployment/workflow-check.boundary.ts`. The five
+  `workflow-*-check.runtime.ts` files remain exact Bun runtime entrypoints but
+  are no longer decoder boundaries. `workflow-check.boundary.test.ts` proves
+  strict JSON ingress, Config failure and typed identity mismatch;
+  `workflow.contract.test.ts` proves all five adapters use Config, the shared
+  boundary and `BunRuntime.runMain` while excluding direct environment,
+  `Bun.file`, unchecked JSON, raw runtime execution, console and process-exit
+  paths.
 - Custom-rule tests must cover prohibited and allowed Effect decoder families,
   imports and aliases, descriptor/member decoders, static computed members,
   factory creation and extraction. They must also cover a TSX decoder attempt,

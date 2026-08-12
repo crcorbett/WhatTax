@@ -310,13 +310,42 @@ describe("docs deployment workflow admission", () => {
   });
 
   test("keeps teardown promotion strict at the receipt decoder", async () => {
-    const checker = await readFile(
-      "tools/docs-deployment/workflow-teardown-proof-check.runtime.ts",
-      "utf-8"
-    );
-    expect(checker).toContain('{ onExcessProperty: "error" }');
+    const [checker, boundary] = await Promise.all([
+      readFile(
+        "tools/docs-deployment/workflow-teardown-proof-check.runtime.ts",
+        "utf-8"
+      ),
+      readFile("tools/docs-deployment/workflow-check.boundary.ts", "utf-8"),
+    ]);
+    expect(checker).toContain("readWorkflowReceipt");
+    expect(boundary).toContain('onExcessProperty: "error"');
     expect(checker).toContain("providerWorkerAbsent");
     expect(checker).toContain("stateStageAbsent");
+  });
+
+  test("keeps workflow verifiers behind the shared Effect host boundary", async () => {
+    const runtimePaths = [
+      "tools/docs-deployment/workflow-input-check.runtime.ts",
+      "tools/docs-deployment/workflow-plan-check.runtime.ts",
+      "tools/docs-deployment/workflow-proof-check.runtime.ts",
+      "tools/docs-deployment/workflow-run-check.runtime.ts",
+      "tools/docs-deployment/workflow-teardown-proof-check.runtime.ts",
+    ];
+    const runtimes = await Promise.all(
+      runtimePaths.map((path) => readFile(path, "utf-8"))
+    );
+
+    for (const source of runtimes) {
+      expect(source).toContain("Config.schema(");
+      expect(source).toContain("readWorkflowReceipt(");
+      expect(source).toContain("BunRuntime.runMain(program)");
+      expect(source).not.toContain("process.env");
+      expect(source).not.toContain("Bun.file");
+      expect(source).not.toContain("JSON.parse");
+      expect(source).not.toContain("Effect.runPromise");
+      expect(source).not.toContain("console.");
+      expect(source).not.toContain("process.exitCode");
+    }
   });
 
   test("reconciles completed workflow runs outside the triggering run", async () => {

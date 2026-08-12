@@ -3,7 +3,7 @@ document_type: architecture
 lifecycle: current
 authority: canonical
 owner: taxkit-architecture-owner
-last_reviewed: 2026-08-10
+last_reviewed: 2026-08-13
 review_trigger: deployment target, runtime adapter, provider resource, state, domain, or rollback change
 ---
 
@@ -55,6 +55,15 @@ intent and task state belong in the active SPEC and execution plan.
   teardown, and report-only inventory. A later candidate, source, protected
   environment or provider change requires fresh promotion; the register does
   not make a timeless availability claim.
+- Five workflow receipt executables are narrow Bun adapters. Each decodes one
+  Config Schema from the host environment, reads receipt JSON and screenshot
+  bytes through the shared Effect FileSystem/Crypto boundary in
+  `workflow-check.boundary.ts`, preserves closed input/read/mismatch errors,
+  logs only safe operation and invariant identities through Effect Console,
+  and executes once through `BunRuntime.runMain`. Receipt decoding rejects
+  excess properties. The executables contain no direct environment, Bun file,
+  Promise, console or process-exit orchestration. This internal boundary does
+  not change workflow commands, the provider graph or historical receipts.
 - `@taxkit/api-http` builds as a package and exposes health, generated docs,
   OpenAPI JSON, metadata and public calculation route contracts.
 - `@taxkit/sdk` builds as a private package for local and downstream
@@ -78,6 +87,9 @@ The local command copies only emitted output to a temporary directory, removes
 checkout paths from the generated Wrangler config, strips provider credential
 variables, runs Wrangler dry-run and then runs the same no-bundle module graph
 under workerd. Local proof does not establish provider state or deployment.
+
+The repository-owned implementation and command map for deployment tooling is
+[`../../tools/docs-deployment/README.md`](../../tools/docs-deployment/README.md).
 
 `bun run check:docs-deployment-inventory` is the separate credentialed,
 provider-bound readback owner. It compares exact `TaxKitDocsCloudflare` state

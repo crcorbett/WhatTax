@@ -1,75 +1,76 @@
-import { Effect, Match, Schema } from "effect";
+import * as BunRuntime from "@effect/platform-bun/BunRuntime";
+import * as BunServices from "@effect/platform-bun/BunServices";
+import { Config, Console, Effect, HashSet, Match } from "effect";
+import * as Path from "effect/Path";
 
+import {
+  readWorkflowReceipt,
+  readWorkflowSha256,
+} from "./workflow-check.boundary.js";
+import {
+  WorkflowCheckInputError,
+  WorkflowCheckMismatchError,
+  WorkflowProofCheckConfig,
+} from "./workflow-check.schemas.js";
 import {
   DeploymentWorkflowHostedProbe,
   DeploymentWorkflowProviderReadback,
 } from "./workflow-receipts.schemas.js";
 
-const readJson = async (path: string) =>
-  JSON.parse(await Bun.file(path).text());
+const check = "workflow-proof" as const;
 
-const program = Effect.gen(function* workflowProofCheck() {
-  const providerPath = process.env["TAXKIT_WORKFLOW_PROVIDER_READBACK"];
-  const hostedPath = process.env["TAXKIT_WORKFLOW_HOSTED_PROBE"];
-  const candidateCommit = process.env["TAXKIT_WORKFLOW_CANDIDATE_COMMIT"];
-  const stage = process.env["TAXKIT_WORKFLOW_STAGE"];
-  const acceptedPlanSha256 = process.env["TAXKIT_WORKFLOW_PLAN_SHA256"];
-  const screenshotRoot =
-    process.env["TAXKIT_WORKFLOW_SCREENSHOT_ROOT"] ?? process.cwd();
-  if (
-    providerPath === undefined ||
-    hostedPath === undefined ||
-    candidateCommit === undefined ||
-    stage === undefined ||
-    acceptedPlanSha256 === undefined
-  ) {
-    return yield* Effect.fail("workflow proof inputs are incomplete");
-  }
-  const provider = yield* Schema.decodeUnknownEffect(
-    DeploymentWorkflowProviderReadback,
-    { onExcessProperty: "error" }
-  )(yield* Effect.promise(() => readJson(providerPath))).pipe(
-    Effect.mapError(() => "provider readback failed Schema decoding")
-  );
-  const hosted = yield* Schema.decodeUnknownEffect(
-    DeploymentWorkflowHostedProbe,
-    { onExcessProperty: "error" }
-  )(yield* Effect.promise(() => readJson(hostedPath))).pipe(
-    Effect.mapError(() => "hosted probe failed Schema decoding")
-  );
-  const screenshotDigests = yield* Effect.promise(() =>
-    Promise.all(
-      hosted.screenshots.map(async (screenshot) => {
-        const file = Bun.file(`${screenshotRoot}/${screenshot.path}`);
-        if (!(await file.exists())) {
-          throw new Error(`screenshot bytes are absent: ${screenshot.path}`);
-        }
-        return new Bun.CryptoHasher("sha256")
-          .update(await file.arrayBuffer())
-          .digest("hex");
-      })
+export const checkWorkflowProof = Effect.gen(function* workflowProofCheck() {
+  const config = yield* Config.schema(WorkflowProofCheckConfig).pipe(
+    Effect.mapError(
+      () => new WorkflowCheckInputError({ check, target: "environment" })
     )
-  ).pipe(Effect.mapError(() => "workflow screenshot bytes could not be read"));
-  const screenshotKinds = new Set(hosted.screenshots.map(({ kind }) => kind));
-  let expectedEnvironment: "preview" | "production" | "rollback";
-  if (stage === "prod") {
-    expectedEnvironment =
-      hosted.environment === "rollback" ? "rollback" : "production";
-  } else {
-    expectedEnvironment = "preview";
-  }
+  );
+  const path = yield* Path.Path;
+  const provider = yield* readWorkflowReceipt(
+    check,
+    config.TAXKIT_WORKFLOW_PROVIDER_READBACK,
+    "provider-readback",
+    DeploymentWorkflowProviderReadback
+  );
+  const hosted = yield* readWorkflowReceipt(
+    check,
+    config.TAXKIT_WORKFLOW_HOSTED_PROBE,
+    "hosted-probe",
+    DeploymentWorkflowHostedProbe
+  );
+  const screenshotDigests = yield* Effect.forEach(
+    hosted.screenshots,
+    (screenshot) =>
+      readWorkflowSha256(
+        check,
+        path.join(config.TAXKIT_WORKFLOW_SCREENSHOT_ROOT, screenshot.path),
+        `screenshot-${screenshot.kind}`
+      ),
+    { concurrency: 2 }
+  );
+  const screenshotKinds = HashSet.fromIterable(
+    hosted.screenshots.map(({ kind }) => kind)
+  );
+  const expectedEnvironment = Match.value(config.TAXKIT_WORKFLOW_STAGE).pipe(
+    Match.when("prod", () =>
+      hosted.environment === "rollback" ? "rollback" : "production"
+    ),
+    Match.orElse(() => "preview" as const)
+  );
   const expectedPreviewPrNumber =
-    stage === "prod" ? null : Number.parseInt(stage.slice(3), 10);
+    config.TAXKIT_WORKFLOW_STAGE === "prod"
+      ? null
+      : Number.parseInt(config.TAXKIT_WORKFLOW_STAGE.slice("pr-".length), 10);
   const mismatch = [
     provider.accountId !== hosted.accountId,
     provider.stateStoreId !== hosted.stateStoreId,
-    provider.candidateCommit !== candidateCommit,
-    hosted.candidateCommit !== candidateCommit,
+    provider.candidateCommit !== config.TAXKIT_WORKFLOW_CANDIDATE_COMMIT,
+    hosted.candidateCommit !== config.TAXKIT_WORKFLOW_CANDIDATE_COMMIT,
     provider.configSha256 !== hosted.configSha256,
     provider.deploymentInputSha256 !== hosted.deploymentInputSha256,
     provider.lockfileSha256 !== hosted.lockfileSha256,
-    provider.stage !== stage,
-    hosted.stage !== stage,
+    provider.stage !== config.TAXKIT_WORKFLOW_STAGE,
+    hosted.stage !== config.TAXKIT_WORKFLOW_STAGE,
     provider.previewPrNumber !== hosted.previewPrNumber,
     provider.previewPrNumber !== expectedPreviewPrNumber,
     hosted.previewPrNumber !== expectedPreviewPrNumber,
@@ -80,43 +81,48 @@ const program = Effect.gen(function* workflowProofCheck() {
       (provider.previousVersionId === null ||
         provider.versionId === provider.previousVersionId ||
         hosted.versionId === hosted.previousVersionId),
-    provider.acceptedPlanSha256 !== acceptedPlanSha256,
-    hosted.acceptedPlanSha256 !== acceptedPlanSha256,
+    provider.acceptedPlanSha256 !== config.TAXKIT_WORKFLOW_PLAN_SHA256,
+    hosted.acceptedPlanSha256 !== config.TAXKIT_WORKFLOW_PLAN_SHA256,
     provider.url !== hosted.url,
     provider.deploymentId !== hosted.deploymentId,
     provider.versionId !== hosted.versionId,
     provider.workerName !== hosted.workerName,
     hosted.diagnostics.length !== 0,
     hosted.screenshots.length !== 2,
-    screenshotKinds.size !== 2 ||
-      !screenshotKinds.has("desktop") ||
-      !screenshotKinds.has("mobile"),
+    HashSet.size(screenshotKinds) !== 2 ||
+      !HashSet.has(screenshotKinds, "desktop") ||
+      !HashSet.has(screenshotKinds, "mobile"),
     hosted.screenshots.some(
       (screenshot, index) => screenshot.sha256 !== screenshotDigests[index]
     ),
   ].some(Boolean);
+
   if (mismatch) {
-    return yield* Effect.fail(
-      "workflow provider/hosted proof identity or diagnostics mismatch"
-    );
+    return yield* new WorkflowCheckMismatchError({
+      check,
+      invariant: "provider-hosted-identity-diagnostics-screenshots",
+    });
   }
-  yield* Effect.sync(() =>
-    console.log(
-      `Docs deployment workflow proof: candidate=${candidateCommit}; stage=${stage}; provider/hosted identity agree; screenshots=desktop,mobile; diagnostics=0.`
-    )
+
+  yield* Console.log(
+    `Docs deployment workflow proof: candidate=${config.TAXKIT_WORKFLOW_CANDIDATE_COMMIT}; stage=${config.TAXKIT_WORKFLOW_STAGE}; provider/hosted identity agree; screenshots=desktop,mobile; diagnostics=0.`
   );
 });
 
-const main = async () => {
-  try {
-    await Effect.runPromise(program);
-  } catch (error) {
-    console.error(`FAIL [workflow-proof] ${String(error)}`);
-    process.exitCode = 1;
-  }
-};
+const program = checkWorkflowProof.pipe(
+  Effect.tapErrorTag("WorkflowCheckInputError", (error) =>
+    Console.error(`FAIL [${error.check}] input=${error.target}`)
+  ),
+  Effect.tapErrorTag("WorkflowCheckReadError", (error) =>
+    Console.error(`FAIL [${error.check}] operation=${error.operation}`)
+  ),
+  Effect.tapErrorTag("WorkflowCheckMismatchError", (error) =>
+    Console.error(`FAIL [${error.check}] invariant=${error.invariant}`)
+  ),
+  Effect.provide(BunServices.layer)
+);
 
 Match.value(import.meta.main).pipe(
-  Match.when(true, () => void main()),
+  Match.when(true, () => BunRuntime.runMain(program)),
   Match.orElse(() => false)
 );

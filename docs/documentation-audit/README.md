@@ -3,7 +3,7 @@ document_type: evidence-index
 lifecycle: evidence
 authority: supporting
 owner: taxkit-documentation-owner
-last_reviewed: 2026-07-24
+last_reviewed: 2026-08-13
 review_trigger: documentation-audit receipt, evidence class, corpus inventory, or decision-record change
 ---
 
@@ -12,6 +12,17 @@ review_trigger: documentation-audit receipt, evidence class, corpus inventory, o
 This route owns dated audit and corpus-accounting evidence, not current
 maintainer policy. Lifecycle and semantic ownership are defined by
 [`../README.md`](../README.md).
+
+Active strict apps and IaC audit:
+
+- [`strict-apps-iac/audit-scope.json`](strict-apps-iac/audit-scope.json)
+- [`strict-apps-iac/corpus-inventory.json`](strict-apps-iac/corpus-inventory.json)
+- [`strict-apps-iac/audit-findings.json`](strict-apps-iac/audit-findings.json)
+- [`strict-apps-iac/accepted-findings.json`](strict-apps-iac/accepted-findings.json)
+
+This accepted register binds four successor code-quality corrections to the
+clean `origin/main` target. It preserves completed deployment evidence and
+grants no provider, deployment, DNS, release or publication authority.
 
 Current HGI-200 receipts:
 
