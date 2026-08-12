@@ -22,6 +22,9 @@ const appRoot = new URL("../", import.meta.url);
 const repositoryRoot = new URL("../../", appRoot);
 const builtRoot = new URL("dist/", appRoot);
 const serverRoot = new URL("server/", builtRoot);
+const receiptRoot = new URL("../../tmp/docs-cloudflare/", appRoot);
+const screenshotRoot = new URL("screenshots/", receiptRoot);
+const captureScreenshots = Bun.argv.includes("--screenshots");
 const workerSizeLimitBytes = 3 * 1024 * 1024;
 const knownPath = "/guides/calculate-australian-take-home-pay";
 const missingPath = "/__docs-evidence__/missing";
@@ -60,6 +63,11 @@ const GeneratedWranglerConfig = Schema.Struct({
 });
 const decodeJsonRecord = (source: string) =>
   Schema.decodeUnknownEffect(Schema.fromJsonString(UnknownRecord))(source);
+
+const sha256File = async (path: URL) =>
+  createHash("sha256")
+    .update(await readFile(path))
+    .digest("hex");
 
 const sha256Directory = async (
   directory: URL,
@@ -294,7 +302,9 @@ const modulesWithNodeFileSystem = serverJavaScriptSources.filter(({ source }) =>
 
 assert.ok(
   modulesWithNodeFileSystem.every(({ path }) =>
-    /^assets\/(?:loaders\.server|policy)-[A-Za-z0-9_-]+\.js$/u.test(path)
+    /^assets\/(?:loaders\.server|runtime\.server|policy)-[A-Za-z0-9_-]+\.js$/u.test(
+      path
+    )
   ),
   "Node filesystem imports must remain isolated to generated raw-text support and the lazy validation policy."
 );
@@ -306,35 +316,37 @@ assert.ok(
   "Filesystem-bearing Worker modules must not retain an absolute checkout path."
 );
 
-const loaderModule = await Bun.file(
-  new URL(
-    serverModules.find((path) =>
-      /^assets\/loaders\.server-[A-Za-z0-9_-]+\.js$/u.test(path)
-    ) ?? "",
-    serverRoot
-  )
-).text();
+const contentRuntimeModule =
+  modulesWithNodeFileSystem.find(({ path }) =>
+    /^assets\/(?:loaders|runtime)\.server-[A-Za-z0-9_-]+\.js$/u.test(path)
+  )?.source ?? "";
 
 assert.match(
-  loaderModule,
+  contentRuntimeModule,
   /validateContent:\s*\(\)\s*=>[\s\S]*?import\("\.\/policy-[A-Za-z0-9_-]+\.js"\)/u
 );
 assert.match(
-  loaderModule,
+  contentRuntimeModule,
   /if\s*\(type\s*===\s*"raw"\)[\s\S]*?import\("node:fs\/promises"\)/u
 );
-assert.match(loaderModule, /getText\("processed"\)/u);
+assert.match(contentRuntimeModule, /getText\("processed"\)/u);
 const emittedServerSource = serverJavaScriptSources
   .map(({ source }) => source)
   .join("\n");
 
-assert.equal(
-  emittedServerSource.match(/var runtimeConstructionCount = 0;/gu)?.length,
-  1
+assert.doesNotMatch(
+  emittedServerSource,
+  /runtimeConstructionCount|randomUUID/u
 );
 assert.equal(
-  emittedServerSource.match(/runtimeConstructionCount \+= 1;/gu)?.length,
-  1
+  emittedServerSource.match(/var DocsRuntimeProbe =/gu)?.length,
+  1,
+  "The emitted Worker must contain one managed runtime-probe service."
+);
+assert.equal(
+  emittedServerSource.match(/var docsRuntimeProbeLive =/gu)?.length,
+  1,
+  "The emitted Worker must contain one app-owned live probe Layer."
 );
 assert.equal(
   emittedServerSource.match(/var docsRuntime = makeDocsRuntime\(/gu)?.length,
@@ -699,6 +711,19 @@ try {
       ),
     "The client navigation server-function responses were not successful same-origin transport calls."
   );
+  const observedServerFunction =
+    serverFunctionResponses[navigationServerFunctionBaseline];
+  assert.ok(observedServerFunction !== undefined);
+  const malformedServerFunctionResponse = await page.request.fetch(
+    observedServerFunction.url,
+    {
+      data: "{",
+      headers: { "content-type": "application/json" },
+      method: "POST",
+    }
+  );
+  assert.ok(malformedServerFunctionResponse.status() >= 400);
+  assert.ok(malformedServerFunctionResponse.status() < 500);
 
   await page.evaluate(async (path) => {
     const router: unknown = Reflect.get(globalThis, "__TSR_ROUTER__");
@@ -831,6 +856,73 @@ try {
     new RegExp(recoverableSourceError.visiblePostcondition, "u")
   );
 
+  const screenshots: {
+    readonly kind: "desktop" | "mobile";
+    readonly path: string;
+    readonly sha256: string;
+    readonly viewport: {
+      readonly deviceScaleFactor: 1;
+      readonly height: number;
+      readonly width: number;
+    };
+  }[] = [];
+  if (captureScreenshots) {
+    await mkdir(screenshotRoot, { recursive: true });
+    await page.setViewportSize({ height: 1000, width: 1440 });
+    await page.goto(`${origin}${knownPath}`, { waitUntil: "networkidle" });
+    await page
+      .getByRole("heading", { name: "Calculate Australian take-home pay" })
+      .waitFor();
+    const desktopScreenshot = new URL("desktop.png", screenshotRoot);
+    await page.screenshot({
+      fullPage: true,
+      path: fileURLToPath(desktopScreenshot),
+    });
+    screenshots.push({
+      kind: "desktop",
+      path: "screenshots/desktop.png",
+      sha256: await sha256File(desktopScreenshot),
+      viewport: { deviceScaleFactor: 1, height: 1000, width: 1440 },
+    });
+
+    const mobilePage = await browser.newPage({
+      deviceScaleFactor: 1,
+      viewport: { height: 844, width: 390 },
+    });
+    mobilePage.on("console", (message) => {
+      if (message.type() === "error" || message.type() === "warning") {
+        diagnostics.push(`mobile ${message.type()}: ${message.text()}`);
+      }
+    });
+    mobilePage.on("pageerror", (error) => {
+      diagnostics.push(`mobile pageerror: ${error.message}`);
+    });
+    mobilePage.on("requestfailed", (request) => {
+      diagnostics.push(
+        `mobile requestfailed: ${request.url()} ${request.failure()?.errorText ?? ""}`
+      );
+    });
+    await mobilePage.goto(`${origin}${knownPath}`, {
+      waitUntil: "networkidle",
+    });
+    await mobilePage.getByRole("button", { name: "Open navigation" }).click();
+    await mobilePage
+      .getByRole("button", { name: "Close navigation" })
+      .waitFor();
+    const mobileScreenshot = new URL("mobile.png", screenshotRoot);
+    await mobilePage.screenshot({
+      fullPage: true,
+      path: fileURLToPath(mobileScreenshot),
+    });
+    screenshots.push({
+      kind: "mobile",
+      path: "screenshots/mobile.png",
+      sha256: await sha256File(mobileScreenshot),
+      viewport: { deviceScaleFactor: 1, height: 844, width: 390 },
+    });
+    await mobilePage.close();
+  }
+
   assert.deepEqual(diagnostics, []);
 
   const sourceCommitOutput = await runProcess(
@@ -887,6 +979,7 @@ try {
       consoleAndPageErrors: "passed",
       directNotFound: "passed",
       hydration: "passed",
+      malformedServerFunction: "passed",
       mobileNavigationDisclosure: "passed",
       pendingNavigation: "passed",
       recoverableError: "passed",
@@ -904,14 +997,41 @@ try {
       perRequestConstructionPatternAbsent: true,
     },
     schemaVersion: 1,
+    screenshots,
   };
-  const receiptRoot = new URL("../../tmp/docs-cloudflare/", appRoot);
 
   await mkdir(receiptRoot, { recursive: true });
   await Bun.write(
     new URL("local-workerd-receipt.json", receiptRoot),
     `${JSON.stringify(receipt, null, 2)}\n`
   );
+  if (captureScreenshots) {
+    assert.deepEqual(
+      screenshots.map(({ kind }) => kind),
+      ["desktop", "mobile"]
+    );
+    await Bun.write(
+      new URL("screenshot-manifest.json", receiptRoot),
+      `${JSON.stringify(
+        {
+          candidate: {
+            assetsSha256,
+            deploymentInputSha256,
+            sourceCommit,
+            workerModulesSha256,
+          },
+          evidenceClass: "local-workerd-visual-review-input",
+          nonClaims: [
+            "Screenshots supplement behavioral assertions and do not prove request type, focus behavior, contrast, reduced motion, HTTP status, hydration, console cleanliness or hosted behavior.",
+          ],
+          schemaVersion: 1,
+          screenshots,
+        },
+        null,
+        2
+      )}\n`
+    );
+  }
 
   console.log(
     `Cloudflare docs proof passed: SSR=200, asset=200/immutable, missing=404, clientNavigationDocuments=0, serverFunctions=${serverFunctionRequests}, diagnostics=0, gzipUploadKiB=${(gzipUploadBytes / 1024).toFixed(2)}, processStartToFirstResponseMs=${processStartToFirstResponseMs.toFixed(2)}, firstResponseRequestMs=${initialRequestMs.toFixed(2)}.`

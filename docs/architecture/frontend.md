@@ -3,7 +3,7 @@ document_type: architecture
 lifecycle: current
 authority: canonical
 owner: taxkit-architecture-owner
-last_reviewed: 2026-07-30
+last_reviewed: 2026-08-13
 review_trigger: frontend runtime, transport, rendering, build adapter, or composition change
 ---
 
@@ -69,15 +69,28 @@ functions.
 
 Docs SSR loaders use the same runtime rule. `apps/docs` keeps one module-scoped
 server runtime for `DocsContentServiceLive`, composed over the TaxKit generated
-collection Layer, and exposes explicit disposal for tests and future host
-lifecycle integration. The browser owns no Effect runtime. A browser-reachable
-loader defines only the TanStack server-function transport stub; its dynamic
+collection Layer, plus one app-private runtime-probe Layer, and exposes explicit
+disposal for tests and future host lifecycle integration. The probe Layer owns
+its construction state in an Effect `Ref`, creates its non-secret identifier
+through Effect `Random`, and admits a deterministic identity Effect in tests.
+The Worker host callback runs the typed probe read through that same runtime
+and Schema-encodes it at response-header egress. It owns no mutable counter or
+randomness. The browser owns no Effect runtime. A browser-reachable loader
+defines only the TanStack server-function transport stub; its dynamic
 `.server.ts` implementation acquires the service, decodes route input before
-lookup and preloads compiled MDX through the browser-safe client loader. App routes should
-not read `packages/docs-content/content` files, `navigation.json` or generated
-`.source/server` modules directly. `@taxkit/docs-content` bundles the authored
-navigation representation and decodes it with the canonical navigation schema,
-so built server functions do not depend on a source-relative filesystem path.
+lookup and preloads compiled MDX through the browser-safe client loader. App
+routes should not read `packages/docs-content/content` files,
+`navigation.json` or generated `.source/server` modules directly.
+`@taxkit/docs-content` bundles the authored navigation representation and
+decodes it with the canonical navigation schema, so built server functions do
+not depend on a source-relative filesystem path.
+
+The opt-in proof response establishes one construction and stable identity only
+for the observed process/isolate. It does not establish a global singleton
+across Cloudflare isolates. Built proof may retain ignored, candidate-bound
+desktop/mobile screenshots and a digest manifest as visual review input; the
+behavioral HTTP/browser oracles remain the authority for SSR, hydration,
+navigation, status, focus, accessibility and console claims.
 
 Docs server functions encode route outcomes with a browser-safe Effect Schema
 boundary. Route loaders return that representation unchanged. On an initial

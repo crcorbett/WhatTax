@@ -3,7 +3,7 @@ document_type: app-readme
 lifecycle: current
 authority: canonical
 owner: taxkit-docs-app-owner
-last_reviewed: 2026-08-10
+last_reviewed: 2026-08-13
 review_trigger: docs route, content boundary, build target, runtime, proof or deployment ownership change
 ---
 
@@ -61,7 +61,7 @@ browser
     -> createServerFn
       -> dynamic .server module
         -> one app-owned ManagedRuntime
-          -> DocsContentService
+          -> DocsContentService + DocsRuntimeProbe
             -> @taxkit/docs-content live layer
               -> @taxkit/docs-fumadocs FumadocsSource
               -> TaxKit generated collection adapter
@@ -121,9 +121,12 @@ contrast, reduced-motion rendering, immutable asset headers, runtime reuse,
 filesystem isolation and compressed upload size. The command owns
 browser/workerd cleanup. `test:cloudflare-built` remains an explicit alias for
 the same canonical proof command. Add `-- --screenshots` for the bounded
-candidate-bound PNG/manifest set; screenshot review supplements these
-behavioral assertions and cannot prove request type, focus behavior, contrast,
-motion suppression, HTTP status, hydration or console cleanliness.
+candidate-bound desktop/mobile PNG and digest manifest under ignored
+`tmp/docs-cloudflare/`. The desktop capture shows the representative guide;
+the mobile capture shows its open navigation state. Screenshot review
+supplements these behavioral assertions and cannot prove request type, focus
+behavior, contrast, motion suppression, HTTP status, hydration, console
+cleanliness or hosted behavior.
 
 `build` and its compatibility alias `build:cloudflare` select the exact
 official Cloudflare Vite adapter and emit the deployable no-bundle Worker at
@@ -176,18 +179,25 @@ route, a paid plan or release/publication.
 and runtime imports from browser-reachable app modules. The docs app has no
 browser Effect runtime. Its `.server.ts` loader module is the only route edge
 that acquires `DocsContentService`, and the module-scoped server runtime is
-reused for the server isolate. The runtime factory exposes disposal so focused
-tests and future host lifecycle integration can release its Layer; the current
-hosting adapter does not provide an application shutdown hook.
+reused for the server isolate. The same runtime owns a private live
+`DocsRuntimeProbe` Layer. That Layer acquires one Effect `Ref` construction
+state and an identifier produced by Effect `Random`; focused tests inject an
+exact deterministic identifier and dispose the complete runtime. The runtime
+factory exposes disposal so tests and future host lifecycle integration can
+release all Layers; the current hosting adapter does not provide an
+application shutdown hook.
 
 The Worker entry accepts the exact
 `x-taxkit-docs-runtime-proof: construction-count` opt-in header and returns a
-non-secret construction count plus random isolate identifier. This temporary
-deployment-migration channel proves reuse across requests; it is not a public
-API. Review it when the runtime, Worker entry, privacy boundary or proof
-channel changes. Retire it after an equally strong non-public provider oracle
-exists; otherwise retain its bounded one-identifier/two-header carrying cost
-explicitly through migration parity.
+non-secret construction count plus random isolate identifier. The host callback
+runs the typed read through the application runtime and Schema-encodes it only
+at response-header egress; it owns no counter or randomness itself. This
+temporary deployment-migration channel proves reuse within the observed
+process/isolate across requests; it is not a public API and does not prove a
+singleton across Cloudflare isolates. Review it when the runtime, Worker entry,
+privacy boundary or proof channel changes. Retire it after an equally strong
+non-public provider oracle exists; otherwise retain its bounded
+one-identifier/two-header carrying cost explicitly through migration parity.
 
 The app-local MDX adapter classifies root-relative, query-only and authored
 relative `.mdx` destinations as TanStack routes while keeping external,

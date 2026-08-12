@@ -2,8 +2,13 @@ import {
   createStartHandler,
   defaultStreamHandler,
 } from "@tanstack/react-start/server";
+import { Effect, Schema } from "effect";
 
-import { readDocsRuntimeProbe } from "./lib/runtime-factory.server";
+import {
+  DocsRuntimeProbeSnapshot,
+  readDocsRuntimeProbe,
+} from "./lib/runtime-factory.server";
+import { docsRuntime } from "./lib/runtime.server";
 
 const startHandler = createStartHandler(defaultStreamHandler);
 const runtimeProofRequestHeader = "x-taxkit-docs-runtime-proof";
@@ -20,7 +25,13 @@ export default {
       return response;
     }
 
-    const probe = readDocsRuntimeProbe();
+    const probe = await docsRuntime.runPromise(
+      readDocsRuntimeProbe.pipe(
+        Effect.flatMap((snapshot) =>
+          Schema.encodeUnknownEffect(DocsRuntimeProbeSnapshot)(snapshot)
+        )
+      )
+    );
     const headers = new Headers(response.headers);
 
     headers.set(runtimeProofResponseHeader, String(probe.constructions));

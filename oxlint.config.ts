@@ -150,6 +150,7 @@ const portableEffectSourceFiles = [
 
 const schemaEncoderEgressFiles = [
   "apps/api/scripts/smoke-public-routes.runtime.ts",
+  "apps/docs/src/server.ts",
   "apps/docs/src/lib/docs/route-boundary.ts",
   "apps/docs/src/lib/docs/route-boundary.browser.test.tsx",
   "apps/docs/src/lib/docs/route-boundary.test.js",
@@ -176,6 +177,7 @@ const runtimeBoundaryFiles = [
   "apps/docs/src/lib/runtime-factory.server.test.ts",
   "apps/docs/src/lib/runtime-factory.server.ts",
   "apps/docs/src/lib/runtime.server.ts",
+  "apps/docs/src/server.ts",
   "apps/docs/scripts/test-cloudflare-built.tsx",
   "apps/docs/scripts/test-cloudflare-hosted.tsx",
   "apps/docs/src/lib/build/cloudflare-stack.test.ts",

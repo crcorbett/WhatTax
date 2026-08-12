@@ -1,27 +1,47 @@
 import "@tanstack/react-start/server-only";
 import type { DocsContentService } from "@taxkit/docs-content/service";
-import type { Layer } from "effect";
-import { ManagedRuntime } from "effect";
+import { Context, Effect, Layer, ManagedRuntime, Ref, Schema } from "effect";
 
-let runtimeConstructionCount = 0;
-let runtimeIsolateId: string | undefined;
+export const DocsRuntimeProbeSnapshot = Schema.Struct({
+  constructions: Schema.Literal(1),
+  isolateId: Schema.NonEmptyString,
+});
+export type DocsRuntimeProbeSnapshot = typeof DocsRuntimeProbeSnapshot.Type;
 
-export const makeDocsRuntime = <E>(
-  layer: Layer.Layer<DocsContentService, E, never>
-) => {
-  runtimeConstructionCount += 1;
+export interface DocsRuntimeProbeShape {
+  readonly read: Effect.Effect<DocsRuntimeProbeSnapshot>;
+}
 
-  return ManagedRuntime.make(layer);
-};
+export class DocsRuntimeProbe extends Context.Service<
+  DocsRuntimeProbe,
+  DocsRuntimeProbeShape
+>()("taxkit/DocsRuntimeProbe") {}
 
-export const readDocsRuntimeProbe = (): {
-  readonly constructions: number;
-  readonly isolateId: string;
-} => {
-  runtimeIsolateId ??= globalThis.crypto.randomUUID();
+export const makeDocsRuntimeProbeLayer = (
+  makeIsolateId: Effect.Effect<string>
+) =>
+  Layer.effect(
+    DocsRuntimeProbe,
+    Effect.gen(function* makeDocsRuntimeProbe() {
+      const constructions = yield* Ref.make(1 as const);
+      const isolateId = yield* makeIsolateId;
 
-  return {
-    constructions: runtimeConstructionCount,
-    isolateId: runtimeIsolateId,
-  };
-};
+      return DocsRuntimeProbe.of({
+        read: Ref.get(constructions).pipe(
+          Effect.map((count) => ({ constructions: count, isolateId }))
+        ),
+      });
+    })
+  );
+
+export const makeDocsRuntime = <E, E2>(
+  contentLayer: Layer.Layer<DocsContentService, E, never>,
+  probeLayer: Layer.Layer<DocsRuntimeProbe, E2, never>
+) => ManagedRuntime.make(Layer.merge(contentLayer, probeLayer));
+
+export const readDocsRuntimeProbe = Effect.gen(
+  function* readDocsRuntimeProbeProgram() {
+    const probe = yield* DocsRuntimeProbe;
+    return yield* probe.read;
+  }
+);

@@ -7,35 +7,47 @@ import { describe, expect, test } from "vitest";
 
 import {
   makeDocsRuntime,
+  makeDocsRuntimeProbeLayer,
   readDocsRuntimeProbe,
 } from "./runtime-factory.server";
 
 describe("docs server runtime ownership", () => {
-  test("reuses one Layer instance and gives the test owner explicit disposal", async () => {
-    const probeBefore = readDocsRuntimeProbe();
+  test("owns content and deterministic proof state for the managed lifetime", async () => {
     const service = DocsContentService.of({
       getNavigation: () => Effect.die("not used"),
       getPage: () => Effect.die("not used"),
       listPages: () => Effect.die("not used"),
       validateContent: () => Effect.die("not used"),
     });
-    const runtime = makeDocsRuntime(Layer.succeed(DocsContentService, service));
-    const probeAfterConstruction = readDocsRuntimeProbe();
+    const runtime = makeDocsRuntime(
+      Layer.succeed(DocsContentService, service),
+      makeDocsRuntimeProbeLayer(Effect.succeed("deterministic-test-isolate"))
+    );
 
-    const first = await runtime.runPromise(Effect.service(DocsContentService));
-    const second = await runtime.runPromise(Effect.service(DocsContentService));
+    const [firstService, firstProbe, secondService, secondProbe] =
+      await runtime.runPromise(
+        Effect.all(
+          [
+            Effect.service(DocsContentService),
+            readDocsRuntimeProbe,
+            Effect.service(DocsContentService),
+            readDocsRuntimeProbe,
+          ],
+          { concurrency: 4 }
+        )
+      );
 
-    expect(probeAfterConstruction).toEqual({
-      constructions: probeBefore.constructions + 1,
-      isolateId: probeBefore.isolateId,
+    expect(firstService).toBe(service);
+    expect(secondService).toBe(firstService);
+    expect(firstProbe).toEqual({
+      constructions: 1,
+      isolateId: "deterministic-test-isolate",
     });
-    expect(readDocsRuntimeProbe()).toEqual(probeAfterConstruction);
-    expect(first).toBe(service);
-    expect(second).toBe(first);
+    expect(secondProbe).toEqual(firstProbe);
     await runtime.dispose();
   });
 
-  test("owns one production runtime construction at module scope", async () => {
+  test("owns one production runtime and one managed probe Layer at module scope", async () => {
     const runtimeSource = await readFile(
       fileURLToPath(new URL("runtime.server.ts", import.meta.url)),
       "utf-8"
@@ -45,5 +57,11 @@ describe("docs server runtime ownership", () => {
       /export const docsRuntime = makeDocsRuntime\(/u
     );
     expect(runtimeSource.match(/makeDocsRuntime\(/gu)).toHaveLength(1);
+    expect(runtimeSource.match(/makeDocsRuntimeProbeLayer\(/gu)).toHaveLength(
+      1
+    );
+    expect(runtimeSource).toContain("Random.nextIntBetween");
+    expect(runtimeSource).not.toContain("globalThis.crypto");
+    expect(runtimeSource).not.toContain("Math.random");
   });
 });

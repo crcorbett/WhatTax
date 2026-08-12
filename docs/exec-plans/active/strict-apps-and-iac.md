@@ -35,9 +35,14 @@ DNS, package publication, versioning, tags and releases remain outside scope.
   boundary restores spawn/exit/UTF-8/JSON into closed secret-negative errors.
   Sixty deployment tests and root verification pass. Evidence:
   [`APP-IAC-002-validation.json`](../../documentation-audit/strict-apps-iac/APP-IAC-002-validation.json).
-- **APP-IAC-003 — active:** move docs runtime proof identity and state behind
-  application-owned Effect composition and prove lifetime deterministically.
-- **APP-IAC-004 — pending:** add the smallest focused recurrence-prevention
+- **APP-IAC-003 — complete:** the single docs ManagedRuntime now owns a private
+  probe Layer with Effect Ref state and live Random identity; tests inject an
+  exact deterministic identity and dispose the runtime. The Worker adapter
+  reads and encodes through that runtime. Server/browser checks and the built
+  workerd journey pass, including malformed RPC and visually reviewed,
+  digest-bound desktop/mobile screenshots. Evidence:
+  [`APP-IAC-003-validation.json`](../../documentation-audit/strict-apps-iac/APP-IAC-003-validation.json).
+- **APP-IAC-004 — active:** add the smallest focused recurrence-prevention
   control and adversarial fixtures earned by the three root corrections.
 - **APP-IAC-005 — pending:** perform the fresh terminal audit, run all gates,
   record bounded residuals, and close lifecycle owners together.

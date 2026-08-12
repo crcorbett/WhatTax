@@ -291,6 +291,17 @@ mapping, fatal stdout/stderr UTF-8 restoration, exact JSON decoding and
 secret-negative diagnostics. Root deployment validation decodes the retained
 dated report, but does not rerun either credentialed source.
 
+The docs app's focused server tests construct one ManagedRuntime with an
+injected deterministic probe identity, read both the content and probe services
+concurrently, prove stable construction state across reads, and dispose the
+runtime. The built workerd journey separately proves one emitted runtime/probe
+Layer, stable opt-in proof headers across initial, missing and concurrent
+requests, SSR, hydration, client navigation, server functions, 404s and clean
+browser diagnostics. `test:cloudflare-built -- --screenshots` additionally
+writes ignored desktop/mobile PNGs and a digest manifest for visual review.
+Those images supplement, but cannot replace, the behavioral oracles or prove
+provider-global isolate lifetime.
+
 The five consumer-visible release journeys are maintained in
 [`../verification/critical-journeys.json`](../verification/critical-journeys.json):
 calculator direct use, packed SDK, HTTP API, docs runtime and release closure.
