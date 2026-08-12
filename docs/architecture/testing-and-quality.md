@@ -275,15 +275,21 @@ provider credential or mutation edge.
 
 The credentialed `check:docs-deployment-inventory` command is also excluded
 from root verification and Quality. Its focused service fixtures prove
-state/provider agreement and disagreement behavior without a provider; an
-authorized live invocation separately checks exact TaxKit state and Workers.
-Neither fixture nor live inventory proves hosted application behavior.
+state/provider agreement and disagreement behavior without a provider. Its
+credential-boundary fixtures additionally prove exact file/JSON Schema,
+absent-versus-malformed classification, protected fallback, excess-property
+rejection, redaction and account mismatch. An authorized live invocation
+separately checks exact TaxKit state and Workers. Neither fixture nor live
+inventory proves hosted application behavior.
 
 The provider-bound `check:docs-deployment-orphans` command adds one exact
 read-only GitHub query and classifies the resulting open-PR/state/Worker graph.
 Focused fixtures retain trusted, cross-repository and missing-PR stage cases
-plus a false-green classification attack. Root deployment validation decodes
-the retained dated report, but does not rerun either credentialed source.
+plus a false-green classification attack. Process fixtures prove disjoint
+bounded environments, disabled ambient inheritance, spawn and non-zero exit
+mapping, fatal stdout/stderr UTF-8 restoration, exact JSON decoding and
+secret-negative diagnostics. Root deployment validation decodes the retained
+dated report, but does not rerun either credentialed source.
 
 The five consumer-visible release journeys are maintained in
 [`../verification/critical-journeys.json`](../verification/critical-journeys.json):

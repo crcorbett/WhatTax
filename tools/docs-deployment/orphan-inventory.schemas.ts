@@ -24,7 +24,7 @@ export const GitHubOpenPullRequest = Schema.Struct({
 });
 export type GitHubOpenPullRequest = typeof GitHubOpenPullRequest.Type;
 
-const PreviewStageClassification = Schema.Struct({
+export const PreviewStageClassification = Schema.Struct({
   classification: Schema.Literals([
     "active-trusted-preview",
     "untrusted-preview-stage",

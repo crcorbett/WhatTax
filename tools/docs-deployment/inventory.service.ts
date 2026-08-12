@@ -1,6 +1,6 @@
 import * as Cloudflare from "alchemy/Cloudflare";
 import { State } from "alchemy/State";
-import { Context, Effect, Layer, Schema } from "effect";
+import { Context, Effect, HashSet, Layer, Schema } from "effect";
 
 import { docsCloudflareStackName } from "../../apps/docs/src/lib/build/cloudflare-stack.js";
 import { DocsDeploymentStage } from "../../apps/docs/src/lib/build/docs-deployment-stage.js";
@@ -46,12 +46,12 @@ export const requireDocsDeploymentInventoryAgreement = (
         : []
     )
   );
-  const stateIdentities = new Set(
+  const stateIdentities = HashSet.fromIterable(
     stateWorkers.map(
       (worker) => `${worker.stage}:${worker.logicalId}:${worker.workerName}`
     )
   );
-  const providerIdentities = new Set(
+  const providerIdentities = HashSet.fromIterable(
     taxkitProviderWorkers.map(
       (worker) => `${worker.stage}:${worker.logicalId}:${worker.workerName}`
     )
@@ -59,13 +59,13 @@ export const requireDocsDeploymentInventoryAgreement = (
   const findings = [
     ...stateWorkers.flatMap((worker) => {
       const identity = `${worker.stage}:${worker.logicalId}:${worker.workerName}`;
-      return providerIdentities.has(identity)
+      return HashSet.has(providerIdentities, identity)
         ? []
         : [`state Worker is absent from provider inventory: ${identity}`];
     }),
     ...taxkitProviderWorkers.flatMap((worker) => {
       const identity = `${worker.stage}:${worker.logicalId}:${worker.workerName}`;
-      return stateIdentities.has(identity)
+      return HashSet.has(stateIdentities, identity)
         ? []
         : [`provider Worker is absent from state inventory: ${identity}`];
     }),

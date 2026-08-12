@@ -1,9 +1,19 @@
 import * as BunRuntime from "@effect/platform-bun/BunRuntime";
 import * as BunServices from "@effect/platform-bun/BunServices";
-import { Clock, Config, Console, Effect, Layer, Match, Schema } from "effect";
+import {
+  Clock,
+  Config,
+  Console,
+  Effect,
+  Layer,
+  Match,
+  Option,
+  Schema,
+} from "effect";
 import * as Path from "effect/Path";
 
 import {
+  DocsDeploymentOrphanInventoryInputError,
   DocsDeploymentOrphanInventoryPolicyError,
   DocsDeploymentOrphanInventoryReceipt,
 } from "./orphan-inventory.schemas.js";
@@ -15,16 +25,25 @@ import {
 } from "./orphan-inventory.service.js";
 
 const repositoryRootUrl = new URL("../..", import.meta.url);
-const OrphanInventoryRuntimeConfig = Schema.Struct({
-  CI: Schema.Literals(["1", "true"]),
+const OrphanInventoryRuntimeConfig = Config.unwrap({
+  alchemyProfile: Config.string("ALCHEMY_PROFILE").pipe(
+    Config.withDefault("default")
+  ),
+  ci: Config.schema(Schema.Literals(["1", "true"]), "CI"),
+  cloudflareAccountId: Config.schema(
+    Schema.NonEmptyString,
+    "CLOUDFLARE_ACCOUNT_ID"
+  ),
+  cloudflareApiToken: Config.redacted("CLOUDFLARE_API_TOKEN"),
+  githubToken: Config.redacted("GH_TOKEN"),
+  home: Config.schema(Schema.NonEmptyString, "HOME"),
+  path: Config.schema(Schema.NonEmptyString, "PATH"),
+  stateStoreCredentialsJson: Config.redacted(
+    "ALCHEMY_STATE_STORE_CREDENTIALS_JSON"
+  ).pipe(Config.option),
 });
-const runtimeLayer = Layer.merge(
-  BunServices.layer,
-  DocsDeploymentOrphanSourcesLive.pipe(Layer.provide(BunServices.layer))
-);
 
-const program = Effect.gen(function* orphanInventoryProgram() {
-  yield* Config.schema(OrphanInventoryRuntimeConfig);
+const readOrphanInventory = Effect.fn(function* orphanInventoryProgram() {
   const path = yield* Path.Path;
   const repositoryRoot = yield* path.fromFileUrl(repositoryRootUrl);
   const sources = yield* DocsDeploymentOrphanSources;
@@ -44,14 +63,35 @@ const program = Effect.gen(function* orphanInventoryProgram() {
   const findings = inspectDocsDeploymentOrphanInventoryReceipt(receipt);
   if (findings.length > 0) {
     return yield* new DocsDeploymentOrphanInventoryPolicyError({
-      findings: [findings[0] ?? "orphan inventory policy failed"],
+      findings: [
+        Option.fromNullishOr(findings[0]).pipe(
+          Option.getOrElse(() => "orphan inventory policy failed")
+        ),
+      ],
     });
   }
   const encoded = yield* Schema.encodeUnknownEffect(
     DocsDeploymentOrphanInventoryReceipt
   )(receipt);
   yield* Console.log(JSON.stringify(encoded, null, 2));
-}).pipe(
+});
+
+const program = OrphanInventoryRuntimeConfig.pipe(
+  Effect.mapError(
+    () =>
+      new DocsDeploymentOrphanInventoryInputError({
+        target: "environment",
+      })
+  ),
+  Effect.flatMap((config) =>
+    readOrphanInventory().pipe(
+      Effect.provide(
+        DocsDeploymentOrphanSourcesLive(config).pipe(
+          Layer.provide(BunServices.layer)
+        )
+      )
+    )
+  ),
   Effect.tapErrorTag("DocsDeploymentOrphanInventoryInputError", (error) =>
     Console.error(`FAIL [orphan-input] target=${error.target}`)
   ),
@@ -61,7 +101,7 @@ const program = Effect.gen(function* orphanInventoryProgram() {
   Effect.tapErrorTag("DocsDeploymentOrphanInventoryPolicyError", (error) =>
     Console.error(`FAIL [orphan-policy] ${error.findings.join("; ")}`)
   ),
-  Effect.provide(runtimeLayer),
+  Effect.provide(BunServices.layer),
   Effect.scoped
 );
 

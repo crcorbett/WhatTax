@@ -1,9 +1,26 @@
-import { Context, Effect, Layer, Schema, Stream } from "effect";
+import {
+  Context,
+  Effect,
+  HashSet,
+  Layer,
+  Match,
+  Option,
+  Schema,
+  Stream,
+} from "effect";
 import type * as Scope from "effect/Scope";
 import { ChildProcess, ChildProcessSpawner } from "effect/unstable/process";
 
 import type { DocsDeploymentInventoryReport } from "./inventory.schemas.js";
 import { DocsDeploymentInventoryReport as InventoryReportSchema } from "./inventory.schemas.js";
+import type {
+  DocsDeploymentOrphanProcessConfig,
+  DocsDeploymentOrphanProcessOperation,
+} from "./orphan-inventory.process-boundary.js";
+import {
+  makeDocsDeploymentChildEnvironment,
+  restoreDocsDeploymentJsonCommand,
+} from "./orphan-inventory.process-boundary.js";
 import type {
   DocsDeploymentOrphanInventoryReceipt,
   GitHubOpenPullRequest,
@@ -14,6 +31,7 @@ import {
   DocsDeploymentOrphanInventoryInputError,
   DocsDeploymentOrphanInventoryReadError,
   GitHubOpenPullRequest as OpenPullRequestSchema,
+  PreviewStageClassification,
 } from "./orphan-inventory.schemas.js";
 
 const repository = "crcorbett/taxkit" as const;
@@ -34,11 +52,6 @@ const githubArgs = [
 const previewStageNumber = (stage: string): number =>
   Number.parseInt(stage.slice("pr-".length), 10);
 
-const decodeProcessBytes = (bytes: readonly Uint8Array[]) =>
-  new TextDecoder().decode(
-    Uint8Array.from(bytes.flatMap((chunk) => [...chunk]))
-  );
-
 export const makeDocsDeploymentOrphanInventoryReceipt = (
   observedAt: string,
   openPullRequests: readonly GitHubOpenPullRequest[],
@@ -48,21 +61,18 @@ export const makeDocsDeploymentOrphanInventoryReceipt = (
     .filter((entry) => entry.stage !== "prod")
     .map((entry) => {
       const prNumber = previewStageNumber(entry.stage);
-      const pullRequest =
-        openPullRequests.find((candidate) => candidate.number === prNumber) ??
-        null;
-      let classification:
-        | "active-trusted-preview"
-        | "untrusted-preview-stage"
-        | "orphan-candidate" = "active-trusted-preview";
-      if (pullRequest === null) {
-        classification = "orphan-candidate";
-      } else if (
-        pullRequest.isCrossRepository ||
-        pullRequest.isDraft === false
-      ) {
-        classification = "untrusted-preview-stage";
-      }
+      const pullRequest = Option.fromNullishOr(
+        openPullRequests.find((candidate) => candidate.number === prNumber)
+      ).pipe(Option.getOrNull);
+      const classification = Match.value(pullRequest).pipe(
+        Match.when(null, () => "orphan-candidate" as const),
+        Match.when(
+          (candidate) =>
+            candidate.isCrossRepository || candidate.isDraft === false,
+          () => "untrusted-preview-stage" as const
+        ),
+        Match.orElse(() => "active-trusted-preview" as const)
+      );
       return {
         classification,
         prNumber,
@@ -77,14 +87,14 @@ export const makeDocsDeploymentOrphanInventoryReceipt = (
       };
     })
     .toSorted((left, right) => left.prNumber - right.prNumber);
-  const previewStageNumbers = new Set(
+  const previewStageNumbers = HashSet.fromIterable(
     previewStages.map((entry) => entry.prNumber)
   );
   const trustedPullRequestsWithoutStage = openPullRequests
     .filter(
       (pullRequest) =>
         !pullRequest.isCrossRepository &&
-        !previewStageNumbers.has(pullRequest.number)
+        !HashSet.has(previewStageNumbers, pullRequest.number)
     )
     .toSorted((left, right) => left.number - right.number);
   return {
@@ -120,10 +130,14 @@ export const inspectDocsDeploymentOrphanInventoryReceipt = (
     receipt.sources.github.openPullRequests,
     receipt.sources.deploymentInventory.report
   );
-  return JSON.stringify(receipt.previewStages) ===
-    JSON.stringify(expected.previewStages) &&
-    JSON.stringify(receipt.trustedPullRequestsWithoutStage) ===
-      JSON.stringify(expected.trustedPullRequestsWithoutStage)
+  return Schema.toEquivalence(Schema.Array(PreviewStageClassification))(
+    receipt.previewStages,
+    expected.previewStages
+  ) &&
+    Schema.toEquivalence(Schema.Array(OpenPullRequestSchema))(
+      receipt.trustedPullRequestsWithoutStage,
+      expected.trustedPullRequestsWithoutStage
+    )
     ? []
     : [
         "orphan-inventory-classification: open pull requests, Alchemy stages and Cloudflare Workers must produce the exact report-only classification",
@@ -154,158 +168,104 @@ export class DocsDeploymentOrphanSources extends Context.Service<
   DocsDeploymentOrphanSourcesShape
 >()("taxkit/DocsDeploymentOrphanSources") {}
 
-export const DocsDeploymentOrphanSourcesLive = Layer.effect(
-  DocsDeploymentOrphanSources,
-  Effect.gen(function* makeDocsDeploymentOrphanSourcesLive() {
-    const childProcesses = yield* ChildProcessSpawner.ChildProcessSpawner;
+export const DocsDeploymentOrphanSourcesLive = (
+  processConfig: DocsDeploymentOrphanProcessConfig
+) =>
+  Layer.effect(
+    DocsDeploymentOrphanSources,
+    Effect.gen(function* makeDocsDeploymentOrphanSourcesLive() {
+      const childProcesses = yield* ChildProcessSpawner.ChildProcessSpawner;
 
-    const readJsonCommand = <A>(
-      repositoryRoot: string,
-      command: string,
-      args: readonly string[],
-      expectedCommand: string,
-      operation: string,
-      schema: Schema.ConstraintDecoder<A>
-    ): Effect.Effect<
-      A,
-      | DocsDeploymentOrphanInventoryInputError
-      | DocsDeploymentOrphanInventoryReadError,
-      Scope.Scope
-    > =>
-      // oxlint-disable-next-line eslint/complexity -- one bounded process ingress keeps command identity and safe failure decoding together
-      Effect.gen(function* readJsonCommandOutput() {
-        if ([command, ...args].join(" ") !== expectedCommand) {
-          return yield* new DocsDeploymentOrphanInventoryInputError({
-            target: `${operation}:command-identity`,
-          });
-        }
-        const handle = yield* childProcesses
-          .spawn(
-            ChildProcess.make(command, args, {
-              cwd: repositoryRoot,
-              env: {
-                ALCHEMY_PROFILE: process.env["ALCHEMY_PROFILE"],
-                HOME: process.env["HOME"],
-              },
-              extendEnv: true,
-              forceKillAfter: "2 seconds",
-              stderr: "pipe",
-              stdin: "ignore",
-              stdout: "pipe",
-            })
-          )
-          .pipe(
-            Effect.mapError(
-              () => new DocsDeploymentOrphanInventoryReadError({ operation })
-            )
-          );
-        const [stdout, stderr] = yield* Effect.all(
-          [Stream.runCollect(handle.stdout), Stream.runCollect(handle.stderr)],
-          { concurrency: "unbounded" }
-        );
-        const exitCode = yield* handle.exitCode;
-        const stdoutText = decodeProcessBytes([...stdout]);
-        const stderrText = decodeProcessBytes([...stderr]);
-        const outputText = `${stdoutText}\n${stderrText}`;
-        if (Number(exitCode) !== 0) {
-          const cacheShape = outputText.match(
-            /FAIL \[inventory-input\] target=missing cached Cloudflare state-store credentials fileVisible=(true|false) fileJsonObject=(true|false)/u
-          );
-          const safeFailure = outputText.match(
-            /FAIL \[(inventory-input|inventory-read|inventory-disagreement)\](?: operation=([A-Za-z0-9:_-]+)| target=(CI=1|missing cached Cloudflare state-store credentials|invalid cached Cloudflare state-store credentials|cached state-store account identity))?/u
-          );
-          let inputSuffix: string | undefined;
-          if (safeFailure?.[3] === "CI=1") {
-            inputSuffix = "ci";
-          } else if (
-            safeFailure?.[3] === "cached state-store account identity"
-          ) {
-            inputSuffix = "account";
-          } else if (
-            safeFailure?.[3] ===
-            "missing cached Cloudflare state-store credentials"
-          ) {
-            inputSuffix = "missing-cache";
-          } else if (
-            safeFailure?.[3] ===
-            "invalid cached Cloudflare state-store credentials"
-          ) {
-            inputSuffix = "invalid-cache";
-          } else if (safeFailure?.[3] !== undefined) {
-            inputSuffix = "credentials";
+      const readJsonCommand = <A>(
+        repositoryRoot: string,
+        command: string,
+        args: readonly string[],
+        expectedCommand: string,
+        operation: DocsDeploymentOrphanProcessOperation,
+        schema: Schema.ConstraintDecoder<A>
+      ): Effect.Effect<
+        A,
+        | DocsDeploymentOrphanInventoryInputError
+        | DocsDeploymentOrphanInventoryReadError,
+        Scope.Scope
+      > =>
+        Effect.gen(function* readJsonCommandOutput() {
+          if ([command, ...args].join(" ") !== expectedCommand) {
+            return yield* new DocsDeploymentOrphanInventoryInputError({
+              target: `${operation}:command-identity`,
+            });
           }
-          const failureSuffix =
-            safeFailure?.[2] ??
-            inputSuffix ??
-            safeFailure?.[1]?.replace("inventory-", "");
-          const cacheShapeSuffix = cacheShape
-            ? `-file-visible-${cacheShape[1]}-json-object-${cacheShape[2]}`
-            : "";
-          return yield* new DocsDeploymentOrphanInventoryReadError({
-            operation: failureSuffix
-              ? `${operation}:${failureSuffix}${cacheShapeSuffix}`
-              : operation,
-          });
-        }
-        const text = yield* Effect.try({
-          catch: () =>
-            new DocsDeploymentOrphanInventoryInputError({
-              target: `${operation}:utf8`,
-            }),
-          try: () =>
-            new TextDecoder("utf-8", { fatal: true }).decode(
-              new TextEncoder().encode(stdoutText)
-            ),
-        });
-        const decoded = yield* Schema.decodeUnknownEffect(
-          Schema.fromJsonString(schema),
-          {
-            onExcessProperty: "error",
-          }
-        )(text).pipe(
-          Effect.mapError(
-            () =>
-              new DocsDeploymentOrphanInventoryInputError({
-                target: `${operation}:json`,
+          const handle = yield* childProcesses
+            .spawn(
+              ChildProcess.make(command, args, {
+                cwd: repositoryRoot,
+                env: makeDocsDeploymentChildEnvironment(
+                  processConfig,
+                  operation
+                ),
+                extendEnv: false,
+                forceKillAfter: "2 seconds",
+                stderr: "pipe",
+                stdin: "ignore",
+                stdout: "pipe",
               })
+            )
+            .pipe(
+              Effect.mapError(
+                () => new DocsDeploymentOrphanInventoryReadError({ operation })
+              )
+            );
+          const [stdout, stderr] = yield* Effect.all(
+            [
+              Stream.runCollect(handle.stdout),
+              Stream.runCollect(handle.stderr),
+            ],
+            { concurrency: 2 }
+          );
+          const exitCode = yield* handle.exitCode;
+          const decoded = yield* restoreDocsDeploymentJsonCommand(
+            operation,
+            Number(exitCode),
+            [...stdout],
+            [...stderr],
+            schema
+          );
+          if (
+            operation === "github-open-pull-requests" &&
+            Array.isArray(decoded) &&
+            decoded.length >= githubPullRequestResultLimit
+          ) {
+            return yield* new DocsDeploymentOrphanInventoryInputError({
+              target: "incomplete GitHub pull-request inventory",
+            });
+          }
+          return decoded;
+        }).pipe(
+          Effect.catchTag(
+            "PlatformError",
+            () => new DocsDeploymentOrphanInventoryReadError({ operation })
           )
         );
-        if (
-          operation === "github-open-pull-requests" &&
-          Array.isArray(decoded) &&
-          decoded.length >= githubPullRequestResultLimit
-        ) {
-          return yield* new DocsDeploymentOrphanInventoryInputError({
-            target: "incomplete GitHub pull-request inventory",
-          });
-        }
-        return decoded;
-      }).pipe(
-        Effect.catchTag(
-          "PlatformError",
-          () => new DocsDeploymentOrphanInventoryReadError({ operation })
-        )
-      );
 
-    return DocsDeploymentOrphanSources.of({
-      readDeploymentInventory: (repositoryRoot) =>
-        readJsonCommand(
-          repositoryRoot,
-          "bun",
-          ["run", "check:docs-deployment-inventory"],
-          docsDeploymentStateProviderInventoryCommand,
-          "deployment-inventory",
-          InventoryReportSchema
-        ),
-      readOpenPullRequests: (repositoryRoot) =>
-        readJsonCommand(
-          repositoryRoot,
-          "gh",
-          githubArgs,
-          docsDeploymentOpenPullRequestsCommand,
-          "github-open-pull-requests",
-          Schema.Array(OpenPullRequestSchema)
-        ),
-    });
-  })
-);
+      return DocsDeploymentOrphanSources.of({
+        readDeploymentInventory: (repositoryRoot) =>
+          readJsonCommand(
+            repositoryRoot,
+            "bun",
+            ["run", "check:docs-deployment-inventory"],
+            docsDeploymentStateProviderInventoryCommand,
+            "deployment-inventory",
+            InventoryReportSchema
+          ),
+        readOpenPullRequests: (repositoryRoot) =>
+          readJsonCommand(
+            repositoryRoot,
+            "gh",
+            githubArgs,
+            docsDeploymentOpenPullRequestsCommand,
+            "github-open-pull-requests",
+            Schema.Array(OpenPullRequestSchema)
+          ),
+      });
+    })
+  );

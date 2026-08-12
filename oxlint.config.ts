@@ -44,6 +44,8 @@ const decodingBoundaryFiles = [
   "tools/documentation/runbook-check.runtime.test.ts",
   "tools/documentation/runbook-policy.test.ts",
   "tools/docs-deployment/input.boundary.ts",
+  "tools/docs-deployment/inventory-credentials.boundary.ts",
+  "tools/docs-deployment/orphan-inventory.process-boundary.ts",
   "tools/docs-deployment/workflow-check.boundary.ts",
   "tools/docs-deployment/automation.check.runtime.ts",
   "tools/docs-deployment/automation.policy.test.ts",

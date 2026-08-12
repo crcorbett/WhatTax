@@ -2,10 +2,7 @@ import * as BunRuntime from "@effect/platform-bun/BunRuntime";
 import * as BunServices from "@effect/platform-bun/BunServices";
 import { AlchemyContextLive, AuthProviders } from "alchemy";
 import { ArtifactStore, createArtifactStore } from "alchemy/Artifacts";
-import {
-  CredentialsStore,
-  credentialsFilePath,
-} from "alchemy/Auth/Credentials";
+import { credentialsFilePath } from "alchemy/Auth/Credentials";
 import { LoggingCli } from "alchemy/Cli/LoggingCli";
 import * as Cloudflare from "alchemy/Cloudflare";
 import { Stack } from "alchemy/Stack";
@@ -15,15 +12,20 @@ import {
   Config,
   Console,
   Effect,
-  FileSystem,
   Layer,
   Match,
+  Option,
   Redacted,
   Schema,
 } from "effect";
 import * as FetchHttpClient from "effect/unstable/http/FetchHttpClient";
 
 import { docsCloudflareStackName } from "../../apps/docs/src/lib/build/cloudflare-stack.js";
+import {
+  readDocsDeploymentStateStoreCredentials,
+  requireDocsDeploymentStateStoreAccount,
+} from "./inventory-credentials.boundary.js";
+import type { DocsDeploymentStateStoreCredentials } from "./inventory.schemas.js";
 import {
   DocsDeploymentInventoryInputError,
   DocsDeploymentInventoryReport,
@@ -33,13 +35,12 @@ import {
   DocsDeploymentInventoryLive,
 } from "./inventory.service.js";
 
-const InventoryRuntimeConfig = Schema.Struct({
-  CI: Schema.Literals(["1", "true"]),
-});
-const CachedStateStoreCredentials = Schema.Struct({
-  accountId: Schema.NonEmptyString,
-  authToken: Schema.RedactedFromValue(Schema.NonEmptyString),
-  url: Schema.URLFromString,
+const InventoryRuntimeConfig = Config.unwrap({
+  ci: Config.schema(Schema.Literals(["1", "true"]), "CI"),
+  profile: Config.string("ALCHEMY_PROFILE").pipe(Config.withDefault("default")),
+  stateCredentialsJson: Config.redacted(
+    "ALCHEMY_STATE_STORE_CREDENTIALS_JSON"
+  ).pipe(Config.option),
 });
 
 const deploymentStack = {
@@ -73,7 +74,7 @@ const cloudflareApiLayer = Cloudflare.CloudflareApiLive().pipe(
 // this keeps the inventory read-only and leaves mutation/bootstrap ownership
 // with the deployment workflows.
 const makeReadOnlyStateLayer = (
-  credentials: typeof CachedStateStoreCredentials.Type
+  credentials: DocsDeploymentStateStoreCredentials
 ) =>
   Layer.effect(
     State,
@@ -86,9 +87,7 @@ const makeReadOnlyStateLayer = (
     )
   );
 
-const makeInventoryLayer = (
-  credentials: typeof CachedStateStoreCredentials.Type
-) =>
+const makeInventoryLayer = (credentials: DocsDeploymentStateStoreCredentials) =>
   Layer.merge(
     DocsDeploymentInventoryLive,
     Layer.merge(
@@ -109,84 +108,35 @@ const readInventoryProgram = Effect.gen(function* readInventoryProgram() {
 });
 
 const program = Effect.gen(function* inventoryProgram() {
-  yield* Config.schema(InventoryRuntimeConfig).pipe(
+  const config = yield* InventoryRuntimeConfig.pipe(
     Effect.mapError(
       () => new DocsDeploymentInventoryInputError({ target: "CI=1" })
     )
   );
-  const profile = yield* Config.string("ALCHEMY_PROFILE").pipe(
-    Config.withDefault("default")
+  const currentEnvironment = yield* Effect.flatten(
+    Cloudflare.CloudflareEnvironment
   );
-  const credentialsStore = yield* CredentialsStore;
-  const currentEnvironment = yield* yield* Cloudflare.CloudflareEnvironment;
-  const cachedStateCredentials = yield* credentialsStore.read<unknown>(
-    profile,
-    "cloudflare-state-store"
-  );
-  const environmentStateCredentials = yield* Config.string(
-    "ALCHEMY_STATE_STORE_CREDENTIALS_JSON"
-  ).pipe(
-    Effect.flatMap((value) =>
-      Effect.try({
-        catch: () => null,
-        try: () => {
-          const parsed: unknown = JSON.parse(value);
-          return parsed;
-        },
-      })
-    ),
-    Effect.catch(() => Effect.succeed(null))
-  );
-  const rawStateCredentials =
-    cachedStateCredentials ?? environmentStateCredentials;
-  if (rawStateCredentials === undefined || rawStateCredentials === null) {
-    const fileSystem = yield* FileSystem.FileSystem;
-    const fileShape = yield* fileSystem
-      .readFileString(credentialsFilePath(profile, "cloudflare-state-store"))
-      .pipe(
-        Effect.map((contents) => {
-          try {
-            const parsed: unknown = JSON.parse(contents);
-            return {
-              fileJsonObject: parsed !== null && typeof parsed === "object",
-              fileVisible: true,
-            };
-          } catch {
-            return { fileJsonObject: false, fileVisible: true };
-          }
-        }),
-        Effect.catch(() =>
-          Effect.succeed({ fileJsonObject: false, fileVisible: false })
-        )
-      );
-    yield* Console.error(
-      `FAIL [inventory-input] target=missing cached Cloudflare state-store credentials fileVisible=${fileShape.fileVisible} fileJsonObject=${fileShape.fileJsonObject}`
+  const decodedStateCredentials =
+    yield* readDocsDeploymentStateStoreCredentials(
+      credentialsFilePath(config.profile, "cloudflare-state-store"),
+      config.stateCredentialsJson
     );
-    return yield* new DocsDeploymentInventoryInputError({
-      target: "missing cached Cloudflare state-store credentials",
-    });
-  }
-  const decodedStateCredentials = yield* Schema.decodeUnknownEffect(
-    CachedStateStoreCredentials
-  )(rawStateCredentials).pipe(
-    Effect.mapError(
-      () =>
-        new DocsDeploymentInventoryInputError({
-          target: "invalid cached Cloudflare state-store credentials",
-        })
-    )
+  yield* requireDocsDeploymentStateStoreAccount(
+    currentEnvironment.accountId,
+    decodedStateCredentials
   );
-  if (decodedStateCredentials.accountId !== currentEnvironment.accountId) {
-    return yield* new DocsDeploymentInventoryInputError({
-      target: "cached state-store account identity",
-    });
-  }
   return yield* readInventoryProgram.pipe(
     Effect.provide(makeInventoryLayer(decodedStateCredentials))
   );
 }).pipe(
   Effect.tapErrorTag("DocsDeploymentInventoryInputError", (error) =>
-    Console.error(`FAIL [inventory-input] target=${error.target}`)
+    Console.error(
+      Option.match(Option.fromNullishOr(error.fileVisible), {
+        onNone: () => `FAIL [inventory-input] target=${error.target}`,
+        onSome: (fileVisible) =>
+          `FAIL [inventory-input] target=${error.target} fileVisible=${fileVisible} fileJsonObject=${error.fileJsonObject === true}`,
+      })
+    )
   ),
   Effect.tapErrorTag("DocsDeploymentInventoryReadError", (error) =>
     Console.error(`FAIL [inventory-read] operation=${error.operation}`)

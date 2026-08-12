@@ -38,9 +38,11 @@ intent and task state belong in the active SPEC and execution plan.
   Worker. It uploads the plugin-produced output through
   `Cloudflare.Worker({ bundle: false })`; Alchemy owns the physical Worker
   name. The separate report-only inventory owner uses Alchemy's public
-  `makeHttpStateStore` after Schema-decoding the account-matched cache, with a
-  fallback to the same protected JSON credential only when a nested process
-  cannot see that cache, so it cannot bootstrap, write or delete state.
+  `makeHttpStateStore` after an Effect FileSystem/Schema boundary decodes the
+  account-matched cache, with a protected, redacted JSON fallback only when a
+  nested process cannot see that cache. Missing, malformed and unreadable
+  credential input remain distinct safe failures; neither path can bootstrap,
+  write or delete state.
 - The Worker uses compatibility date `2026-06-24`, `nodejs_compat`, default
   asset-first full-stack routing, a provider Worker URL, built-in invocation
   logs and disabled traces. Hashed `/assets/*` responses are immutable.
@@ -111,9 +113,14 @@ OAuth profile into CI.
 `bun run check:docs-deployment-orphans` composes that readback with an exact
 read-only GitHub open-PR query. Its Schema-decoded receipt classifies each
 `pr-N` stage as trusted-active, untrusted or an orphan candidate and separately
-reports trusted open PRs without a stage. It has no provider-write or deletion
-operation. A candidate is only a dated human-review input, never teardown
-authority.
+reports trusted open PRs without a stage. The executable Config owner injects
+two disjoint child environments: GitHub receives its token only, while the
+deployment inventory receives only the Cloudflare/state-read inputs. Both
+receive explicit path/home/locale values and disable ambient environment
+inheritance. The process boundary restores spawn, exit, stdout/stderr UTF-8 and
+JSON once into closed safe errors and never includes raw diagnostics. It has no
+provider-write or deletion operation. A candidate is only a dated human-review
+input, never teardown authority.
 
 The accepted Preview requalification used candidate
 `d9cb8945529fb72158e59ca0daf02a98e1e4de1a` at deterministic stage `pr-1`.

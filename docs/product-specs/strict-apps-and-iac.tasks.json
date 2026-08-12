@@ -137,7 +137,7 @@
     },
     {
       "id": "APP-IAC-002",
-      "status": "in_progress",
+      "status": "complete",
       "acceptedFindingIds": ["FINDING-002"],
       "requirementIds": ["AIR-002", "AIR-004"],
       "title": "Make inventory credentials and process sources strict and report-only",
@@ -181,7 +181,7 @@
     },
     {
       "id": "APP-IAC-003",
-      "status": "pending",
+      "status": "in_progress",
       "acceptedFindingIds": ["FINDING-003"],
       "requirementIds": ["AIR-003", "AIR-004"],
       "title": "Put docs runtime proof under application-owned Effect lifetime",

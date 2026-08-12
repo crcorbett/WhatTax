@@ -29,10 +29,13 @@ DNS, package publication, versioning, tags and releases remain outside scope.
   contracted from five executables to one boundary; 50 deployment tests,
   focused types/lint/format/docs checks and root verification pass. Evidence:
   [`APP-IAC-001-validation.json`](../../documentation-audit/strict-apps-iac/APP-IAC-001-validation.json).
-- **APP-IAC-002 — active:** correct inventory credential, Config, process,
-  decoding and semantic collection ownership while preserving report-only
-  behavior.
-- **APP-IAC-003 — pending:** move docs runtime proof identity and state behind
+- **APP-IAC-002 — complete:** state credentials now enter through one strict
+  Effect file/JSON boundary, provider and GitHub children receive disjoint
+  Config-owned environments with ambient inheritance disabled, and one process
+  boundary restores spawn/exit/UTF-8/JSON into closed secret-negative errors.
+  Sixty deployment tests and root verification pass. Evidence:
+  [`APP-IAC-002-validation.json`](../../documentation-audit/strict-apps-iac/APP-IAC-002-validation.json).
+- **APP-IAC-003 — active:** move docs runtime proof identity and state behind
   application-owned Effect composition and prove lifetime deterministically.
 - **APP-IAC-004 — pending:** add the smallest focused recurrence-prevention
   control and adversarial fixtures earned by the three root corrections.

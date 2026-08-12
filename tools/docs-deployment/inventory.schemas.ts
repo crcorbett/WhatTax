@@ -35,6 +35,14 @@ export const ProviderDocsWorker = Schema.Struct({
   workerName: DocsDeploymentWorkerName,
 });
 
+export const DocsDeploymentStateStoreCredentials = Schema.Struct({
+  accountId: Schema.NonEmptyString,
+  authToken: Schema.RedactedFromValue(Schema.NonEmptyString),
+  url: Schema.URLFromString,
+});
+export type DocsDeploymentStateStoreCredentials =
+  typeof DocsDeploymentStateStoreCredentials.Type;
+
 const InventoryResource = Schema.Struct({
   instanceId: Schema.NonEmptyString,
   logicalId: DocsDeploymentLogicalResourceId,
@@ -73,6 +81,8 @@ export type DocsDeploymentInventoryReport =
 export class DocsDeploymentInventoryInputError extends Schema.TaggedErrorClass<DocsDeploymentInventoryInputError>()(
   "DocsDeploymentInventoryInputError",
   {
+    fileJsonObject: Schema.optional(Schema.Boolean),
+    fileVisible: Schema.optional(Schema.Boolean),
     target: Schema.NonEmptyString,
   }
 ) {}
