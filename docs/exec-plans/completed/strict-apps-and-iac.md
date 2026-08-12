@@ -1,8 +1,8 @@
 ---
 document_type: execution-plan
-lifecycle: active
+lifecycle: historical
 authority: supporting
-owner: taxkit-execution-owner
+owner: taxkit-execution-history-owner
 last_reviewed: 2026-08-13
 review_trigger: APP-IAC task state, finding, implementation evidence, gate, exception, or candidate change
 successor: ../../product-specs/strict-apps-and-iac.md
@@ -11,15 +11,15 @@ tombstone: false
 
 # Strict apps and IaC execution plan
 
-This active plan implements
+This completed plan implemented
 [`strict-apps-and-iac.md`](../../product-specs/strict-apps-and-iac.md) and its
 [`sibling task list`](../../product-specs/strict-apps-and-iac.tasks.json). The
 accepted audit crosswalk is
 [`accepted-findings.json`](../../documentation-audit/strict-apps-iac/accepted-findings.json).
 
-The governing goal is active. Repository-local implementation and
-passing-gated commits are authorized. External deployment, provider mutation,
-DNS, package publication, versioning, tags and releases remain outside scope.
+The governing goal completed through APP-IAC-005. External deployment,
+provider mutation, DNS, package publication, versioning, tags and releases
+remained outside scope and were not performed.
 
 ## Progress
 
@@ -48,8 +48,14 @@ DNS, package publication, versioning, tags and releases remain outside scope.
   retaining two named host adapters, and the control runs once through the
   existing deployment test edge. Evidence:
   [`APP-IAC-004-validation.json`](../../documentation-audit/strict-apps-iac/APP-IAC-004-validation.json).
-- **APP-IAC-005 — active:** perform the fresh terminal audit, run all gates,
-  record bounded residuals, and close lifecycle owners together.
+- **APP-IAC-005 — complete:** the final candidate was re-inventoried across
+  docs, Alchemy, deployment tooling, exports, config, tests and owners. Exact
+  beta.100 and beta.64 sources were reconfirmed, four residual adapters were
+  bounded, full local SSR/browser/workerd proof passed with reviewed
+  screenshots, and lifecycle owners closed together. Evidence:
+  [`terminal-audit.json`](../../documentation-audit/strict-apps-iac/terminal-audit.json)
+  and
+  [`APP-IAC-005-validation.json`](../../documentation-audit/strict-apps-iac/APP-IAC-005-validation.json).
 
 ## Execution rules
 

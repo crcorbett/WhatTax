@@ -1,6 +1,6 @@
 ---
 document_type: product-spec
-lifecycle: active
+lifecycle: implemented
 authority: supporting
 owner: taxkit-product-owner
 last_reviewed: 2026-08-13
@@ -25,13 +25,18 @@ mutation and randomness outside Effect; and repository enforcement did not
 prevent those patterns. The structured source is
 [`accepted-findings.json`](../documentation-audit/strict-apps-iac/accepted-findings.json).
 
-Implementation follows
+Implementation completed on 13 August 2026. The terminal audit is retained at
+[`terminal-audit.json`](../documentation-audit/strict-apps-iac/terminal-audit.json),
+and the historical execution record is the
+[`completed plan`](../exec-plans/completed/strict-apps-and-iac.md).
+
+Implementation followed
 [`strict-apps-and-iac.tasks.json`](./strict-apps-and-iac.tasks.json) and the
-[active execution plan](../exec-plans/active/strict-apps-and-iac.md).
+[execution plan](../exec-plans/completed/strict-apps-and-iac.md).
 
 ## Outcome
 
-The apps and deployment-tooling surface must have:
+The apps and deployment-tooling surface now has:
 
 - one Schema decode at each unknown or representation ingress
 - closed tagged errors through internal Effect programs
@@ -66,13 +71,15 @@ Installed versions at that target are:
 | TanStack React Router | `1.169.2` |
 | Fumadocs core | `16.9.3` |
 | Fumadocs MDX | `14.3.2` |
-| Vite | `8.0.11` |
+| Vite | `8.0.14` (`^8.0.11` catalog range) |
 
 Installed package source and types are authoritative for every implementation
-call. An inspected Effect v4 source checkout at revision
+call. The terminal audit also inspected the exact Effect v4 beta.100 source
+checkout at revision `67114e90c37365712b634cf8e6652f3c2aa15bce`.
+Earlier task work used revision
 `1caab3cc30f626efbf15e59d74f539a487e5c85c`, package version
-`4.0.0-beta.93`, provides version-qualified trajectory evidence only. An
-available Effect v3 checkout was explicitly rejected. DeepWiki guidance for
+`4.0.0-beta.93`, only as version-qualified trajectory evidence. An available
+Effect v3 checkout was explicitly rejected. DeepWiki guidance for
 Effect-TS/effect and alchemy-run/alchemy was consulted on 2026-08-13, but
 cannot override pinned beta.100 or beta.64 source.
 
@@ -102,7 +109,7 @@ claim is trusted.
 ## Call graphs
 
 ```text
-Current workflow verifier
+Initial workflow verifier
 
 process.env + Bun.file + JSON.parse
   -> raw Promise/async orchestration
@@ -111,7 +118,7 @@ process.env + Bun.file + JSON.parse
 ```
 
 ```text
-Target workflow verifier
+Implemented workflow verifier
 
 Bun executable host
   -> BunRuntime.runMain
@@ -123,7 +130,7 @@ Bun executable host
 ```
 
 ```text
-Target docs server
+Implemented docs server
 
 TanStack fetch callback
   -> application-owned runtime adapter

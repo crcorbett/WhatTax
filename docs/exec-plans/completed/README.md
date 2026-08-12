@@ -16,6 +16,7 @@ evidence remains useful.
 
 Completed plans:
 
+- [Strict apps and IaC](./strict-apps-and-iac.md)
 - [Docs Cloudflare and Alchemy deployment](./docs-cloudflare-alchemy-deployment.md)
 - [TaxKit docs application architecture](./docs-application-architecture.md)
 - [Repository portability and production contracts](./repository-portability-and-production-contracts.md)

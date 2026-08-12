@@ -13,16 +13,25 @@ This route owns dated audit and corpus-accounting evidence, not current
 maintainer policy. Lifecycle and semantic ownership are defined by
 [`../README.md`](../README.md).
 
-Active strict apps and IaC audit:
+Accepted strict apps and IaC audit and implementation evidence:
 
 - [`strict-apps-iac/audit-scope.json`](strict-apps-iac/audit-scope.json)
 - [`strict-apps-iac/corpus-inventory.json`](strict-apps-iac/corpus-inventory.json)
 - [`strict-apps-iac/audit-findings.json`](strict-apps-iac/audit-findings.json)
 - [`strict-apps-iac/accepted-findings.json`](strict-apps-iac/accepted-findings.json)
+- [`strict-apps-iac/APP-IAC-001-validation.json`](strict-apps-iac/APP-IAC-001-validation.json)
+- [`strict-apps-iac/APP-IAC-002-validation.json`](strict-apps-iac/APP-IAC-002-validation.json)
+- [`strict-apps-iac/APP-IAC-003-validation.json`](strict-apps-iac/APP-IAC-003-validation.json)
+- [`strict-apps-iac/APP-IAC-004-validation.json`](strict-apps-iac/APP-IAC-004-validation.json)
+- [`strict-apps-iac/APP-IAC-005-validation.json`](strict-apps-iac/APP-IAC-005-validation.json)
+- [`strict-apps-iac/terminal-audit.json`](strict-apps-iac/terminal-audit.json)
 
 This accepted register binds four successor code-quality corrections to the
-clean `origin/main` target. It preserves completed deployment evidence and
-grants no provider, deployment, DNS, release or publication authority.
+clean initial `origin/main` target. APP-IAC-001 through APP-IAC-005 implement
+those corrections; the terminal audit records exact final-candidate proof and
+four bounded residual adapters. Completed deployment evidence remains
+historical, and this work grants or proves no provider, deployment, DNS,
+release or publication state.
 
 Current HGI-200 receipts:
 

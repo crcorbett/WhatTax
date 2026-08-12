@@ -2,9 +2,9 @@
   "$schema": "https://taxkit.local/schemas/product-spec-task-plan.v1.json",
   "spec": "docs/product-specs/strict-apps-and-iac.md",
   "title": "Strict Apps and IaC Implementation Tasks",
-  "status": "active",
+  "status": "complete",
   "last_reviewed": "2026-08-13",
-  "beforeImplementation": "The governing no-budget goal is active. Use installed Effect 4.0.0-beta.100 and Alchemy 2.0.0-beta.64 source and types as exact authority; never use Effect v3 guidance. Read the active SPEC, plan, structured audit and applicable docs/strict Effect/Alchemy instructions before each slice.",
+  "beforeImplementation": "Implementation completed under the governing no-budget goal. Installed Effect 4.0.0-beta.100 and Alchemy 2.0.0-beta.64 source and types were exact authority; Effect v3 guidance was never used. The completed SPEC, task receipts, terminal audit and historical plan retain the execution context.",
   "principles": [
     "Correct the earliest boundary owner in small vertical slices and update its docs and proof in the same slice.",
     "Keep host callbacks narrow, internal programs typed, Config and secrets Schema-owned, and runtime resources application-owned.",
@@ -63,7 +63,7 @@
     {
       "surface": "docs-runtime-proof",
       "decision": "change_required",
-      "paths": ["apps/docs/src/lib/runtime-factory.server.ts", "apps/docs/src/runtime.server.ts", "apps/docs/src/server.ts", "apps/docs/**/*test.ts", "apps/docs/README.md"],
+      "paths": ["apps/docs/src/lib/runtime-factory.server.ts", "apps/docs/src/lib/runtime.server.ts", "apps/docs/src/server.ts", "apps/docs/**/*test.ts", "apps/docs/README.md"],
       "acceptance": "One application runtime owns managed, injectable proof identity and state while host callbacks, route behavior, and headers remain narrow and tested."
     },
     {
@@ -273,7 +273,7 @@
     },
     {
       "id": "APP-IAC-005",
-      "status": "in_progress",
+      "status": "complete",
       "acceptedFindingIds": ["FINDING-001", "FINDING-002", "FINDING-003", "FINDING-004"],
       "requirementIds": ["AIR-005"],
       "title": "Run the terminal audit and close the successor lifecycle",

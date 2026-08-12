@@ -14,10 +14,10 @@ tombstone: false
 Live implementation plans belong here while work is in progress. Maintainer
 lifecycle is owned by [`../../README.md`](../../README.md).
 
-The active
-[`Strict apps and IaC`](./strict-apps-and-iac.md) plan hardens docs-app runtime
-proof and deployment verification/inventory boundaries without authorizing an
-external deployment or changing the Alchemy resource graph.
+There is no active implementation plan. The completed
+[`Strict apps and IaC`](../completed/strict-apps-and-iac.md) plan retains the
+docs-app runtime and deployment-boundary implementation history without
+claiming an external deployment or changed Alchemy resource graph.
 
 The Docs Cloudflare and Alchemy deployment SPEC completed all five slices at closeout candidate
 `c0cd1a9`; its historical execution plan is retained at
