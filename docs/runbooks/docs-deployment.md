@@ -313,7 +313,7 @@ credential cache only in the runner and keeps the subsequent inventory command
 read-only. The report-only workflow remains separately credentialed and is not
 established by this correction.
 
-The deployment and quality workflows install the pinned Chromium binary with
+The deployment workflows install the pinned Chromium binary with
 `playwright install chromium`, without `--with-deps`. The managed Ubuntu
 runner supplies the browser's system dependencies; skipping the package
 installation keeps the provider workflow from hanging before Alchemy planning.
