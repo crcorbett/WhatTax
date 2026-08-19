@@ -143,7 +143,8 @@ const waitForHydratedRouter = async (page: Page) => {
       typeof router === "object" &&
       router !== null &&
       typeof Reflect.get(router, "navigate") === "function" &&
-      document.querySelector('[data-tk-hydrated="true"]') !== null
+      document.querySelector('[data-tk-hydrated="true"]') !== null &&
+      document.querySelector('[data-tk-navigation-interactive="true"]') !== null
     );
   });
 };

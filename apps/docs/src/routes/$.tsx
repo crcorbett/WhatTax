@@ -4,7 +4,7 @@ import type {
   DocsNavigation as DocsNavigationValue,
 } from "@taxkit/docs-content/schemas";
 import { Array, Match, Option, Result, pipe } from "effect";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import {
   DocsRecoverableError,
@@ -54,12 +54,14 @@ const DocsRouteFailure = ({
 
 const DocsNavigation = ({
   currentPath,
+  interactive,
   navigation,
   onNavigate,
   onToggle,
   open,
 }: Readonly<{
   currentPath: DocsContentPage["path"];
+  interactive: boolean;
   navigation: DocsNavigationValue;
   onNavigate: () => void;
   onToggle: () => void;
@@ -84,6 +86,7 @@ const DocsNavigation = ({
       aria-label="Documentation"
       className="docs-nav"
       data-open={open}
+      data-tk-navigation-interactive={interactive ? "true" : "false"}
       id="docs-navigation"
     >
       <Link className="docs-nav__home docs-nav__home--desktop" to="/">
@@ -151,12 +154,14 @@ const DocsArticle = ({ page }: { readonly page: DocsContentPage }) => (
 );
 
 const DocsPageLayout = ({
+  interactive,
   navigation,
   onNavigate,
   onToggle,
   open,
   page,
 }: Readonly<{
+  interactive: boolean;
   navigation: DocsNavigationValue;
   onNavigate: () => void;
   onToggle: () => void;
@@ -166,6 +171,7 @@ const DocsPageLayout = ({
   <div className="docs-page-layout">
     <DocsNavigation
       currentPath={page.path}
+      interactive={interactive}
       navigation={navigation}
       onNavigate={onNavigate}
       onToggle={onToggle}
@@ -182,7 +188,13 @@ const DocsPageContainer = ({
   navigation: DocsNavigationValue;
   page: DocsContentPage;
 }>) => {
+  const [interactive, setInteractive] = useState(false);
   const [navigationOpen, setNavigationOpen] = useState(false);
+
+  useEffect(() => {
+    setInteractive(true);
+  }, []);
+
   const toggleNavigation = () => {
     const opening = !navigationOpen;
 
@@ -212,6 +224,7 @@ const DocsPageContainer = ({
 
   return (
     <DocsPageLayout
+      interactive={interactive}
       navigation={navigation}
       onNavigate={() => setNavigationOpen(false)}
       onToggle={toggleNavigation}
