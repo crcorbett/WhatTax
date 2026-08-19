@@ -4,7 +4,7 @@ import { readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 
 import { chromium } from "playwright";
-import type { Page } from "playwright";
+import type { Page, Request } from "playwright";
 
 const origin = process.env.TAXKIT_DOCS_HOSTED_URL;
 const candidateCommit = process.env.TAXKIT_DOCS_CANDIDATE_COMMIT;
@@ -149,6 +149,17 @@ const waitForHydratedRouter = async (page: Page) => {
   });
 };
 
+const isExpectedServerFunctionAbort = (request: Request) => {
+  const url = new URL(request.url());
+
+  return (
+    (request.resourceType() === "fetch" || request.resourceType() === "xhr") &&
+    url.origin === origin &&
+    url.pathname.startsWith("/_serverFn/") &&
+    request.failure()?.errorText === "net::ERR_ABORTED"
+  );
+};
+
 const initialResponse = await fetchHostedResponse(
   `${origin}${knownPath}`,
   { headers: runtimeProofHeaders },
@@ -230,11 +241,15 @@ page.on("console", (message) => {
 page.on("pageerror", (error) =>
   diagnostics.push(`pageerror: ${error.message}`)
 );
-page.on("requestfailed", (request) =>
+page.on("requestfailed", (request) => {
+  if (isExpectedServerFunctionAbort(request)) {
+    return;
+  }
+
   diagnostics.push(
     `requestfailed: ${request.url()} ${request.failure()?.errorText ?? ""}`
-  )
-);
+  );
+});
 page.on("request", (request) => {
   if (request.resourceType() === "document") {
     documentRequests += 1;
@@ -343,11 +358,15 @@ mobilePage.on("console", (message) => {
 mobilePage.on("pageerror", (error) =>
   diagnostics.push(`mobile pageerror: ${error.message}`)
 );
-mobilePage.on("requestfailed", (request) =>
+mobilePage.on("requestfailed", (request) => {
+  if (isExpectedServerFunctionAbort(request)) {
+    return;
+  }
+
   diagnostics.push(
     `mobile requestfailed: ${request.url()} ${request.failure()?.errorText ?? ""}`
-  )
-);
+  );
+});
 await mobilePage.goto(`${origin}${knownPath}`, {
   waitUntil: "domcontentloaded",
 });

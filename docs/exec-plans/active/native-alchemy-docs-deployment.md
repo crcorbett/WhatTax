@@ -99,3 +99,13 @@ candidate adds a post-effect marker on the documentation navigation itself and
 requires both the root and navigation markers before browser interactions.
 The failed `pr-47` Worker remains a retained failure observation until its
 exact teardown proves absence.
+
+Preview run `32285790999` created and read back the exact `pr-48` Worker, but
+the hosted browser journey observed one same-origin TanStack server-function
+prefetch cancelled with `net::ERR_ABORTED`. The required navigation,
+transport, route, mobile and screenshot assertions had otherwise reached their
+endpoints. The browser probes now classify only that exact same-origin
+`/_serverFn/` cancellation as an expected navigation prefetch abort; all other
+request failures remain diagnostics and fail the proof. The failed `pr-48`
+Worker remains a retained failure observation until its exact teardown proves
+absence.
