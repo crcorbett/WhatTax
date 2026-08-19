@@ -45,3 +45,13 @@ SPEC and its
 Local checks, workflow results, Alchemy state, Cloudflare readback and public
 journeys are separate claims. This plan will not claim current public
 availability, rollback or cleanup without the matching dated observation.
+
+## Candidate correction
+
+The first native candidate used Worker-first asset routing. Three Preview
+deploy attempts reached a live SSR page but returned `404` for its referenced
+fingerprinted CSS asset, including after an exact stage teardown and clean
+recreate. The current candidate changes `runWorkerFirst` to `false`, matching
+Cloudflare's asset-first full-stack default and the local built contract. The
+failed workflow runs remain disconfirming evidence; they are not deployment
+acceptance.

@@ -24,7 +24,10 @@ export default Alchemy.Stack(
     const stage = yield* Stage.pipe(Effect.flatMap(decodeDocsDeploymentStage));
     const worker = yield* Cloudflare.Website.Vite(docsWorkerResourceId, {
       assets: {
-        runWorkerFirst: true,
+        // Let Cloudflare serve fingerprinted Vite assets directly before the
+        // TanStack Start Worker handles application routes. This is the
+        // supported full-stack default and keeps missing assets as real 404s.
+        runWorkerFirst: false,
       },
       compatibility: {
         date: docsWorkerCompatibilityDate,

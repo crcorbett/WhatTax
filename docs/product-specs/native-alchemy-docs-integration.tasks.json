@@ -19,7 +19,7 @@
       "dependsOn": [],
       "acceptance": [
         "One Website.Vite resource owns the docs Worker and assets.",
-        "The existing stack, stage, compatibility, Worker-first assets, observability and output identity remain explicit."
+        "The existing stack, stage, compatibility, asset-first routing, observability and output identity remain explicit."
       ]
     },
     {

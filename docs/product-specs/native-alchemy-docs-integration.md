@@ -56,7 +56,7 @@ server under `alchemy dev`.
 ### `NAI-001` — one native website resource
 
 Root `alchemy.run.ts` must retain the existing stack name, stage decoding,
-compatibility, Worker-first assets, observability and output identity while
+compatibility, asset-first routing, observability and output identity while
 replacing `DocsBuild` plus `DocsWebsite` with one
 `Cloudflare.Website.Vite("DocsWebsite")` resource rooted at `apps/docs`.
 

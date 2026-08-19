@@ -46,6 +46,9 @@ force-push operations remain outside scope.
 ### `DPL-001` — exact candidate and local proof
 
 Use the current native `Cloudflare.Website.Vite("DocsWebsite")` composition.
+The Website.Vite asset policy must use Cloudflare's default asset-first
+routing for this TanStack Start app; Worker-first routing is not accepted when
+the hosted asset journey returns a 404.
 Run the repository's focused checks and built Worker/browser proof. Record the
 base revision, final candidate commit, installed Alchemy/Effect versions and
 the local proof limits before provider access.
