@@ -131,3 +131,7 @@ completed exact-candidate Quality success, reject pending attempts and failed
 completed attempts, and tolerate only cancelled historical reruns beside that
 success. This is a workflow-gate correction; it does not establish Preview or
 Production.
+
+The correction is carried by open PR `#50`, exact head `6a9c62a…`; its
+pull-request Quality run must pass before the PR is merged and the Preview
+plan is retried.
