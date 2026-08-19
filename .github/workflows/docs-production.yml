@@ -96,7 +96,16 @@ jobs:
           test "$(jq -r .status <<<"$preview_run")" = "completed"
           test "$(jq -r .conclusion <<<"$preview_run")" = "success"
           checks="$(gh api "repos/${GITHUB_REPOSITORY}/commits/${CANDIDATE_SHA}/check-runs?per_page=100")"
-          jq -e '[.check_runs[] | select((.name | test("quality"; "i"))) | .conclusion] | length > 0 and all(. == "success")' <<<"$checks" >/dev/null
+          # A rerun can leave a cancelled historical Quality check on the same
+          # SHA. Require a completed exact-candidate success, reject any
+          # pending attempt, and keep every completed failure blocking.
+          quality_runs="$(jq '[.check_runs[] | select((.name | test("quality"; "i"))) | {status,conclusion}]' <<<"$checks")"
+          jq -e '
+            length > 0 and
+            all(.[]; .status == "completed") and
+            any(.[]; .conclusion == "success") and
+            all(.[]; .conclusion == "success" or .conclusion == "cancelled")
+          ' <<<"$quality_runs" >/dev/null
           mkdir -p "$RUNNER_TEMP/docs-deployment"
           jq -nS \
             --arg candidate "$CANDIDATE_SHA" \

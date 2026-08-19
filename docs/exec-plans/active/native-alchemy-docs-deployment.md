@@ -121,3 +121,16 @@ deployment tests but failed the repository lint with
 now receives its already-bound origin explicitly; this is a code correction,
 not a runner or provider result, and the candidate must pass a fresh Quality
 run before deployment work continues.
+The merged candidate's pull-request Quality run `32289715529` passed, while
+the duplicate push run `32289705420` timed out in `playwright install
+--with-deps` after 30 minutes. The first Preview plan `32291448965` stopped at
+the exact Quality check before Alchemy login, planning, provider mutation or
+hosted proof. The deployment admission is being tightened to require one
+completed exact-candidate Quality success, reject pending attempts and failed
+completed attempts, and tolerate only cancelled historical reruns beside that
+success. This is a workflow-gate correction; it does not establish Preview or
+Production.
+
+The correction is carried by open PR `#50`, exact head `56b95cc…`; its
+pull-request Quality run must pass before the PR is merged and the Preview
+plan is retried.

@@ -80,7 +80,16 @@ jobs:
             '{candidateCommit:$candidate,operation:$operation,prNumber:($pr|tonumber),sourceRef:"refs/heads/main",workflowCommit:$workflow,workflowName:"Docs Preview Deployment",workflowPath:".github/workflows/docs-preview.yml",workflowRunId:$run}' \
             > "$RUNNER_TEMP/docs-deployment/workflow-input.json"
           checks="$(gh api "repos/${GITHUB_REPOSITORY}/commits/${CANDIDATE_SHA}/check-runs?per_page=100")"
-          jq -e '[.check_runs[] | select((.name | test("quality"; "i"))) | .conclusion] | length > 0 and all(. == "success")' <<<"$checks" >/dev/null
+          # A rerun can leave a cancelled historical Quality check on the same
+          # SHA. Require a completed exact-candidate success, reject any
+          # pending attempt, and keep every completed failure blocking.
+          quality_runs="$(jq '[.check_runs[] | select((.name | test("quality"; "i"))) | {status,conclusion}]' <<<"$checks")"
+          jq -e '
+            length > 0 and
+            all(.[]; .status == "completed") and
+            any(.[]; .conclusion == "success") and
+            all(.[]; .conclusion == "success" or .conclusion == "cancelled")
+          ' <<<"$quality_runs" >/dev/null
 
       - name: Check out exact candidate
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.2.0
