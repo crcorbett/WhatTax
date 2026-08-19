@@ -3,7 +3,7 @@ document_type: execution-plan
 lifecycle: current
 authority: supporting
 owner: taxkit-execution-owner
-last_reviewed: 2026-08-19
+last_reviewed: 2026-08-20
 review_trigger: DPL task, candidate, workflow run, provider readback, public journey, screenshot, teardown, rollback or capability change
 successor: null
 tombstone: false
@@ -22,7 +22,8 @@ SPEC and its
   checks and built Worker/browser proof passed in the deployment worktree.
 - **DPL-002 — in progress:** create the exact candidate commit, push the admitted
   branch, create or update the trusted draft PR, and complete default-branch
-  workflow bootstrap if required.
+  workflow bootstrap if required. The next candidate also contains the
+  native-build hydration correction recorded below.
 - **DPL-003 — pending:** run and accept Preview before Production.
 - **DPL-004 — pending:** run and accept fixed Production from the Preview
   receipt.
@@ -134,3 +135,28 @@ Production.
 The correction is carried by open PR `#50`, exact head `56b95cc…`; its
 pull-request Quality run must pass before the PR is merged and the Preview
 plan is retried.
+
+## 2026-08-20 — Production hydration mismatch correction
+
+Production deploy run `32296155483` completed the provider mutation and readback
+for candidate `305bed06140407488986008469e78809251c88eb`, but its hosted browser
+proof failed with React error `#418`. The public Worker returned the expected
+SSR page and assets; a direct Playwright check found one page error in the
+client bundle while the root and navigation markers were present. Preview run
+`32295694051` did not show that error for the same source candidate.
+
+The public asset comparison isolated the failure to separately compiled MDX
+chunks: the Production client chunk used different Shiki output from the
+server-rendered module, so React replaced a Suspense boundary during hydration.
+This is a failed Production observation, not an acceptance receipt. The
+sanitised provider readback is retained under the deployment evidence route;
+the hosted proof is intentionally empty because the browser contract failed.
+
+The next candidate wraps the Fumadocs Vite generator's `buildStart` hook with a
+single shared Promise. TanStack Start builds client and server environments in
+one Vite builder, while Fumadocs writes the generated collection modules from
+`buildStart`. Generating that shared source exactly once prevents the two
+environments from observing different compiled MDX content. Local proof after
+the correction shows one MDX generation event, deterministic Vite output and
+zero built-browser diagnostics. A provider-backed claim still requires fresh
+Preview and Production receipts for the new exact commit.

@@ -3,7 +3,7 @@ document_type: deployment-evidence-index
 lifecycle: current
 authority: canonical
 owner: taxkit-docs-deployment-proof-owner
-last_reviewed: 2026-08-10
+last_reviewed: 2026-08-20
 review_trigger: docs deployment candidate, provider, stage, URL, proof, screenshot, teardown or rollback receipt change
 ---
 
@@ -563,3 +563,16 @@ exact verification, green remote Quality, fresh independent review, and
 claim-matched DCD-004 receipts. It preserves the exact source/candidate
 identities of existing provider and hosted evidence and adds no new deployment
 or public-availability claim.
+
+## 2026-08-20 failed Production hosted proof
+
+Production deploy run `32296155483` mutated and read back the fixed `prod`
+Worker for candidate `305bed06140407488986008469e78809251c88eb`. The sanitised
+provider observation is
+`2026-08-20-production-prod-305bed0/provider-readback-32296155483.json`.
+The hosted browser proof failed with React hydration error `#418`, so this
+directory deliberately contains no accepted hosted proof or screenshot
+receipt. The failure observation records the exact workflow and provider
+identities plus the non-claims. The next candidate's shared Fumadocs
+`buildStart` correction must earn fresh Preview and Production receipts; this
+failed observation remains unchanged history.

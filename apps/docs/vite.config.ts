@@ -10,12 +10,32 @@ export default defineConfig(async () => {
     // oxlint-disable-next-line effect/no-process-outside-boundaries -- Vite configuration is the exact host boundary for Alchemy's documented process-local injection signal.
     process.env.ALCHEMY_CLOUDFLARE_VITE_INJECTED === "1";
 
+  const docsMdx = await fumadocsMdx(docsConfig, {
+    configPath: "../../packages/docs-content/source.config.ts",
+    outDir: "../../packages/docs-content/.source",
+  });
+  const originalDocsMdxBuildStart = docsMdx.buildStart;
+  if (typeof originalDocsMdxBuildStart !== "function") {
+    throw new TypeError("Fumadocs Vite plugin must expose a buildStart hook.");
+  }
+  let docsMdxBuildStartResult: Promise<unknown> | undefined;
+  const docsMdxForBuild = {
+    ...docsMdx,
+    buildStart: () => {
+      docsMdxBuildStartResult ??= Promise.resolve(originalDocsMdxBuildStart());
+      return docsMdxBuildStartResult;
+    },
+    sharedDuringBuild: true,
+  };
+
   return {
     plugins: [
-      await fumadocsMdx(docsConfig, {
-        configPath: "../../packages/docs-content/source.config.ts",
-        outDir: "../../packages/docs-content/.source",
-      }),
+      // Fumadocs writes the generated collection modules during buildStart.
+      // TanStack Start uses Vite's client and server environments, so leave
+      // this generator in the shared build phase and do not run it once per
+      // environment. Otherwise the two MDX transforms can observe different
+      // generated content and React can reject hydration in the deployed app.
+      docsMdxForBuild,
       ...(alchemyOwnsCloudflareVite
         ? []
         : [cloudflare({ viteEnvironment: { name: "ssr" } })]),
