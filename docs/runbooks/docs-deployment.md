@@ -973,6 +973,29 @@ custom-domain/DNS, billing, release, publication, byte promotion or future
 provider state. A no-op teardown remains valid only when the same reviewed
 workflow proves the exact stage and provider/state absence.
 
+## 2026-08-20 — failed Production hydration observation and correction
+
+Production deploy run `32296155483` completed the native provider mutation and
+readback for candidate `305bed06140407488986008469e78809251c88eb`, but the
+hosted browser proof failed. The Worker returned HTTP 200 SSR and its assets;
+Playwright then observed React error `#418` while hydrating the docs route.
+The provider readback is retained at
+`docs/evidence/deployments/2026-08-20-production-prod-305bed0/provider-readback-32296155483.json`.
+There is no hosted-proof acceptance file for this run: the raw hosted output
+was empty because the browser assertion failed. Do not treat the provider
+mutation, URL or manual page load as Production acceptance.
+
+The direct asset comparison showed that the client and server compiled the
+same MDX page with different Shiki output. TanStack Start builds those
+environments from one Vite builder, while Fumadocs writes its generated
+collection modules from `buildStart`. A second generation pass made the
+client/server boundary vulnerable to different compiled content. The next
+candidate wraps that hook in one shared Promise and marks the plugin shared,
+so the generated collection is written once per build. Local `build:cloudflare`
+and built-browser proof must show one generation event and zero diagnostics;
+fresh Preview and Production hosted proof are still required before accepting
+the change.
+
 ## Stop conditions
 
 Stop before unrelated `versioning`, `commit`, `push`, `tag`, `release`,

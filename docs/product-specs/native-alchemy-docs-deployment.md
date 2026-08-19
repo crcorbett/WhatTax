@@ -3,7 +3,7 @@ document_type: product-spec
 lifecycle: current
 authority: supporting
 owner: taxkit-product-owner
-last_reviewed: 2026-08-19
+last_reviewed: 2026-08-20
 review_trigger: docs deployment candidate, Git identity, workflow run, provider readback, public journey, screenshot, teardown, rollback, or credential capability change
 successor: null
 tombstone: false
@@ -53,6 +53,12 @@ Run the repository's focused checks and built Worker/browser proof. Record the
 base revision, final candidate commit, installed Alchemy/Effect versions and
 the local proof limits before provider access.
 
+The TanStack Start client and server environments must consume one generated
+Fumadocs collection result per Vite build. The Fumadocs generator's `buildStart`
+hook is therefore shared and deduplicated; a client/server MDX or syntax-
+highlighting mismatch that produces a React hydration error is a failed
+deployment, even when the initial SSR response and static assets are healthy.
+
 ### `DPL-002` — Git and workflow bootstrap
 
 Create one exact candidate commit and push it to the admitted remote branch.
@@ -96,6 +102,7 @@ proof layer.
 | Workflow, receipt and automation owners | Change required | They record the exact candidate-bound external observations. |
 | Public docs content, navigation and design | Preserve | Deployment does not change authored content or presentation. |
 | Historical deployment evidence | Preserve | Previous receipts remain dated observations and are not rewritten. |
+| Fumadocs/Vite build boundary | Change required | The shared generator hook owns one generated MDX source for the client/server build and prevents hydration drift. |
 | Package exports, Changeset, release, custom domain and DNS | N/A | No package or public-host contract changes are part of this goal. |
 
 ## Proof ceiling

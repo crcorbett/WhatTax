@@ -3,8 +3,8 @@
   "spec": "docs/product-specs/native-alchemy-docs-deployment.md",
   "title": "Native Alchemy docs deployment tasks",
   "status": "active",
-  "last_reviewed": "2026-08-19",
-  "beforeImplementation": "Use the installed Alchemy 2.0.0-beta.64 and the current native Website.Vite graph. Preserve historical evidence and use only the named TaxKit deployment authority.",
+  "last_reviewed": "2026-08-20",
+  "beforeImplementation": "Use the installed Alchemy 2.0.0-beta.64 and the current native Website.Vite graph. Keep Fumadocs generated MDX source shared across the TanStack client/server build environments. Preserve historical evidence and use only the named TaxKit deployment authority.",
   "principles": [
     "Preview is accepted before Production.",
     "Every provider and public claim is bound to an exact pushed commit and sanitised receipt.",
