@@ -82,3 +82,11 @@ same unbounded Effect batch as its file writes. The validator now creates that
 directory before the bounded file-write batch. The local downstream gate passes
 after this correction; the earlier CI failure remains retained as evidence for
 the rejected candidate and is not a provider or deployment result.
+
+Preview run `32281782913` then created and read back the exact `pr-46`
+`DocsWebsite` Worker, but hosted proof stopped at the no-document-reload
+oracle (`2` document requests instead of `1`). The `useHydrated()` marker was
+still observable before React's click handler was ready. The next candidate
+uses an app-owned post-effect interactivity marker; the failed `pr-46` Worker
+must remain a retained failure observation until its exact teardown proves
+absence.
