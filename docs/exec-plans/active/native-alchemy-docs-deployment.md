@@ -99,3 +99,25 @@ candidate adds a post-effect marker on the documentation navigation itself and
 requires both the root and navigation markers before browser interactions.
 The failed `pr-47` Worker remains a retained failure observation until its
 exact teardown proves absence.
+
+Preview run `32285790999` created and read back the exact `pr-48` Worker, but
+the hosted browser journey observed one same-origin TanStack server-function
+prefetch cancelled with `net::ERR_ABORTED`. The required navigation,
+transport, route, mobile and screenshot assertions had otherwise reached their
+endpoints. The browser probes now classify only that exact same-origin
+`/_serverFn/` cancellation as an expected navigation prefetch abort; all other
+request failures remain diagnostics and fail the proof. The failed `pr-48`
+Worker remains a retained failure observation until its exact teardown proves
+absence.
+
+The exact PR-close teardown run `32285607142` then destroyed only the
+`pr-48` stage and read back `providerWorkerAbsent: true` for its former Worker.
+The retained provider and hosted failure artifacts remain intact; no other
+Preview stage or Production was changed.
+
+Quality run `32287793567` then completed the browser install, policy checks and
+deployment tests but failed the repository lint with
+`no-use-before-define` in the new built-probe abort classifier. The classifier
+now receives its already-bound origin explicitly; this is a code correction,
+not a runner or provider result, and the candidate must pass a fresh Quality
+run before deployment work continues.

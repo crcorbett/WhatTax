@@ -7,7 +7,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 
 import { Effect, Record as EffectRecord, Schema } from "effect";
 import { chromium } from "playwright";
-import type { Browser, Page } from "playwright";
+import type { Browser, Page, Request } from "playwright";
 import { renderToStaticMarkup } from "react-dom/server";
 
 import { DocsRecoverableError } from "../src/components/docs-route-states";
@@ -161,6 +161,17 @@ const waitForInteractiveDocs = async (page: Page) => {
       document.querySelector('[data-tk-navigation-interactive="true"]') !== null
     );
   });
+};
+
+const isExpectedServerFunctionAbort = (request: Request, origin: string) => {
+  const url = new URL(request.url());
+
+  return (
+    (request.resourceType() === "fetch" || request.resourceType() === "xhr") &&
+    url.origin === origin &&
+    url.pathname.startsWith("/_serverFn/") &&
+    request.failure()?.errorText === "net::ERR_ABORTED"
+  );
 };
 
 const processEnvironment = EffectRecord.filter(Bun.env, (_, name) =>
@@ -640,6 +651,10 @@ try {
     diagnostics.push(`pageerror: ${error.message}`);
   });
   page.on("requestfailed", (request) => {
+    if (isExpectedServerFunctionAbort(request, origin)) {
+      return;
+    }
+
     diagnostics.push(
       `requestfailed: ${request.url()} ${request.failure()?.errorText ?? ""}`
     );
@@ -914,6 +929,10 @@ try {
       diagnostics.push(`mobile pageerror: ${error.message}`);
     });
     mobilePage.on("requestfailed", (request) => {
+      if (isExpectedServerFunctionAbort(request, origin)) {
+        return;
+      }
+
       diagnostics.push(
         `mobile requestfailed: ${request.url()} ${request.failure()?.errorText ?? ""}`
       );
