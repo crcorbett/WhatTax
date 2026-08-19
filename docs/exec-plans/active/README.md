@@ -14,6 +14,11 @@ tombstone: false
 Live implementation plans belong here while work is in progress. Maintainer
 lifecycle is owned by [`../../README.md`](../../README.md).
 
+The current focused CI slice is the
+[`Quality Trigger Efficiency`](./quality-trigger-efficiency.md) plan. It
+removes duplicate feature-branch push runs while preserving pull-request and
+main-branch coverage.
+
 The completed deployment goal is retained in the
 [`Native Alchemy docs deployment`](../completed/native-alchemy-docs-deployment.md)
 plan. It records the implemented native Website.Vite candidate through the

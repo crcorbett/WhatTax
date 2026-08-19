@@ -109,7 +109,7 @@
   "boundaryFacts": [
     "Package, API, SDK, app, and public documentation behavior remains owned by code, Schemas, manifests, exports, and direct READMEs.",
     "The local release-readiness graph grants no versioning, Git, registry, release, deployment, provider, public-site, or recovery authority.",
-    "The existing Quality workflow invokes bun run release:check -- --ci; that graph begins with root verification and remains the sole hosted CI route.",
+    "The existing Quality workflow invokes bun run release:check -- --ci for pull requests and main-branch pushes; that graph begins with root verification and remains the sole hosted CI route.",
     "Exactly five operational runbooks and docs/operations/authority-model.md remain the repeatable operation and authority owners.",
     "The separate four-entry docs deployment journey owner and dated deployment receipts never alter the five local release journeys or historical HGI/HFI evidence.",
     "Repository-local skills and validators must work from a clean clone without reading a user home or global skill installation."

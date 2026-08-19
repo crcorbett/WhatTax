@@ -239,8 +239,10 @@ approval. Versioning, changelog application and publishing remain explicit
 operations after a human reviews pending Changesets and the release impact.
 
 The Quality workflow invokes `bun run release:check -- --ci` for every
-configured pull request and push rather than relying on path filters. The
-explicit CI mode runs the same nine ordered checks without consuming or
+configured pull request and for pushes to `main` rather than relying on path
+filters. Feature-branch pushes are covered by the pull-request event, so the
+same Quality graph is not run twice for one change. The explicit CI mode runs
+the same nine ordered checks without consuming or
 rewriting an HGI-203 candidate packet; it returns bounded local command detail
 only. Its exact read-only runner bootstrap fetches complete Git history,
 materialises the configured `main` comparison ref and installs Chromium through
