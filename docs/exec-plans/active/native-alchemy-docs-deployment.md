@@ -90,3 +90,12 @@ still observable before React's click handler was ready. The next candidate
 uses an app-owned post-effect interactivity marker; the failed `pr-46` Worker
 must remain a retained failure observation until its exact teardown proves
 absence.
+
+Preview run `32283638059` then created and read back the exact `pr-47`
+`DocsWebsite` Worker. The desktop no-document-reload and server-function
+checks passed, but the mobile proof timed out after opening navigation because
+the route-owned navigation handler was not yet observable as ready. The next
+candidate adds a post-effect marker on the documentation navigation itself and
+requires both the root and navigation markers before browser interactions.
+The failed `pr-47` Worker remains a retained failure observation until its
+exact teardown proves absence.

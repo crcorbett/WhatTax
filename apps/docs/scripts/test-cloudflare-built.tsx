@@ -149,6 +149,20 @@ const assertComputedContrast = async (
   );
 };
 
+const waitForInteractiveDocs = async (page: Page) => {
+  await page.waitForFunction(() => {
+    const router: unknown = Reflect.get(globalThis, "__TSR_ROUTER__");
+
+    return (
+      typeof router === "object" &&
+      router !== null &&
+      typeof Reflect.get(router, "navigate") === "function" &&
+      document.querySelector('[data-tk-hydrated="true"]') !== null &&
+      document.querySelector('[data-tk-navigation-interactive="true"]') !== null
+    );
+  });
+};
+
 const processEnvironment = EffectRecord.filter(Bun.env, (_, name) =>
   /^(?:CI|COLORTERM|LANG|LC_ALL|NO_COLOR|PATH|TERM|TMPDIR|TZ)$/u.test(name)
 );
@@ -657,6 +671,7 @@ try {
   });
 
   await page.goto(`${origin}${knownPath}`, { waitUntil: "networkidle" });
+  await waitForInteractiveDocs(page);
   const representativeHeading = page.getByRole("heading", {
     name: "Calculate Australian take-home pay",
   });
@@ -760,6 +775,7 @@ try {
 
   await page.setViewportSize({ height: 844, width: 390 });
   await page.goto(`${origin}${knownPath}`, { waitUntil: "networkidle" });
+  await waitForInteractiveDocs(page);
   const navigationToggle = page.getByRole("button", {
     name: "Open navigation",
   });
@@ -779,6 +795,7 @@ try {
   await page.setViewportSize({ height: 1000, width: 1440 });
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto(`${origin}${knownPath}`, { waitUntil: "networkidle" });
+  await waitForInteractiveDocs(page);
   const motionStyles = await page
     .locator(
       ".docs-page-layout, .docs-nav, .docs-nav-toggle, .docs-article, .docs-route-state"
@@ -904,6 +921,7 @@ try {
     await mobilePage.goto(`${origin}${knownPath}`, {
       waitUntil: "networkidle",
     });
+    await waitForInteractiveDocs(mobilePage);
     await mobilePage.getByRole("button", { name: "Open navigation" }).click();
     await mobilePage
       .getByRole("button", { name: "Close navigation" })
