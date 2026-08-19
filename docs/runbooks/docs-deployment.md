@@ -323,6 +323,13 @@ desktop/mobile screenshots still run. If a runner image changes and the
 browser cannot start, the workflow must fail and the image dependency problem
 must be fixed rather than bypassed.
 
+The exact-candidate Quality admission reads the GitHub check runs for the
+candidate SHA. It requires at least one completed `quality` success, rejects
+queued or in-progress Quality attempts, and keeps every completed failure
+blocking. A cancelled historical rerun is tolerated only alongside that
+completed success; this prevents a timed-out duplicate runner attempt from
+masking a failed check while allowing a later successful rerun to be used.
+
 ## Procedure
 
 Run `bun run check:docs-deployment` before an admitted operation. It validates

@@ -218,6 +218,21 @@ describe("docs deployment workflow admission", () => {
     expect(preview).toContain('test "$(jq -r .draft <<<"$pr_json")" = "true"');
   });
 
+  test("accepts only a completed exact Quality success and tolerates cancelled reruns", async () => {
+    const [preview, production] = await Promise.all([
+      readWorkflow(workflowPaths.preview),
+      readWorkflow(workflowPaths.production),
+    ]);
+    for (const source of [preview, production]) {
+      expect(source).toContain("quality_runs=");
+      expect(source).toContain('all(.[]; .status == "completed")');
+      expect(source).toContain('any(.[]; .conclusion == "success")');
+      expect(source).toContain(
+        'all(.[]; .conclusion == "success" or .conclusion == "cancelled")'
+      );
+    }
+  });
+
   test("binds PR-close teardown to the current default-branch source", async () => {
     const teardown = await readWorkflow(workflowPaths.teardown);
     const githubExpression = [
