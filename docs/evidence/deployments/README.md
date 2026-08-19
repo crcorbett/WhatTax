@@ -616,3 +616,23 @@ provider change. The successful absence receipts are in
 This epoch proves only the recorded workers.dev observations and exact-stage
 cleanup. It does not establish a custom domain, DNS, package publication,
 release, byte promotion, or a permanent availability guarantee.
+
+## 2026-08-20 final remote Quality readback and checkout reconciliation
+
+PR #52 carried the documentation closeout at exact head
+`1cbcf2d119527db65868c2fc42d196f1d31c606f` and merged to `main` as
+`a86994a5e8cec1ba6220620e244afdc0d29eaed1`. Pull-request Quality run
+`32304045477` completed successfully, including Chromium installation,
+`check:quality-workflow` and `release:check -- --ci`. The duplicate
+push-triggered Quality run `32304009721` completed as cancelled during
+`playwright install --with-deps chromium`, with later steps skipped. It is a
+bounded runner limitation and not a successful check or a code-failure claim;
+the completed PR Quality success is the admission result.
+
+Post-merge `main` Quality run `32305069327` passed for
+`a86994a5e8cec1ba6220620e244afdc0d29eaed1`. Exact Preview teardown
+`32305072590` and workflow-receipt reconciliation `32305214604` also passed.
+The original checkout was fast-forwarded to the same remote SHA without a
+reset or discard, and its pre-reconciliation dirty candidate remains
+preserved in a local stash. This readback adds no provider, DNS, custom-domain,
+publication, release, byte-promotion or permanent-availability claim.

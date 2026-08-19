@@ -118,7 +118,9 @@ old provider readback into a current availability claim.
 
 All five DPL tasks are complete for candidate
 `7a23bf3eb286a44f2e06775750105ffe9cc09d3e`, merged to `main` at
-`72dea00022e3d196d7021ec0b677ea9631d6a4d5`. Preview was accepted by runs
+`72dea00022e3d196d7021ec0b677ea9631d6a4d5`, with the final documentation
+closeout merged by PR #52 at `a86994a5e8cec1ba6220620e244afdc0d29eaed1`.
+Preview was accepted by runs
 `32301004640` and `32301180775`; Production consumed that exact Preview
 receipt and was accepted by runs `32301473695` and `32301629287`. Both hosted
 journeys passed with zero diagnostics and reviewed desktop/mobile screenshots.
@@ -128,3 +130,14 @@ receipts are indexed in
 `docs/evidence/deployments/README.md`; this closeout does not add a custom
 domain, DNS, release, publication, byte-promotion or permanent-availability
 claim.
+
+The final remote Quality readback is bounded and claim-matched: PR #52 head
+`1cbcf2d119527db65868c2fc42d196f1d31c606f` passed Quality in run
+`32304045477`; the duplicate push run `32304009721` completed as cancelled
+only during Chromium installation; and post-merge `main` Quality passed in
+run `32305069327`. The cancellation is retained as runner evidence and does
+not weaken or bypass the Quality admission contract. Preview teardown run
+`32305072590` and receipt reconciliation run `32305214604` passed. Local and
+remote `main` were reconciled to `a86994a5e8cec1ba6220620e244afdc0d29eaed1`
+without discarding the prior dirty candidate, which remains preserved outside
+the repository history.
