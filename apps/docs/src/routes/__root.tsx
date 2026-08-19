@@ -3,6 +3,7 @@ import {
   HeadContent,
   Outlet,
   Scripts,
+  useHydrated,
 } from "@tanstack/react-router";
 import { useEffect } from "react";
 
@@ -31,6 +32,8 @@ const RootShell = ({ children }: { readonly children: React.ReactNode }) => (
 );
 
 const RootComponent = () => {
+  const hydrated = useHydrated();
+
   useEffect(() => {
     addEventListener("popstate", requestDocsNavigationFocus);
 
@@ -38,7 +41,12 @@ const RootComponent = () => {
   }, []);
 
   return (
-    <main className="docs-app-shell" id="docs-main" tabIndex={-1}>
+    <main
+      className="docs-app-shell"
+      data-tk-hydrated={hydrated ? "true" : "false"}
+      id="docs-main"
+      tabIndex={-1}
+    >
       <Outlet />
     </main>
   );
