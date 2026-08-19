@@ -61,7 +61,9 @@
       "dependsOn": ["DPL-004"],
       "acceptance": [
         "Sanitised receipts and current documentation agree.",
-        "The final report lists exact IDs, URLs, checks, limits and recovery ownership."
+        "The final report lists exact IDs, URLs, checks, limits and recovery ownership.",
+        "PR #52 head 1cbcf2d119527db65868c2fc42d196f1d31c606f passed pull-request Quality in run 32304045477, and post-merge main Quality passed for a86994a5e8cec1ba6220620e244afdc0d29eaed1 in run 32305069327.",
+        "The duplicate push Quality run 32304009721 is retained as a cancelled Chromium-install runner limitation beside the completed success; it is not hidden or used as positive proof."
       ]
     }
   ]

@@ -33,7 +33,8 @@ SPEC and its
   no rollback was needed.
 - **DPL-005 — complete:** dated sanitised receipts, screenshots, task/spec,
   runbook and automation register agree. The final closeout records exact
-  claims, non-claims and cleanup evidence.
+  claims, non-claims, cleanup evidence and the post-merge Quality readback for
+  PR #52 at `a86994a5e8cec1ba6220620e244afdc0d29eaed1`.
 
 ## Operating rules
 
@@ -198,3 +199,24 @@ domain/DNS, package publication, release, byte promotion or a permanent
 availability guarantee. No rollback was performed because the accepted
 Production hosted proof passed; the previous version identity remains in the
 provider receipt for source-bound recovery.
+
+## 2026-08-20 — final Quality readback and checkout reconciliation
+
+PR #52 carried the documentation closeout at exact head
+`1cbcf2d119527db65868c2fc42d196f1d31c606f` and merged to `main` as
+`a86994a5e8cec1ba6220620e244afdc0d29eaed1`. Its pull-request Quality run
+`32304045477` passed, including the pinned Chromium install,
+`check:quality-workflow` and `release:check -- --ci`. The duplicate
+push-triggered Quality run `32304009721` completed as `cancelled` during
+`playwright install --with-deps chromium`; later Quality steps were skipped.
+This is retained as a bounded GitHub-runner limitation, not treated as a
+successful or code-failing Quality result. The completed PR Quality success
+remains the admission result required by the runbook.
+
+The post-merge `main` Quality run `32305069327` passed for
+`a86994a5e8cec1ba6220620e244afdc0d29eaed1`, and the exact Preview teardown
+`32305072590` plus workflow-receipt reconciliation `32305214604` also passed.
+The original checkout was fast-forwarded to that same SHA without a reset or
+discard; its pre-reconciliation dirty candidate remains preserved in a local
+stash. No provider, DNS, custom-domain, publication or release mutation was
+performed during this reconciliation.

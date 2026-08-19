@@ -1030,6 +1030,17 @@ custom domain, DNS, package publication, release, byte promotion or permanent
 availability. Recovery remains a normal source-bound Production redeploy using
 the recorded previous version identity; no rollback mutation was performed.
 
+The final remote closeout readback for PR #52 is claim-matched to head
+`1cbcf2d119527db65868c2fc42d196f1d31c606f`, merged as
+`a86994a5e8cec1ba6220620e244afdc0d29eaed1`. Pull-request Quality run
+`32304045477` passed. The duplicate push run `32304009721` completed as
+cancelled during the Chromium installation step and is retained only as a
+bounded runner limitation; it does not override the completed PR success.
+Post-merge `main` Quality run `32305069327`, exact Preview teardown
+`32305072590` and workflow-receipt reconciliation `32305214604` passed. No
+provider, DNS, custom-domain, publication or release claim follows from this
+readback.
+
 ## Stop conditions
 
 Stop before unrelated `versioning`, `commit`, `push`, `tag`, `release`,
