@@ -55,3 +55,8 @@ recreate. The current candidate changes `runWorkerFirst` to `false`, matching
 Cloudflare's asset-first full-stack default and the local built contract. The
 failed workflow runs remain disconfirming evidence; they are not deployment
 acceptance.
+
+The hosted probe now has a six-attempt, two-second bounded retry for transient
+route `404`/`5xx` responses during Worker propagation. It does not retry the
+expected missing-route `404`, and it does not turn a persistent response or a
+later browser/proof failure into success.
