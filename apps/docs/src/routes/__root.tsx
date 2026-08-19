@@ -3,9 +3,8 @@ import {
   HeadContent,
   Outlet,
   Scripts,
-  useHydrated,
 } from "@tanstack/react-router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 import {
   DocsRouteError,
@@ -32,9 +31,10 @@ const RootShell = ({ children }: { readonly children: React.ReactNode }) => (
 );
 
 const RootComponent = () => {
-  const hydrated = useHydrated();
+  const [interactive, setInteractive] = useState(false);
 
   useEffect(() => {
+    setInteractive(true);
     addEventListener("popstate", requestDocsNavigationFocus);
 
     return () => removeEventListener("popstate", requestDocsNavigationFocus);
@@ -43,7 +43,7 @@ const RootComponent = () => {
   return (
     <main
       className="docs-app-shell"
-      data-tk-hydrated={hydrated ? "true" : "false"}
+      data-tk-hydrated={interactive ? "true" : "false"}
       id="docs-main"
       tabIndex={-1}
     >
