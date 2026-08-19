@@ -109,3 +109,8 @@ endpoints. The browser probes now classify only that exact same-origin
 request failures remain diagnostics and fail the proof. The failed `pr-48`
 Worker remains a retained failure observation until its exact teardown proves
 absence.
+
+The exact PR-close teardown run `32285607142` then destroyed only the
+`pr-48` stage and read back `providerWorkerAbsent: true` for its former Worker.
+The retained provider and hosted failure artifacts remain intact; no other
+Preview stage or Production was changed.
