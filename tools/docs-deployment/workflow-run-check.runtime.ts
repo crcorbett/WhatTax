@@ -15,18 +15,10 @@ const check = "workflow-run" as const;
 const isTeardownPath = (workflowPath: string) =>
   workflowPath.endsWith("docs-preview-teardown.yml");
 
-const isOrphanPath = (workflowPath: string) =>
-  workflowPath.endsWith("docs-orphan-inventory.yml");
-
 const isAllowedEvent = (workflowPath: string, workflowEvent: string) => {
   if (isTeardownPath(workflowPath)) {
     return (
       workflowEvent === "pull_request" || workflowEvent === "workflow_dispatch"
-    );
-  }
-  if (isOrphanPath(workflowPath)) {
-    return (
-      workflowEvent === "schedule" || workflowEvent === "workflow_dispatch"
     );
   }
   return workflowEvent === "workflow_dispatch";

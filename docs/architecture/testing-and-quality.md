@@ -262,11 +262,11 @@ The harness gate is not a separate Quality workflow step. The existing
 inherits it without duplicating execution or widening workflow authority.
 
 Deployment automation is intentionally outside Quality. The local
-`check:docs-deployment-automation` command Schema-decodes four target-owned
-automation records plus five controls (including the read-only completed-run
+`check:docs-deployment-automation` command Schema-decodes three target-owned
+automation records plus four controls (including the read-only completed-run
 receipt reconciler) and runs focused negative fixtures for
 candidate trust, mutation locking, equal replans, teardown safety,
-credential/environment denial and report-only orphan handling. This proves
+and credential/environment denial. This proves
 repository desired state only. A hosted workflow claim additionally requires
 default-branch workflow identity, protected-environment and credential
 readback, exact-candidate execution, provider/state agreement and a dated
@@ -282,14 +282,10 @@ rejection, redaction and account mismatch. An authorized live invocation
 separately checks exact TaxKit state and Workers. Neither fixture nor live
 inventory proves hosted application behavior.
 
-The provider-bound `check:docs-deployment-orphans` command adds one exact
-read-only GitHub query and classifies the resulting open-PR/state/Worker graph.
-Focused fixtures retain trusted, cross-repository and missing-PR stage cases
-plus a false-green classification attack. Process fixtures prove disjoint
-bounded environments, disabled ambient inheritance, spawn and non-zero exit
-mapping, fatal stdout/stderr UTF-8 restoration, exact JSON decoding and
-secret-negative diagnostics. Root deployment validation decodes the retained
-dated report, but does not rerun either credentialed source.
+The former provider-bound GitHub/open-PR orphan command and process fixtures
+are retired. Historical JSON reports remain evidence for their dated epoch;
+root validation does not invoke or model that contributor-lifecycle helper.
+PR-close teardown is the current Preview cleanup owner.
 
 The docs app's focused server tests construct one ManagedRuntime with an
 injected deterministic probe identity, read both the content and probe services

@@ -5,8 +5,10 @@ import viteReact from "@vitejs/plugin-react";
 import fumadocsMdx from "fumadocs-mdx/vite";
 import { defineConfig } from "vite";
 
-export default defineConfig(async ({ command }) => {
-  const useSourceWorkspacePackages = command !== "build";
+export default defineConfig(async () => {
+  const alchemyOwnsCloudflareVite =
+    // oxlint-disable-next-line effect/no-process-outside-boundaries -- Vite configuration is the exact host boundary for Alchemy's documented process-local injection signal.
+    process.env.ALCHEMY_CLOUDFLARE_VITE_INJECTED === "1";
 
   return {
     plugins: [
@@ -14,7 +16,9 @@ export default defineConfig(async ({ command }) => {
         configPath: "../../packages/docs-content/source.config.ts",
         outDir: "../../packages/docs-content/.source",
       }),
-      cloudflare({ viteEnvironment: { name: "ssr" } }),
+      ...(alchemyOwnsCloudflareVite
+        ? []
+        : [cloudflare({ viteEnvironment: { name: "ssr" } })]),
       tanstackStart({
         server: {
           entry: "server",
@@ -23,16 +27,14 @@ export default defineConfig(async ({ command }) => {
       viteReact(),
     ],
     resolve: {
-      conditions: useSourceWorkspacePackages ? ["source"] : undefined,
+      conditions: ["source"],
       tsconfigPaths: true,
     },
     ssr: {
       noExternal: [/^@taxkit\/docs-content/u, /^@taxkit\/docs-fumadocs/u],
-      resolve: useSourceWorkspacePackages
-        ? {
-            conditions: ["source", "node"],
-          }
-        : undefined,
+      resolve: {
+        conditions: ["source", "node"],
+      },
     },
   };
 });

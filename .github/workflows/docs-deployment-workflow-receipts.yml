@@ -6,7 +6,6 @@ on:
       - Docs Preview Deployment
       - Docs Production Deployment
       - Docs Preview Teardown
-      - Docs Orphan Inventory (Report Only)
     types: [completed]
 
 permissions:
@@ -55,10 +54,6 @@ jobs:
               artifact_name="taxkit-docs-preview-teardown-${SOURCE_RUN_ID}"
               expected_name="Docs Preview Teardown"
               ;;
-            .github/workflows/docs-orphan-inventory.yml)
-              artifact_name="taxkit-docs-orphan-inventory-${SOURCE_RUN_ID}"
-              expected_name="Docs Orphan Inventory (Report Only)"
-              ;;
             *)
               echo "Unexpected deployment workflow path: $workflow_path" >&2
               exit 1
@@ -67,9 +62,6 @@ jobs:
           test "$workflow_name" = "$expected_name"
           if [ "$workflow_path" = ".github/workflows/docs-preview-teardown.yml" ]; then
             test "$source_event" = "pull_request" || test "$source_event" = "workflow_dispatch"
-          elif [ "$workflow_path" = ".github/workflows/docs-orphan-inventory.yml" ]; then
-            test "$source_event" = "schedule" || test "$source_event" = "workflow_dispatch"
-            test "$source_head_branch" = "main"
           else
             test "$source_event" = "workflow_dispatch"
             test "$source_head_branch" = "main"

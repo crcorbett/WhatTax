@@ -4,7 +4,6 @@ const AutomationId = Schema.Literals([
   "docs-preview-delivery",
   "docs-production-delivery",
   "docs-preview-teardown",
-  "docs-orphan-inventory",
 ]);
 
 const MutationOperation = Schema.Literals([
@@ -18,7 +17,6 @@ const EnvironmentId = Schema.Literals([
   "taxkit-docs-preview",
   "taxkit-docs-production",
   "taxkit-docs-preview-teardown",
-  "github-actions-report-only",
 ]);
 
 const ReceiptPath = Schema.String.check(
@@ -32,9 +30,7 @@ const AutomationAuthority = Schema.Struct({
   denied: Schema.NonEmptyArray(Schema.NonEmptyString),
   durationOrRevocation: Schema.NonEmptyString,
   environment: EnvironmentId,
-  operations: Schema.NonEmptyArray(
-    Schema.Union([MutationOperation, Schema.Literal("orphan-inventory-read")])
-  ),
+  operations: Schema.NonEmptyArray(MutationOperation),
   principal: Schema.NonEmptyString,
   resources: Schema.NonEmptyArray(Schema.NonEmptyString),
 });
@@ -42,7 +38,7 @@ const AutomationAuthority = Schema.Struct({
 const AutomationLock = Schema.Struct({
   cancelInProgress: Schema.Boolean,
   group: Schema.NonEmptyString,
-  scope: Schema.Literals(["stage", "report-only-inventory"]),
+  scope: Schema.Literal("stage"),
 });
 
 const AutomationPlanContract = Schema.Struct({
@@ -86,7 +82,6 @@ const DeploymentAutomation = Schema.Struct({
     kind: Schema.Literals([
       "candidate-plan-provider-receipt",
       "exact-stage-absence-receipt",
-      "report-only-inventory-receipt",
     ]),
     location: Schema.NonEmptyString,
   }),
@@ -108,7 +103,6 @@ const DeploymentAutomation = Schema.Struct({
       "trusted-pull-request-dispatch",
       "production-dispatch",
       "pull-request-closed",
-      "scheduled-or-manual-report",
     ]),
     revisionSource: Schema.NonEmptyString,
   }),
@@ -124,7 +118,6 @@ const DeploymentControl = Schema.Struct({
     "docs-workflow-candidate-trust",
     "docs-workflow-mutation-lock",
     "docs-preview-teardown-safety",
-    "docs-orphan-report-only",
     "docs-workflow-receipt-reconciliation",
   ]),
   owner: Schema.Literal("taxkit-docs-deployment-automation-owner"),
@@ -148,7 +141,6 @@ export class DeploymentAutomationFinding extends Schema.TaggedClass<DeploymentAu
       "mutation-lock",
       "plan-equality",
       "teardown-safety",
-      "orphan-report-only",
       "external-proof",
     ]),
     recovery: Schema.NonEmptyString,

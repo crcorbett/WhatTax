@@ -34,10 +34,10 @@ intent and task state belong in the active SPEC and execution plan.
   retired after local parity; `apps/web` remains a separate Nitro owner.
 - Root `alchemy.run.ts` owns one `TaxKitDocsCloudflare` stack, branded
   `pr-<number>` or `prod` stage admission, the mutation composition's
-  `Cloudflare.state()`, one `Command.Build`, and one logical `DocsWebsite`
-  Worker. It uploads the plugin-produced output through
-  `Cloudflare.Worker({ bundle: false })`; Alchemy owns the physical Worker
-  name. The separate report-only inventory owner uses Alchemy's public
+  `Cloudflare.state()`, and one logical
+  `Cloudflare.Website.Vite("DocsWebsite")` resource. Alchemy injects its
+  Cloudflare Vite integration, builds the app, and owns the SSR Worker/assets
+  lifecycle and physical Worker name. The separate read-only inventory owner uses Alchemy's public
   `makeHttpStateStore` after an Effect FileSystem/Schema boundary decodes the
   account-matched cache, with a protected, redacted JSON fallback only when a
   nested process cannot see that cache. Missing, malformed and unreadable
@@ -50,13 +50,11 @@ intent and task state belong in the active SPEC and execution plan.
   service. KV, D1, R2, Durable Objects, Queues, Hyperdrive, Cron, custom
   domains, DNS and third-party observability are absent.
 - `tools/docs-deployment/automation-register.json` and `controls.json` own the
-  Schema-decoded desired state for three mutating workflow classes and one
-  report-only orphan inventory. The current repository-promoted epoch has four
-  externally established entries, each backed by a reviewed default-branch
-  workflow receipt: Preview delivery, Production delivery, exact-stage Preview
-  teardown, and report-only inventory. A later candidate, source, protected
-  environment or provider change requires fresh promotion; the register does
-  not make a timeless availability claim.
+  Schema-decoded desired state for three workflow classes: Preview delivery,
+  Production delivery and exact-stage Preview teardown. All three are
+  `not-established` for the native one-resource graph until new matching
+  provider receipts are promoted. Historical two-resource and orphan receipts
+  remain evidence, not current automation state.
 - Five workflow receipt executables are narrow Bun adapters. Each decodes one
   Config Schema from the host environment, reads receipt JSON and screenshot
   bytes through the shared Effect FileSystem/Crypto boundary in
@@ -75,14 +73,11 @@ intent and task state belong in the active SPEC and execution plan.
 
 ```text
 frozen source and lock
-  -> apps/docs build (or build:cloudflare compatibility alias)
-    -> Cloudflare Vite plugin
-      -> dist/server/index.js plus modules
-      -> dist/client assets
-  -> root Alchemy Command.Build
-    -> Cloudflare.Worker("DocsWebsite", bundle: false)
-      -> isolated pr-N Worker or fixed prod Worker
-      -> read-back workers.dev URL
+  -> root Cloudflare.Website.Vite("DocsWebsite")
+    -> Alchemy injects the Cloudflare Vite integration
+    -> Vite builds the TanStack SSR Worker and client assets
+    -> Alchemy applies one isolated pr-N or fixed prod website resource
+    -> provider/state readback identifies the workers.dev URL
 ```
 
 The local command copies only emitted output to a temporary directory, removes
@@ -110,17 +105,10 @@ runner, and the inventory command reads the cache under `CI=1`. This does not
 grant the report-only workflow mutation authority and does not copy the local
 OAuth profile into CI.
 
-`bun run check:docs-deployment-orphans` composes that readback with an exact
-read-only GitHub open-PR query. Its Schema-decoded receipt classifies each
-`pr-N` stage as trusted-active, untrusted or an orphan candidate and separately
-reports trusted open PRs without a stage. The executable Config owner injects
-two disjoint child environments: GitHub receives its token only, while the
-deployment inventory receives only the Cloudflare/state-read inputs. Both
-receive explicit path/home/locale values and disable ambient environment
-inheritance. The process boundary restores spawn, exit, stdout/stderr UTF-8 and
-JSON once into closed safe errors and never includes raw diagnostics. It has no
-provider-write or deletion operation. A candidate is only a dated human-review
-input, never teardown authority.
+The former scheduled GitHub/open-PR orphan classifier and nested subprocess
+boundary are retired. They did not provide a contributor-neutral lifecycle
+model. PR-close teardown remains the explicit Preview cleanup owner; retained
+orphan reports are immutable historical observations only.
 
 The accepted Preview requalification used candidate
 `d9cb8945529fb72158e59ca0daf02a98e1e4de1a` at deterministic stage `pr-1`.
@@ -254,9 +242,9 @@ inventory completeness is unknown. These controls are desired-state and
 dated-receipt owners, not claims that the current branch or public domain is
 available.
 
-## 2026-08-10 current main-sourced deployment epoch
+## 2026-08-10 historical main-sourced deployment epoch
 
-The current promoted epoch is represented by the exact Preview receipt
+The historical promoted epoch is represented by the exact Preview receipt
 `docs/evidence/deployments/2026-08-10-preview-pr-24/workflow-receipt-31338052297.json`,
 the fixed Production/rollback receipt
 `docs/evidence/deployments/2026-08-10-production-prod-fef1dfc/workflow-receipt-31343392260.json`,
@@ -264,12 +252,16 @@ the report-only receipt
 `docs/evidence/deployments/2026-08-10-orphan-inventory-main-53d936/workflow-receipt-31344401196.json`,
 and the reviewed-main teardown receipt
 `docs/evidence/deployments/2026-08-10-preview-teardown-pr-24/workflow-receipt-31350160353.json`.
-The deployment register reports four established entries. Their receipts bind
+That retired graph reported four established entries. Their receipts bind
 source/input, stage, plan/configuration/lockfile, Alchemy state, provider
 Worker/version/URL and the relevant hosted or absence postconditions. These
 are dated workers.dev and report-only observations; custom-domain/DNS, billing,
 publication, release, byte-promotion and future public availability remain
 outside the claim envelope.
+
+The native `Website.Vite` successor deliberately resets the three current
+automation entries to `not-established`. No local migration check establishes
+Preview, Production, teardown or current Cloudflare state.
 
 ## Local runtime shape
 
@@ -284,8 +276,9 @@ bun run --filter=docs dev
 `apps/api` dev runs through portless as `https://api.taxkit.localhost`.
 `apps/web` dev injects that URL into `TAXKIT_API_BASE_URL` and
 `VITE_TAXKIT_API_BASE_URL` before serving through portless as
-`https://taxkit.localhost`. `apps/docs` serves through portless as
-`https://docs.taxkit.localhost`. Production deployment should provide
+`https://taxkit.localhost`. `apps/docs dev` runs the Alchemy-managed Cloudflare
+lifecycle. Use `bun run --filter=docs dev:vite` for the infrastructure-free
+portless app at `https://docs.taxkit.localhost`. Production deployment should provide
 equivalent API base URL environment values explicitly.
 
 The focused Cloudflare candidate proof is:

@@ -23,16 +23,6 @@ const readGovernedSources = async (): Promise<StrictAppBoundarySources> => ({
   "tools/docs-deployment/inventory.runtime.ts": await readSource(
     "tools/docs-deployment/inventory.runtime.ts"
   ),
-  "tools/docs-deployment/orphan-inventory.process-boundary.ts":
-    await readSource(
-      "tools/docs-deployment/orphan-inventory.process-boundary.ts"
-    ),
-  "tools/docs-deployment/orphan-inventory.runtime.ts": await readSource(
-    "tools/docs-deployment/orphan-inventory.runtime.ts"
-  ),
-  "tools/docs-deployment/orphan-inventory.service.ts": await readSource(
-    "tools/docs-deployment/orphan-inventory.service.ts"
-  ),
   "tools/docs-deployment/workflow-input-check.runtime.ts": await readSource(
     "tools/docs-deployment/workflow-input-check.runtime.ts"
   ),
@@ -71,7 +61,7 @@ describe("strict docs app and deployment architecture", () => {
 
   test("rejects direct environment, manual JSON/file and raw runtime execution", async () => {
     const sources = await readGovernedSources();
-    const path = "tools/docs-deployment/orphan-inventory.service.ts";
+    const path = "tools/docs-deployment/inventory.runtime.ts";
     const contaminated = replaceSource(sources, path, (source) =>
       [
         source,
@@ -86,18 +76,15 @@ describe("strict docs app and deployment architecture", () => {
     );
   });
 
-  test("rejects raw concurrency and ambient child environment inheritance", async () => {
+  test("rejects raw concurrency", async () => {
     const sources = await readGovernedSources();
-    const path = "tools/docs-deployment/orphan-inventory.service.ts";
+    const path = "tools/docs-deployment/inventory.runtime.ts";
     const contaminated = replaceSource(
       sources,
       path,
-      (source) =>
-        `${source.replace("extendEnv: false", "extendEnv: true")}\nPromise.all([]);\n`
+      (source) => `${source}\nPromise.all([]);\n`
     );
-    expect(findingInvariants(contaminated)).toEqual(
-      expect.arrayContaining(["process-environment", "raw-concurrency"])
-    );
+    expect(findingInvariants(contaminated)).toContain("raw-concurrency");
   });
 
   test("rejects unmanaged docs runtime proof state and randomness", async () => {
@@ -113,7 +100,7 @@ describe("strict docs app and deployment architecture", () => {
     expect(findingInvariants(contaminated)).toContain("runtime-probe");
   });
 
-  test("rejects bypassed shared credential, workflow and process boundaries", async () => {
+  test("rejects bypassed shared credential and workflow boundaries", async () => {
     const sources = await readGovernedSources();
     const withoutCredentialBoundary = replaceSource(
       sources,
@@ -129,32 +116,16 @@ describe("strict docs app and deployment architecture", () => {
       "tools/docs-deployment/workflow-input-check.runtime.ts",
       (source) => source.replace("readWorkflowReceipt(", "readReceipt(")
     );
-    const withoutProcessBoundary = replaceSource(
-      sources,
-      "tools/docs-deployment/orphan-inventory.service.ts",
-      (source) =>
-        source.replace(
-          "restoreDocsDeploymentJsonCommand(",
-          "restoreUncheckedJson("
-        )
-    );
-
     expect(findingInvariants(withoutCredentialBoundary)).toContain(
       "credential-boundary"
     );
     expect(findingInvariants(withoutWorkflowBoundary)).toContain(
       "workflow-boundary"
     );
-    expect(findingInvariants(withoutProcessBoundary)).toContain(
-      "process-environment"
-    );
   });
 
-  test("permits the narrow byte adapter and Worker host callback", async () => {
+  test("permits the Worker host callback", async () => {
     const sources = await readGovernedSources();
-    expect(
-      sources["tools/docs-deployment/orphan-inventory.process-boundary.ts"]
-    ).toContain('new TextDecoder("utf-8", { fatal: true })');
     expect(sources["apps/docs/src/server.ts"]).toContain(
       "fetch: async (request: Request)"
     );

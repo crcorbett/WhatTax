@@ -5,8 +5,6 @@ import type {
   DeploymentControl,
 } from "./automation.schemas.js";
 import { DeploymentAutomationFinding } from "./automation.schemas.js";
-import { docsDeploymentOpenPullRequestsCommand } from "./orphan-inventory.schemas.js";
-import { inspectDocsDeploymentOrphanInventoryReceipt } from "./orphan-inventory.service.js";
 import { inspectDeploymentPlanReceipt } from "./policy.js";
 import type {
   DeploymentWorkflowExternalEvidence,
@@ -21,14 +19,12 @@ const expectedAutomationIds = [
   "docs-preview-delivery",
   "docs-production-delivery",
   "docs-preview-teardown",
-  "docs-orphan-inventory",
 ] as const;
 
 const expectedControlIds = [
   "docs-workflow-candidate-trust",
   "docs-workflow-mutation-lock",
   "docs-preview-teardown-safety",
-  "docs-orphan-report-only",
   "docs-workflow-receipt-reconciliation",
 ] as const;
 
@@ -56,9 +52,6 @@ const previewMutationGroup = ["taxkit-docs-preview-", "$", "{stage}"].join("");
 const inspectMutation = (
   automation: DeploymentAutomation
 ): readonly DeploymentAutomationFinding[] => {
-  if (automation.id === "docs-orphan-inventory") {
-    return [];
-  }
   const expected = {
     "docs-preview-delivery": {
       credentials: ["CLOUDFLARE_ACCOUNT_ID", "CLOUDFLARE_API_TOKEN"],
@@ -73,10 +66,7 @@ const inspectMutation = (
       group: previewMutationGroup,
       operation: "preview-deploy",
       principal: "taxkit-docs-preview-workflow",
-      resources: [
-        "TaxKitDocsCloudflare/pr-N/DocsBuild",
-        "TaxKitDocsCloudflare/pr-N/DocsWebsite",
-      ],
+      resources: ["TaxKitDocsCloudflare/pr-N/DocsWebsite"],
       revisionSource: "exact same-repository pull-request head SHA",
       signal: "trusted-pull-request-dispatch",
       trigger:
@@ -95,10 +85,7 @@ const inspectMutation = (
       group: previewMutationGroup,
       operation: "preview-destroy",
       principal: "taxkit-docs-preview-teardown-workflow",
-      resources: [
-        "TaxKitDocsCloudflare/pr-N/DocsBuild",
-        "TaxKitDocsCloudflare/pr-N/DocsWebsite",
-      ],
+      resources: ["TaxKitDocsCloudflare/pr-N/DocsWebsite"],
       revisionSource:
         "reviewed-default-branch-workflow-commit-plus-closed-pr-number",
       signal: "pull-request-closed",
@@ -117,10 +104,7 @@ const inspectMutation = (
       group: "taxkit-docs-production-prod",
       operation: "production-deploy",
       principal: "taxkit-docs-production-workflow",
-      resources: [
-        "TaxKitDocsCloudflare/prod/DocsBuild",
-        "TaxKitDocsCloudflare/prod/DocsWebsite",
-      ],
+      resources: ["TaxKitDocsCloudflare/prod/DocsWebsite"],
       revisionSource: "exact accepted candidate SHA",
       signal: "production-dispatch",
       trigger:
@@ -216,7 +200,7 @@ export const inspectDeploymentAutomationRegisters = (
       finding(
         "automation-register",
         "tools/docs-deployment/automation-register.json",
-        "Retain exactly Preview, Production, teardown and report-only orphan automation entries."
+        "Retain exactly Preview, Production and PR-close teardown automation entries."
       )
     );
   }
@@ -257,7 +241,6 @@ export const inspectDeploymentAutomationRegisters = (
           : externalReceipts.get(automation.id);
       const evidence = externalEvidence.get(automation.id);
       const plan = evidence?.plan ?? null;
-      const orphanReport = evidence?.orphanReport ?? null;
       const provider = evidence?.provider ?? null;
       const hosted = evidence?.hosted ?? null;
       const workflowRun: DeploymentWorkflowRunReadback | null =
@@ -266,8 +249,6 @@ export const inspectDeploymentAutomationRegisters = (
         evidence?.workflowInput ?? null;
       const workflowPath = (
         {
-          "docs-orphan-inventory":
-            ".github/workflows/docs-orphan-inventory.yml",
           "docs-preview-delivery": ".github/workflows/docs-preview.yml",
           "docs-preview-teardown":
             ".github/workflows/docs-preview-teardown.yml",
@@ -276,7 +257,6 @@ export const inspectDeploymentAutomationRegisters = (
       )[automation.id];
       const workflowName = (
         {
-          "docs-orphan-inventory": "Docs Orphan Inventory (Report Only)",
           "docs-preview-delivery": "Docs Preview Deployment",
           "docs-preview-teardown": "Docs Preview Teardown",
           "docs-production-delivery": "Docs Production Deployment",
@@ -290,16 +270,13 @@ export const inspectDeploymentAutomationRegisters = (
             "production-rollback",
           ].includes(receipt.operation);
         } else {
-          let expectedOperation = "preview-destroy";
-          if (automation.id === "docs-orphan-inventory") {
-            expectedOperation = "orphan-inventory-read";
-          } else if (automation.id === "docs-preview-delivery") {
-            expectedOperation = "preview-deploy";
-          }
+          const expectedOperation =
+            automation.id === "docs-preview-delivery"
+              ? "preview-deploy"
+              : "preview-destroy";
           operationMismatch = receipt.operation !== expectedOperation;
         }
       }
-      const isOrphan = automation.id === "docs-orphan-inventory";
       const isTeardown = automation.id === "docs-preview-teardown";
       const workflowProvider: DeploymentWorkflowProviderReadback | null =
         provider !== null && "acceptedPlanSha256" in provider ? provider : null;
@@ -307,31 +284,8 @@ export const inspectDeploymentAutomationRegisters = (
         provider !== null && "providerWorkerAbsent" in provider
           ? provider
           : null;
-      let providerIdentityMismatch = false;
-      if (isOrphan) {
-        providerIdentityMismatch =
-          provider !== null ||
-          hosted !== null ||
-          plan !== null ||
-          orphanReport === null ||
-          orphanReport.repository !== "crcorbett/taxkit" ||
-          orphanReport.mutationCapability !== "none" ||
-          orphanReport.automaticDeletion !== "prohibited" ||
-          orphanReport.sources.github.command !==
-            docsDeploymentOpenPullRequestsCommand ||
-          orphanReport.sources.github.openPullRequests.length >= 1000 ||
-          orphanReport.previewStages.some(
-            (entry) =>
-              entry.classification === "active-trusted-preview" &&
-              entry.pullRequest?.isDraft !== true
-          ) ||
-          orphanReport.sources.deploymentInventory.report.agreement !==
-            "state-provider-agree" ||
-          inspectDocsDeploymentOrphanInventoryReceipt(orphanReport).length !==
-            0;
-      } else if (isTeardown) {
-        providerIdentityMismatch =
-          teardownProvider === null ||
+      const providerIdentityMismatch = isTeardown
+        ? teardownProvider === null ||
           teardownProvider.candidateCommit !== receipt?.candidateCommit ||
           teardownProvider.stage !== receipt?.stage ||
           !/^pr-[1-9]\d*$/u.test(teardownProvider.stage) ||
@@ -345,10 +299,8 @@ export const inspectDeploymentAutomationRegisters = (
           teardownProvider.configSha256 !== receipt?.configSha256 ||
           teardownProvider.deploymentInputSha256 !==
             receipt?.deploymentInputSha256 ||
-          teardownProvider.lockfileSha256 !== receipt?.lockfileSha256;
-      } else {
-        providerIdentityMismatch =
-          workflowProvider === null ||
+          teardownProvider.lockfileSha256 !== receipt?.lockfileSha256
+        : workflowProvider === null ||
           workflowProvider.candidateCommit !== receipt?.candidateCommit ||
           workflowProvider.stage !== receipt?.stage ||
           workflowProvider.acceptedPlanSha256 !== receipt?.acceptedPlanSha256 ||
@@ -366,7 +318,6 @@ export const inspectDeploymentAutomationRegisters = (
                 `pr-${workflowProvider.previewPrNumber}`
             : workflowProvider.previewPrNumber !== null ||
               workflowProvider.stage !== "prod");
-      }
       let expectedPlanOperation = "production-equal-replan";
       if (receipt?.operation === "preview-deploy") {
         expectedPlanOperation = "preview-equal-replan";
@@ -388,30 +339,28 @@ export const inspectDeploymentAutomationRegisters = (
         receipt?.operation !== "preview-destroy" &&
         plan !== null &&
         plan.projection.logicalResources.some(
-          ({ action }) => action === "delete"
+          ({ action, logicalId }) =>
+            action === "delete" && logicalId !== "DocsBuild"
         );
       const planContractMismatch =
         plan === null ||
         inspectDeploymentPlanReceipt(plan).length !== 0 ||
         teardownActionMismatch ||
         deployActionMismatch;
-      const planMismatch = isOrphan
-        ? plan !== null
-        : planContractMismatch ||
-          receipt === undefined ||
-          plan.operation !== expectedPlanOperation ||
-          plan.receiptPath !== receipt.planPath ||
-          plan.acceptedPlanSha256 !== receipt.acceptedPlanSha256 ||
-          plan.projection.candidate.exactCommit !== receipt.candidateCommit ||
-          plan.projection.stage !== receipt.stage ||
-          plan.projection.configSha256 !== receipt.configSha256 ||
-          plan.projection.candidate.deploymentInputSha256 !==
-            receipt.deploymentInputSha256 ||
-          plan.projection.candidate.lockfileSha256 !== receipt.lockfileSha256;
+      const planMismatch =
+        planContractMismatch ||
+        receipt === undefined ||
+        plan.operation !== expectedPlanOperation ||
+        plan.receiptPath !== receipt.planPath ||
+        plan.acceptedPlanSha256 !== receipt.acceptedPlanSha256 ||
+        plan.projection.candidate.exactCommit !== receipt.candidateCommit ||
+        plan.projection.stage !== receipt.stage ||
+        plan.projection.configSha256 !== receipt.configSha256 ||
+        plan.projection.candidate.deploymentInputSha256 !==
+          receipt.deploymentInputSha256 ||
+        plan.projection.candidate.lockfileSha256 !== receipt.lockfileSha256;
       let hostedIdentityMismatch = false;
-      if (isOrphan) {
-        hostedIdentityMismatch = hosted !== null;
-      } else if (isTeardown) {
+      if (isTeardown) {
         hostedIdentityMismatch = hosted !== null;
       } else if (
         hosted === null ||
@@ -466,9 +415,7 @@ export const inspectDeploymentAutomationRegisters = (
         receipt !== undefined
       ) {
         let allowedEvents: readonly string[] = ["workflow_dispatch"];
-        if (isOrphan) {
-          allowedEvents = ["schedule", "workflow_dispatch"];
-        } else if (isTeardown) {
+        if (isTeardown) {
           allowedEvents = ["pull_request", "workflow_dispatch"];
         }
         workflowRunMismatch =
@@ -494,11 +441,7 @@ export const inspectDeploymentAutomationRegisters = (
         workflowInput !== null &&
         receipt !== undefined
       ) {
-        let expectedInputOperation:
-          | "deploy"
-          | "destroy"
-          | "report"
-          | "rollback";
+        let expectedInputOperation: "deploy" | "destroy" | "rollback";
         if (
           receipt.operation === "preview-deploy" ||
           receipt.operation === "production-deploy"
@@ -509,7 +452,7 @@ export const inspectDeploymentAutomationRegisters = (
         } else if (receipt.operation === "preview-destroy") {
           expectedInputOperation = "destroy";
         } else {
-          expectedInputOperation = "report";
+          expectedInputOperation = "destroy";
         }
         let expectedPrNumber: number | null = null;
         if (
@@ -538,25 +481,13 @@ export const inspectDeploymentAutomationRegisters = (
         receipt.lockGroup !== automation.lock.group ||
         operationMismatch ||
         receipt.workflowPath !== workflowPath ||
-        (isOrphan
-          ? receipt.acceptedPlanSha256 !== null ||
-            receipt.accountId !== null ||
-            receipt.configSha256 !== null ||
-            receipt.deploymentInputSha256 !== null ||
-            receipt.planPath !== null ||
-            receipt.providerReadbackPath !== null ||
-            receipt.hostedProofPath !== null ||
-            receipt.lockfileSha256 !== null ||
-            receipt.previousVersionId !== null ||
-            receipt.rollbackRecoveryIdentity !== null ||
-            receipt.reportPath === null
-          : receipt.acceptedPlanSha256 === null ||
-            receipt.planPath === null ||
-            receipt.providerReadbackPath === null ||
-            receipt.reportPath !== null ||
-            (isTeardown
-              ? receipt.hostedProofPath !== null
-              : receipt.hostedProofPath === null)) ||
+        receipt.acceptedPlanSha256 === null ||
+        receipt.planPath === null ||
+        receipt.providerReadbackPath === null ||
+        receipt.reportPath !== null ||
+        (isTeardown
+          ? receipt.hostedProofPath !== null
+          : receipt.hostedProofPath === null) ||
         receipt.workflowRunPath.length === 0 ||
         workflowRunMismatch ||
         receipt.workflowInputPath.length === 0 ||
@@ -591,54 +522,6 @@ export const inspectDeploymentAutomationRegisters = (
         "teardown-safety",
         "tools/docs-deployment/automation-register.json:docs-preview-teardown",
         "Use reviewed default-branch code, derive only pr-N and reject pull-request-head execution."
-      )
-    );
-  }
-  const orphan = automations.find(
-    (entry) => entry.id === "docs-orphan-inventory"
-  );
-  if (
-    orphan === undefined ||
-    orphan.authority.principal !== "taxkit-docs-orphan-inventory-workflow" ||
-    orphan.environment.id !== "github-actions-report-only" ||
-    orphan.authority.environment !== "github-actions-report-only" ||
-    orphan.environment.trigger !==
-      "bounded schedule or explicit manual report" ||
-    orphan.signal.kind !== "scheduled-or-manual-report" ||
-    orphan.signal.revisionSource !==
-      "reviewed default-branch workflow commit" ||
-    orphan.lock.scope !== "report-only-inventory" ||
-    orphan.lock.group !== "taxkit-docs-orphan-inventory" ||
-    !orphan.lock.cancelInProgress ||
-    orphan.authority.operations.length !== 1 ||
-    orphan.authority.operations[0] !== "orphan-inventory-read" ||
-    !hasExactStrings(orphan.authority.credentialIdentities, [
-      "CLOUDFLARE_READ_API_TOKEN",
-      "ALCHEMY_STATE_STORE_CREDENTIALS_JSON",
-    ]) ||
-    !hasExactStrings(orphan.authority.resources, [
-      "open TaxKit pull-request identities",
-      "TaxKitDocsCloudflare Alchemy stages",
-      "TaxKit docs Cloudflare Worker names",
-    ]) ||
-    !hasExactStrings(orphan.authority.denied, [
-      "automatic-orphan-deletion",
-      "credential-write",
-      "custom-domain-or-dns",
-      "deployment",
-      "provider-write",
-      "release-or-publication",
-      "state-store-write",
-    ]) ||
-    orphan.plan.acceptedDigestRequired ||
-    orphan.plan.equalReplanRequired ||
-    !orphan.plan.providerReadbackRequired
-  ) {
-    findings.push(
-      finding(
-        "orphan-report-only",
-        "tools/docs-deployment/automation-register.json:docs-orphan-inventory",
-        "Keep orphan inventory cancellable, read-only, separately credentialed and unable to delete."
       )
     );
   }

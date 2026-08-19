@@ -1,7 +1,6 @@
 import { Schema } from "effect";
 
 import { DocsDeploymentStage } from "../../apps/docs/src/lib/build/docs-deployment-stage.js";
-import type { DocsDeploymentOrphanInventoryReceipt } from "./orphan-inventory.schemas.js";
 import type { DeploymentPlanReceipt } from "./schemas.js";
 
 const CommitSha = Schema.String.check(Schema.isPattern(/^[a-f0-9]{40}$/u));
@@ -188,7 +187,6 @@ export type DeploymentWorkflowExternalReceipt =
 
 export interface DeploymentWorkflowExternalEvidence {
   readonly hosted: DeploymentWorkflowHostedProbe | null;
-  readonly orphanReport: DocsDeploymentOrphanInventoryReceipt | null;
   readonly plan: DeploymentPlanReceipt | null;
   readonly provider:
     | DeploymentWorkflowProviderReadback

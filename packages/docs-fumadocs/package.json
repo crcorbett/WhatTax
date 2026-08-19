@@ -7,7 +7,7 @@
     "./config": {
       "source": "./src/config.ts",
       "types": "./dist/config.d.ts",
-      "default": "./dist/config.js"
+      "default": "./src/config.ts"
     },
     "./errors": {
       "source": "./src/errors.ts",

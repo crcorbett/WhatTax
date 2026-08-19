@@ -177,13 +177,24 @@ export const DeploymentApplyFailureReceipt = Schema.Struct({
 export type DeploymentApplyFailureReceipt =
   typeof DeploymentApplyFailureReceipt.Type;
 
-export const DeploymentPlanProjection = Schema.Struct({
+const DeploymentPlanProjectionFields = {
   candidate: Schema.Struct({
     deploymentInputSha256: Sha256,
     exactCommit: CommitSha,
     lockfileSha256: Sha256,
   }),
   configSha256: Sha256,
+  redaction: Schema.Struct({
+    ansiRemoved: Schema.Literal(true),
+    secretValuesIncluded: Schema.Literal(false),
+    timestampsExcludedFromDigest: Schema.Literal(true),
+  }),
+  stack: Schema.Literal("TaxKitDocsCloudflare"),
+  stage: DocsDeploymentStage,
+} as const;
+
+const LegacyDeploymentPlanProjection = Schema.Struct({
+  ...DeploymentPlanProjectionFields,
   logicalResources: Schema.Tuple([
     Schema.Struct({
       action: Schema.Literals(["create", "update", "noop", "delete"]),
@@ -196,15 +207,34 @@ export const DeploymentPlanProjection = Schema.Struct({
       resourceType: Schema.Literal("Cloudflare.Worker"),
     }),
   ]),
-  redaction: Schema.Struct({
-    ansiRemoved: Schema.Literal(true),
-    secretValuesIncluded: Schema.Literal(false),
-    timestampsExcludedFromDigest: Schema.Literal(true),
-  }),
   schemaVersion: Schema.Literal(1),
-  stack: Schema.Literal("TaxKitDocsCloudflare"),
-  stage: DocsDeploymentStage,
 });
+
+const NativeWebsiteResource = Schema.Struct({
+  action: Schema.Literals(["create", "update", "noop", "delete"]),
+  logicalId: Schema.Literal("DocsWebsite"),
+  resourceType: Schema.Literal("Cloudflare.Worker"),
+});
+
+const RetiredBuildResource = Schema.Struct({
+  action: Schema.Literal("delete"),
+  logicalId: Schema.Literal("DocsBuild"),
+  resourceType: Schema.Literal("Command.Build"),
+});
+
+const NativeDeploymentPlanProjection = Schema.Struct({
+  ...DeploymentPlanProjectionFields,
+  logicalResources: Schema.Union([
+    Schema.Tuple([NativeWebsiteResource]),
+    Schema.Tuple([RetiredBuildResource, NativeWebsiteResource]),
+  ]),
+  schemaVersion: Schema.Literal(2),
+});
+
+export const DeploymentPlanProjection = Schema.Union([
+  LegacyDeploymentPlanProjection,
+  NativeDeploymentPlanProjection,
+]);
 export type DeploymentPlanProjection = typeof DeploymentPlanProjection.Type;
 
 export const DeploymentPlanReceipt = Schema.Struct({
@@ -223,7 +253,7 @@ export const DeploymentPlanReceipt = Schema.Struct({
   projection: DeploymentPlanProjection,
   receiptPath: RepositoryEvidencePath,
   replanSha256: Schema.NullOr(Sha256),
-  schemaVersion: Schema.Literal(1),
+  schemaVersion: Schema.Literals([1, 2]),
 });
 export type DeploymentPlanReceipt = typeof DeploymentPlanReceipt.Type;
 

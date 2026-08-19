@@ -80,6 +80,7 @@ browser
 
 ```txt
 bun run --filter=docs dev
+bun run --filter=docs dev:vite
 bun run --filter=docs check-import-boundaries
 bun run --filter=docs test
 bun run --filter=docs test:browser
@@ -94,15 +95,22 @@ bun run --filter=@taxkit/docs-content check-examples
 bun run docs:validate
 ```
 
+`dev` is the authoritative Alchemy-managed Cloudflare development path and
+runs `alchemy dev` from the repository root. `dev:vite` is the fast,
+infrastructure-free portless Vite path at `https://docs.taxkit.localhost`.
+Alchemy beta.64 injects its Cloudflare Vite plugin for the native resource;
+standalone Vite installs the same official plugin only when the documented
+`ALCHEMY_CLOUDFLARE_VITE_INJECTED` guard is absent.
+
 `@taxkit/docs-content` `check-types` includes `check-examples`, so the
 package-owned public examples stay connected to current SDK/API/calculator
 exports.
 
 Run `build` before `preview`. Turbo orders the package-owned content build
 before the app, while a direct Vite app build regenerates the same package-owned
-source through `source.config.ts`; both paths compile
-`@taxkit/docs-fumadocs/config` first. `dev` and `preview` expose the app through
-`https://docs.taxkit.localhost` with portless.
+source through `source.config.ts`. The config-only Fumadocs export is
+source-owned, so a clean direct app build does not require a prebuilt workspace
+artifact. `dev:vite` and `preview` expose the app through portless.
 
 `test:browser` runs the programmatic TanStack client-route harness in Chromium.
 It proves success, expected failures, malformed transport and framework error
@@ -150,11 +158,13 @@ Nitro remains an independent owner only where another application still uses
 it. Final hosted requalification of the exact retirement candidate and the
 report-only Alchemy state boundary remain separate claims.
 
-Root `alchemy.run.ts` composes the same output through public Alchemy
-`Command.Build` and `Cloudflare.Worker({ bundle: false })`. `apps/docs` owns
-the build target and asset headers; root owns provider composition and
-Alchemy owns the physical Worker name. `.wrangler/**` and `dist/**` are
-ignored generated proof/build output and are never deployment receipts.
+Root `alchemy.run.ts` uses public Alchemy
+`Cloudflare.Website.Vite("DocsWebsite")`. Alchemy owns Vite build execution,
+assets, the SSR Worker lifecycle and the physical Worker name as one logical
+resource. The standalone `build:cloudflare` alias and workerd harness are
+provider-free preflight proof; their `dist/**` output is not asserted to be the
+exact artifact produced inside an Alchemy plan/apply. `.wrangler/**` and
+`dist/**` remain ignored generated output and are never deployment receipts.
 
 Exact Preview, Production, teardown, rollback and Alchemy-state operations
 belong to `docs/runbooks/docs-deployment.md`; dated sanitized observations

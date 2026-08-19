@@ -1,7 +1,5 @@
 import * as Alchemy from "alchemy";
 import * as Cloudflare from "alchemy/Cloudflare";
-import * as Command from "alchemy/Command";
-import * as Output from "alchemy/Output";
 import { Stack } from "alchemy/Stack";
 import { Stage } from "alchemy/Stage";
 import * as Effect from "effect/Effect";
@@ -9,16 +7,11 @@ import * as Effect from "effect/Effect";
 import {
   decodeDocsDeploymentStage,
   docsCloudflareStackName,
-  docsWorkerAssetHeaders,
-  docsWorkerAssetOutputDirectory,
   docsWorkerCompatibilityDate,
   docsWorkerCompatibilityFlags,
-  docsWorkerGeneratedMain,
   docsWorkerObservability,
   docsWorkerResourceId,
 } from "./apps/docs/src/lib/build/cloudflare-stack.js";
-
-const docsWorkerBuildOutputRoot = "apps/docs/dist";
 
 export default Alchemy.Stack(
   docsCloudflareStackName,
@@ -29,24 +22,16 @@ export default Alchemy.Stack(
   Effect.gen(function* () {
     const stack = yield* Stack;
     const stage = yield* Stage.pipe(Effect.flatMap(decodeDocsDeploymentStage));
-    const build = yield* Command.Build("DocsBuild", {
-      command: "bun run build:cloudflare",
-      cwd: "apps/docs",
-      memo: false,
-      outdir: "dist",
-    });
-    const worker = yield* Cloudflare.Worker(docsWorkerResourceId, {
+    const worker = yield* Cloudflare.Website.Vite(docsWorkerResourceId, {
       assets: {
-        directory: Output.interpolate`${build.outdir}/${docsWorkerAssetOutputDirectory}`,
-        headers: docsWorkerAssetHeaders,
+        runWorkerFirst: true,
       },
-      bundle: false,
       compatibility: {
         date: docsWorkerCompatibilityDate,
         flags: [...docsWorkerCompatibilityFlags],
       },
-      main: `${docsWorkerBuildOutputRoot}/server/${docsWorkerGeneratedMain}`,
       observability: docsWorkerObservability,
+      rootDir: "apps/docs",
       url: true,
     });
 

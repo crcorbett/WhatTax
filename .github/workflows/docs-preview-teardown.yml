@@ -97,7 +97,7 @@ jobs:
       - name: Validate deployment owners
         run: bun run check:docs-deployment
 
-      - name: Build exact deployment input
+      - name: Build provider-free docs proof
         run: bun run --filter=docs build:cloudflare
 
       - name: Materialize ephemeral Alchemy state-store credential cache
@@ -150,7 +150,7 @@ jobs:
           previous_worker_name=""
           previous_worker_url=""
           if [ "$stage_count_before" -eq 1 ]; then
-            jq -e --arg stage "$stage" '([.stages[] | select(.stage == $stage) | .resources | map(.logicalId) | sort] == [["DocsBuild", "DocsWebsite"]]) and ([.providerWorkers[] | select(.stage == $stage and .logicalId == "DocsWebsite")] | length == 1)' "$RUNNER_TEMP/docs-deployment/provider-inventory-before.json" > /dev/null
+            jq -e --arg stage "$stage" '([.stages[] | select(.stage == $stage) | .resources | map(.logicalId) | sort] | . == [["DocsWebsite"]] or . == [["DocsBuild", "DocsWebsite"]]) and ([.providerWorkers[] | select(.stage == $stage and .logicalId == "DocsWebsite")] | length == 1)' "$RUNNER_TEMP/docs-deployment/provider-inventory-before.json" > /dev/null
             previous_worker_name="$(jq -er --arg stage "$stage" '.stages[] | select(.stage == $stage) | .resources[] | select(.logicalId == "DocsWebsite") | .workerName' "$RUNNER_TEMP/docs-deployment/provider-inventory-before.json")"
             previous_worker_url="$(jq -er --arg stage "$stage" '.stages[] | select(.stage == $stage) | .resources[] | select(.logicalId == "DocsWebsite") | .workerUrl' "$RUNNER_TEMP/docs-deployment/provider-inventory-before.json")"
           fi
@@ -177,26 +177,32 @@ jobs:
             test -z "$unexpected_destroy_resources"
             printf '%s' "$destroy_resource_lines" | grep -E '^[[](DocsBuild|DocsWebsite)[]] delete$' > "$RUNNER_TEMP/docs-deployment/destroy-${attempt}.resources.txt" || true
             resource_count="$(wc -l < "$RUNNER_TEMP/docs-deployment/destroy-${attempt}.resources.txt" | tr -d ' ')"
-            test "$resource_count" -eq 0 || test "$resource_count" -eq 2
+            test "$resource_count" -ge 0 && test "$resource_count" -le 2
           done
           cmp "$RUNNER_TEMP/docs-deployment/destroy-one.resources.txt" "$RUNNER_TEMP/docs-deployment/destroy-two.resources.txt"
           resource_count="$(wc -l < "$RUNNER_TEMP/docs-deployment/destroy-one.resources.txt" | tr -d ' ')"
-          if [ "$resource_count" -eq 2 ]; then
-            destroy_action="delete"
+          if [ "$resource_count" -gt 0 ]; then
+            website_destroy_resource="$(grep -E '^\[DocsWebsite\] delete$' "$RUNNER_TEMP/docs-deployment/destroy-one.resources.txt" || true)"
+            test -n "$website_destroy_resource"
+            if grep -Eq '^\[DocsBuild\] delete$' "$RUNNER_TEMP/docs-deployment/destroy-one.resources.txt"; then
+              logical_resources='[{"action":"delete","logicalId":"DocsBuild","resourceType":"Command.Build"},{"action":"delete","logicalId":"DocsWebsite","resourceType":"Cloudflare.Worker"}]'
+            else
+              logical_resources='[{"action":"delete","logicalId":"DocsWebsite","resourceType":"Cloudflare.Worker"}]'
+            fi
           else
-            destroy_action="noop"
+            logical_resources='[{"action":"noop","logicalId":"DocsWebsite","resourceType":"Cloudflare.Worker"}]'
           fi
           lockfile_sha256="$(shasum -a 256 bun.lock | cut -d ' ' -f1)"
           config_sha256="$(for file in alchemy.run.ts apps/docs/package.json apps/docs/vite.config.ts apps/docs/src/lib/build/cloudflare-stack.ts apps/docs/src/lib/build/docs-deployment-stage.ts apps/docs/public/_headers; do shasum -a 256 "$file"; done | shasum -a 256 | cut -d ' ' -f1)"
-          deployment_input_sha256="$(find apps/docs/dist -type f -print | LC_ALL=C sort | while IFS= read -r file; do shasum -a 256 "$file"; done | shasum -a 256 | cut -d ' ' -f1)"
+          deployment_input_sha256="$(git ls-files -z -- alchemy.run.ts apps/docs packages/docs-content packages/docs-fumadocs | LC_ALL=C sort -z | xargs -0 shasum -a 256 | shasum -a 256 | cut -d ' ' -f1)"
           jq -nS \
             --arg commit "$REVIEWED_WORKFLOW_SHA" \
             --arg lockfile "$lockfile_sha256" \
             --arg deployment "$deployment_input_sha256" \
             --arg config "$config_sha256" \
             --arg stage "$stage" \
-            --arg action "$destroy_action" \
-            '{candidate:{deploymentInputSha256:$deployment,exactCommit:$commit,lockfileSha256:$lockfile},configSha256:$config,logicalResources:[{action:$action,logicalId:"DocsBuild",resourceType:"Command.Build"},{action:$action,logicalId:"DocsWebsite",resourceType:"Cloudflare.Worker"}],redaction:{ansiRemoved:true,secretValuesIncluded:false,timestampsExcludedFromDigest:true},schemaVersion:1,stack:"TaxKitDocsCloudflare",stage:$stage}' \
+            --argjson logicalResources "$logical_resources" \
+            '{candidate:{deploymentInputSha256:$deployment,exactCommit:$commit,lockfileSha256:$lockfile},configSha256:$config,logicalResources:$logicalResources,redaction:{ansiRemoved:true,secretValuesIncluded:false,timestampsExcludedFromDigest:true},schemaVersion:2,stack:"TaxKitDocsCloudflare",stage:$stage}' \
             > "$RUNNER_TEMP/docs-deployment/projection.json"
           destroy_sha256="$(jq -cS . "$RUNNER_TEMP/docs-deployment/projection.json" | tr -d '\n' | shasum -a 256 | cut -d ' ' -f1)"
           jq -nS \
@@ -204,7 +210,7 @@ jobs:
             --arg acceptedPlanSha256 "$destroy_sha256" \
             --arg observedAt "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
             --slurpfile projection "$RUNNER_TEMP/docs-deployment/projection.json" \
-            '{acceptedBy:$acceptedBy,acceptedPlanSha256:$acceptedPlanSha256,observedAt:$observedAt,operation:"preview-destroy",projection:$projection[0],receiptPath:("docs/evidence/deployments/workflow-" + env.GITHUB_RUN_ID + "/destroy-plan.json"),replanSha256:$acceptedPlanSha256,schemaVersion:1}' \
+            '{acceptedBy:$acceptedBy,acceptedPlanSha256:$acceptedPlanSha256,observedAt:$observedAt,operation:"preview-destroy",projection:$projection[0],receiptPath:("docs/evidence/deployments/workflow-" + env.GITHUB_RUN_ID + "/destroy-plan.json"),replanSha256:$acceptedPlanSha256,schemaVersion:2}' \
             > "$RUNNER_TEMP/docs-deployment/destroy-plan.json"
           TAXKIT_WORKFLOW_PLAN_RECEIPT="$RUNNER_TEMP/docs-deployment/destroy-plan.json" \
           TAXKIT_WORKFLOW_PLAN_CANDIDATE_COMMIT="$REVIEWED_WORKFLOW_SHA" \
@@ -217,12 +223,12 @@ jobs:
           jq -e --arg stage "$stage" --argjson expected "$stage_count_before" --arg worker "$previous_worker_name" --arg url "$previous_worker_url" '
             ([.stages[] | select(.stage == $stage)] | length == $expected) and
             (if $expected == 0 then true else
-              ([.stages[] | select(.stage == $stage) | .resources | map(.logicalId) | sort] == [["DocsBuild", "DocsWebsite"]]) and
+              ([.stages[] | select(.stage == $stage) | .resources | map(.logicalId) | sort] | . == [["DocsWebsite"]] or . == [["DocsBuild", "DocsWebsite"]]) and
               ([.stages[] | select(.stage == $stage) | .resources[] | select(.logicalId == "DocsWebsite" and .workerUrl == $url)] | length == 1) and
               ([.providerWorkers[] | select(.stage == $stage and .logicalId == "DocsWebsite" and .workerName == $worker)] | length == 1)
             end)
           ' "$RUNNER_TEMP/docs-deployment/provider-inventory-pre-destroy.json" > /dev/null
-          if [ "$resource_count" -eq 2 ]; then
+          if [ "$resource_count" -gt 0 ]; then
             ALCHEMY_TELEMETRY_DISABLED=1 ALCHEMY_PLAIN=1 CI=1 bun node_modules/alchemy/bin/alchemy.ts destroy --stage "$stage" --profile "$ALCHEMY_PROFILE" --yes
           fi
           read_inventory "$RUNNER_TEMP/docs-deployment/provider-inventory.json" "$RUNNER_TEMP/docs-deployment/provider-inventory.stderr.txt" "$RUNNER_TEMP/docs-deployment/provider-inventory.attempts.txt"

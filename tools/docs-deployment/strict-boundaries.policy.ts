@@ -4,9 +4,6 @@ const strictAppBoundaryPaths = [
   "apps/docs/src/server.ts",
   "tools/docs-deployment/inventory-credentials.boundary.ts",
   "tools/docs-deployment/inventory.runtime.ts",
-  "tools/docs-deployment/orphan-inventory.process-boundary.ts",
-  "tools/docs-deployment/orphan-inventory.runtime.ts",
-  "tools/docs-deployment/orphan-inventory.service.ts",
   "tools/docs-deployment/workflow-input-check.runtime.ts",
   "tools/docs-deployment/workflow-plan-check.runtime.ts",
   "tools/docs-deployment/workflow-proof-check.runtime.ts",
@@ -23,7 +20,6 @@ export interface StrictAppBoundaryFinding {
   readonly invariant:
     | "credential-boundary"
     | "host-ingress"
-    | "process-environment"
     | "raw-concurrency"
     | "runtime-owner"
     | "runtime-probe"
@@ -123,30 +119,6 @@ const inspectCredentialBoundary = (
     : [finding("credential-boundary", boundaryPath)];
 };
 
-const inspectProcessBoundary = (
-  sources: StrictAppBoundarySources
-): readonly StrictAppBoundaryFinding[] => {
-  const servicePath =
-    "tools/docs-deployment/orphan-inventory.service.ts" as const;
-  const processBoundary =
-    sources["tools/docs-deployment/orphan-inventory.process-boundary.ts"];
-  const orphanRuntime =
-    sources["tools/docs-deployment/orphan-inventory.runtime.ts"];
-  const orphanService = sources[servicePath];
-  const serviceRequirements = [
-    "makeDocsDeploymentChildEnvironment(",
-    "restoreDocsDeploymentJsonCommand(",
-    "extendEnv: false",
-  ] as const;
-  const valid =
-    orphanRuntime.includes("Config.unwrap(") &&
-    includesEvery(orphanService, serviceRequirements) &&
-    !orphanService.includes("extendEnv: true") &&
-    processBoundary.includes('new TextDecoder("utf-8", { fatal: true })');
-
-  return valid ? [] : [finding("process-environment", servicePath)];
-};
-
 const inspectDocsRuntimeBoundary = (
   sources: StrictAppBoundarySources
 ): readonly StrictAppBoundaryFinding[] => {
@@ -183,6 +155,5 @@ export const inspectStrictAppBoundaries = (
   ...inspectGenericBoundaries(sources),
   ...inspectWorkflowBoundaries(sources),
   ...inspectCredentialBoundary(sources),
-  ...inspectProcessBoundary(sources),
   ...inspectDocsRuntimeBoundary(sources),
 ];

@@ -62,7 +62,7 @@ export const checkWorkflowPlan = Effect.gen(function* workflowPlanCheck() {
   }
 
   yield* Console.log(
-    `Docs deployment workflow plan: operation=${config.TAXKIT_WORKFLOW_PLAN_OPERATION}; candidate=${config.TAXKIT_WORKFLOW_PLAN_CANDIDATE_COMMIT}; stage=${config.TAXKIT_WORKFLOW_PLAN_STAGE}; digest=${config.TAXKIT_WORKFLOW_PLAN_SHA256}; schema=1; equalReplan=${plan.replanSha256 !== null}.`
+    `Docs deployment workflow plan: operation=${config.TAXKIT_WORKFLOW_PLAN_OPERATION}; candidate=${config.TAXKIT_WORKFLOW_PLAN_CANDIDATE_COMMIT}; stage=${config.TAXKIT_WORKFLOW_PLAN_STAGE}; digest=${config.TAXKIT_WORKFLOW_PLAN_SHA256}; schema=${plan.schemaVersion}; equalReplan=${plan.replanSha256 !== null}.`
   );
 });
 

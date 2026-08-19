@@ -9,11 +9,6 @@ import {
   DeploymentControlRegister,
 } from "./automation.schemas.js";
 import controlsJson from "./controls.json";
-import {
-  docsDeploymentOpenPullRequestsCommand,
-  DocsDeploymentOrphanInventoryReceipt,
-  docsDeploymentStateProviderInventoryCommand,
-} from "./orphan-inventory.schemas.js";
 import { deploymentRecordDigest } from "./policy.js";
 import { DeploymentPlanReceipt } from "./schemas.js";
 import {
@@ -41,7 +36,7 @@ const decodeRegisters = () =>
   );
 
 describe("docs deployment automation admission", () => {
-  test("accepts the exact four deployment automations and five controls before hosted establishment", async () => {
+  test("accepts the exact three deployment automations and four controls before hosted establishment", async () => {
     const [automations, controls] = await decodeRegisters();
     expect(inspectDeploymentAutomationRegisters(automations, controls)).toEqual(
       []
@@ -163,37 +158,6 @@ describe("docs deployment automation admission", () => {
         (item) => item.invariant
       )
     ).toContain("teardown-safety");
-  });
-
-  test("rejects mutating or broadly credentialed orphan inventory", async () => {
-    const [automations, controls] = await decodeRegisters();
-    const contaminated = await decodeAutomations(
-      automations.map((entry) =>
-        entry.id === "docs-orphan-inventory"
-          ? {
-              ...entry,
-              authority: {
-                ...entry.authority,
-                credentialIdentities: ["CLOUDFLARE_API_TOKEN"],
-                denied: entry.authority.denied.filter(
-                  (denial) =>
-                    denial !== "provider-write" &&
-                    denial !== "automatic-orphan-deletion"
-                ),
-              },
-              lock: {
-                ...entry.lock,
-                cancelInProgress: false,
-              },
-            }
-          : entry
-      )
-    );
-    expect(
-      inspectDeploymentAutomationRegisters(contaminated, controls).map(
-        (item) => item.invariant
-      )
-    ).toContain("orphan-report-only");
   });
 
   test("rejects every external-state establishment until hosted receipt admission exists", async () => {
@@ -335,6 +299,9 @@ describe("docs deployment automation admission", () => {
         schemaVersion: 1,
       })
     );
+    if (plan.projection.schemaVersion !== 1) {
+      throw new Error("Expected the historical v1 plan fixture.");
+    }
     const provider = await Effect.runPromise(
       Schema.decodeUnknownEffect(DeploymentWorkflowProviderReadback)({
         acceptedPlanSha256: receipt.acceptedPlanSha256,
@@ -434,7 +401,6 @@ describe("docs deployment automation admission", () => {
             preview.id,
             {
               hosted,
-              orphanReport: null,
               plan,
               provider,
               receipt,
@@ -456,7 +422,6 @@ describe("docs deployment automation admission", () => {
             preview.id,
             {
               hosted,
-              orphanReport: null,
               plan,
               provider,
               receipt,
@@ -478,7 +443,6 @@ describe("docs deployment automation admission", () => {
             preview.id,
             {
               hosted,
-              orphanReport: null,
               plan,
               provider,
               receipt,
@@ -503,7 +467,6 @@ describe("docs deployment automation admission", () => {
             preview.id,
             {
               hosted,
-              orphanReport: null,
               plan: {
                 ...plan,
                 projection: {
@@ -537,7 +500,6 @@ describe("docs deployment automation admission", () => {
             preview.id,
             {
               hosted,
-              orphanReport: null,
               plan: { ...plan, replanSha256: null },
               provider,
               receipt,
@@ -559,7 +521,6 @@ describe("docs deployment automation admission", () => {
             preview.id,
             {
               hosted,
-              orphanReport: null,
               plan,
               provider,
               receipt,
@@ -588,7 +549,6 @@ describe("docs deployment automation admission", () => {
                 environment: "production",
                 screenshots: [hosted.screenshots[0], hosted.screenshots[0]],
               },
-              orphanReport: null,
               plan,
               provider,
               receipt,
@@ -599,210 +559,5 @@ describe("docs deployment automation admission", () => {
         ])
       ).map((item) => item.invariant)
     ).toContain("external-proof");
-  });
-
-  test("rejects orphan establishment without a dedicated decoded report path", async () => {
-    const [automations, controls] = await decodeRegisters();
-    const orphan = automations.find(
-      (entry) => entry.id === "docs-orphan-inventory"
-    );
-    expect(orphan).toBeDefined();
-    if (orphan === undefined) {
-      return;
-    }
-    const orphanReport = await Effect.runPromise(
-      Schema.decodeUnknownEffect(DocsDeploymentOrphanInventoryReceipt)({
-        automaticDeletion: "prohibited",
-        mutationCapability: "none",
-        nonClaims: ["This fixture is not provider proof."],
-        observedAt: "2026-08-10T00:00:00.000Z",
-        previewStages: [],
-        repository: "crcorbett/taxkit",
-        schemaVersion: 1,
-        sources: {
-          deploymentInventory: {
-            command: docsDeploymentStateProviderInventoryCommand,
-            report: {
-              agreement: "state-provider-agree",
-              nonClaims: ["This fixture is not provider proof."],
-              providerWorkers: [],
-              stack: "TaxKitDocsCloudflare",
-              stages: [],
-              stateStore: { id: "state-store", version: 1 },
-            },
-          },
-          github: {
-            command: docsDeploymentOpenPullRequestsCommand,
-            openPullRequests: [],
-          },
-        },
-        trustedPullRequestsWithoutStage: [],
-      })
-    );
-    const candidateCommit = "a".repeat(40);
-    const workflowCommit = "b".repeat(40);
-    const receipt = await Effect.runPromise(
-      Schema.decodeUnknownEffect(DeploymentWorkflowExternalReceipt)({
-        acceptedPlanSha256: null,
-        accountId: null,
-        automationId: orphan.id,
-        candidateCommit,
-        configSha256: null,
-        deploymentInputSha256: null,
-        environment: orphan.environment.id,
-        hostedProofPath: null,
-        lockGroup: orphan.lock.group,
-        lockfileSha256: null,
-        nonClaims: ["This fixture is not provider proof."],
-        observedAt: "2026-08-10T00:00:00Z",
-        operation: "orphan-inventory-read",
-        planPath: null,
-        postcondition: "state/provider report was decoded",
-        previousVersionId: null,
-        principal: orphan.authority.principal,
-        providerReadbackPath: null,
-        reportPath: null,
-        rollbackRecoveryIdentity: null,
-        schemaVersion: 1,
-        stage: "prod",
-        workflowCommit,
-        workflowInputPath:
-          "docs/evidence/deployments/workflow-orphan-input.json",
-        workflowPath: ".github/workflows/docs-orphan-inventory.yml",
-        workflowReceiptPath: "docs/evidence/deployments/workflow-orphan.json",
-        workflowRunId: "42",
-        workflowRunPath: "docs/evidence/deployments/workflow-orphan-run.json",
-      })
-    );
-    const findings = inspectDeploymentAutomationRegisters(
-      automations.map((entry) =>
-        entry.id === orphan.id
-          ? {
-              ...entry,
-              externalState: {
-                receipt: receipt.workflowReceiptPath,
-                status: "established" as const,
-              },
-            }
-          : entry
-      ),
-      controls,
-      new Map([[orphan.id, receipt]]),
-      new Map([
-        [
-          orphan.id,
-          {
-            hosted: null,
-            orphanReport,
-            plan: null,
-            provider: null,
-            receipt,
-            workflowInput: {
-              candidateCommit,
-              operation: "report",
-              prNumber: null,
-              sourceRef: "refs/heads/main",
-              workflowCommit,
-              workflowName: "Docs Orphan Inventory (Report Only)",
-              workflowPath: receipt.workflowPath,
-              workflowRunId: receipt.workflowRunId,
-            },
-            workflowRun: {
-              candidateCommit,
-              conclusion: "success" as const,
-              event: "schedule",
-              headBranch: "main" as const,
-              headSha: workflowCommit,
-              path: receipt.workflowPath,
-              ref: "refs/heads/main" as const,
-              status: "completed" as const,
-              workflowCommit,
-              workflowName: "Docs Orphan Inventory (Report Only)",
-              workflowRunId: receipt.workflowRunId,
-            },
-          },
-        ],
-      ])
-    ).map((item) => item.invariant);
-    expect(findings).toContain("external-proof");
-
-    const admittedReceipt = {
-      ...receipt,
-      reportPath: "docs/evidence/deployments/workflow-orphan-report.json",
-    };
-    const admittedFindings = inspectDeploymentAutomationRegisters(
-      automations.map((entry) =>
-        entry.id === orphan.id
-          ? {
-              ...entry,
-              externalState: {
-                receipt: admittedReceipt.workflowReceiptPath,
-                status: "established" as const,
-              },
-            }
-          : entry
-      ),
-      controls,
-      new Map([[orphan.id, admittedReceipt]]),
-      new Map([
-        [
-          orphan.id,
-          {
-            hosted: null,
-            orphanReport,
-            plan: null,
-            provider: null,
-            receipt: admittedReceipt,
-            workflowInput: {
-              candidateCommit,
-              operation: "report",
-              prNumber: null,
-              sourceRef: "refs/heads/main",
-              workflowCommit,
-              workflowName: "Docs Orphan Inventory (Report Only)",
-              workflowPath: admittedReceipt.workflowPath,
-              workflowRunId: admittedReceipt.workflowRunId,
-            },
-            workflowRun: {
-              candidateCommit,
-              conclusion: "success" as const,
-              event: "schedule",
-              headBranch: "main" as const,
-              headSha: workflowCommit,
-              path: admittedReceipt.workflowPath,
-              ref: "refs/heads/main" as const,
-              status: "completed" as const,
-              workflowCommit,
-              workflowName: "Docs Orphan Inventory (Report Only)",
-              workflowRunId: admittedReceipt.workflowRunId,
-            },
-          },
-        ],
-      ])
-    ).map((item) => item.invariant);
-    expect(admittedFindings).not.toContain("external-proof");
-  });
-
-  test("rejects additive denials and orphan ownership expansion", async () => {
-    const [automations, controls] = await decodeRegisters();
-    const contaminated = await decodeAutomations(
-      automations.map((entry) =>
-        entry.id === "docs-orphan-inventory"
-          ? {
-              ...entry,
-              authority: {
-                ...entry.authority,
-                denied: [...entry.authority.denied, "new-unknown-denial"],
-                resources: [...entry.authority.resources, "UnrelatedStack"],
-              },
-            }
-          : entry
-      )
-    );
-    expect(
-      inspectDeploymentAutomationRegisters(contaminated, controls).map(
-        (item) => item.invariant
-      )
-    ).toEqual(["orphan-report-only"]);
   });
 });

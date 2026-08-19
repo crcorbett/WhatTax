@@ -834,6 +834,9 @@ describe("docs deployment provider receipt contracts", () => {
         productionRollbackPaths
       )
     ).toContainEqual(expect.stringContaining("production-rollback-binding"));
+    if (restoredPlan.projection.schemaVersion !== 1) {
+      throw new Error("Expected the historical v1 plan fixture.");
+    }
     expect(
       inspectProductionRollbackReceipt(
         rollbackReceipt,

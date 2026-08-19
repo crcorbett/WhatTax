@@ -3,7 +3,7 @@ document_type: automation-register
 lifecycle: current
 authority: canonical
 owner: taxkit-ci-release-maintainer
-last_reviewed: 2026-08-10
+last_reviewed: 2026-08-13
 review_trigger: workflow, signal, authority, proof, stopping, escalation, rollback, or retirement change
 ---
 
@@ -35,49 +35,35 @@ availability consequence.
 The distinct docs deployment owner is
 [`tools/docs-deployment/automation-register.json`](../../tools/docs-deployment/automation-register.json).
 It is decoded and cross-checked with the deployment-only control register by
-`bun run check:docs-deployment-automation`. It admits exactly four desired
-classes: trusted Preview delivery, fixed Production delivery, exact-stage
-Preview teardown, and report-only orphan inventory. The three mutation records
-require separately protected environments, non-cancellable stage locks,
+`bun run check:docs-deployment-automation`. It admits exactly three desired
+classes: trusted Preview delivery, fixed Production delivery and exact-stage
+Preview teardown. The records require separately protected environments, non-cancellable stage locks,
 accepted/equal replans, narrow credential identities, provider/state readback,
 bounded receipts and fail-closed recovery. Teardown executes reviewed
-default-branch code rather than pull-request-head code. Orphan inventory is
-cancellable, separately read-only credentialed and unable to delete.
+default-branch code rather than pull-request-head code.
 
 Because GitHub runners are ephemeral, each mutation workflow refreshes the
 account-matched Alchemy `cloudflare-state-store` cache with the installed
 `alchemy cloudflare bootstrap` command before it reads provider/state
 postconditions. The preceding `alchemy login` command persists only the
 environment-method selector; the token remains a GitHub environment secret.
-That preparation is bounded to the named state-store control plane and is not
-available to report-only inventory; no local OAuth profile is copied into CI.
-The report-only workflow instead materializes the separately scoped
-`ALCHEMY_STATE_STORE_CREDENTIALS_JSON` cache beside its Cloudflare read token.
-It invokes only the inventory reader and has no login, bootstrap, deploy,
-destroy or state-write command. Beta.64 does not expose a cryptographically
-read-only state bearer, so this operational read-only boundary is retained as
-an explicit limitation and must not be reused by mutation workflows.
+That preparation is bounded to the named state-store control plane; no local
+OAuth profile is copied into CI.
 
-The local operator command `bun run check:docs-deployment-orphans` now proves
-the report-only data path against one dated observation. It compared the exact
-open PR set with Schema-decoded Alchemy/Worker inventory, found no Preview
-stage and therefore no orphan candidate, and retained PR `#1` as an open
-trusted PR without a stage. This does not establish the scheduled/manual
-GitHub automation class or grant teardown authority.
+The current native `Cloudflare.Website.Vite` graph has one `DocsWebsite`
+resource. All three automation entries are `not-established`: retained v1
+receipts describe the retired `DocsBuild` plus `DocsWebsite` graph and cannot
+establish this successor. Plan v2 admits one Website action and, only during
+migration, an adjacent `DocsBuild` delete. The provider-free Vite/workerd build
+is preflight proof; the deployment-input digest binds the tracked Website
+source set rather than claiming byte identity with Alchemy's internal build.
 
-The current register has four positive external-state entries: the
-main-sourced Preview receipt for `pr-24`, the fixed Production/rollback receipt,
-the reviewed default-branch report-only receipt, and the reviewed-main
-exact-stage teardown receipt. Historical default-branch epochs under
-`docs/evidence/deployments/2026-08-05-*` and `2026-08-10-*` remain separate
-dated observations. The report-only run `30967000841` remains inconclusive
-because its read-only Cloudflare credential could not derive Alchemy beta.64's
-HTTP state-store bearer without mutation-capable bootstrap; the first
-report-only failure `30966300887` (missing `GH_TOKEN`) and the corrected
-failure are both retained. The report-only workflow has no teardown or
-deletion authority. Quality remains independently cancellable and without
-provider credentials or provider mutation authority. A later source,
-candidate, environment or provider change requires fresh receipt promotion.
+The scheduled/open-PR orphan automation and its child-process implementation
+are retired. PR-close teardown remains the explicit lifecycle owner. Historical
+orphan schemas and receipts remain decodable evidence only and cannot establish
+current automation.
+
+## Historical observations
 
 ### 2026-08-10 historical branch-bound candidate readback
 
@@ -89,9 +75,9 @@ This receipt is intentionally branch-bound and cannot alter the current
 register. No provider mutation, state write, teardown or credential-scope
 expansion is inferred from that historical observation.
 
-Each admitted mutation workflow now enforces the remaining boundary in its
-own YAML: the initial plan and equal replan reject every action/resource outside
-`DocsBuild` and `DocsWebsite`; provider inventory and the latest Wrangler
+Each current mutation workflow enforces the remaining boundary in its own YAML:
+the initial plan and equal replan require `DocsWebsite` and admit `DocsBuild`
+only as a migration delete; provider inventory and the latest Wrangler
 deployment are bound to the candidate, stage, plan, account, Alchemy state,
 Worker, URL, version and pre-mutation version; and the shared hosted proof
 checker must pass after strict receipt filtering and screenshot-byte digest
@@ -106,17 +92,12 @@ entry can move to `externalState.status: established`.
 
 The positive admission path is explicit: decode one outer
 `DeploymentWorkflowExternalReceipt`, then decode its plan/provider/hosted (or
-teardown absence) paths; for `docs-orphan-inventory`, decode its dedicated
-`reportPath` as `DocsDeploymentOrphanInventoryReceipt` rather than treating the
-report as a provider deployment receipt. Recompute retained screenshot bytes
+teardown absence) paths. Recompute retained screenshot bytes
 and cross-check workflow path, source SHA, environment, principal, stage lock,
 plan/config/deployment/lockfile identity, account/state identity, deterministic
-PR stage, provider/hosted identity and postconditions. A stale branch-bound
-receipt remains historical and cannot establish the current default-branch
-automation class. The report-only schedule is protected by a reviewer gate;
-until that gate is intentionally removed, scheduled inventory is manual/report
-only and must not be described as unattended detection. The orphan reader
-requests at most 1,000 pull requests and fails closed at the bound.
+PR stage, provider/hosted identity and postconditions. A stale branch-bound or
+retired-graph receipt remains historical and cannot establish the current
+default-branch automation class.
 
 Production's authority record admits `production-deploy` and
 `production-rollback` as separate operations under the same protected
@@ -130,7 +111,7 @@ hosted artifact and its canonical plan artifact. The separate read-only
 artifact after the triggering workflow ends; a triggering job cannot assert its
 own completed status. A future established receipt must name strict workflow-run
 and workflow-input readbacks proving the expected workflow name and exact
-workflow path. Preview, Production and report-only API heads must be `main` and
+workflow path. Preview and Production API heads must be `main` and
 match the outer workflow commit; automatic PR-close teardown instead records the
 pull-request API head separately while its `workflowCommit` and
 `refs/heads/main` identify the reviewed implementation that was checked out.
@@ -141,11 +122,10 @@ outer candidate. Synthetic workflow IDs or branch-bound output cannot establish
 external state. Promotion checks hosted environment/stage semantics,
 one desktop and one mobile screenshot with retained bytes, positive numeric PR
 identity before Preview bootstrap, and a rollback identity sourced from the
-accepted Preview provider receipt. Report-only dispatch is rejected unless its
-ref and SHA are the reviewed default branch before bearer materialisation.
+accepted Preview provider receipt.
 The reconciler is governed by `docs-workflow-receipt-reconciliation` in the
 deployment control register; it adds no provider mutation or credential
-authority and does not create a fifth deployment automation entry.
+authority and does not create another deployment automation entry.
 
 ### 2026-08-10 main-sourced Preview readback and teardown stop
 
@@ -186,7 +166,7 @@ The corresponding `pr-24` teardown run `31337384729` stopped at the pinned
 beta.64 dry-run with no destroy or absence readback, so the Worker remains
 present. The report-only schedule remains reviewer-gated and report-only.
 
-### 2026-08-10 current Production and report-only promotion
+### 2026-08-10 historical Production and report-only promotion
 
 The reviewed default-branch Production epoch used source
 `fef1dfca39d56d28b1f5956e4604af1cc659672b` and candidate
