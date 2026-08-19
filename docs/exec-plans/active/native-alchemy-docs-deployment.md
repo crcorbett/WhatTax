@@ -75,3 +75,10 @@ planning or provider mutation. GitHub's managed Ubuntu image supplies the
 browser runtime dependencies; the hosted proof still runs the same pinned
 Playwright browser and assertions. The cancelled attempts remain runner-only
 failure evidence and are not deployment receipts.
+
+The first merged workflow candidate also exposed a race in the SDK downstream
+release check: the temporary consumer's `src` directory was created in the
+same unbounded Effect batch as its file writes. The validator now creates that
+directory before the bounded file-write batch. The local downstream gate passes
+after this correction; the earlier CI failure remains retained as evidence for
+the rejected candidate and is not a provider or deployment result.
