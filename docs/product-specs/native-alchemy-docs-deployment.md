@@ -67,7 +67,9 @@ native one-resource plan, equal plan digests, protected environment, Alchemy
 state/provider agreement, the workers.dev URL, hosted HTTP/browser proof,
 desktop/mobile screenshots and zero diagnostics. Retain the Preview stage
 until Production has consumed its accepted receipt, then prove exact-stage
-teardown and absence.
+teardown and absence. The hosted probe allows only a short bounded wait for
+Cloudflare route propagation; a persistent 404 or any other proof failure
+remains a failed deployment.
 
 ### `DPL-004` — Production acceptance
 

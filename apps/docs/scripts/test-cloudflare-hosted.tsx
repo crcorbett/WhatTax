@@ -72,6 +72,27 @@ const missingPath = "/__docs-evidence__/missing";
 const runtimeProofHeaders = {
   "x-taxkit-docs-runtime-proof": "construction-count",
 };
+const hostedPropagationAttempts = 6;
+const hostedPropagationDelayMs = 2000;
+
+const fetchHostedResponse = async (
+  input: string,
+  init: RequestInit | undefined,
+  expectedStatus: number
+) => {
+  let response = await fetch(input, init);
+  for (
+    let attempt = 1;
+    attempt < hostedPropagationAttempts &&
+    (response.status === 404 || response.status >= 500) &&
+    response.status !== expectedStatus;
+    attempt += 1
+  ) {
+    await Bun.sleep(hostedPropagationDelayMs);
+    response = await fetch(input, init);
+  }
+  return response;
+};
 
 const parseRgb = (value: string): readonly [number, number, number] => {
   const channels = value.match(/\d+(?:\.\d+)?/gu)?.map(Number);
@@ -115,9 +136,11 @@ const assertComputedContrast = async (page: Page) => {
   return Number(ratio.toFixed(2));
 };
 
-const initialResponse = await fetch(`${origin}${knownPath}`, {
-  headers: runtimeProofHeaders,
-});
+const initialResponse = await fetchHostedResponse(
+  `${origin}${knownPath}`,
+  { headers: runtimeProofHeaders },
+  200
+);
 const initialHtml = await initialResponse.text();
 assert.equal(initialResponse.status, 200);
 assert.match(initialHtml, /Calculate Australian take-home pay/u);
@@ -134,7 +157,11 @@ const assetPath = /(?:src|href)="(\/assets\/[^"]+\.(?:css|js))"/u.exec(
   initialHtml
 )?.[1];
 assert.ok(assetPath !== undefined);
-const assetResponse = await fetch(`${origin}${assetPath}`);
+const assetResponse = await fetchHostedResponse(
+  `${origin}${assetPath}`,
+  undefined,
+  200
+);
 const assetBody = await assetResponse.text();
 assert.equal(assetResponse.status, 200);
 assert.match(
