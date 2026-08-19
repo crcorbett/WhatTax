@@ -313,6 +313,16 @@ credential cache only in the runner and keeps the subsequent inventory command
 read-only. The report-only workflow remains separately credentialed and is not
 established by this correction.
 
+The deployment workflows install the pinned Chromium binary with
+`playwright install chromium`, without `--with-deps`. The managed Ubuntu
+runner supplies the browser's system dependencies; skipping the package
+installation keeps the provider workflow from hanging before Alchemy planning.
+This does not weaken the hosted proof: the same pinned browser, HTTP checks,
+client-navigation checks, server-function checks, diagnostics check and
+desktop/mobile screenshots still run. If a runner image changes and the
+browser cannot start, the workflow must fail and the image dependency problem
+must be fixed rather than bypassed.
+
 ## Procedure
 
 Run `bun run check:docs-deployment` before an admitted operation. It validates
