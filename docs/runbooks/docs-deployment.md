@@ -3,7 +3,7 @@ document_type: runbook
 lifecycle: current
 authority: canonical
 owner: taxkit-docs-deployment-operation-owner
-last_reviewed: 2026-08-13
+last_reviewed: 2026-08-20
 review_trigger: docs deployment candidate, Cloudflare or Alchemy identity/state, stage, plan, provider readback, teardown, rollback, credential or authority change
 ---
 
@@ -48,8 +48,9 @@ Website action. Stop on any other resource or action.
    closed PR, require two equal dry-runs, destroy only exact `pr-N`, and prove
    both Alchemy stage and Worker absence. A missing stage is a bounded no-op.
 6. Promote a receipt only after workflow-run reconciliation and Schema checks.
-   The three current register entries remain `not-established` until fresh
-   native-graph receipts are retained and reviewed.
+   The current native-graph Preview, Production and exact-stage teardown
+   receipts are retained under the 2026-08-20 evidence directories and are
+   the current external-state observations for those three owners.
 
 For integrated local Cloudflare development run `bun run docs:dev:cloudflare`
 (`alchemy dev`). Use `bun run docs:dev:vite` only for the explicitly
@@ -995,6 +996,39 @@ so the generated collection is written once per build. Local `build:cloudflare`
 and built-browser proof must show one generation event and zero diagnostics;
 fresh Preview and Production hosted proof are still required before accepting
 the change.
+
+## 2026-08-20 — accepted native candidate and cleanup
+
+Candidate `7a23bf3eb286a44f2e06775750105ffe9cc09d3e` was merged to `main` at
+`72dea00022e3d196d7021ec0b677ea9631d6a4d5` after the exact Quality checks.
+Preview plan/deploy runs `32301004640` and `32301180775` accepted stage
+`pr-51`, equal plan digest
+`268d59fe8593e9ab0e35a576f03796cd3ad84427a10ad4d7cc10f66385ff944f`, Worker
+deployment `7c626c74-825a-45f4-b526-4ad8ff7e38cf`, and version
+`b6adab26-b5a2-4cb3-8d74-06603c729f0b`. Hosted proof passed with zero
+diagnostics and reviewed desktop/mobile screenshot bytes.
+
+Production plan/deploy runs `32301473695` and `32301629287` consumed the exact
+Preview receipt and accepted fixed `prod`, plan digest
+`8bf3c669f67f8d74adc37219da41382930f363128c9c401973862726cc0de6db`, Worker
+deployment `1f79f9c3-a326-408c-a0e1-85b439070793`, version
+`e951d0cf-a5f4-48e7-aebf-03230562a980`, and recovery identity
+`production-32301629287`. The hosted journey passed SSR, hydration, client
+navigation, server-function transport, malformed input, 404, accessibility,
+cache/header, console and screenshot checks. No rollback was required.
+
+After Production acceptance, teardown run `32300321743` proved exact `pr-51`
+state and Worker absence. Current-workflow teardown run `32302090160` proved
+the older accepted `pr-50` stage and Worker absent. The earlier PR-close run
+`32295516940` stopped before checkout because its recorded workflow revision
+was superseded; it made no provider change and remains disconfirming history.
+
+The claim-matched receipts and screenshot bytes are indexed in
+`docs/evidence/deployments/README.md`. This observation establishes only the
+recorded workers.dev journeys and named-stage cleanup. It does not establish a
+custom domain, DNS, package publication, release, byte promotion or permanent
+availability. Recovery remains a normal source-bound Production redeploy using
+the recorded previous version identity; no rollback mutation was performed.
 
 ## Stop conditions
 

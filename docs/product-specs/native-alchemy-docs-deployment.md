@@ -1,6 +1,6 @@
 ---
 document_type: product-spec
-lifecycle: current
+lifecycle: implemented
 authority: supporting
 owner: taxkit-product-owner
 last_reviewed: 2026-08-20
@@ -113,3 +113,18 @@ state. Cloudflare readback proves the provider's reported Worker and version.
 Public journeys prove observed behaviour at the returned URL. The final
 receipt must keep these claims separate and must not turn a historical URL or
 old provider readback into a current availability claim.
+
+## Closeout observation — 2026-08-20
+
+All five DPL tasks are complete for candidate
+`7a23bf3eb286a44f2e06775750105ffe9cc09d3e`, merged to `main` at
+`72dea00022e3d196d7021ec0b677ea9631d6a4d5`. Preview was accepted by runs
+`32301004640` and `32301180775`; Production consumed that exact Preview
+receipt and was accepted by runs `32301473695` and `32301629287`. Both hosted
+journeys passed with zero diagnostics and reviewed desktop/mobile screenshots.
+Exact-stage teardown then proved `pr-51` and the older accepted `pr-50` absent
+in runs `32300321743` and `32302090160`. No rollback was required. The dated
+receipts are indexed in
+`docs/evidence/deployments/README.md`; this closeout does not add a custom
+domain, DNS, release, publication, byte-promotion or permanent-availability
+claim.

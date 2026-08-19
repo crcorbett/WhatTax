@@ -576,3 +576,43 @@ receipt. The failure observation records the exact workflow and provider
 identities plus the non-claims. The next candidate's shared Fumadocs
 `buildStart` correction must earn fresh Preview and Production receipts; this
 failed observation remains unchanged history.
+
+## 2026-08-20 native Alchemy candidate `7a23bf3`
+
+The corrected native Alchemy candidate
+`7a23bf3eb286a44f2e06775750105ffe9cc09d3e` was accepted by the merged
+default-branch workflows at `72dea00022e3d196d7021ec0b677ea9631d6a4d5`.
+Preview plan/deploy run `32301004640` and `32301180775` used stage `pr-51`,
+accepted plan digest
+`268d59fe8593e9ab0e35a576f03796cd3ad84427a10ad4d7cc10f66385ff944f`, and
+read back Worker deployment `7c626c74-825a-45f4-b526-4ad8ff7e38cf`, version
+`b6adab26-b5a2-4cb3-8d74-06603c729f0b` and its workers.dev URL. Hosted proof
+passed with zero diagnostics, no document reload on client navigation, valid
+server-function transport and malformed-input rejection, direct 404 handling,
+accessibility/focus checks, cache-header checks and reviewed desktop/mobile
+screenshots. The claim-matched receipts and images are in
+`2026-08-20-preview-pr-51/`.
+
+Production plan/deploy run `32301473695` and `32301629287` consumed that exact
+Preview receipt, used fixed stage `prod`, and read back Worker deployment
+`1f79f9c3-a326-408c-a0e1-85b439070793`, version
+`e951d0cf-a5f4-48e7-aebf-03230562a980` and the fixed workers.dev URL. Hosted
+proof passed with zero diagnostics and the same browser, transport,
+accessibility and screenshot contract. The fixed Worker had previous version
+`473a6e65-06f0-462b-8dc8-df34f8bc5ed2`; the recovery identity is
+`production-32301629287`. The claim-matched receipts and images are in
+`2026-08-20-production-prod-7a23bf3/`.
+
+After Production acceptance, exact-stage teardown run `32300321743` removed
+`pr-51` and manual current-workflow teardown run `32302090160` removed the
+older accepted `pr-50`. Equal destroy plans, state readback and provider
+readback prove each named stage and former Worker absent. The earlier
+PR-close `pr-50` run `32295516940` is retained as a pre-mutation workflow-source
+stop because it used the superseded default-branch revision; it made no
+provider change. The successful absence receipts are in
+`2026-08-20-preview-teardown-pr-51/` and
+`2026-08-20-preview-teardown-pr-50/`.
+
+This epoch proves only the recorded workers.dev observations and exact-stage
+cleanup. It does not establish a custom domain, DNS, package publication,
+release, byte promotion, or a permanent availability guarantee.

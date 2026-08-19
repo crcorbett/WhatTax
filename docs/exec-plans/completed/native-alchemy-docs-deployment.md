@@ -1,11 +1,11 @@
 ---
 document_type: execution-plan
-lifecycle: current
+lifecycle: historical
 authority: supporting
-owner: taxkit-execution-owner
+owner: taxkit-execution-history-owner
 last_reviewed: 2026-08-20
 review_trigger: DPL task, candidate, workflow run, provider readback, public journey, screenshot, teardown, rollback or capability change
-successor: null
+successor: ../../product-specs/native-alchemy-docs-deployment.md
 tombstone: false
 ---
 
@@ -20,15 +20,20 @@ SPEC and its
 
 - **DPL-001 — complete:** local native deployment contracts, documentation
   checks and built Worker/browser proof passed in the deployment worktree.
-- **DPL-002 — in progress:** create the exact candidate commit, push the admitted
-  branch, create or update the trusted draft PR, and complete default-branch
-  workflow bootstrap if required. The next candidate also contains the
-  native-build hydration correction recorded below.
-- **DPL-003 — pending:** run and accept Preview before Production.
-- **DPL-004 — pending:** run and accept fixed Production from the Preview
-  receipt.
-- **DPL-005 — pending:** retain sanitised receipts, update current owners and
-  close with exact claims and non-claims.
+- **DPL-002 — complete:** commit `7a23bf3eb286a44f2e06775750105ffe9cc09d3e`,
+  merge it to `main` through PR #51, and pass the exact-candidate Quality
+  checks.
+- **DPL-003 — complete:** Preview plan/deploy runs `32301004640` and
+  `32301180775` passed with equal plans, provider readback, hosted proof and
+  screenshots; exact stages `pr-51` and the prior accepted `pr-50` were later
+  torn down with absence readback.
+- **DPL-004 — complete:** Production plan/deploy runs `32301473695` and
+  `32301629287` consumed the Preview receipt and passed fixed-Worker provider,
+  hosted and screenshot proof. The source-bound recovery identity is retained;
+  no rollback was needed.
+- **DPL-005 — complete:** dated sanitised receipts, screenshots, task/spec,
+  runbook and automation register agree. The final closeout records exact
+  claims, non-claims and cleanup evidence.
 
 ## Operating rules
 
@@ -158,5 +163,38 @@ one Vite builder, while Fumadocs writes the generated collection modules from
 `buildStart`. Generating that shared source exactly once prevents the two
 environments from observing different compiled MDX content. Local proof after
 the correction shows one MDX generation event, deterministic Vite output and
-zero built-browser diagnostics. A provider-backed claim still requires fresh
-Preview and Production receipts for the new exact commit.
+zero built-browser diagnostics. The fresh provider-backed Preview and
+Production receipts for this exact commit are recorded below.
+
+## 2026-08-20 — accepted Preview, Production and exact cleanup
+
+The corrected candidate `7a23bf3eb286a44f2e06775750105ffe9cc09d3e` passed the
+merged default-branch Quality checks and the native Alchemy workflow graph.
+Preview used `pr-51`, plan digest
+`268d59fe8593e9ab0e35a576f03796cd3ad84427a10ad4d7cc10f66385ff944f`, run
+`32301180775`, Worker deployment `7c626c74-825a-45f4-b526-4ad8ff7e38cf`, and
+version `b6adab26-b5a2-4cb3-8d74-06603c729f0b`. The hosted contract passed with
+zero diagnostics and reviewed desktop/mobile screenshots.
+
+Production consumed that exact Preview receipt. Plan/deploy run
+`32301629287` used fixed `prod`, plan digest
+`8bf3c669f67f8d74adc37219da41382930f363128c9c401973862726cc0de6db`, Worker
+deployment `1f79f9c3-a326-408c-a0e1-85b439070793`, version
+`e951d0cf-a5f4-48e7-aebf-03230562a980`, and recovery identity
+`production-32301629287`. Hosted SSR, hydration, navigation, server-function,
+malformed-input, 404, accessibility, console and screenshot checks passed.
+
+After Production acceptance, teardown run `32300321743` proved exact `pr-51`
+state and Worker absence. A current-workflow manual teardown run
+`32302090160` proved the older accepted `pr-50` stage and Worker absent. The
+superseded PR-close `pr-50` run `32295516940` stopped before checkout because
+its recorded workflow revision was no longer the current default branch; it
+made no provider mutation and remains disconfirming history.
+
+The receipts are retained under the four dated directories in
+`docs/evidence/deployments/2026-08-20-*`. This establishes only the recorded
+workers.dev observations and exact-stage cleanup. It does not claim custom
+domain/DNS, package publication, release, byte promotion or a permanent
+availability guarantee. No rollback was performed because the accepted
+Production hosted proof passed; the previous version identity remains in the
+provider receipt for source-bound recovery.

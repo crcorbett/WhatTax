@@ -2,7 +2,7 @@
   "$schema": "https://taxkit.local/schemas/product-spec-task-plan.v1.json",
   "spec": "docs/product-specs/native-alchemy-docs-deployment.md",
   "title": "Native Alchemy docs deployment tasks",
-  "status": "active",
+  "status": "complete",
   "last_reviewed": "2026-08-20",
   "beforeImplementation": "Use the installed Alchemy 2.0.0-beta.64 and the current native Website.Vite graph. Keep Fumadocs generated MDX source shared across the TanStack client/server build environments. Preserve historical evidence and use only the named TaxKit deployment authority.",
   "principles": [
@@ -24,7 +24,7 @@
     },
     {
       "id": "DPL-002",
-      "status": "in_progress",
+      "status": "complete",
       "title": "Commit, push and complete workflow bootstrap",
       "dependsOn": ["DPL-001"],
       "acceptance": [
@@ -34,7 +34,7 @@
     },
     {
       "id": "DPL-003",
-      "status": "pending",
+      "status": "complete",
       "title": "Accept Preview",
       "dependsOn": ["DPL-002"],
       "acceptance": [
@@ -45,7 +45,7 @@
     },
     {
       "id": "DPL-004",
-      "status": "pending",
+      "status": "complete",
       "title": "Accept Production",
       "dependsOn": ["DPL-003"],
       "acceptance": [
@@ -56,7 +56,7 @@
     },
     {
       "id": "DPL-005",
-      "status": "pending",
+      "status": "complete",
       "title": "Retain evidence and close the deployment goal",
       "dependsOn": ["DPL-004"],
       "acceptance": [

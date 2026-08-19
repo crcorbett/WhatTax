@@ -21,7 +21,7 @@ Specs:
 
 | Spec | Status | Notes |
 | --- | --- | --- |
-| [Native Alchemy docs deployment](./native-alchemy-docs-deployment.md) | Active | Run the native Website.Vite docs candidate through exact Git, Preview, Production, public-journey and teardown proof. |
+| [Native Alchemy docs deployment](./native-alchemy-docs-deployment.md) | Implemented | Candidate `7a23bf3` passed exact Git, Preview, Production, public-journey and named-stage teardown proof; future changes require a successor SPEC. |
 | [Native Alchemy docs integration](./native-alchemy-docs-integration.md) | Implemented | The manual docs build/Worker graph is replaced by beta.64's first-class Website.Vite lifecycle; current proof owns one resource and the ephemeral GitHub orphan subprocess helper is retired. |
 | [Strict apps and IaC](./strict-apps-and-iac.md) | Implemented | APP-IAC-001 through APP-IAC-005 hardened docs-app runtime proof and Alchemy/Cloudflare verification and inventory boundaries; the terminal audit retains four bounded adapters without changing the deployed resource graph or external state. |
 | [Docs Cloudflare and Alchemy deployment](./docs-cloudflare-alchemy-deployment.md) | Implemented | DCD-001 through DCD-005 are accepted at closeout candidate `c0cd1a9`; main-sourced Preview `pr-24`, fixed Production/rollback, report-only and exact Preview teardown absence receipts remain claim-matched (`31338052297`, `31343392260`, `31343236244`, `31344401196`, `31350160353`). The completed plan retains the full history; custom-domain/DNS remains a successor non-goal. |
