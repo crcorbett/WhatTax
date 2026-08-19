@@ -3,7 +3,7 @@ document_type: execution-plan-index
 lifecycle: historical
 authority: canonical
 owner: taxkit-execution-history-owner
-last_reviewed: 2026-08-10
+last_reviewed: 2026-08-20
 review_trigger: completed-plan retention, evidence, or successor correction
 successor: null
 tombstone: false
@@ -16,6 +16,7 @@ evidence remains useful.
 
 Completed plans:
 
+- [Native Alchemy docs deployment](./native-alchemy-docs-deployment.md)
 - [Native Alchemy docs integration](./native-alchemy-docs-integration.md)
 - [Strict apps and IaC](./strict-apps-and-iac.md)
 - [Docs Cloudflare and Alchemy deployment](./docs-cloudflare-alchemy-deployment.md)

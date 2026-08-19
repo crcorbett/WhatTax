@@ -3,7 +3,7 @@ document_type: execution-plan-index
 lifecycle: current
 authority: canonical
 owner: taxkit-documentation-owner
-last_reviewed: 2026-08-13
+last_reviewed: 2026-08-20
 review_trigger: active execution-plan admission, lifecycle, dependency, or successor change
 successor: null
 tombstone: false
@@ -14,10 +14,10 @@ tombstone: false
 Live implementation plans belong here while work is in progress. Maintainer
 lifecycle is owned by [`../../README.md`](../../README.md).
 
-The current deployment goal is owned by the
-[`Native Alchemy docs deployment`](./native-alchemy-docs-deployment.md) plan.
-It runs the implemented native Website.Vite candidate through the governed
-GitHub, Preview, Production, public-journey and teardown procedure.
+The completed deployment goal is retained in the
+[`Native Alchemy docs deployment`](../completed/native-alchemy-docs-deployment.md)
+plan. It records the implemented native Website.Vite candidate through the
+governed GitHub, Preview, Production, public-journey and teardown procedure.
 
 The completed [`Strict apps and IaC`](../completed/strict-apps-and-iac.md) plan
 retains the earlier docs-app runtime and deployment-boundary implementation

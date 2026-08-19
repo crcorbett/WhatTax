@@ -26,7 +26,10 @@
       "id": "taxkit-docs-preview",
       "trigger": "separately dispatched trusted same-repository pull-request candidate"
     },
-    "externalState": { "receipt": null, "status": "not-established" },
+    "externalState": {
+      "receipt": "docs/evidence/deployments/2026-08-20-preview-pr-51/workflow-receipt-32301180775.json",
+      "status": "established"
+    },
     "failure": {
       "escalationOwner": "taxkit-docs-deployment-operation-owner",
       "recovery": "Retain the failed receipt, repair the named owner and retry only as a new exact authorized attempt.",
@@ -109,7 +112,10 @@
       "id": "taxkit-docs-production",
       "trigger": "separately dispatched exact candidate after accepted Preview evidence"
     },
-    "externalState": { "receipt": null, "status": "not-established" },
+    "externalState": {
+      "receipt": "docs/evidence/deployments/2026-08-20-production-prod-7a23bf3/workflow-receipt-32301629287.json",
+      "status": "established"
+    },
     "failure": {
       "escalationOwner": "taxkit-docs-deployment-operation-owner",
       "recovery": "Retain the failed receipt and use the normal accepted source-bound rollback path.",
@@ -192,7 +198,10 @@
       "id": "taxkit-docs-preview-teardown",
       "trigger": "same-repository pull request closed"
     },
-    "externalState": { "receipt": null, "status": "not-established" },
+    "externalState": {
+      "receipt": "docs/evidence/deployments/2026-08-20-preview-teardown-pr-51/workflow-receipt-32300321743.json",
+      "status": "established"
+    },
     "failure": {
       "escalationOwner": "taxkit-docs-deployment-operation-owner",
       "recovery": "Retain the stop receipt and use the manual runbook under exact destroy authority.",
