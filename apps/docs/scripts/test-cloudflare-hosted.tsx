@@ -241,7 +241,7 @@ page.on("response", (response) => {
   }
 });
 
-await page.goto(`${origin}${knownPath}`, { waitUntil: "networkidle" });
+await page.goto(`${origin}${knownPath}`, { waitUntil: "domcontentloaded" });
 await page
   .getByRole("heading", { name: "Calculate Australian take-home pay" })
   .waitFor();
@@ -293,7 +293,7 @@ await page.evaluate(async (path) => {
 await page.getByTestId("route-not-found").waitFor();
 assert.equal(documentRequests, navigationDocumentBaseline);
 
-await page.goto(`${origin}/start`, { waitUntil: "networkidle" });
+await page.goto(`${origin}/start`, { waitUntil: "domcontentloaded" });
 await page.keyboard.press("Tab");
 const skipLink = page.getByRole("link", { name: "Skip to documentation" });
 assert.equal(
@@ -306,7 +306,7 @@ assert.equal(
   true
 );
 
-await page.goto(`${origin}${knownPath}`, { waitUntil: "networkidle" });
+await page.goto(`${origin}${knownPath}`, { waitUntil: "domcontentloaded" });
 await page
   .getByRole("heading", { name: "Calculate Australian take-home pay" })
   .waitFor();
@@ -332,7 +332,9 @@ mobilePage.on("requestfailed", (request) =>
     `mobile requestfailed: ${request.url()} ${request.failure()?.errorText ?? ""}`
   )
 );
-await mobilePage.goto(`${origin}${knownPath}`, { waitUntil: "networkidle" });
+await mobilePage.goto(`${origin}${knownPath}`, {
+  waitUntil: "domcontentloaded",
+});
 await mobilePage.getByRole("button", { name: "Open navigation" }).click();
 await mobilePage.getByRole("button", { name: "Close navigation" }).waitFor();
 await mobilePage.screenshot({

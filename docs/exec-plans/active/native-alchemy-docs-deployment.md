@@ -60,3 +60,10 @@ The hosted probe now has a six-attempt, two-second bounded retry for transient
 route `404`/`5xx` responses during Worker propagation. It does not retry the
 expected missing-route `404`, and it does not turn a persistent response or a
 later browser/proof failure into success.
+
+The hosted browser proof waits for `domcontentloaded` and then asserts the
+required rendered UI, client navigation, server-function transport and
+screenshots. It does not wait for Playwright's unbounded `networkidle` state:
+Cloudflare edge connections can remain open after the document and assets are
+usable, which otherwise creates a false timeout without changing the
+application journey being tested.
