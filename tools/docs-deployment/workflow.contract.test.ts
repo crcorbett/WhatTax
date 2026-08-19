@@ -48,6 +48,9 @@ describe("docs deployment workflow admission", () => {
     ]) {
       const source = await readWorkflow(path);
       expect(source).toContain(
+        "apps/docs/node_modules/.bin/playwright install chromium"
+      );
+      expect(source).not.toContain(
         "apps/docs/node_modules/.bin/playwright install --with-deps chromium"
       );
     }

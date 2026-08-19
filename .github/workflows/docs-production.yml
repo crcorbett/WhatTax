@@ -176,7 +176,7 @@ jobs:
         run: bun run check:docs-deployment-workflow-input
 
       - name: Install pinned Playwright browser
-        run: apps/docs/node_modules/.bin/playwright install --with-deps chromium
+        run: apps/docs/node_modules/.bin/playwright install chromium
 
       - name: Schema-check accepted Preview plan
         env:

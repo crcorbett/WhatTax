@@ -67,3 +67,11 @@ server-function transport and screenshots. It does not wait for Playwright's
 unbounded `networkidle` state: Cloudflare edge connections can remain open
 after the document and assets are usable, which otherwise creates a false
 timeout without changing the application journey being tested.
+
+The Preview and Production deployment workflows install the pinned Chromium
+binary without `--with-deps`. Three exact Preview deploy attempts reached the
+runner only and stalled in the system-package installation before Alchemy
+planning or provider mutation. GitHub's managed Ubuntu image supplies the
+browser runtime dependencies; the hosted proof still runs the same pinned
+Playwright browser and assertions. The cancelled attempts remain runner-only
+failure evidence and are not deployment receipts.
