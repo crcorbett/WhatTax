@@ -163,7 +163,7 @@ const waitForInteractiveDocs = async (page: Page) => {
   });
 };
 
-const isExpectedServerFunctionAbort = (request: Request) => {
+const isExpectedServerFunctionAbort = (request: Request, origin: string) => {
   const url = new URL(request.url());
 
   return (
@@ -651,7 +651,7 @@ try {
     diagnostics.push(`pageerror: ${error.message}`);
   });
   page.on("requestfailed", (request) => {
-    if (isExpectedServerFunctionAbort(request)) {
+    if (isExpectedServerFunctionAbort(request, origin)) {
       return;
     }
 
@@ -929,7 +929,7 @@ try {
       diagnostics.push(`mobile pageerror: ${error.message}`);
     });
     mobilePage.on("requestfailed", (request) => {
-      if (isExpectedServerFunctionAbort(request)) {
+      if (isExpectedServerFunctionAbort(request, origin)) {
         return;
       }
 

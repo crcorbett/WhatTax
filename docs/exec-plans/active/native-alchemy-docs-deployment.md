@@ -114,3 +114,10 @@ The exact PR-close teardown run `32285607142` then destroyed only the
 `pr-48` stage and read back `providerWorkerAbsent: true` for its former Worker.
 The retained provider and hosted failure artifacts remain intact; no other
 Preview stage or Production was changed.
+
+Quality run `32287793567` then completed the browser install, policy checks and
+deployment tests but failed the repository lint with
+`no-use-before-define` in the new built-probe abort classifier. The classifier
+now receives its already-bound origin explicitly; this is a code correction,
+not a runner or provider result, and the candidate must pass a fresh Quality
+run before deployment work continues.
