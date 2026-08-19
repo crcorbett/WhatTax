@@ -435,31 +435,34 @@ const writeConsumerFiles = (
   path: Path.Path,
   workspacePath: string
 ) =>
-  Effect.all(
-    [
-      fs.makeDirectory(path.join(workspacePath, "src"), { recursive: true }),
-      fs.writeFileString(
-        path.join(workspacePath, "tsconfig.json"),
-        `${JSON.stringify(
-          {
-            compilerOptions: {
-              lib: ["DOM", "ES2022", "ESNext.Disposable"],
-              module: "NodeNext",
-              moduleResolution: "NodeNext",
-              noEmit: true,
-              strict: true,
-              target: "ES2022",
-              types: [],
+  Effect.gen(function* () {
+    yield* fs.makeDirectory(path.join(workspacePath, "src"), {
+      recursive: true,
+    });
+    yield* Effect.all(
+      [
+        fs.writeFileString(
+          path.join(workspacePath, "tsconfig.json"),
+          `${JSON.stringify(
+            {
+              compilerOptions: {
+                lib: ["DOM", "ES2022", "ESNext.Disposable"],
+                module: "NodeNext",
+                moduleResolution: "NodeNext",
+                noEmit: true,
+                strict: true,
+                target: "ES2022",
+                types: [],
+              },
+              include: ["src/**/*.ts"],
             },
-            include: ["src/**/*.ts"],
-          },
-          null,
-          2
-        )}\n`
-      ),
-      fs.writeFileString(
-        path.join(workspacePath, "src/typecheck.ts"),
-        `import type { CalculationInput } from "@taxkit/sdk";
+            null,
+            2
+          )}\n`
+        ),
+        fs.writeFileString(
+          path.join(workspacePath, "src/typecheck.ts"),
+          `import type { CalculationInput } from "@taxkit/sdk";
 import { TaxKit } from "@taxkit/sdk";
 import { calculateReport } from "@taxkit/sdk/effect";
 import { au } from "@taxkit/sdk/au";
@@ -502,10 +505,10 @@ au.pay.takeHomePay({
   taxableIncome: aud(9_000_000),
 });
 `
-      ),
-      fs.writeFileString(
-        path.join(workspacePath, "src/runtime.ts"),
-        `import { PublicCalculatorServiceLive } from "@taxkit/calculators/live";
+        ),
+        fs.writeFileString(
+          path.join(workspacePath, "src/runtime.ts"),
+          `import { PublicCalculatorServiceLive } from "@taxkit/calculators/live";
 import { CalculationEngineLive } from "@taxkit/core";
 import { aud } from "@taxkit/core/primitives";
 import { GrossPay } from "@taxkit/rules-au-pay";
@@ -569,10 +572,10 @@ if (effectAnnualReport.rulePackVersion !== "rules-au-income-tax/1.0.0") {
 
 console.log("Downstream SDK runtime examples passed.");
 `
-      ),
-      fs.writeFileString(
-        path.join(workspacePath, "src/browser-entry.ts"),
-        `import { TaxKit } from "@taxkit/sdk";
+        ),
+        fs.writeFileString(
+          path.join(workspacePath, "src/browser-entry.ts"),
+          `import { TaxKit } from "@taxkit/sdk";
 import { au } from "@taxkit/sdk/au";
 import { CalculatorRunRequest } from "@taxkit/sdk/schemas";
 
@@ -582,10 +585,11 @@ export const browserSafeEntrypoints = {
   schemas: Boolean(CalculatorRunRequest),
 } as const;
 `
-      ),
-    ],
-    { concurrency: "unbounded" }
-  );
+        ),
+      ],
+      { concurrency: 1 }
+    );
+  });
 
 const writePublicEntrypointSmoke = (
   fs: FileSystem.FileSystem,
