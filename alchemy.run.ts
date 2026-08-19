@@ -7,6 +7,7 @@ import * as Effect from "effect/Effect";
 import {
   decodeDocsDeploymentStage,
   docsCloudflareStackName,
+  docsWorkerAssetHeaders,
   docsWorkerCompatibilityDate,
   docsWorkerCompatibilityFlags,
   docsWorkerObservability,
@@ -24,6 +25,11 @@ export default Alchemy.Stack(
     const stage = yield* Stage.pipe(Effect.flatMap(decodeDocsDeploymentStage));
     const worker = yield* Cloudflare.Website.Vite(docsWorkerResourceId, {
       assets: {
+        // Cloudflare Workers Assets does not infer the app-owned `_headers`
+        // file when the config is passed through Website.Vite. Pass the same
+        // closed header policy through the native Alchemy asset config so
+        // fingerprinted assets retain their immutable cache contract.
+        headers: docsWorkerAssetHeaders,
         // Let Cloudflare serve fingerprinted Vite assets directly before the
         // TanStack Start Worker handles application routes. This is the
         // supported full-stack default and keeps missing assets as real 404s.
