@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   decodeDocsDeploymentStage,
+  docsWorkerAssetHeaders,
   docsWorkerObservability,
 } from "./cloudflare-stack";
 
@@ -48,8 +49,6 @@ describe("docs Cloudflare stack policy", () => {
       "utf-8"
     );
 
-    expect(headers).toBe(
-      "/assets/*\n  Cache-Control: public, max-age=31536000, immutable\n"
-    );
+    expect(headers).toBe(docsWorkerAssetHeaders);
   });
 });
