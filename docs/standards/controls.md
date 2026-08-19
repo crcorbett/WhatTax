@@ -3,7 +3,7 @@ document_type: standard
 lifecycle: current
 authority: canonical
 owner: taxkit-ci-release-maintainer
-last_reviewed: 2026-08-10
+last_reviewed: 2026-08-13
 review_trigger: public boundary, workflow, action, release graph, or repeated-review finding change
 ---
 
@@ -43,30 +43,21 @@ Its Schema and negative fixtures admit only these controls:
 | Candidate selection; fork, stale SHA, failed Quality result or candidate execution through `pull_request_target` reaches credentials | `docs-workflow-candidate-trust`; `tools/docs-deployment/automation.policy.test.ts`; repair exact trusted source/default-branch binding and issue a new attempt | Trigger, checkout, Quality, principal or candidate change | Stronger accepted workflow identity policy preserves exact-source proof. |
 | Preview, Production or teardown mutation; cancellable or weak stage locking bypasses equal replan or readback | `docs-workflow-mutation-lock`; deployment policy check; restore the non-cancellable stage lock and accepted/equal plan contract | Concurrency, plan, approval, state or provider change | Stronger provider-aware distributed lock replaces repository orchestration locking. |
 | Pull request closes; teardown executes candidate code or derives a target other than exact `pr-N` | `docs-preview-teardown-safety`; stop and return to reviewed default-branch code plus manual exact-stage recovery | Close trigger, checkout, stage derivation or destroy change | Stronger accepted Preview lifecycle preserves reviewed-code and exact-stage proof. |
-| Orphan inventory; partial inventory gains provider mutation or automatic deletion | `docs-orphan-report-only`; retain an inconclusive report and require separate teardown authority | Inventory source, schedule, credential, classification or retirement change | Separately accepted lifecycle owner replaces report-only classification without weakening non-mutation. |
 | Named deployment workflow completes; a self-authored or detached run/artifact is promoted without completed Actions API readback, exact source/input identity or bounded failure metadata | `docs-workflow-receipt-reconciliation`; `workflow.contract.test.ts`, `workflow-run-check.runtime.ts`, and the read-only `workflow_run` reconciler; retain the source artifact and reconciliation stop, then retry against the exact completed run | Workflow_run trigger, receipt schema/checker, artifact naming, source checkout or external-state promotion change | A stronger provider-independent receipt reconciler preserves completed-run, artifact, source/input and failure-readback coverage. |
 
 `bun run check:docs-deployment-automation` proves these local records and
-cross-field invariants only. The current repository-promoted epoch reports four
-externally established deployment automations: the exact main-sourced Preview
-receipt, fixed Production deploy/rollback receipt, reviewed default-branch
-report-only inventory receipt, and reviewed-main exact-stage teardown receipt
-recorded below. Future source, candidate, protected-environment or provider
-changes require a fresh receipt promotion; these dated receipts do not imply
-timeless availability or public-domain claims.
+cross-field invariants only. The native one-resource successor has three
+automation entries—Preview, Production and exact-stage teardown—and all are
+`not-established`. Historical two-resource and orphan receipts recorded below
+remain evidence for their dated graph, not admission for the successor.
 
 The dated manual Preview/Production/rollback receipts under
 `docs/evidence/deployments/` prove the same candidate, plan, provider/state and
 hosted contracts for an authorized operator epoch, but they do not change
-`externalState.status` for those historical candidates. The current workflow
-receipts below separately establish the four named automation classes after
-protected-environment, credential, source and provider readback.
-
-The separate provider-bound `bun run check:docs-deployment-orphans` command
-executes only the admitted open-PR, state and Worker reads. Its receipt Schema
-fixes `mutationCapability` to `none` and `automaticDeletion` to `prohibited`;
-the policy recomputes classifications from the embedded source inventories so
-a false active/orphan label fails validation.
+`externalState.status` for those historical candidates. Those historical
+workflow receipts established the retired classes after protected-environment,
+credential, source and provider readback. The scheduled open-PR orphan
+automation is now retired; PR-close teardown is the current lifecycle owner.
 
 The 2026-08-05 default-branch workflow epoch provides dated receipts for the
 three mutation control classes: Preview plan/deploy and exact-stage teardown,

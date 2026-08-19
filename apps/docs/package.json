@@ -6,9 +6,10 @@
     "#/*": "./src/*"
   },
   "scripts": {
-    "dev": "portless run --name docs.taxkit vite dev",
-    "build": "bun run --filter=@taxkit/docs-fumadocs build && vite build",
-    "build:cloudflare": "bun run build",
+    "dev": "bun --cwd ../.. run docs:dev:cloudflare",
+    "dev:vite": "portless run --name docs.taxkit vite dev",
+    "build": "vite build",
+    "build:cloudflare": "vite build",
     "check-types": "bun run --filter=@taxkit/docs-fumadocs build && tsc --noEmit",
     "clean": "rm -rf .tanstack .turbo .wrangler dist node_modules/.vite",
     "check-import-boundaries": "bun run ./scripts/check-import-boundaries.ts",

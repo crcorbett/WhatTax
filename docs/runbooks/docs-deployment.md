@@ -3,7 +3,7 @@ document_type: runbook
 lifecycle: current
 authority: canonical
 owner: taxkit-docs-deployment-operation-owner
-last_reviewed: 2026-08-10
+last_reviewed: 2026-08-13
 review_trigger: docs deployment candidate, Cloudflare or Alchemy identity/state, stage, plan, provider readback, teardown, rollback, credential or authority change
 ---
 
@@ -18,6 +18,47 @@ This runbook owns one TaxKit docs Worker/assets deployment composed by root
 `pr-N` Preview stages and the single fixed `prod` stage. It does not own a
 custom domain, DNS, unrelated provider resources, third-party observability,
 application state services, credentials or repository publication.
+
+## Current native Website procedure
+
+The current composition is one
+`Cloudflare.Website.Vite("DocsWebsite")` resource. Alchemy beta.64 owns its
+Vite build, SSR Worker, assets and lifecycle. `DocsBuild` is not a current
+resource; a first successor plan may include its deletion beside the required
+Website action. Stop on any other resource or action.
+
+1. Bind the exact candidate SHA, reviewed workflow SHA, `pr-N` or `prod` stage,
+   account, protected environment and operation. Run
+   `bun run check:docs-deployment` and the repository verification appropriate
+   to the change.
+2. Run `bun run --filter=docs build:cloudflare` and
+   `bun run --filter=docs test:cloudflare-built -- --screenshots` as
+   provider-free preflight. These commands do not produce the Alchemy-owned
+   deployment artifact or prove provider state.
+3. Let `alchemy plan` execute the native Website build. The sanitized v2 plan
+   must contain exactly `DocsWebsite` create/update/noop, optionally preceded
+   by `DocsBuild` delete during migration. The tracked Website source digest,
+   lockfile digest, configuration digest, exact candidate and stage form the
+   accepted projection.
+4. For Preview or Production apply, require an equal replan and accepted
+   digest before `alchemy deploy`. Read back the exact Alchemy stage, one
+   `DocsWebsite` Worker, provider deployment/version and workers.dev URL, then
+   run hosted HTTP/browser and desktop/mobile screenshot proof.
+5. For Preview teardown, execute reviewed default-branch code, recheck the
+   closed PR, require two equal dry-runs, destroy only exact `pr-N`, and prove
+   both Alchemy stage and Worker absence. A missing stage is a bounded no-op.
+6. Promote a receipt only after workflow-run reconciliation and Schema checks.
+   The three current register entries remain `not-established` until fresh
+   native-graph receipts are retained and reviewed.
+
+For integrated local Cloudflare development run `bun run docs:dev:cloudflare`
+(`alchemy dev`). Use `bun run docs:dev:vite` only for the explicitly
+infrastructure-free portless path. The former scheduled open-PR/orphan command
+is retired; PR-close teardown is the sole current Preview cleanup owner.
+
+The sections below retain the original two-resource deployment epochs and
+authority receipts as historical operational evidence. Their `DocsBuild`,
+orphan-inventory and four-entry register instructions are not current commands.
 
 ## Preconditions
 
@@ -691,19 +732,11 @@ alone is not a last-known-good proof. The rollback provider/hosted receipt must
 also show a non-null pre-mutation version and a different resulting deployment
 version; a no-op version readback is not rollback proof.
 
-The exact authorized operator invocation is:
-
-```sh
-bun run check:docs-deployment-orphans
-```
-
-It runs the existing state/provider inventory plus one exact GitHub open-PR
-read, Schema-decodes both sources, recomputes every classification and emits no
-credential, account value or raw provider response. Retain its JSON at a dated
-deployment-evidence route. The 2026-07-30 receipt observed only fixed
-Production, no Preview stage or orphan candidate, and one trusted open PR
-without a stage. Do not turn that observation into deletion or absence proof
-for a later provider epoch.
+The historical orphan operator command described by this epoch has been
+removed. Its 2026-07-30 receipt observed only fixed Production, no Preview
+stage or orphan candidate, and one trusted open PR without a stage. It must not
+be replayed or turned into deletion or absence proof for a later provider
+epoch.
 
 ## 2026-08-05 workflow execution epoch
 
@@ -753,7 +786,7 @@ successes.
 The exact report-only workflow candidate materializes
 `ALCHEMY_STATE_STORE_CREDENTIALS_JSON` into the default Alchemy credential
 cache after frozen installation, validates account identity, URL and bearer
-shape with `jq`, and then invokes only `bun run check:docs-deployment-orphans`.
+shape with `jq`, and then invoked only the now-retired orphan reader.
 It does not run `alchemy login`, `alchemy cloudflare bootstrap`, `alchemy
 plan`, `alchemy deploy`, `alchemy destroy` or any state-write operation. The
 secret is scoped only to `github-actions-report-only`, alongside

@@ -14,8 +14,6 @@ import { DocsRecoverableError } from "../src/components/docs-route-states";
 import {
   docsWorkerCompatibilityDate,
   docsWorkerCompatibilityFlags,
-  docsWorkerAssetOutputDirectory,
-  docsWorkerGeneratedMain,
 } from "../src/lib/build/cloudflare-stack";
 
 const appRoot = new URL("../", import.meta.url);
@@ -25,6 +23,8 @@ const serverRoot = new URL("server/", builtRoot);
 const receiptRoot = new URL("../../tmp/docs-cloudflare/", appRoot);
 const screenshotRoot = new URL("screenshots/", receiptRoot);
 const captureScreenshots = Bun.argv.includes("--screenshots");
+const docsWorkerAssetOutputDirectory = "client";
+const docsWorkerGeneratedMain = "index.js";
 const workerSizeLimitBytes = 3 * 1024 * 1024;
 const knownPath = "/guides/calculate-australian-take-home-pay";
 const missingPath = "/__docs-evidence__/missing";
@@ -869,7 +869,6 @@ try {
   if (captureScreenshots) {
     await mkdir(screenshotRoot, { recursive: true });
     await page.setViewportSize({ height: 1000, width: 1440 });
-    await page.goto(`${origin}${knownPath}`, { waitUntil: "networkidle" });
     await page
       .getByRole("heading", { name: "Calculate Australian take-home pay" })
       .waitFor();

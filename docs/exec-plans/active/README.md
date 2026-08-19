@@ -14,10 +14,16 @@ tombstone: false
 Live implementation plans belong here while work is in progress. Maintainer
 lifecycle is owned by [`../../README.md`](../../README.md).
 
-There is no active implementation plan. The completed
-[`Strict apps and IaC`](../completed/strict-apps-and-iac.md) plan retains the
-docs-app runtime and deployment-boundary implementation history without
-claiming an external deployment or changed Alchemy resource graph.
+The current deployment goal is owned by the
+[`Native Alchemy docs deployment`](./native-alchemy-docs-deployment.md) plan.
+It runs the implemented native Website.Vite candidate through the governed
+GitHub, Preview, Production, public-journey and teardown procedure.
+
+The completed [`Strict apps and IaC`](../completed/strict-apps-and-iac.md) plan
+retains the earlier docs-app runtime and deployment-boundary implementation
+history. Its child-process boundary is superseded by the completed
+[`Native Alchemy docs integration`](../completed/native-alchemy-docs-integration.md)
+plan rather than treated as current architecture.
 
 The Docs Cloudflare and Alchemy deployment SPEC completed all five slices at closeout candidate
 `c0cd1a9`; its historical execution plan is retained at

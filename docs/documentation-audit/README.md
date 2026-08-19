@@ -13,6 +13,17 @@ This route owns dated audit and corpus-accounting evidence, not current
 maintainer policy. Lifecycle and semantic ownership are defined by
 [`../README.md`](../README.md).
 
+Accepted native Alchemy docs integration evidence:
+
+- [`native-alchemy-docs-integration/NAI-005-validation.json`](native-alchemy-docs-integration/NAI-005-validation.json)
+- [`native-alchemy-docs-integration/terminal-audit.json`](native-alchemy-docs-integration/terminal-audit.json)
+
+The accepted candidate replaces the manual build/Worker pair with one native
+Alchemy `Website.Vite` resource and removes the ephemeral GitHub orphan query
+and its child-process boundary. Exact local source, built Worker, browser,
+screenshot and repository proof is retained; no provider plan, deployment,
+Cloudflare state or public availability is established.
+
 Accepted strict apps and IaC audit and implementation evidence:
 
 - [`strict-apps-iac/audit-scope.json`](strict-apps-iac/audit-scope.json)

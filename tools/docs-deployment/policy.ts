@@ -254,15 +254,26 @@ export const inspectDeploymentPlanReceipt = (
 export const inspectDeploymentPlanActions = (
   receipt: DeploymentPlanReceipt,
   expectedAction: "create" | "update" | "delete"
-): readonly string[] =>
-  Array.every(
-    receipt.projection.logicalResources,
-    (resource) => resource.action === expectedAction
-  )
+): readonly string[] => {
+  const resources = receipt.projection.logicalResources;
+  const website = resources.find(
+    (resource) => resource.logicalId === "DocsWebsite"
+  );
+  const retiredBuild = resources.find(
+    (resource) => resource.logicalId === "DocsBuild"
+  );
+  const valid =
+    website?.action === expectedAction &&
+    (retiredBuild === undefined ||
+      (receipt.projection.schemaVersion === 1
+        ? retiredBuild.action === expectedAction
+        : retiredBuild.action === "delete"));
+  return valid
     ? []
     : [
-        `plan-actions: both owned resources must use ${expectedAction} for this operation`,
+        `plan-actions: the website must use ${expectedAction}; a beta.64 native migration may additionally delete only the retired build resource`,
       ];
+};
 
 export const inspectHostedDeploymentProof = (
   receipt: DeploymentHostedProofReceipt

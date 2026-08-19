@@ -13,7 +13,7 @@ import type {
 } from "fumadocs-mdx/config";
 import remarkMermaid from "remark-mermaidjs";
 
-import { FumadocsCodeBlockMeta } from "./schemas.js";
+import { FumadocsCodeBlockMeta } from "./schemas.ts";
 
 export const effectSchemaToStandardSchema = <
   const SourceSchema extends Schema.Decoder<unknown, never>,

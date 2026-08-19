@@ -2,7 +2,6 @@ import { describe, expect, test } from "bun:test";
 import { readFile } from "node:fs/promises";
 
 const workflowPaths = {
-  orphan: ".github/workflows/docs-orphan-inventory.yml",
   preview: ".github/workflows/docs-preview.yml",
   production: ".github/workflows/docs-production.yml",
   receipts: ".github/workflows/docs-deployment-workflow-receipts.yml",
@@ -21,7 +20,6 @@ const workflowRunApiReadback = [
 describe("docs deployment workflow admission", () => {
   test("keeps every deployment workflow exact-SHA and pinned", async () => {
     for (const path of [
-      workflowPaths.orphan,
       workflowPaths.preview,
       workflowPaths.production,
       workflowPaths.teardown,
@@ -71,14 +69,18 @@ describe("docs deployment workflow admission", () => {
     }
   });
 
-  test("builds the exact deployment input before hashing or provider mutation", async () => {
+  test("builds provider-free proof and hashes the native Website inputs before mutation", async () => {
     for (const path of [workflowPaths.preview, workflowPaths.production]) {
       const source = await readWorkflow(path);
       expect(source).toContain("run: bun run --filter=docs build:cloudflare");
+      expect(source).toContain(
+        "git ls-files -z -- alchemy.run.ts apps/docs packages/docs-content packages/docs-fumadocs"
+      );
+      expect(source).not.toContain("find apps/docs/dist");
     }
   });
 
-  test("keeps mutation locks non-cancellable and report-only work cancellable", async () => {
+  test("keeps mutation locks non-cancellable", async () => {
     const planCancellation = [
       "cancel-in-progress: ",
       "$",
@@ -191,50 +193,17 @@ describe("docs deployment workflow admission", () => {
     expect(teardown).toContain(
       "TAXKIT_WORKFLOW_PLAN_OPERATION=preview-destroy"
     );
-    const orphan = await readWorkflow(workflowPaths.orphan);
-    expect(orphan).toContain("cancel-in-progress: true");
-    expect(orphan).toContain('test "$GITHUB_REF" = "refs/heads/main"');
-    expect(orphan).toContain('test "$GITHUB_REF_NAME" = "main"');
-    expect(orphan).toContain("CLOUDFLARE_READ_API_TOKEN");
-    expect(orphan).not.toContain("alchemy deploy");
-    expect(orphan).not.toContain("alchemy destroy");
   });
 
-  test("materializes only the bounded report-only state-read cache", async () => {
-    const orphan = await readWorkflow(workflowPaths.orphan);
-    const stateSecretEnv = [
-      "ALCHEMY_STATE_STORE_CREDENTIALS_JSON: $",
-      "{{ secrets.ALCHEMY_STATE_STORE_CREDENTIALS_JSON }}",
-    ].join("");
-    expect(orphan).toContain(stateSecretEnv);
-    expect(orphan).toContain("Materialize the reviewed state-read cache");
-    expect(orphan).toContain("cloudflare-state-store.json");
-    expect(orphan).toContain(
-      [
-        "      - name: Run report-only orphan inventory\n        env:\n          ALCHEMY_STATE_STORE_CREDENTIALS_JSON: $",
-        "{{ secrets.ALCHEMY_STATE_STORE_CREDENTIALS_JSON }}",
-      ].join("")
-    );
-    expect(orphan).toContain("jq -e");
-    expect(orphan).not.toContain("alchemy login");
-    expect(orphan).not.toContain("alchemy cloudflare bootstrap");
-    expect(orphan).toContain("check:docs-deployment-workflow-input");
-    expect(orphan).not.toContain("Materialize successful");
-    expect(orphan).not.toContain("alchemy plan");
-    expect(orphan).not.toContain("alchemy destroy");
-  });
-
-  test("uses the four exact protected environment identities", async () => {
-    const [preview, production, teardown, orphan] = await Promise.all([
+  test("uses the three exact protected environment identities", async () => {
+    const [preview, production, teardown] = await Promise.all([
       readWorkflow(workflowPaths.preview),
       readWorkflow(workflowPaths.production),
       readWorkflow(workflowPaths.teardown),
-      readWorkflow(workflowPaths.orphan),
     ]);
     expect(preview).toContain("environment: taxkit-docs-preview");
     expect(production).toContain("environment: taxkit-docs-production");
     expect(teardown).toContain("environment: taxkit-docs-preview-teardown");
-    expect(orphan).toContain("environment: github-actions-report-only");
   });
 
   test("keeps the first default-branch bootstrap source-bound", async () => {

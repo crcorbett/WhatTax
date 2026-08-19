@@ -204,7 +204,7 @@ jobs:
       - name: Validate deployment owners
         run: bun run check:docs-deployment
 
-      - name: Build exact deployment input
+      - name: Build provider-free docs proof
         run: bun run --filter=docs build:cloudflare
 
       - name: Materialize ephemeral Alchemy state-store credential cache
@@ -221,28 +221,30 @@ jobs:
           ALCHEMY_PLAIN=1 CI=1 bunx alchemy plan --stage prod --profile "$ALCHEMY_PROFILE" > "$RUNNER_TEMP/docs-deployment/alchemy-plan.txt"
           sed -E $'s/\\033\\[[0-9;]*m//g' "$RUNNER_TEMP/docs-deployment/alchemy-plan.txt" > "$RUNNER_TEMP/docs-deployment/alchemy-plan.clean.txt"
           all_resource_lines="$(grep -E '^\[[^]]+\] ' "$RUNNER_TEMP/docs-deployment/alchemy-plan.clean.txt" || true)"
-          unexpected_resource_lines="$(printf '%s\n' "$all_resource_lines" | grep -Ev '^\[(DocsBuild|DocsWebsite)\] (create|update|noop)$' || true)"
+          unexpected_resource_lines="$(printf '%s\n' "$all_resource_lines" | grep -Ev '^(\[DocsBuild\] delete|\[DocsWebsite\] (create|update|noop))$' || true)"
           test -z "$unexpected_resource_lines"
-          resources="$(printf '%s\n' "$all_resource_lines" | grep -E '^\[(DocsBuild|DocsWebsite)\] (create|update|noop)$' || true)"
+          resources="$(printf '%s\n' "$all_resource_lines" | grep -E '^(\[DocsBuild\] delete|\[DocsWebsite\] (create|update|noop))$' || true)"
           resource_count="$(printf '%s\n' "$resources" | sed '/^$/d' | wc -l | tr -d ' ')"
-          test "$resource_count" -eq 2
-          first_resource="$(printf '%s\n' "$resources" | sed -n '1p')"
-          second_resource="$(printf '%s\n' "$resources" | sed -n '2p')"
-          case "$first_resource" in "[DocsBuild] "*) ;; *) echo "Unexpected first resource: $first_resource" >&2; exit 1 ;; esac
-          case "$second_resource" in "[DocsWebsite] "*) ;; *) echo "Unexpected second resource: $second_resource" >&2; exit 1 ;; esac
-          build_action="$(printf '%s\n' "$first_resource" | sed -E 's/^\[[^]]+\] //')"
-          website_action="$(printf '%s\n' "$second_resource" | sed -E 's/^\[[^]]+\] //')"
+          test "$resource_count" -eq 1 || test "$resource_count" -eq 2
+          build_resource="$(printf '%s\n' "$resources" | grep -E '^\[DocsBuild\] delete$' || true)"
+          website_resource="$(printf '%s\n' "$resources" | grep -E '^\[DocsWebsite\] (create|update|noop)$' || true)"
+          test "$(printf '%s\n' "$website_resource" | sed '/^$/d' | wc -l | tr -d ' ')" -eq 1
+          website_action="$(printf '%s\n' "$website_resource" | sed -E 's/^\[[^]]+\] //')"
+          if [ -n "$build_resource" ]; then
+            logical_resources="$(jq -n --arg website "$website_action" '[{action:"delete",logicalId:"DocsBuild",resourceType:"Command.Build"},{action:$website,logicalId:"DocsWebsite",resourceType:"Cloudflare.Worker"}]')"
+          else
+            logical_resources="$(jq -n --arg website "$website_action" '[{action:$website,logicalId:"DocsWebsite",resourceType:"Cloudflare.Worker"}]')"
+          fi
           lockfile_sha256="$(shasum -a 256 bun.lock | cut -d ' ' -f1)"
           config_sha256="$(for file in alchemy.run.ts apps/docs/package.json apps/docs/vite.config.ts apps/docs/src/lib/build/cloudflare-stack.ts apps/docs/src/lib/build/docs-deployment-stage.ts apps/docs/public/_headers; do shasum -a 256 "$file"; done | shasum -a 256 | cut -d ' ' -f1)"
-          deployment_input_sha256="$(find apps/docs/dist -type f -print | LC_ALL=C sort | while IFS= read -r file; do shasum -a 256 "$file"; done | shasum -a 256 | cut -d ' ' -f1)"
+          deployment_input_sha256="$(git ls-files -z -- alchemy.run.ts apps/docs packages/docs-content packages/docs-fumadocs | LC_ALL=C sort -z | xargs -0 shasum -a 256 | shasum -a 256 | cut -d ' ' -f1)"
           jq -nS \
             --arg commit "$CANDIDATE_SHA" \
             --arg lockfile "$lockfile_sha256" \
             --arg deployment "$deployment_input_sha256" \
             --arg config "$config_sha256" \
-            --arg build_action "$build_action" \
-            --arg website_action "$website_action" \
-            '{candidate:{deploymentInputSha256:$deployment,exactCommit:$commit,lockfileSha256:$lockfile},configSha256:$config,logicalResources:[{action:$build_action,logicalId:"DocsBuild",resourceType:"Command.Build"},{action:$website_action,logicalId:"DocsWebsite",resourceType:"Cloudflare.Worker"}],redaction:{ansiRemoved:true,secretValuesIncluded:false,timestampsExcludedFromDigest:true},schemaVersion:1,stack:"TaxKitDocsCloudflare",stage:"prod"}' \
+            --argjson logicalResources "$logical_resources" \
+            '{candidate:{deploymentInputSha256:$deployment,exactCommit:$commit,lockfileSha256:$lockfile},configSha256:$config,logicalResources:$logicalResources,redaction:{ansiRemoved:true,secretValuesIncluded:false,timestampsExcludedFromDigest:true},schemaVersion:2,stack:"TaxKitDocsCloudflare",stage:"prod"}' \
             > "$RUNNER_TEMP/docs-deployment/projection.json"
           plan_sha256="$(jq -cS . "$RUNNER_TEMP/docs-deployment/projection.json" | tr -d '\n' | shasum -a 256 | cut -d ' ' -f1)"
           jq -nS \
@@ -252,7 +254,7 @@ jobs:
             --arg receiptPath "docs/evidence/deployments/workflow-${GITHUB_RUN_ID}/plan.json" \
             --arg observedAt "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
             --slurpfile projection "$RUNNER_TEMP/docs-deployment/projection.json" \
-            '{acceptedBy:$acceptedBy,acceptedPlanSha256:$acceptedPlanSha256,observedAt:$observedAt,operation:$operation,projection:$projection[0],receiptPath:$receiptPath,replanSha256:null,schemaVersion:1}' \
+            '{acceptedBy:$acceptedBy,acceptedPlanSha256:$acceptedPlanSha256,observedAt:$observedAt,operation:$operation,projection:$projection[0],receiptPath:$receiptPath,replanSha256:null,schemaVersion:2}' \
             > "$RUNNER_TEMP/docs-deployment/plan.json"
           echo "plan_sha256=$plan_sha256" >> "$GITHUB_OUTPUT"
 
@@ -274,28 +276,30 @@ jobs:
           ALCHEMY_PLAIN=1 CI=1 bunx alchemy plan --stage prod --profile "$ALCHEMY_PROFILE" > "$RUNNER_TEMP/docs-deployment/alchemy-replan.txt"
           sed -E $'s/\\033\\[[0-9;]*m//g' "$RUNNER_TEMP/docs-deployment/alchemy-replan.txt" > "$RUNNER_TEMP/docs-deployment/alchemy-replan.clean.txt"
           all_replan_resources="$(grep -E '^\[[^]]+\] ' "$RUNNER_TEMP/docs-deployment/alchemy-replan.clean.txt" || true)"
-          unexpected_replan_resources="$(printf '%s\n' "$all_replan_resources" | grep -Ev '^\[(DocsBuild|DocsWebsite)\] (create|update|noop)$' || true)"
+          unexpected_replan_resources="$(printf '%s\n' "$all_replan_resources" | grep -Ev '^(\[DocsBuild\] delete|\[DocsWebsite\] (create|update|noop))$' || true)"
           test -z "$unexpected_replan_resources"
-          replan_resources="$(printf '%s\n' "$all_replan_resources" | grep -E '^\[(DocsBuild|DocsWebsite)\] (create|update|noop)$' || true)"
+          replan_resources="$(printf '%s\n' "$all_replan_resources" | grep -E '^(\[DocsBuild\] delete|\[DocsWebsite\] (create|update|noop))$' || true)"
           replan_resource_count="$(printf '%s\n' "$replan_resources" | sed '/^$/d' | wc -l | tr -d ' ')"
-          test "$replan_resource_count" -eq 2
-          replan_first_resource="$(printf '%s\n' "$replan_resources" | sed -n '1p')"
-          replan_second_resource="$(printf '%s\n' "$replan_resources" | sed -n '2p')"
-          case "$replan_first_resource" in "[DocsBuild] "*) ;; *) echo "Unexpected first replan resource: $replan_first_resource" >&2; exit 1 ;; esac
-          case "$replan_second_resource" in "[DocsWebsite] "*) ;; *) echo "Unexpected second replan resource: $replan_second_resource" >&2; exit 1 ;; esac
-          replan_build_action="$(printf '%s\n' "$replan_first_resource" | sed -E 's/^\[[^]]+\] //')"
-          replan_website_action="$(printf '%s\n' "$replan_second_resource" | sed -E 's/^\[[^]]+\] //')"
+          test "$replan_resource_count" -eq 1 || test "$replan_resource_count" -eq 2
+          replan_build_resource="$(printf '%s\n' "$replan_resources" | grep -E '^\[DocsBuild\] delete$' || true)"
+          replan_website_resource="$(printf '%s\n' "$replan_resources" | grep -E '^\[DocsWebsite\] (create|update|noop)$' || true)"
+          test "$(printf '%s\n' "$replan_website_resource" | sed '/^$/d' | wc -l | tr -d ' ')" -eq 1
+          replan_website_action="$(printf '%s\n' "$replan_website_resource" | sed -E 's/^\[[^]]+\] //')"
+          if [ -n "$replan_build_resource" ]; then
+            replan_logical_resources="$(jq -n --arg website "$replan_website_action" '[{action:"delete",logicalId:"DocsBuild",resourceType:"Command.Build"},{action:$website,logicalId:"DocsWebsite",resourceType:"Cloudflare.Worker"}]')"
+          else
+            replan_logical_resources="$(jq -n --arg website "$replan_website_action" '[{action:$website,logicalId:"DocsWebsite",resourceType:"Cloudflare.Worker"}]')"
+          fi
           replan_lockfile_sha256="$(shasum -a 256 bun.lock | cut -d ' ' -f1)"
           replan_config_sha256="$(for file in alchemy.run.ts apps/docs/package.json apps/docs/vite.config.ts apps/docs/src/lib/build/cloudflare-stack.ts apps/docs/src/lib/build/docs-deployment-stage.ts apps/docs/public/_headers; do shasum -a 256 "$file"; done | shasum -a 256 | cut -d ' ' -f1)"
-          replan_deployment_input_sha256="$(find apps/docs/dist -type f -print | LC_ALL=C sort | while IFS= read -r file; do shasum -a 256 "$file"; done | shasum -a 256 | cut -d ' ' -f1)"
+          replan_deployment_input_sha256="$(git ls-files -z -- alchemy.run.ts apps/docs packages/docs-content packages/docs-fumadocs | LC_ALL=C sort -z | xargs -0 shasum -a 256 | shasum -a 256 | cut -d ' ' -f1)"
           jq -nS \
             --arg commit "$CANDIDATE_SHA" \
             --arg lockfile "$replan_lockfile_sha256" \
             --arg deployment "$replan_deployment_input_sha256" \
             --arg config "$replan_config_sha256" \
-            --arg build_action "$replan_build_action" \
-            --arg website_action "$replan_website_action" \
-            '{candidate:{deploymentInputSha256:$deployment,exactCommit:$commit,lockfileSha256:$lockfile},configSha256:$config,logicalResources:[{action:$build_action,logicalId:"DocsBuild",resourceType:"Command.Build"},{action:$website_action,logicalId:"DocsWebsite",resourceType:"Cloudflare.Worker"}],redaction:{ansiRemoved:true,secretValuesIncluded:false,timestampsExcludedFromDigest:true},schemaVersion:1,stack:"TaxKitDocsCloudflare",stage:"prod"}' \
+            --argjson logicalResources "$replan_logical_resources" \
+            '{candidate:{deploymentInputSha256:$deployment,exactCommit:$commit,lockfileSha256:$lockfile},configSha256:$config,logicalResources:$logicalResources,redaction:{ansiRemoved:true,secretValuesIncluded:false,timestampsExcludedFromDigest:true},schemaVersion:2,stack:"TaxKitDocsCloudflare",stage:"prod"}' \
             > "$RUNNER_TEMP/docs-deployment/replan-projection.json"
           replan_sha256="$(jq -cS . "$RUNNER_TEMP/docs-deployment/replan-projection.json" | tr -d '\n' | shasum -a 256 | cut -d ' ' -f1)"
           test "$ACCEPTED_PLAN_SHA256" = "$replan_sha256"
@@ -313,7 +317,7 @@ jobs:
           current_stage_count="$(jq '[.stages[] | select(.stage == "prod")] | length' "$RUNNER_TEMP/docs-deployment/provider-inventory-before.json")"
           test "$current_stage_count" -eq 0 || test "$current_stage_count" -eq 1
           if [ "$current_stage_count" -eq 1 ]; then
-            jq -e '([.stages[] | select(.stage == "prod") | .resources | map(.logicalId) | sort] == [["DocsBuild", "DocsWebsite"]]) and ([.providerWorkers[] | select(.stage == "prod" and .logicalId == "DocsWebsite")] | length == 1)' "$RUNNER_TEMP/docs-deployment/provider-inventory-before.json" > /dev/null
+            jq -e '([.stages[] | select(.stage == "prod") | .resources | map(.logicalId) | sort] | . == [["DocsWebsite"]] or . == [["DocsBuild", "DocsWebsite"]]) and ([.providerWorkers[] | select(.stage == "prod" and .logicalId == "DocsWebsite")] | length == 1)' "$RUNNER_TEMP/docs-deployment/provider-inventory-before.json" > /dev/null
             current_worker_name="$(jq -er '.stages[] | select(.stage == "prod") | .resources[] | select(.logicalId == "DocsWebsite") | .workerName' "$RUNNER_TEMP/docs-deployment/provider-inventory-before.json")"
             current_deployments="$(bunx wrangler deployments list --name "$current_worker_name" --json)"
             previous_version_id="$(jq -er '.[-1].versions[0].version_id' <<<"$current_deployments")"
@@ -328,7 +332,7 @@ jobs:
           jq -e '
             .agreement == "state-provider-agree" and
             ([.stages[] | select(.stage == "prod")] | length == 1) and
-            ([.stages[] | select(.stage == "prod") | .resources | map(.logicalId) | sort] == [["DocsBuild", "DocsWebsite"]]) and
+            ([.stages[] | select(.stage == "prod") | .resources | map(.logicalId)] == [["DocsWebsite"]]) and
             ([.providerWorkers[] | select(.stage == "prod" and .logicalId == "DocsWebsite")] | length == 1)
           ' "$RUNNER_TEMP/docs-deployment/provider-inventory.json" > /dev/null
           worker_name="$(jq -er '.stages[] | select(.stage == "prod") | .resources[] | select(.logicalId == "DocsWebsite") | .workerName' "$RUNNER_TEMP/docs-deployment/provider-inventory.json")"

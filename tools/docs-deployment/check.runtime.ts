@@ -4,8 +4,6 @@ import { Array, Console, Effect, Match } from "effect";
 import * as Path from "effect/Path";
 
 import { readDeploymentJson, readDeploymentSha256 } from "./input.boundary.js";
-import { DocsDeploymentOrphanInventoryReceipt } from "./orphan-inventory.schemas.js";
-import { inspectDocsDeploymentOrphanInventoryReceipt } from "./orphan-inventory.service.js";
 import {
   inspectDeploymentOwners,
   inspectAuthorityCapabilityReceipt,
@@ -418,11 +416,6 @@ export const checkDocsDeployment = (repositoryRoot: string) =>
         DeploymentProviderReadback
       ),
     });
-    const orphanInventory = yield* readDeploymentJson(
-      repositoryRoot,
-      "docs/evidence/deployments/2026-07-30-orphan-inventory/report.json",
-      DocsDeploymentOrphanInventoryReceipt
-    );
     const current = yield* Effect.all({
       credential: readDeploymentJson(
         repositoryRoot,
@@ -849,7 +842,6 @@ export const checkDocsDeployment = (repositoryRoot: string) =>
         [production.restoredDesktop, production.restoredMobile],
         productionRollbackPaths
       ),
-      ...inspectDocsDeploymentOrphanInventoryReceipt(orphanInventory),
       ...inspectGitReadbackReceipt(current.git),
       ...inspectDeploymentPlanReceipt(current.previewPlan),
       ...inspectDeploymentPlanActions(current.previewPlan, "create"),
@@ -1029,7 +1021,7 @@ const program = Effect.gen(function* docsDeploymentMain() {
   const repositoryRoot = yield* path.fromFileUrl(repositoryRootUrl);
   const findings = yield* checkDocsDeployment(repositoryRoot);
   yield* Console.info(
-    `Docs deployment validation: journeys=4; historicalPreflightReceipts=11; currentEpochPreflightReceipts=4; gitAuthorityReceipts=1; historicalGitReadbackReceipts=5; currentEpochGitReadbackReceipts=1; historicalPlanReceipts=11; currentEpochPlanReceipts=6; historicalProviderReadbackReceipts=6; currentEpochProviderReadbackReceipts=3; historicalHostedProofReceipts=6; currentEpochHostedProofReceipts=3; historicalScreenshotManifests=12; currentEpochScreenshotManifests=6; historicalTeardownReceipts=3; currentEpochTeardownReceipts=1; workflowTeardownReceipts=1; rollbackReceipts=1; failedApplyReceipts=1; orphanInventoryReceipts=2; violations=${findings.length}; providerReadOperations=45; providerMutations=14.`
+    `Docs deployment validation: journeys=4; historicalPreflightReceipts=11; currentEpochPreflightReceipts=4; gitAuthorityReceipts=1; historicalGitReadbackReceipts=5; currentEpochGitReadbackReceipts=1; historicalPlanReceipts=11; currentEpochPlanReceipts=6; historicalProviderReadbackReceipts=6; currentEpochProviderReadbackReceipts=3; historicalHostedProofReceipts=6; currentEpochHostedProofReceipts=3; historicalScreenshotManifests=12; currentEpochScreenshotManifests=6; historicalTeardownReceipts=3; currentEpochTeardownReceipts=1; workflowTeardownReceipts=1; rollbackReceipts=1; failedApplyReceipts=1; violations=${findings.length}; providerReadOperations=45; providerMutations=14.`
   );
   return yield* Array.match(findings, {
     onEmpty: () => Effect.void,
