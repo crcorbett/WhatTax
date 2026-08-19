@@ -136,6 +136,17 @@ const assertComputedContrast = async (page: Page) => {
   return Number(ratio.toFixed(2));
 };
 
+const waitForHydratedRouter = async (page: Page) => {
+  await page.waitForFunction(() => {
+    const router: unknown = Reflect.get(globalThis, "__TSR_ROUTER__");
+    return (
+      typeof router === "object" &&
+      router !== null &&
+      typeof Reflect.get(router, "navigate") === "function"
+    );
+  });
+};
+
 const initialResponse = await fetchHostedResponse(
   `${origin}${knownPath}`,
   { headers: runtimeProofHeaders },
@@ -245,6 +256,7 @@ await page.goto(`${origin}${knownPath}`, { waitUntil: "domcontentloaded" });
 await page
   .getByRole("heading", { name: "Calculate Australian take-home pay" })
   .waitFor();
+await waitForHydratedRouter(page);
 assert.equal(await page.getByRole("main").count(), 1);
 assert.equal(await page.getByRole("article").count(), 1);
 assert.equal(
@@ -294,6 +306,7 @@ await page.getByTestId("route-not-found").waitFor();
 assert.equal(documentRequests, navigationDocumentBaseline);
 
 await page.goto(`${origin}/start`, { waitUntil: "domcontentloaded" });
+await waitForHydratedRouter(page);
 await page.keyboard.press("Tab");
 const skipLink = page.getByRole("link", { name: "Skip to documentation" });
 assert.equal(
@@ -310,6 +323,7 @@ await page.goto(`${origin}${knownPath}`, { waitUntil: "domcontentloaded" });
 await page
   .getByRole("heading", { name: "Calculate Australian take-home pay" })
   .waitFor();
+await waitForHydratedRouter(page);
 await page.screenshot({
   fullPage: true,
   path: fileURLToPath(desktopScreenshot),
@@ -335,6 +349,7 @@ mobilePage.on("requestfailed", (request) =>
 await mobilePage.goto(`${origin}${knownPath}`, {
   waitUntil: "domcontentloaded",
 });
+await waitForHydratedRouter(mobilePage);
 await mobilePage.getByRole("button", { name: "Open navigation" }).click();
 await mobilePage.getByRole("button", { name: "Close navigation" }).waitFor();
 await mobilePage.screenshot({
