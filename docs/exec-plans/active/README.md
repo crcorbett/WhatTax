@@ -14,17 +14,13 @@ tombstone: false
 Live implementation plans belong here while work is in progress. Maintainer
 lifecycle is owned by [`../../README.md`](../../README.md).
 
-The active
+The completed
 [Turbo and CI Cache Efficiency](../../product-specs/ci-cache-efficiency.md)
-SPEC, [task list](../../product-specs/ci-cache-efficiency.tasks.json) and
-[execution plan](./ci-cache-efficiency.md) own the current CI cache work.
-TCC-001 has qualified the exact cache inputs, event boundary and cold baseline.
-The cache owner approved the complete SPEC implementation in the
-`cooper-corbetts-projects` Hobby team. TCC-002 is accepted: trusted main wrote
-and reused the Vercel Remote Cache, the pull request reused the same eligible
-hash under read-only authority, and both retained the complete hosted Quality
-graph. TCC-003 accepted separate Bun package and Chromium binary caches;
-TCC-004 now owns deployment and receipt workflow treatment.
+SPEC and [task list](../../product-specs/ci-cache-efficiency.tasks.json) retain
+the current cache policy. Its implementation history and bounded hosted
+measurements are in the
+[`completed plan`](../completed/ci-cache-efficiency.md). No CI cache execution
+plan is active.
 
 The completed deployment goal is retained in the
 [`Native Alchemy docs deployment`](../completed/native-alchemy-docs-deployment.md)
