@@ -199,7 +199,7 @@
     },
     {
       "id": "TCC-002",
-      "status": "in_progress",
+      "status": "completed",
       "title": "Route Quality commands through Turbo and enable Vercel Remote Cache",
       "type": "ci-cache",
       "dependsOn": [
@@ -269,7 +269,7 @@
     },
     {
       "id": "TCC-003",
-      "status": "pending",
+      "status": "completed",
       "title": "Add Bun package and Playwright Chromium caches to every Quality event",
       "type": "ci-cache",
       "dependsOn": [
@@ -332,7 +332,7 @@
     },
     {
       "id": "TCC-004",
-      "status": "pending",
+      "status": "in_progress",
       "title": "Route deployment and receipt commands through Turbo and add all cache layers",
       "type": "deployment-ci",
       "dependsOn": [

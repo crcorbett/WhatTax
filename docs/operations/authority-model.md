@@ -80,10 +80,31 @@ name, last updated at `2026-08-20T02:31:29Z`. 1Password reads back the renamed
 item `taxkit-turbo-ci-team-2026-08-20` in the Corbett Family `taxkit` vault.
 The bearer was transferred directly, no repository content records its value,
 and the system clipboard was cleared. Hosted pull-request run `32323001841`,
-attempt 2, then reported Remote Cache enabled under read-only mode. This
-names-only and hosted readback admits the remaining TCC-002 proof under the
-same expiry, revocation and rollback boundary; it does not establish a trusted
-main write or cache hit.
+attempt 2, then reported Remote Cache enabled under read-only mode. PR #55
+merged with Cooper's explicit approval. Main run `32337825523` then wrote and
+reused the same eligible task hash, while pull-request run `32337381827`
+reused it under `remote:r`. This accepts TCC-002 under the same expiry,
+revocation and rollback boundary; it does not establish deployment,
+publication or public availability.
+
+TCC-003 uses the same approved repository-workflow authority for event-scoped
+GitHub dependency caches. Pull requests and `main` use distinct Bun-package and
+Playwright-Chromium keys, with GitHub ref scoping as another boundary. The
+workflow can restore and save those cache entries only; it retains
+`contents: read`, frozen install, Chromium system-package installation and the
+complete Quality graph. Cache operations are non-fatal. This grants no GitHub
+secret administration, deployment, publication, release or unrelated cache
+deletion authority.
+
+TCC-004 applies that cache-only authority to the reviewed docs Preview,
+Production, exact-stage teardown and completed-run receipt workflows. They may
+read and write the named Vercel Remote Cache and event-scoped Bun package
+caches; the three browser workflows may also read and write their event-scoped
+Chromium caches. This does not add Cloudflare, Alchemy, mutation, artifact,
+hosted-proof or receipt-promotion authority. Those boundaries remain live under
+the separate dated docs deployment envelope below. Cache-only rollback removes
+the remote bindings and restore/save steps while preserving every install,
+candidate, plan, provider and receipt command.
 
 ## Dated TaxKit docs deployment envelope
 

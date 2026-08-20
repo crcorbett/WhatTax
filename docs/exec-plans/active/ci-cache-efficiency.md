@@ -32,8 +32,10 @@ project, expiring team-scoped token, GitHub `TURBO_TOKEN` secret and
 `taxkit-turbo-ci-team-2026-08-20` item read back from the Corbett Family
 `taxkit` 1Password vault without exposing the bearer. Pull-request run
 `32323001841`, attempt 2, proved Remote Cache connectivity in read-only mode,
-and the superseded project-scoped token is revoked. TCC-001 admits TCC-002
-workflow mutation. Deployment, publication, merge, release, package
+and the superseded project-scoped token is revoked. PR #55 merged the accepted
+TCC-002 source to `main`; a trusted write followed by same-commit main and
+pull-request read hits. TCC-002 now admits TCC-003 workflow mutation.
+Deployment, publication, future merge, release, package
 publication, DNS and unrelated provider mutation remain outside this cache
 authority.
 
@@ -42,9 +44,9 @@ authority.
 | Task | Status | Bounded result |
 | --- | --- | --- |
 | TCC-001 | Complete | Cold and hosted baselines, Turbo inputs, cache keys, event matrix, cache authority and names-only provider/secret/vault readback are accepted. |
-| TCC-002 | In progress | The Quality graph uses audited Turbo tasks; pull-request read-only Remote Cache connectivity passed, while trusted-main write/hit proof still needs separately authorised merge. |
-| TCC-003 | Pending | Add separate Bun and Chromium caches after TCC-002. |
-| TCC-004 | Pending | Change trusted deployment and receipt workflows after the Quality slices. |
+| TCC-002 | Complete | The Quality graph uses audited Turbo tasks; trusted main wrote and reused the cache, while a pull request reused the same hash under read-only authority. The same-commit hosted main run fell from 5m36s to 1m09s. |
+| TCC-003 | Complete | Exact hosted keys reused Bun packages and Chromium while frozen install, system dependencies and the nine-check browser graph stayed live; setup steps improved, but the two-run sample did not reduce total job time. |
+| TCC-004 | In progress | Change trusted deployment and receipt workflows after the accepted Quality slices. |
 | TCC-005 | Pending | Measure hosted cold/warm outcomes and close the lifecycle. |
 
 ## TCC-001 working set
@@ -72,6 +74,8 @@ authority.
 | Operational authority model | Change required | The cache authority, selected team, empty project, expiring token metadata, GitHub secret/variable names and 1Password item are established without recording the bearer. |
 | `turbo.json`, package scripts and workflows | Preserve for TCC-001 | This task audits them; executable changes begin in TCC-002. |
 | Root and scripts READMEs, testing architecture, CI controls, automation register and release-readiness runbook | Change required for TCC-002 | They now own the Turbo-backed leaf graph, event-scoped remote access, fallback and proof limits. |
+| Quality workflow/policy, CI controls, automation register, testing architecture, authority model, root/scripts READMEs and TCC-003 evidence | Change required for TCC-003 | They own separate event-scoped Bun-package and Chromium-binary caches, live install order, fallback and hosted proof limits. |
+| Four docs deployment/receipt workflows, Turbo task map, deployment contracts/controls, deployment architecture/runbook, automation register, root/scripts READMEs and TCC-004 evidence | Change required for TCC-004 | They own trusted remote access, event-scoped dependency caches, cacheable provider-free build work, explicitly live external checks and plan-only proof. |
 | Public docs, API, SDK and package READMEs | N/A | Qualification changes no public or package contract. |
 | Harness profile and critical journeys | N/A | Cache evidence does not create a consumer-visible journey or general effectiveness claim. |
 | Changeset | N/A | Planning and CI qualification do not change a published package. |

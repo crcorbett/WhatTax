@@ -13,10 +13,12 @@
     },
     "authority": {
       "principal": "taxkit-ci-release-maintainer",
-      "resource": "taxkit-repository-runner-and-vercel-cache",
+      "resource": "taxkit-repository-runner-and-ci-caches",
       "environment": "github-actions-ci",
       "grants": [
         "contents:read",
+        "dependency-cache:read",
+        "dependency-cache:write-event-scoped",
         "remote-cache:read",
         "remote-cache:write-on-main"
       ],
@@ -31,11 +33,13 @@
       ]
     },
     "resource": {
-      "id": "taxkit-repository-runner-and-vercel-cache",
+      "id": "taxkit-repository-runner-and-ci-caches",
       "scope": [
         "immutable repository revision",
         "configured Actions runner",
-        "Vercel team remote-cache task artifacts and logs"
+        "Vercel team remote-cache task artifacts and logs",
+        "event-scoped GitHub Bun package cache",
+        "event-scoped GitHub Playwright Chromium cache"
       ]
     },
     "environment": {
@@ -60,16 +64,18 @@
         "first tagged check failure",
         "unknown workflow shape",
         "pull-request remote write mode",
+        "pull-request dependency cache uses a trusted main key",
+        "dependency cache skips frozen install or Chromium system dependencies",
         "cache-only success or missing uncached fallback"
       ],
       "escalationOwner": "taxkit-ci-release-maintainer"
     },
     "rollback": {
-      "action": "remove Turbo cache bindings while preserving the complete uncached Quality graph",
+      "action": "remove Turbo and dependency-cache bindings while preserving frozen installs and the complete uncached Quality graph",
       "authorityRequired": "taxkit-ci-release-maintainer"
     },
     "recovery": {
-      "action": "repair the named source or cache boundary and run the canonical graph uncached on a new revision",
+      "action": "repair the named source or cache boundary, remove dependency-cache restore/save when needed, and run frozen installs plus the canonical graph on a new revision",
       "owner": "taxkit-ci-release-maintainer",
       "verificationCommand": "bun run release:check -- --ci"
     },

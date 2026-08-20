@@ -26,6 +26,7 @@ const expectedControlIds = [
   "docs-workflow-mutation-lock",
   "docs-preview-teardown-safety",
   "docs-workflow-receipt-reconciliation",
+  "docs-workflow-cache-boundary",
 ] as const;
 
 const finding = (
@@ -214,7 +215,7 @@ export const inspectDeploymentAutomationRegisters = (
       finding(
         "control-register",
         "tools/docs-deployment/controls.json",
-        "Retain exactly the four deployment automation controls."
+        "Retain exactly the five deployment automation controls."
       )
     );
   }

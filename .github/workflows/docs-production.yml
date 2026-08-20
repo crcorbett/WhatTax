@@ -73,6 +73,9 @@ jobs:
       ROLLBACK_RECOVERY_IDENTITY: ${{ inputs.rollback_recovery_identity }}
       ACCEPTED_PLAN_SHA256: ${{ inputs.accepted_plan_sha256 }}
       OPERATION: ${{ inputs.operation }}
+      TURBO_CACHE: local:rw,remote:rw
+      TURBO_TEAM: ${{ vars.TURBO_TEAM }}
+      TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
     steps:
       - name: Check exact candidate and Quality result
         env:
@@ -160,8 +163,28 @@ jobs:
         with:
           bun-version-file: .bun-version
 
+      - name: Resolve Bun package cache path
+        id: bun-cache-path
+        run: echo "path=$(bun pm cache)" >> "$GITHUB_OUTPUT"
+
+      - name: Restore Bun package cache
+        id: bun-cache-restore
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        continue-on-error: true
+        with:
+          path: ${{ steps.bun-cache-path.outputs.path }}
+          key: bun-packages-${{ github.event_name }}-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('.bun-version') }}-${{ hashFiles('bun.lock') }}
+
       - name: Install frozen dependencies
         run: bun install --frozen-lockfile
+
+      - name: Save Bun package cache
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        if: steps.bun-cache-restore.outputs.cache-hit != 'true'
+        continue-on-error: true
+        with:
+          path: ${{ steps.bun-cache-path.outputs.path }}
+          key: ${{ steps.bun-cache-restore.outputs.cache-primary-key }}
 
       - name: Schema-check current Production workflow input
         env:
@@ -184,8 +207,30 @@ jobs:
           TAXKIT_WORKFLOW_INPUT_PR_NUMBER: ${{ inputs.accepted_preview_pr_number }}
         run: bun run check:docs-deployment-workflow-input
 
+      - name: Resolve Playwright cache identity
+        id: playwright-identity
+        run: |
+          echo "PLAYWRIGHT_BROWSERS_PATH=$RUNNER_TEMP/ms-playwright" >> "$GITHUB_ENV"
+          echo "version=$(apps/docs/node_modules/.bin/playwright --version | cut -d' ' -f2)" >> "$GITHUB_OUTPUT"
+
+      - name: Restore Playwright Chromium cache
+        id: playwright-cache-restore
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        continue-on-error: true
+        with:
+          path: ${{ env.PLAYWRIGHT_BROWSERS_PATH }}
+          key: playwright-chromium-${{ github.event_name }}-${{ runner.os }}-${{ runner.arch }}-${{ steps.playwright-identity.outputs.version }}-${{ hashFiles('bun.lock') }}
+
       - name: Install pinned Playwright browser
         run: apps/docs/node_modules/.bin/playwright install chromium
+
+      - name: Save Playwright Chromium cache
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        if: steps.playwright-cache-restore.outputs.cache-hit != 'true'
+        continue-on-error: true
+        with:
+          path: ${{ env.PLAYWRIGHT_BROWSERS_PATH }}
+          key: ${{ steps.playwright-cache-restore.outputs.cache-primary-key }}
 
       - name: Schema-check accepted Preview plan
         env:
@@ -214,7 +259,7 @@ jobs:
         run: bun run check:docs-deployment
 
       - name: Build provider-free docs proof
-        run: bun run --filter=docs build:cloudflare
+        run: bun run docs:build
 
       - name: Materialize ephemeral Alchemy state-store credential cache
         run: |

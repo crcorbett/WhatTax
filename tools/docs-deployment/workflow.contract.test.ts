@@ -16,6 +16,9 @@ const workflowRunApiReadback = [
   "$",
   '{SOURCE_RUN_ID}")"',
 ].join("");
+const cacheActionSha = "55cc8345863c7cc4c66a329aec7e433d2d1c52a9";
+const cacheRestoreAction = `actions/cache/restore@${cacheActionSha}`;
+const cacheSaveAction = `actions/cache/save@${cacheActionSha}`;
 
 describe("docs deployment workflow admission", () => {
   test("keeps every deployment workflow exact-SHA and pinned", async () => {
@@ -56,6 +59,111 @@ describe("docs deployment workflow admission", () => {
     }
   });
 
+  test("keeps remote, Bun and Chromium caches bounded to live setup", async () => {
+    const [preview, production, receipts, teardown] = await Promise.all([
+      readWorkflow(workflowPaths.preview),
+      readWorkflow(workflowPaths.production),
+      readWorkflow(workflowPaths.receipts),
+      readWorkflow(workflowPaths.teardown),
+    ]);
+    const workflowEntries = [
+      ["preview", preview],
+      ["production", production],
+      ["receipts", receipts],
+      ["teardown", teardown],
+    ] as const;
+    const turboTeamBinding = ["TURBO_TEAM: $", "{{ vars.TURBO_TEAM }}"].join(
+      ""
+    );
+    const turboTokenBinding = [
+      "TURBO_TOKEN: $",
+      "{{ secrets.TURBO_TOKEN }}",
+    ].join("");
+    const bunCacheKeyPrefix = [
+      "bun-packages-$",
+      "{{ github.event_name }}-",
+    ].join("");
+    const playwrightCacheKeyPrefix = [
+      "playwright-chromium-$",
+      "{{ github.event_name }}-",
+    ].join("");
+    for (const [, source] of workflowEntries) {
+      expect(source).toContain("TURBO_CACHE: local:rw,remote:rw");
+      expect(source).toContain(turboTeamBinding);
+      expect(source).toContain(turboTokenBinding);
+      expect(source).toContain(cacheRestoreAction);
+      expect(source).toContain(cacheSaveAction);
+      expect(source).toContain('echo "path=$(bun pm cache)"');
+      expect(source).toContain(bunCacheKeyPrefix);
+      expect(source).toContain("hashFiles('.bun-version')");
+      expect(source).toContain("hashFiles('bun.lock')");
+      expect(source).toContain("bun install --frozen-lockfile");
+      expect(source).not.toContain("path: node_modules");
+      expect(source.indexOf(cacheRestoreAction)).toBeLessThan(
+        source.indexOf("bun install --frozen-lockfile")
+      );
+      expect(source.indexOf(cacheSaveAction)).toBeGreaterThan(
+        source.indexOf("bun install --frozen-lockfile")
+      );
+      expect(source).toContain(
+        "steps.bun-cache-restore.outputs.cache-hit != 'true'"
+      );
+    }
+    for (const [name, source] of workflowEntries) {
+      const expectedActionCount = name === "receipts" ? 1 : 2;
+      expect(source.split(cacheRestoreAction)).toHaveLength(
+        expectedActionCount + 1
+      );
+      expect(source.split(cacheSaveAction)).toHaveLength(
+        expectedActionCount + 1
+      );
+      if (name === "receipts") {
+        expect(source).not.toContain("playwright-chromium-");
+        continue;
+      }
+      expect(source).toContain(
+        'echo "PLAYWRIGHT_BROWSERS_PATH=$RUNNER_TEMP/ms-playwright"'
+      );
+      expect(source).toContain(playwrightCacheKeyPrefix);
+      expect(source).toContain("steps.playwright-identity.outputs.version");
+      expect(source.indexOf("playwright-cache-restore")).toBeLessThan(
+        source.indexOf("playwright install chromium")
+      );
+      expect(source.lastIndexOf(cacheSaveAction)).toBeGreaterThan(
+        source.indexOf("playwright install chromium")
+      );
+      expect(source).toContain(
+        "steps.playwright-cache-restore.outputs.cache-hit != 'true'"
+      );
+    }
+  });
+
+  test("routes repository checks through cache-safe Turbo tasks", async () => {
+    const [packageSource, turboSource] = await Promise.all([
+      readFile("package.json", "utf-8"),
+      readFile("turbo.json", "utf-8"),
+    ]);
+    expect(packageSource).toContain(
+      '"docs:build": "turbo run build --filter=docs"'
+    );
+    for (const command of [
+      "check:docs-deployment-inventory",
+      "check:docs-deployment-workflow-proof",
+      "check:docs-deployment-workflow-input",
+      "check:docs-deployment-workflow-run",
+      "check:docs-deployment-workflow-plan",
+      "check:docs-deployment-workflow-teardown-proof",
+    ]) {
+      expect(packageSource).toContain(`turbo run //#${command}:task`);
+      expect(turboSource).toContain(`"//#${command}:task": {`);
+    }
+    expect(turboSource.split('"cache": false')).toHaveLength(9);
+    expect(turboSource).toContain('"passThroughEnv": ["TAXKIT_*"]');
+    expect(turboSource).toContain(
+      '"passThroughEnv": ["ALCHEMY_PROFILE", "CLOUDFLARE_*", "TAXKIT_*"]'
+    );
+  });
+
   test("materializes only the ephemeral Alchemy state-store cache before inventory", async () => {
     for (const path of [
       workflowPaths.preview,
@@ -75,7 +183,7 @@ describe("docs deployment workflow admission", () => {
   test("builds provider-free proof and hashes the native Website inputs before mutation", async () => {
     for (const path of [workflowPaths.preview, workflowPaths.production]) {
       const source = await readWorkflow(path);
-      expect(source).toContain("run: bun run --filter=docs build:cloudflare");
+      expect(source).toContain("run: bun run docs:build");
       expect(source).toContain(
         "git ls-files -z -- alchemy.run.ts apps/docs packages/docs-content packages/docs-fumadocs"
       );
@@ -355,6 +463,7 @@ describe("docs deployment workflow admission", () => {
     expect(receipts).toContain("check:docs-deployment-workflow-run");
     expect(receipts).toContain("workflow-run-failure.json");
     expect(receipts).toContain("actions: read");
-    expect(receipts).not.toContain("secrets.");
+    expect(receipts).not.toContain("secrets.CLOUDFLARE");
+    expect(receipts.match(/secrets\./gu)).toHaveLength(1);
   });
 });

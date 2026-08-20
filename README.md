@@ -131,6 +131,18 @@ explicit developer choice through `TURBO_TOKEN` and `TURBO_TEAM`. Never commit
 either credential or treat a cache hit as test, release, deployment or public
 availability proof.
 
+Quality also keeps separate GitHub caches for Bun package downloads and the
+Playwright Chromium binary. It does not cache `node_modules`, and it still runs
+the frozen Bun install plus Playwright system-dependency setup on every run.
+Pull-request and main cache keys are separate; a miss or cache outage only
+changes download time.
+
+The trusted docs Preview, Production, teardown and receipt workflows use the
+same remote task cache for deterministic Turbo work. They keep event-scoped Bun
+download caches, and browser workflows keep a separate Chromium cache. Exact
+candidate checks, provider plans or mutations, hosted readback and receipt
+promotion are always live and cannot be satisfied by a cache hit.
+
 Package-facing changes must include a Changeset. Use `bun run changeset` during
 implementation to record the user-facing package impact, and use
 `bun run version-repo` only when intentionally consuming pending Changesets into

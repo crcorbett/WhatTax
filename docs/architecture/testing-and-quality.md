@@ -250,10 +250,11 @@ commands use explicit `//#...:task` entries so a public wrapper never calls
 itself. Builds declare their output paths and environment-sensitive inputs;
 provider, candidate, receipt, dependency-install and browser-install work
 remain live. Its exact read-only runner bootstrap fetches complete Git history,
-materialises the configured `main` comparison ref and installs Chromium through
-the frozen app-local Playwright executable before the canonical graph. This
-keeps Changesets and docs build/browser proof bound to the checked-out graph;
-floating `bunx` resolution is rejected.
+materialises the configured `main` comparison ref, restores only Bun package
+downloads and Playwright Chromium binaries, then still runs frozen install and
+Chromium `--with-deps` through the app-local Playwright executable before the
+canonical graph. This keeps Changesets and docs build/browser proof bound to
+the checked-out graph; floating `bunx` resolution is rejected.
 
 Quality binds Vercel Remote Cache through `TURBO_TEAM` and `TURBO_TOKEN` for
 each Turbo invocation. Pull requests use `local:rw,remote:r`; pushes to `main`
@@ -265,12 +266,25 @@ still runs and its real exit status remains authoritative. Cache logs and
 artifacts are not candidate, release, provider, deployment or public-site
 proof.
 
+The GitHub dependency caches are separate from Turbo. The Bun cache resolves
+its user-level path with `bun pm cache` and never contains `node_modules`.
+Chromium uses an explicit `ms-playwright` directory under GitHub's runner
+temporary directory and outside the checkout. Both keys include event class, OS, architecture and `bun.lock`; Bun
+also includes `.bun-version`, while Chromium includes the resolved app-local
+Playwright version. Restore/save actions are pinned to the full v6.1.0 commit,
+are non-fatal, and save only after their install succeeds. Pull-request and
+main keys are different. Frozen dependency installation, system-package setup
+and the complete browser check remain live on hits, misses and cache outages.
+Turbo treats `PLAYWRIGHT_BROWSERS_PATH` as an explicit build and browser-test
+input so strict environment filtering cannot detach those tasks from the
+installed Chromium identity.
+
 A non-CI `release:check` remains the authority-bound new-candidate
 operation in the release-readiness runbook. Its static contract is owned by
 [`../../tools/quality-workflow/check.runtime.ts`](../../tools/quality-workflow/check.runtime.ts): it rejects missing read-only permissions, timeout or concurrency
-limits, floating action or browser-tool resolution, shallow/ambiguous release
-history, absent canonical graph invocation, and additional workflow-local
-release steps. Its fixtures name public exports,
+limits, floating action or browser-tool resolution, unsafe dependency-cache
+paths/keys/order, shallow/ambiguous release history, absent canonical graph
+invocation, and additional workflow-local release steps. Its fixtures name public exports,
 packed SDK, API, docs, manifests, workflows, and release scripts as
 release-relevant boundaries. This is local workflow-configuration proof only;
 it does not prove a hosted run, publication, deployment, registry state, or

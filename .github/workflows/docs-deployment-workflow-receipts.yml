@@ -26,6 +26,9 @@ jobs:
       GH_TOKEN: ${{ github.token }}
       SOURCE_RUN_ID: ${{ github.event.workflow_run.id }}
       SOURCE_RUN_CONCLUSION: ${{ github.event.workflow_run.conclusion }}
+      TURBO_CACHE: local:rw,remote:rw
+      TURBO_TEAM: ${{ vars.TURBO_TEAM }}
+      TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
     steps:
       - name: Initialise bounded receipt directory
         run: mkdir -p "$RUNNER_TEMP/docs-deployment"
@@ -157,9 +160,31 @@ jobs:
         with:
           bun-version-file: .bun-version
 
+      - name: Resolve Bun package cache path for receipt validation
+        if: github.event.workflow_run.conclusion == 'success'
+        id: bun-cache-path
+        run: echo "path=$(bun pm cache)" >> "$GITHUB_OUTPUT"
+
+      - name: Restore Bun package cache for receipt validation
+        if: github.event.workflow_run.conclusion == 'success'
+        id: bun-cache-restore
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        continue-on-error: true
+        with:
+          path: ${{ steps.bun-cache-path.outputs.path }}
+          key: bun-packages-${{ github.event_name }}-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('.bun-version') }}-${{ hashFiles('bun.lock') }}
+
       - name: Install frozen dependencies for receipt validation
         if: github.event.workflow_run.conclusion == 'success'
         run: bun install --frozen-lockfile
+
+      - name: Save Bun package cache for receipt validation
+        if: github.event.workflow_run.conclusion == 'success' && steps.bun-cache-restore.outputs.cache-hit != 'true'
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        continue-on-error: true
+        with:
+          path: ${{ steps.bun-cache-path.outputs.path }}
+          key: ${{ steps.bun-cache-restore.outputs.cache-primary-key }}
 
       - name: Validate completed workflow input and run identity
         if: github.event.workflow_run.conclusion == 'success'
