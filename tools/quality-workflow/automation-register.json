@@ -20,7 +20,7 @@
         "dependency-cache:read",
         "dependency-cache:write-event-scoped",
         "remote-cache:read",
-        "remote-cache:write-on-main"
+        "remote-cache:write-on-token-bearing-events"
       ],
       "denied": [
         "credential-write",
@@ -63,7 +63,7 @@
       "stopConditions": [
         "first tagged check failure",
         "unknown workflow shape",
-        "pull-request remote write mode",
+        "fork pull request receives remote-cache credential",
         "pull-request dependency cache uses a trusted main key",
         "dependency cache skips frozen install or Chromium system dependencies",
         "cache-only success or missing uncached fallback"

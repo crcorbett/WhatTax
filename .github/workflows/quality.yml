@@ -11,7 +11,7 @@ permissions:
 
 env:
   TAXKIT_ACTION_PIN_UPDATE_OWNER: taxkit-ci-release-maintainer
-  TURBO_CACHE: ${{ github.event_name == 'pull_request' && 'local:rw,remote:r' || 'local:rw,remote:rw' }}
+  TURBO_CACHE: local:rw,remote:rw
   TURBO_TEAM: ${{ vars.TURBO_TEAM }}
   TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
 

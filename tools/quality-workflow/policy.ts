@@ -21,10 +21,7 @@ const expectedConcurrencyGroup = [
   `${workflowExpressionPrefix}{{ github.workflow }}-`,
   `${workflowExpressionPrefix}{{ github.ref }}`,
 ].join("");
-const expectedTurboCache = [
-  workflowExpressionPrefix,
-  "{{ github.event_name == 'pull_request' && 'local:rw,remote:r' || 'local:rw,remote:rw' }}",
-].join("");
+const expectedTurboCache = "local:rw,remote:rw";
 const expectedTurboTeam = [
   workflowExpressionPrefix,
   "{{ vars.TURBO_TEAM }}",
@@ -510,7 +507,7 @@ export const inspectQualityWorkflow = (workflow: QualityWorkflowDocument) => {
           finding(
             "workflow-cache-policy",
             ".github/workflows/quality.yml:env",
-            "Bind the approved Vercel cache identity once, keep pull requests remote-read-only, allow trusted main read/write, and reject step-level cache overrides."
+            "Bind the approved Vercel cache identity once, use read/write for token-bearing events, keep fork pull requests secret-free through the pull_request trigger, and reject step-level cache overrides."
           ),
         ]),
     ...inspectSteps(quality?.steps),
@@ -648,7 +645,7 @@ const expectedControls = {
     fixture: "tools/quality-workflow/policy.test.ts",
     owner: "taxkit-ci-release-maintainer",
     preventedFailure:
-      "CI caches node_modules, reuses an incompatible browser binary, lets pull-request entries replace trusted main entries, skips frozen or system installation, or turns cache failure into Quality failure.",
+      "CI caches node_modules, reuses an incompatible browser binary, skips frozen or system installation, or turns cache failure into Quality failure.",
     recovery:
       "Remove the dependency-cache restore/save steps while preserving frozen Bun install, Chromium system dependencies, browser proof and the full Quality graph.",
     retirementCondition:
@@ -677,7 +674,7 @@ const expectedControls = {
     fixture: "tools/quality-workflow/policy.test.ts",
     owner: "taxkit-ci-release-maintainer",
     preventedFailure:
-      "Pull-request code writes trusted remote cache entries, a missing cache blocks the full graph, or a cache hit is treated as release proof.",
+      "A fork or pull_request_target run receives the remote-cache credential, a missing cache blocks the full graph, or a cache hit is treated as release proof.",
     recovery:
       "Remove the remote-cache bindings while preserving every uncached Quality command and true exit status.",
     retirementCondition:
@@ -899,7 +896,7 @@ const inspectQualityAutomation = (
       "dependency-cache:read",
       "dependency-cache:write-event-scoped",
       "remote-cache:read",
-      "remote-cache:write-on-main",
+      "remote-cache:write-on-token-bearing-events",
     ]) ||
     !hasExactMembers(quality.authority.denied, deniedExternalMutation) ||
     !hasExactMembers(quality.resource.scope, [
@@ -919,7 +916,7 @@ const inspectQualityAutomation = (
     !hasExactMembers(quality.stopAndEscalation.stopConditions, [
       "first tagged check failure",
       "unknown workflow shape",
-      "pull-request remote write mode",
+      "fork pull request receives remote-cache credential",
       "pull-request dependency cache uses a trusted main key",
       "dependency cache skips frozen install or Chromium system dependencies",
       "cache-only success or missing uncached fallback",

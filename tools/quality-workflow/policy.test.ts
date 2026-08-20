@@ -22,7 +22,7 @@ permissions:
   contents: read
 env:
   TAXKIT_ACTION_PIN_UPDATE_OWNER: taxkit-ci-release-maintainer
-  TURBO_CACHE: ${"${{"} github.event_name == 'pull_request' && 'local:rw,remote:r' || 'local:rw,remote:rw' }}
+  TURBO_CACHE: local:rw,remote:rw
   TURBO_TEAM: ${"${{"} vars.TURBO_TEAM }}
   TURBO_TOKEN: ${"${{"} secrets.TURBO_TOKEN }}
 concurrency:
@@ -79,7 +79,7 @@ const findingsFor = (text: string) =>
   inspectQualityWorkflow(Effect.runSync(decodeQualityWorkflow(text)));
 
 describe("quality workflow policy", () => {
-  test("accepts the decoded bounded read-only canonical release graph", () => {
+  test("accepts the bounded pull-request write-through canonical release graph", () => {
     expect(findingsFor(acceptedWorkflow)).toEqual([]);
   });
 
@@ -211,6 +211,17 @@ describe("quality workflow policy", () => {
     }
   });
 
+  test("rejects pull_request_target so forks cannot receive the cache token", () => {
+    expect(
+      findingsFor(
+        acceptedWorkflow.replace(
+          "  pull_request:\n",
+          "  pull_request_target:\n"
+        )
+      ).map((item) => item.invariant)
+    ).toContain("workflow-triggers");
+  });
+
   test("rejects branch pushes that duplicate pull-request coverage", () => {
     expect(
       findingsFor(
@@ -237,7 +248,7 @@ describe("quality workflow policy", () => {
     ]);
   });
 
-  test("rejects missing cache identity, pull-request writes and step overrides", () => {
+  test("rejects missing cache identity, remote read-only regression and step overrides", () => {
     for (const workflow of [
       acceptedWorkflow.replace(
         ["  TURBO_TEAM: $", "{{ vars.TURBO_TEAM }}\n"].join(""),
@@ -247,10 +258,7 @@ describe("quality workflow policy", () => {
         ["  TURBO_TOKEN: $", "{{ secrets.TURBO_TOKEN }}\n"].join(""),
         ""
       ),
-      acceptedWorkflow.replace(
-        "github.event_name == 'pull_request' && 'local:rw,remote:r'",
-        "github.event_name == 'pull_request' && 'local:rw,remote:rw'"
-      ),
+      acceptedWorkflow.replace("local:rw,remote:rw", "local:rw,remote:r"),
       acceptedWorkflow.replace(
         "      - run: bun run release:check -- --ci",
         "      - run: bun run release:check -- --ci\n        env:\n          TURBO_CACHE: local:rw,remote:rw"

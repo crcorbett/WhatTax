@@ -14,13 +14,13 @@ tombstone: false
 Live implementation plans belong here while work is in progress. Maintainer
 lifecycle is owned by [`../../README.md`](../../README.md).
 
-The completed
-[Turbo and CI Cache Efficiency](../../product-specs/ci-cache-efficiency.md)
-SPEC and [task list](../../product-specs/ci-cache-efficiency.tasks.json) retain
-the current cache policy. Its implementation history and bounded hosted
-measurements are in the
-[`completed plan`](../completed/ci-cache-efficiency.md). No CI cache execution
-plan is active.
+The active
+[Pull-request Turbo Write-through Cache](../../product-specs/pull-request-turbo-write-through.md)
+SPEC and [plan](./pull-request-turbo-write-through.md) change token-bearing
+same-repository pull requests from remote read-only to remote read/write while
+preserving secret-free fork fallback and live frozen installation. The
+completed predecessor and its bounded measurements remain in the
+[`completed plan`](../completed/ci-cache-efficiency.md).
 
 The completed deployment goal is retained in the
 [`Native Alchemy docs deployment`](../completed/native-alchemy-docs-deployment.md)

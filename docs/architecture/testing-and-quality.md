@@ -257,17 +257,24 @@ canonical graph. This keeps Changesets and docs build/browser proof bound to
 the checked-out graph; floating `bunx` resolution is rejected.
 
 Quality binds Vercel Remote Cache through `TURBO_TEAM` and `TURBO_TOKEN` for
-each Turbo invocation. Pull requests use `local:rw,remote:r`; pushes to `main`
-use `local:rw,remote:rw`. Fork pull requests receive no repository secret and
-run the complete local fallback. The policy rejects missing bindings,
-pull-request remote writes and step-level overrides. A cache miss, missing
-token or unavailable service therefore changes speed only: the full command
-still runs and its real exit status remains authoritative. Cache logs and
-artifacts are not candidate, release, provider, deployment or public-site
-proof.
+each Turbo invocation and configures `local:rw,remote:rw` on every event.
+Same-repository pull requests and pushes to `main` receive the existing
+team-scoped remote-cache token, so both can populate and reuse matching task
+hashes. Fork pull requests receive no repository secret and run the complete
+local fallback. The policy rejects missing bindings, remote read-only
+regression, `pull_request_target` and step-level overrides. A cache miss,
+missing token or unavailable service therefore changes speed only: the full
+command still runs and its real exit status remains authoritative.
+Same-repository pull-request
+code can access the cache token; this accepted trust boundary must be reviewed
+if contributor trust or token scope changes. Cache logs and artifacts are not
+candidate, release, provider, deployment or public-site proof.
 
 The GitHub dependency caches are separate from Turbo. The Bun cache resolves
 its user-level path with `bun pm cache` and never contains `node_modules`.
+Warm hosted frozen install currently takes only 1–2 seconds after restore,
+while the installed tree is about 1.4 GB with thousands of workspace links;
+transferring a second installed-tree archive is not justified by that saving.
 Chromium uses an explicit `ms-playwright` directory under GitHub's runner
 temporary directory and outside the checkout. Both keys include event class, OS, architecture and `bun.lock`; Bun
 also includes `.bun-version`, while Chromium includes the resolved app-local

@@ -87,6 +87,16 @@ reused it under `remote:r`. This accepts TCC-002 under the same expiry,
 revocation and rollback boundary; it does not establish deployment,
 publication or public availability.
 
+Cooper's 2026-08-20 successor approval expands only the existing cache-token
+use: token-bearing same-repository pull requests may now write deterministic
+Turbo task artifacts and logs as well as read them. This accepts that trusted
+same-repository pull-request code can access the existing team-scoped bearer.
+Fork pull requests remain outside the authority, receive no repository secret
+under the `pull_request` trigger and use local fallback. The successor creates
+no token, project, deployment or publication authority. Rollback restores
+pull-request remote read-only mode; suspected disclosure follows the existing
+revocation owner and procedure.
+
 TCC-003 uses the same approved repository-workflow authority for event-scoped
 GitHub dependency caches. Pull requests and `main` use distinct Bun-package and
 Playwright-Chromium keys, with GitHub ref scoping as another boundary. The
