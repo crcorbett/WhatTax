@@ -1,6 +1,7 @@
 {
   "schemaVersion": "1",
   "observedAt": "2026-08-20",
+  "correctedAt": "2026-08-20T05:52:02Z",
   "principal": "crcorbett",
   "vercel": {
     "team": {
@@ -22,7 +23,29 @@
       "expiresOn": "2026-11-18",
       "created": true,
       "bearerRecorded": false,
-      "bearerTransferredToGitHub": true
+      "bearerTransferredToGitHub": true,
+      "status": "revoked",
+      "revokedOn": "2026-08-20",
+      "reason": "Project scope could not authenticate external CI Remote Cache."
+    },
+    "replacementToken": {
+      "name": "taxkit-turbo-ci-team-2026-08-20",
+      "scope": "team_1LX7ZujbijowTv8J9k0aU7nD/all-projects",
+      "expiresOn": "2026-11-18",
+      "created": true,
+      "bearerRecorded": false,
+      "bearerTransferredToGitHub": true,
+      "status": "active",
+      "hostedReadback": {
+        "runId": 32323001841,
+        "attempt": 2,
+        "source": "44a5137478677ffa4eebbc486ccb5a651e1eb985",
+        "event": "pull_request",
+        "cacheMode": "local:rw,remote:r",
+        "remoteCachingEnabled": true,
+        "remoteHit": false,
+        "remoteUpload": false
+      }
     }
   },
   "github": {
@@ -33,26 +56,27 @@
     "secretNames": [
       "TURBO_TOKEN"
     ],
-    "workflowBindingsPresent": false
+    "secretUpdatedAt": "2026-08-20T02:31:29Z",
+    "workflowBindingsPresent": true
   },
   "onePassword": {
     "account": "Corbett Family",
     "vault": "taxkit",
-    "item": "taxkit-turbo-ci-2026-08-20",
+    "item": "taxkit-turbo-ci-team-2026-08-20",
     "category": "API Credentials",
     "secretValueReadBack": false
   },
   "clipboardCleared": true,
   "limitations": [
     "GitHub and 1Password readback confirms names and metadata only; neither provider returns the bearer value.",
-    "No remote-cache authentication, task upload, task download, hosted cache hit or fallback has been proved.",
+    "Remote-cache authentication and pull-request read-only behavior are proved; no remote hit or trusted upload has been proved.",
     "The empty project is a credential-scope resource, not a deployment or public site."
   ],
   "rollback": [
-    "remove the taxkit-turbo-ci-2026-08-20 item from the 1Password taxkit vault",
+    "remove the taxkit-turbo-ci-team-2026-08-20 item from the 1Password taxkit vault",
     "remove the TURBO_TOKEN GitHub Actions secret",
     "remove the TURBO_TEAM GitHub repository variable",
-    "revoke the exact named Vercel token",
+    "revoke the exact taxkit-turbo-ci-team-2026-08-20 Vercel token",
     "delete the empty taxkit-ci-cache project only after credential and workflow detachment"
   ]
 }

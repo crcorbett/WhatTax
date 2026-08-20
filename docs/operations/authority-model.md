@@ -70,14 +70,20 @@ cache rollback.
 
 Under that envelope, Vercel read back team
 `team_1LX7ZujbijowTv8J9k0aU7nD`, the enabled team Remote Cache, and empty
-project `prj_5AOSvL1mowN48x15MnwhvRWPZc9k`. The project-scoped token
-`taxkit-turbo-ci-2026-08-20` expires on 2026-11-18. GitHub reads back
+project `prj_5AOSvL1mowN48x15MnwhvRWPZc9k`. The first project-scoped token
+`taxkit-turbo-ci-2026-08-20` could not authenticate external CI Remote Cache
+and was revoked on 2026-08-20 after replacement readback. The current token
+`taxkit-turbo-ci-team-2026-08-20` is scoped to all projects in the selected
+team and expires on 2026-11-18. GitHub reads back
 `TURBO_TEAM=cooper-corbetts-projects` and the encrypted `TURBO_TOKEN` secret
-name. 1Password reads back API Credential item
-`taxkit-turbo-ci-2026-08-20` in the Corbett Family `taxkit` vault. The bearer
-was transferred directly, no repository content records its value, and the
-system clipboard was cleared. This names-only readback admits the TCC-002
-workflow slice under the same expiry, revocation and rollback boundary.
+name, last updated at `2026-08-20T02:31:29Z`. 1Password reads back the renamed
+item `taxkit-turbo-ci-team-2026-08-20` in the Corbett Family `taxkit` vault.
+The bearer was transferred directly, no repository content records its value,
+and the system clipboard was cleared. Hosted pull-request run `32323001841`,
+attempt 2, then reported Remote Cache enabled under read-only mode. This
+names-only and hosted readback admits the remaining TCC-002 proof under the
+same expiry, revocation and rollback boundary; it does not establish a trusted
+main write or cache hit.
 
 ## Dated TaxKit docs deployment envelope
 

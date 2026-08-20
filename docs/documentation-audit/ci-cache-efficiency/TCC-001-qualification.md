@@ -30,6 +30,25 @@ workflow binding exists yet. The bounded names-only readback is
 The read-only authority used for this audit is
 [`TCC-001-read-only-authority.json`](./TCC-001-read-only-authority.json).
 
+## Successor credential correction
+
+The names-only readback above is the original TCC-001 observation. Hosted
+TCC-002 attempt 1 later showed that the project-scoped token could not connect
+external CI to Remote Cache. Under the same approved expiry and revocation
+boundary, it was replaced by team-scoped token
+`taxkit-turbo-ci-team-2026-08-20`, the GitHub `TURBO_TOKEN` secret was updated,
+and the existing 1Password item was renamed and replaced in the same `taxkit`
+vault. Hosted attempt 2 reported Remote Cache enabled with pull-request
+read-only access. The failed project-scoped token was then revoked and no
+longer appears in Vercel's active-token list. The corrected names-only record
+is retained in [`TCC-001-provider-readback.json`](./TCC-001-provider-readback.json),
+and hosted behavior belongs to
+[`TCC-002-quality-turbo-candidate.md`](./TCC-002-quality-turbo-candidate.md).
+
+This correction proves provider authentication and revocation readback only.
+It does not prove a remote hit, trusted-main write, deployment, publication or
+public availability.
+
 ## Current call graph
 
 ~~~text

@@ -27,19 +27,22 @@ misses and cache outages must leave the full uncached command graph runnable.
 
 Cooper's 2026-08-20 approval authorises the complete active SPEC under the
 bounded cache envelope. The selected Vercel team, dedicated empty cache
-project, expiring project-scoped token, GitHub `TURBO_TOKEN` secret and
-`TURBO_TEAM` variable now exist. A matching API Credential item is stored in
-the Corbett Family `taxkit` 1Password vault. Names-only readback is complete,
-and TCC-001 admits TCC-002 workflow mutation. Deployment, publication, merge,
-release, package publication, DNS and unrelated provider mutation remain
-outside this cache authority.
+project, expiring team-scoped token, GitHub `TURBO_TOKEN` secret and
+`TURBO_TEAM` variable now exist. The replacement token and matching
+`taxkit-turbo-ci-team-2026-08-20` item read back from the Corbett Family
+`taxkit` 1Password vault without exposing the bearer. Pull-request run
+`32323001841`, attempt 2, proved Remote Cache connectivity in read-only mode,
+and the superseded project-scoped token is revoked. TCC-001 admits TCC-002
+workflow mutation. Deployment, publication, merge, release, package
+publication, DNS and unrelated provider mutation remain outside this cache
+authority.
 
 ## Task status
 
 | Task | Status | Bounded result |
 | --- | --- | --- |
 | TCC-001 | Complete | Cold and hosted baselines, Turbo inputs, cache keys, event matrix, cache authority and names-only provider/secret/vault readback are accepted. |
-| TCC-002 | In progress | Route the Quality graph through audited Turbo tasks and bind the approved remote-cache policy. |
+| TCC-002 | In progress | The Quality graph uses audited Turbo tasks; pull-request read-only Remote Cache connectivity passed, while trusted-main write/hit proof still needs separately authorised merge. |
 | TCC-003 | Pending | Add separate Bun and Chromium caches after TCC-002. |
 | TCC-004 | Pending | Change trusted deployment and receipt workflows after the Quality slices. |
 | TCC-005 | Pending | Measure hosted cold/warm outcomes and close the lifecycle. |

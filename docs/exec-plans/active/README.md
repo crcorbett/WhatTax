@@ -19,9 +19,11 @@ The active
 SPEC, [task list](../../product-specs/ci-cache-efficiency.tasks.json) and
 [execution plan](./ci-cache-efficiency.md) own the current CI cache work.
 TCC-001 has qualified the exact cache inputs, event boundary and cold baseline.
-The cache owner has now approved the complete SPEC implementation in the
-`cooper-corbetts-projects` Hobby team, so the task is establishing the bounded
-project, credential and GitHub readback before workflow changes.
+The cache owner approved the complete SPEC implementation in the
+`cooper-corbetts-projects` Hobby team. TCC-002 now has a working team-scoped
+credential, pull-request read-only Remote Cache connectivity and the complete
+hosted Quality graph. Trusted-main write/hit proof remains the next acceptance
+boundary and still needs separately authorised merge.
 
 The completed deployment goal is retained in the
 [`Native Alchemy docs deployment`](../completed/native-alchemy-docs-deployment.md)

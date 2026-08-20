@@ -99,13 +99,49 @@ because port 4173 was already in use; no process was killed or hidden.
 
 ## Hosted acceptance still required
 
-1. Push one immutable candidate and run the complete pull-request Quality job.
-2. Record a remote read observation without a pull-request remote write.
-3. Run the same candidate with cache bypass and retain the complete browser
-   postcondition.
-4. After separately authorised merge/default-branch publication, record a
+Hosted pull-request run
+[32323001841](https://github.com/crcorbett/taxkit/actions/runs/32323001841)
+attempt 1 passed the complete Quality job for source `44a5137` in 5m25s. It
+retained the pull-request mode `local:rw,remote:r`, masked `TURBO_TOKEN`,
+completed Chromium setup and passed the full browser/release graph. Turbo then
+reported remote caching unavailable because it could not connect to
+`https://vercel.com/api`, so it ran locally with zero remote hits. This is
+valid fallback proof, not remote-cache acceptance.
+
+Current official Turbo guidance requires a team-scoped personal access token
+for GitHub Actions Remote Cache. The failed token was project-scoped, so the
+accepted correction was a bounded expiring team-scoped token, an updated
+encrypted GitHub secret and 1Password item, a rerun of the exact event, then
+revocation of the non-working token after successful readback. No deployment
+or Git link was required.
+
+That correction is complete. Attempt 2 of the same run and source passed in
+5m02s of worker time. Bun installation took 17s, Chromium setup took 23s, and
+the complete nine-check release graph took 4m16s including docs browser proof.
+Turbo reported `Remote caching enabled`, then one remote miss for the Quality
+policy task and `Remote cache is read-only, skipping upload`. There was no
+connection warning. This proves the team-scoped replacement can read the
+Remote Cache service and that pull-request execution does not upload. It does
+not prove a remote hit because no trusted run has seeded this task hash.
+
+Names-only readback retained current token
+`taxkit-turbo-ci-team-2026-08-20`, team
+`team_1LX7ZujbijowTv8J9k0aU7nD`, expiry 2026-11-18, GitHub secret
+`TURBO_TOKEN` updated at `2026-08-20T02:31:29Z`, and the renamed Corbett Family
+`taxkit` 1Password item. The superseded project-scoped token was revoked after
+attempt 2 and no longer appears in Vercel's active-token list. No bearer is in
+the repository or evidence.
+
+Remaining acceptance steps:
+
+1. Treat attempt 1 as the hosted cache-unavailable/fresh-run observation and
+   retain the complete browser postcondition; local `TURBO_FORCE=true` proof
+   separately confirms forced execution of the same nine-check graph.
+2. After separately authorised merge/default-branch publication, record a
    trusted-main remote write followed by a hit for an eligible task.
-5. Accept, revise or remove TCC-002 from those observations before TCC-003.
+3. Rerun the pull request after the trusted seed and record a remote hit without
+   a pull-request upload.
+4. Accept, revise or remove TCC-002 from those observations before TCC-003.
 
 Rollback removes the three Turbo workflow bindings and restores the direct
 leaf command entrypoints while preserving the complete nine-check graph.
