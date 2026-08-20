@@ -19,6 +19,8 @@ const workflowRunApiReadback = [
 const cacheActionSha = "55cc8345863c7cc4c66a329aec7e433d2d1c52a9";
 const cacheRestoreAction = `actions/cache/restore@${cacheActionSha}`;
 const cacheSaveAction = `actions/cache/save@${cacheActionSha}`;
+const checkoutAction =
+  "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1";
 
 describe("docs deployment workflow admission", () => {
   test("keeps every deployment workflow exact-SHA and pinned", async () => {
@@ -29,9 +31,7 @@ describe("docs deployment workflow admission", () => {
     ]) {
       const source = await readWorkflow(path);
       expect(source).not.toContain("pull_request_target");
-      expect(source).toContain(
-        "actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5"
-      );
+      expect(source).toContain(checkoutAction);
       expect(source).toContain(
         "oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6"
       );
@@ -79,15 +79,13 @@ describe("docs deployment workflow admission", () => {
       "TURBO_TOKEN: $",
       "{{ secrets.TURBO_TOKEN }}",
     ].join("");
-    const bunCacheKeyPrefix = [
-      "bun-packages-$",
-      "{{ github.event_name }}-",
-    ].join("");
+    const bunCacheKeyPrefix = ["bun-packages-$", "{{ runner.os }}-"].join("");
     const playwrightCacheKeyPrefix = [
       "playwright-chromium-$",
-      "{{ github.event_name }}-",
+      "{{ runner.os }}-",
     ].join("");
     for (const [, source] of workflowEntries) {
+      expect(source).toContain(checkoutAction);
       expect(source).toContain("TURBO_CACHE: local:rw,remote:rw");
       expect(source).toContain(turboTeamBinding);
       expect(source).toContain(turboTokenBinding);
@@ -95,6 +93,9 @@ describe("docs deployment workflow admission", () => {
       expect(source).toContain(cacheSaveAction);
       expect(source).toContain('echo "path=$(bun pm cache)"');
       expect(source).toContain(bunCacheKeyPrefix);
+      expect(source).not.toContain(
+        ["bun-packages-$", "{{ github.event_name }}"].join("")
+      );
       expect(source).toContain("hashFiles('.bun-version')");
       expect(source).toContain("hashFiles('bun.lock')");
       expect(source).toContain("bun install --frozen-lockfile");
@@ -125,6 +126,9 @@ describe("docs deployment workflow admission", () => {
         'echo "PLAYWRIGHT_BROWSERS_PATH=$RUNNER_TEMP/ms-playwright"'
       );
       expect(source).toContain(playwrightCacheKeyPrefix);
+      expect(source).not.toContain(
+        ["playwright-chromium-$", "{{ github.event_name }}"].join("")
+      );
       expect(source).toContain("steps.playwright-identity.outputs.version");
       expect(source.indexOf("playwright-cache-restore")).toBeLessThan(
         source.indexOf("playwright install chromium")

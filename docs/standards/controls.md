@@ -39,21 +39,22 @@ release proof.
 Quality separately caches Bun package downloads and Playwright Chromium
 binaries through full-SHA GitHub cache restore/save actions. Bun's path comes
 from `bun pm cache`; Chromium uses an explicit `ms-playwright` directory under
-GitHub's runner temporary directory, outside the checkout. Keys include the event class, runner OS and architecture. The Bun
-key also includes `.bun-version` and `bun.lock`; the Chromium key includes the
-resolved app-local Playwright version and `bun.lock`. Pull requests and `main`
-therefore cannot write the same key, and GitHub's ref scoping adds a second
-boundary. Cache operations are non-fatal, saves occur only after the matching
-install succeeds, and `bun install --frozen-lockfile` plus Playwright
-`--with-deps` always run. A restored Chromium binary does not prove system
-packages were installed.
+GitHub's runner temporary directory, outside the checkout. Keys include runner
+OS, architecture and `bun.lock`. The Bun key also includes `.bun-version`; the
+Chromium key includes the resolved app-local Playwright version. Event name is
+excluded so a pull request can restore a matching default-branch cache. GitHub
+ref scope keeps pull-request writes away from `main` and sibling pull requests.
+Cache operations are non-fatal, saves occur only after the matching install
+succeeds, and `bun install --frozen-lockfile` plus Playwright `--with-deps`
+always run. A restored Chromium binary does not prove system packages were
+installed.
 
 | Signal and named failure | Owner, fixture, evidence and recovery | Review trigger | Retirement |
 | --- | --- | --- | --- |
 | Workflow change; a floating action/browser tool, shallow or ambiguous base history, write permission, unbounded run, other-job/comment spoof, or bypassed graph | `tools/quality-workflow/controls.json` entry `quality-workflow-semantics`; `policy.test.ts`, `check:quality-workflow`, bounded tagged finding and recovery | Workflow, action, browser dependency, public-boundary, or release-graph change | A stronger schema-decoded workflow policy replaces this exact contract. |
 | Release-relevant revision; a boundary passes a partial local CI graph | `controls.json` entry `canonical-release-graph`; `@taxkit/scripts` CI report with owning failed command | Package, API, SDK, docs, manifest, workflow, or release-script change | A stronger canonical graph owns all nine ordered checks. |
-| Turbo task, cache credential or event mode changes; a fork or `pull_request_target` receives the credential, missing cache blocks execution, or a hit is treated as proof | `controls.json` entry `turbo-remote-cache-boundary`; `policy.test.ts`, `check:quality-workflow`, full local fallback and exact mode recovery | Turbo config, task input/output, workflow event, contributor trust, credential or fallback change | A stronger event-scoped cache authority and fallback control replaces this contract. |
-| Bun or Chromium cache changes; `node_modules`, an incompatible binary, skipped install or fatal cache outage enters Quality | `controls.json` entry `quality-dependency-cache-boundary`; `policy.test.ts`, `check:quality-workflow`, exact path/key/order and cache-removal recovery | Bun/Playwright version, lockfile, runner platform, cache action, key, path, event or install change | A stronger event-scoped dependency-cache control replaces this contract. |
+| Turbo task, cache credential or event mode changes; a fork or `pull_request_target` receives the credential, missing cache blocks execution, or a hit is treated as proof | `controls.json` entry `turbo-remote-cache-boundary`; `policy.test.ts`, `check:quality-workflow`, full local fallback and exact mode recovery | Turbo config, task input/output, workflow event, contributor trust, credential or fallback change | A stronger token-bearing cache authority and fallback control replaces this contract. |
+| Bun or Chromium cache changes; `node_modules`, an incompatible binary, skipped install or fatal cache outage enters Quality | `controls.json` entry `quality-dependency-cache-boundary`; `policy.test.ts`, `check:quality-workflow`, exact path/key/order and cache-removal recovery | Bun/Playwright version, lockfile, runner platform, cache action, key, path, event or install change | A stronger content-addressed dependency-cache control replaces this contract. |
 | Proposed recurring context work; untrusted output enters canonical context or corroborates itself | `controls.json` entry `context-candidate-admission`; Schema-decoded report-only envelope | Candidate source, retrieval, reviewer, publisher, retention or recovery change | A separately accepted canonical context-governance owner replaces this contract. |
 
 Controls are admitted only when their exact signal, prevented failure, owner,

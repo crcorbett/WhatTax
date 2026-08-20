@@ -138,12 +138,13 @@ authority and does not create another deployment automation entry.
 The separate `docs-workflow-cache-boundary` control governs acceleration in all
 four workflows. The approved `TURBO_TOKEN` grants access only to the TaxKit
 Vercel Remote Cache; it does not extend Cloudflare, deployment, release or
-receipt-promotion authority. Event-scoped GitHub caches retain Bun package
+receipt-promotion authority. Content-addressed GitHub caches retain Bun package
 downloads in all four workflows and Chromium binaries only where the browser is
-installed. Frozen install, browser install, exact candidate checks, plans,
-mutations, provider and hosted readback, artifact reads and receipt promotion
-remain live. Cache action failure is non-fatal, while failure of any owning
-command still stops the workflow.
+installed. A ref may restore a matching default-branch cache, while GitHub ref
+scope isolates its writes. Frozen install, browser install, exact candidate
+checks, plans, mutations, provider and hosted readback, artifact reads and
+receipt promotion remain live. Cache action failure is non-fatal, while failure
+of any owning command still stops the workflow.
 
 ### 2026-08-10 main-sourced Preview readback and teardown stop
 

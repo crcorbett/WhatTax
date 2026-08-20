@@ -160,7 +160,7 @@ const AutomationAuthority = Schema.Struct({
     Schema.Literals([
       "contents:read",
       "dependency-cache:read",
-      "dependency-cache:write-event-scoped",
+      "dependency-cache:write-ref-scoped",
       "remote-cache:read",
       "remote-cache:write-on-token-bearing-events",
     ])

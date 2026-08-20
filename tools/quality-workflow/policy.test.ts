@@ -33,7 +33,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           fetch-depth: 0
       - run: git show-ref --verify --quiet refs/heads/main || git branch --track main origin/main
@@ -47,7 +47,7 @@ jobs:
         continue-on-error: true
         with:
           path: ${"${{"} steps.bun-cache-path.outputs.path }}
-          key: bun-packages-${"${{"} github.event_name }}-${"${{"} runner.os }}-${"${{"} runner.arch }}-${"${{"} hashFiles('.bun-version') }}-${"${{"} hashFiles('bun.lock') }}
+          key: bun-packages-${"${{"} runner.os }}-${"${{"} runner.arch }}-${"${{"} hashFiles('.bun-version') }}-${"${{"} hashFiles('bun.lock') }}
       - run: bun install --frozen-lockfile
       - uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9
         if: steps.bun-cache-restore.outputs.cache-hit != 'true'
@@ -63,7 +63,7 @@ jobs:
         continue-on-error: true
         with:
           path: ${"${{"} env.PLAYWRIGHT_BROWSERS_PATH }}
-          key: playwright-chromium-${"${{"} github.event_name }}-${"${{"} runner.os }}-${"${{"} runner.arch }}-${"${{"} steps.playwright-identity.outputs.version }}-${"${{"} hashFiles('bun.lock') }}
+          key: playwright-chromium-${"${{"} runner.os }}-${"${{"} runner.arch }}-${"${{"} steps.playwright-identity.outputs.version }}-${"${{"} hashFiles('bun.lock') }}
       - run: apps/docs/node_modules/.bin/playwright install --with-deps chromium
       - uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9
         if: steps.playwright-cache-restore.outputs.cache-hit != 'true'
@@ -118,7 +118,7 @@ describe("quality workflow policy", () => {
     }
   });
 
-  test("rejects node_modules caches and keys without event or version identity", () => {
+  test("rejects node_modules caches and keys without platform or version identity", () => {
     for (const workflow of [
       acceptedWorkflow.replace(
         ["path: $", "{{ steps.bun-cache-path.outputs.path }}"].join(""),
@@ -140,12 +140,31 @@ describe("quality workflow policy", () => {
     }
   });
 
-  test("rejects trusted-key reuse, cache failures that stop Quality and early saves", () => {
+  test("rejects event-name key splitting", () => {
     for (const workflow of [
       acceptedWorkflow.replace(
-        ["$", "{{ github.event_name }}"].join(""),
-        "push"
+        ["bun-packages-$", "{{ runner.os }}"].join(""),
+        ["bun-packages-$", "{{ github.event_name }}-$", "{{ runner.os }}"].join(
+          ""
+        )
       ),
+      acceptedWorkflow.replace(
+        ["playwright-chromium-$", "{{ runner.os }}"].join(""),
+        [
+          "playwright-chromium-$",
+          "{{ github.event_name }}-$",
+          "{{ runner.os }}",
+        ].join("")
+      ),
+    ]) {
+      expect(findingsFor(workflow).map((item) => item.invariant)).toContain(
+        "workflow-mutation-step"
+      );
+    }
+  });
+
+  test("rejects cache failures that stop Quality and early saves", () => {
+    for (const workflow of [
       acceptedWorkflow.replace("        continue-on-error: true\n", ""),
       acceptedWorkflow.replace(
         "      - run: bun install --frozen-lockfile\n      - uses: actions/cache/save@",
@@ -167,7 +186,7 @@ describe("quality workflow policy", () => {
       findingsFor(
         acceptedWorkflow
           .replace("contents: read", "contents: write")
-          .replace("@34e114876b0b11c390a56381ad16ebd13914f8d5", "@v4")
+          .replace("@3d3c42e5aac5ba805825da76410c181273ba90b1", "@v7")
           .replace("bun run release:check -- --ci", "bun run verification")
       ).map((item) => item.invariant)
     ).toEqual([

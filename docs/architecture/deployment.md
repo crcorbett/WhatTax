@@ -66,11 +66,13 @@ intent and task state belong in the active SPEC and execution plan.
   not change workflow commands, the provider graph or historical receipts.
 - The four deployment and receipt workflows bind the approved Vercel Remote
   Cache in read/write mode because they execute reviewed, exact-source workflow
-  code. Frozen Bun installation remains live and is preceded by an event-scoped
-  package-download cache. Preview, Production and teardown also restore an
-  event-scoped Playwright Chromium cache from the runner temporary directory,
-  then still run the pinned browser install. The provider-free docs build uses
-  the existing Turbo `docs#build` task and its declared `dist/**` output.
+  code. Frozen Bun installation remains live and is preceded by a
+  content-addressed package-download cache. Preview, Production and teardown
+  also restore a content-addressed Playwright Chromium cache from the runner
+  temporary directory, then still run the pinned browser install. GitHub ref
+  scope isolates writes while allowing a matching default-branch cache to be
+  restored. The provider-free docs build uses the existing Turbo `docs#build`
+  task and its declared `dist/**` output.
   Receipt-file checks, Alchemy plans and mutations, provider inventory, hosted
   proof and receipt promotion enter through live or explicitly non-cacheable
   tasks; no cache result can replace their current input or postcondition.

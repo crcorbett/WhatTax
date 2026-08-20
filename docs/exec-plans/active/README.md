@@ -14,6 +14,12 @@ tombstone: false
 Live implementation plans belong here while work is in progress. Maintainer
 lifecycle is owned by [`../../README.md`](../../README.md).
 
+The active
+[Shared Dependency Cache and Checkout Upgrade](./shared-dependency-cache-and-checkout.md)
+plan removes event-name key splits while preserving GitHub ref-scoped writes,
+and upgrades all workflow checkout pins to v7.0.1. It requires focused local
+policy proof and one immutable hosted pull-request Quality receipt.
+
 The implemented
 [Pull-request Turbo Write-through Cache](../../product-specs/pull-request-turbo-write-through.md)
 SPEC and [completed plan](../completed/pull-request-turbo-write-through.md)

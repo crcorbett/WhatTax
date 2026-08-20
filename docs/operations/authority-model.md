@@ -116,6 +116,25 @@ the separate dated docs deployment envelope below. Cache-only rollback removes
 the remote bindings and restore/save steps while preserving every install,
 candidate, plan, provider and receipt command.
 
+### 2026-08-20 — shared dependency-cache successor
+
+Cooper approved the active Shared Dependency Cache and Checkout Upgrade SPEC.
+It permits repository workflow, policy and documentation changes that remove
+event name from Bun-package and Chromium keys. The paths remain limited to
+public package downloads and browser binaries. GitHub may serve a matching
+default-branch cache to a pull request, while its ref scope keeps pull-request
+writes unavailable to `main` and sibling pull requests. Fork-readable caches
+must never contain secrets, credentials, `node_modules`, provider state or
+receipts. Frozen Bun installation, browser installation and every owning
+command remain live. This successor changes cache lookup only; it adds no
+provider, deployment, teardown, release or publication authority.
+
+The same approval permits replacing all five exact checkout v4.2.0 pins with
+the verified checkout v7.0.1 commit. Checkout only places reviewed Git source
+in the runner workspace. Bun remains the repository runtime and package
+manager. Hosted Quality proof must establish runner compatibility before
+closeout; local policy proof cannot establish that external result.
+
 ## Dated TaxKit docs deployment envelope
 
 The generic table remains the fail-closed default. Cooper's bounded 2026-07-30

@@ -60,11 +60,12 @@ is retired; PR-close teardown is the sole current Preview cleanup owner.
 ### Workflow acceleration and cache recovery
 
 Preview, Production, teardown and completed-run reconciliation use the approved
-Vercel Remote Cache for Turbo tasks. All four restore the event-scoped Bun
+Vercel Remote Cache for Turbo tasks. All four restore the content-addressed Bun
 package cache and still run `bun install --frozen-lockfile`. The three workflows
-that build or probe docs also restore Playwright Chromium under
+that build or probe docs also restore content-addressed Playwright Chromium under
 `$RUNNER_TEMP/ms-playwright` and still run the pinned Chromium install. They do
-not cache `node_modules` or operating-system packages.
+not cache `node_modules` or operating-system packages. Matching default-branch
+caches may be restored by other refs; GitHub keeps each ref's writes isolated.
 
 Only deterministic repository work may replay. The docs build and static
 deployment-owner check are cacheable. Workflow input, plan, provider, hosted,

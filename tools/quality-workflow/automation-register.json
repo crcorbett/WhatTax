@@ -18,7 +18,7 @@
       "grants": [
         "contents:read",
         "dependency-cache:read",
-        "dependency-cache:write-event-scoped",
+        "dependency-cache:write-ref-scoped",
         "remote-cache:read",
         "remote-cache:write-on-token-bearing-events"
       ],
@@ -38,8 +38,8 @@
         "immutable repository revision",
         "configured Actions runner",
         "Vercel team remote-cache task artifacts and logs",
-        "event-scoped GitHub Bun package cache",
-        "event-scoped GitHub Playwright Chromium cache"
+        "content-addressed ref-scoped GitHub Bun package cache",
+        "content-addressed ref-scoped GitHub Playwright Chromium cache"
       ]
     },
     "environment": {
@@ -64,7 +64,7 @@
         "first tagged check failure",
         "unknown workflow shape",
         "fork pull request receives remote-cache credential",
-        "pull-request dependency cache uses a trusted main key",
+        "dependency cache key or path contains secret or mutable installed state",
         "dependency cache skips frozen install or Chromium system dependencies",
         "cache-only success or missing uncached fallback"
       ],

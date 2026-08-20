@@ -276,12 +276,15 @@ Warm hosted frozen install currently takes only 1–2 seconds after restore,
 while the installed tree is about 1.4 GB with thousands of workspace links;
 transferring a second installed-tree archive is not justified by that saving.
 Chromium uses an explicit `ms-playwright` directory under GitHub's runner
-temporary directory and outside the checkout. Both keys include event class, OS, architecture and `bun.lock`; Bun
-also includes `.bun-version`, while Chromium includes the resolved app-local
-Playwright version. Restore/save actions are pinned to the full v6.1.0 commit,
-are non-fatal, and save only after their install succeeds. Pull-request and
-main keys are different. Frozen dependency installation, system-package setup
-and the complete browser check remain live on hits, misses and cache outages.
+temporary directory and outside the checkout. Both keys include OS,
+architecture and `bun.lock`; Bun also includes `.bun-version`, while Chromium
+includes the resolved app-local Playwright version. Event name is deliberately
+absent: a pull request may restore a content-identical default-branch cache,
+while GitHub keeps its writes scoped to the pull-request merge ref and
+unavailable to `main` or sibling pull requests. Restore/save actions are pinned
+to the full v6.1.0 commit, are non-fatal, and save only after their install
+succeeds. Frozen dependency installation, system-package setup and the complete
+browser check remain live on hits, misses and cache outages.
 Turbo treats `PLAYWRIGHT_BROWSERS_PATH` as an explicit build and browser-test
 input so strict environment filtering cannot detach those tasks from the
 installed Chromium identity.
@@ -296,6 +299,13 @@ packed SDK, API, docs, manifests, workflows, and release scripts as
 release-relevant boundaries. This is local workflow-configuration proof only;
 it does not prove a hosted run, publication, deployment, registry state, or
 external consumer behaviour.
+
+All five workflows pin `actions/checkout` v7.0.1 by exact commit. Checkout
+places the selected Git revision in GitHub's workspace; it does not install or
+run TaxKit. The following pinned setup action installs the repository's Bun
+version, and Bun owns frozen dependency installation and repository commands.
+The GitHub-hosted Quality run is the compatibility proof for checkout's
+Node.js 24 action runtime.
 
 The harness gate is not a separate Quality workflow step. The existing
 `release:check -- --ci` graph begins with root verification and therefore
