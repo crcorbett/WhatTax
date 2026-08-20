@@ -45,10 +45,12 @@ The distinct docs deployment owner is
 It is decoded and cross-checked with the deployment-only control register by
 `bun run check:docs-deployment-automation`. It admits exactly three desired
 classes: trusted Preview delivery, fixed Production delivery and exact-stage
-Preview teardown. The records require separately protected environments, non-cancellable stage locks,
-accepted/equal replans, narrow credential identities, provider/state readback,
-bounded receipts and fail-closed recovery. Teardown executes reviewed
-default-branch code rather than pull-request-head code.
+Preview teardown. Preview delivery and teardown share the unreviewed
+`taxkit-docs-preview` credential environment; Production retains its separate
+reviewer-protected environment. The records require non-cancellable stage
+locks, accepted/equal replans, narrow credential identities, provider/state
+readback, bounded receipts and fail-closed recovery. Teardown executes
+reviewed default-branch code rather than pull-request-head code.
 
 Because GitHub runners are ephemeral, each mutation workflow refreshes the
 account-matched Alchemy `cloudflare-state-store` cache with the installed
@@ -59,12 +61,13 @@ That preparation is bounded to the named state-store control plane; no local
 OAuth profile is copied into CI.
 
 The current native `Cloudflare.Website.Vite` graph has one `DocsWebsite`
-resource. All three automation entries are `not-established`: retained v1
-receipts describe the retired `DocsBuild` plus `DocsWebsite` graph and cannot
-establish this successor. Plan v2 admits one Website action and, only during
-migration, an adjacent `DocsBuild` delete. The provider-free Vite/workerd build
-is preflight proof; the deployment-input digest binds the tracked Website
-source set rather than claiming byte identity with Alchemy's internal build.
+resource. Preview and Production retain their accepted observations. Teardown
+returns to `not-established` when its environment identity changes and needs a
+fresh default-branch PR-close receipt before promotion. Plan v2 admits one
+Website action and, only during migration, an adjacent `DocsBuild` delete. The
+provider-free Vite/workerd build is preflight proof; the deployment-input
+digest binds the tracked Website source set rather than claiming byte identity
+with Alchemy's internal build.
 
 The scheduled/open-PR orphan automation and its child-process implementation
 are retired. PR-close teardown remains the explicit lifecycle owner. Historical
@@ -138,12 +141,13 @@ authority and does not create another deployment automation entry.
 The separate `docs-workflow-cache-boundary` control governs acceleration in all
 four workflows. The approved `TURBO_TOKEN` grants access only to the TaxKit
 Vercel Remote Cache; it does not extend Cloudflare, deployment, release or
-receipt-promotion authority. Event-scoped GitHub caches retain Bun package
+receipt-promotion authority. Content-addressed GitHub caches retain Bun package
 downloads in all four workflows and Chromium binaries only where the browser is
-installed. Frozen install, browser install, exact candidate checks, plans,
-mutations, provider and hosted readback, artifact reads and receipt promotion
-remain live. Cache action failure is non-fatal, while failure of any owning
-command still stops the workflow.
+installed. A ref may restore a matching default-branch cache, while GitHub ref
+scope isolates its writes. Frozen install, browser install, exact candidate
+checks, plans, mutations, provider and hosted readback, artifact reads and
+receipt promotion remain live. Cache action failure is non-fatal, while failure
+of any owning command still stops the workflow.
 
 ### 2026-08-10 main-sourced Preview readback and teardown stop
 

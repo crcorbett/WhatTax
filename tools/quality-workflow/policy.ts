@@ -30,6 +30,8 @@ const expectedTurboToken = [
   workflowExpressionPrefix,
   "{{ secrets.TURBO_TOKEN }}",
 ].join("");
+const checkoutActionSha = "3d3c42e5aac5ba805825da76410c181273ba90b1";
+const checkoutAction = `actions/checkout@${checkoutActionSha}`;
 const cacheActionSha = "55cc8345863c7cc4c66a329aec7e433d2d1c52a9";
 const cacheRestoreAction = `actions/cache/restore@${cacheActionSha}`;
 const cacheSaveAction = `actions/cache/save@${cacheActionSha}`;
@@ -45,8 +47,6 @@ const expectedBunCachePath = [
 const expectedBunCacheKey = [
   "bun-packages-",
   workflowExpressionPrefix,
-  "{{ github.event_name }}-",
-  workflowExpressionPrefix,
   "{{ runner.os }}-",
   workflowExpressionPrefix,
   "{{ runner.arch }}-",
@@ -61,8 +61,6 @@ const expectedPlaywrightCachePath = [
 ].join("");
 const expectedPlaywrightCacheKey = [
   "playwright-chromium-",
-  workflowExpressionPrefix,
-  "{{ github.event_name }}-",
   workflowExpressionPrefix,
   "{{ runner.os }}-",
   workflowExpressionPrefix,
@@ -91,7 +89,7 @@ const allowedRunSteps = new Set([
   "bun run release:check -- --ci",
 ]);
 const expectedActionSteps = [
-  "actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5",
+  checkoutAction,
   "oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6",
   cacheRestoreAction,
   cacheSaveAction,
@@ -281,8 +279,7 @@ const inspectSteps = (steps: unknown): readonly QualityWorkflowFinding[] => {
     steps.length === 14 &&
     checkoutStep !== null &&
     hasOnly(checkoutStep, ["uses", "with"]) &&
-    checkoutStep.uses ===
-      "actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5" &&
+    checkoutStep.uses === checkoutAction &&
     checkoutWith !== null &&
     hasOnly(checkoutWith, ["fetch-depth"]) &&
     checkoutWith["fetch-depth"] === 0 &&
@@ -649,7 +646,7 @@ const expectedControls = {
     recovery:
       "Remove the dependency-cache restore/save steps while preserving frozen Bun install, Chromium system dependencies, browser proof and the full Quality graph.",
     retirementCondition:
-      "A stronger event-scoped dependency-cache control replaces this contract.",
+      "A stronger content-addressed dependency-cache control replaces this contract.",
     reviewTrigger:
       "Bun version, lockfile, Playwright version, runner platform, cache action, key, path, event scope or install command change.",
     signal:
@@ -678,7 +675,7 @@ const expectedControls = {
     recovery:
       "Remove the remote-cache bindings while preserving every uncached Quality command and true exit status.",
     retirementCondition:
-      "A stronger event-scoped cache authority and fallback control replaces this contract.",
+      "A stronger token-bearing cache authority and fallback control replaces this contract.",
     reviewTrigger:
       "Turbo config, root task, credential, event, cache mode, task input/output or fallback change.",
     signal:
@@ -894,7 +891,7 @@ const inspectQualityAutomation = (
     !hasExactMembers(quality.authority.grants, [
       "contents:read",
       "dependency-cache:read",
-      "dependency-cache:write-event-scoped",
+      "dependency-cache:write-ref-scoped",
       "remote-cache:read",
       "remote-cache:write-on-token-bearing-events",
     ]) ||
@@ -903,8 +900,8 @@ const inspectQualityAutomation = (
       "immutable repository revision",
       "configured Actions runner",
       "Vercel team remote-cache task artifacts and logs",
-      "event-scoped GitHub Bun package cache",
-      "event-scoped GitHub Playwright Chromium cache",
+      "content-addressed ref-scoped GitHub Bun package cache",
+      "content-addressed ref-scoped GitHub Playwright Chromium cache",
     ]) ||
     quality.environment.trigger !== "configured-pull-request-or-push" ||
     quality.proof.command !== "bun run release:check -- --ci" ||
@@ -917,7 +914,7 @@ const inspectQualityAutomation = (
       "first tagged check failure",
       "unknown workflow shape",
       "fork pull request receives remote-cache credential",
-      "pull-request dependency cache uses a trusted main key",
+      "dependency cache key or path contains secret or mutable installed state",
       "dependency cache skips frozen install or Chromium system dependencies",
       "cache-only success or missing uncached fallback",
     ]) ||
@@ -960,7 +957,7 @@ export const renderQualityWorkflowReport = (
   findings: readonly QualityWorkflowFinding[]
 ): string =>
   findings.length === 0
-    ? "Quality workflow policy passed: decoded immutable, bounded, event-scoped cache and canonical release graph."
+    ? "Quality workflow policy passed: decoded immutable, bounded, content-addressed ref-scoped cache and canonical release graph."
     : [
         `Quality workflow policy failed with ${findings.length} finding(s):`,
         ...findings

@@ -116,6 +116,51 @@ the separate dated docs deployment envelope below. Cache-only rollback removes
 the remote bindings and restore/save steps while preserving every install,
 candidate, plan, provider and receipt command.
 
+### 2026-08-20 — shared dependency-cache successor
+
+Cooper approved the active Shared Dependency Cache and Checkout Upgrade SPEC.
+It permits repository workflow, policy and documentation changes that remove
+event name from Bun-package and Chromium keys. The paths remain limited to
+public package downloads and browser binaries. GitHub may serve a matching
+default-branch cache to a pull request, while its ref scope keeps pull-request
+writes unavailable to `main` and sibling pull requests. Fork-readable caches
+must never contain secrets, credentials, `node_modules`, provider state or
+receipts. Frozen Bun installation, browser installation and every owning
+command remain live. This successor changes cache lookup only; it adds no
+provider, deployment, teardown, release or publication authority.
+
+The same approval permits replacing all five exact checkout v4.2.0 pins with
+the verified checkout v7.0.1 commit. Checkout only places reviewed Git source
+in the runner workspace. Bun remains the repository runtime and package
+manager. Hosted Quality proof must establish runner compatibility before
+closeout; local policy proof cannot establish that external result.
+
+### 2026-08-20 — automatic Preview teardown admission
+
+Cooper approved automatic same-repository PR-close cleanup and rejected a new
+manual-recovery environment. The repository change may bind Preview deploy and
+exact-stage teardown to `taxkit-docs-preview`, remove that environment's
+required reviewer rule, update the exact current automation owners and retain
+fresh GitHub readback. The environment already contains only
+`CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_API_TOKEN`; no value may enter the
+checkout or evidence.
+
+The automatic authority remains limited to reviewed default-branch code, a
+closed same-repository PR against `main`, exact stage `pr-N`, the
+`TaxKitDocsCloudflare/pr-N/DocsWebsite` resource, two equal destroy plans,
+provider/state freshness and absence readback. Production, DNS, custom domains,
+credentials, unrelated Workers, orphan deletion, release and publication stay
+excluded. Production retains its required reviewer.
+
+The accepted GitHub mutation read back zero Preview protection rules and the
+unchanged secret names `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_API_TOKEN`.
+Production still requires `crcorbett`. The sanitized receipt is
+[`../documentation-audit/automatic-preview-teardown/APT-001-github-environment-readback.json`](../documentation-audit/automatic-preview-teardown/APT-001-github-environment-readback.json).
+Rollback restores the Preview reviewer rule and the former teardown environment
+binding. The old teardown environment must not be removed until the reviewed
+workflow reaches `main`; its presence grants no current workflow authority
+after that cutover.
+
 ## Dated TaxKit docs deployment envelope
 
 The generic table remains the fail-closed default. Cooper's bounded 2026-07-30

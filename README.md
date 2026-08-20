@@ -137,12 +137,15 @@ Playwright Chromium binary. It does not cache `node_modules`: current warm
 hosted evidence shows the frozen Bun install takes only 1–2 seconds after the
 package cache restores, while the installed tree is about 1.4 GB. The workflow
 still runs frozen install plus Playwright system-dependency setup on every run.
-Pull-request and main dependency-cache keys are separate; a miss or cache
-outage only changes download time.
+Keys use platform and dependency content, so pull requests may restore a
+matching cache saved by `main`. GitHub keeps pull-request writes on the
+pull-request merge ref, away from `main` and sibling pull requests. A miss or
+cache outage only changes download time.
 
 The trusted docs Preview, Production, teardown and receipt workflows use the
-same remote task cache for deterministic Turbo work. They keep event-scoped Bun
-download caches, and browser workflows keep a separate Chromium cache. Exact
+same remote task cache for deterministic Turbo work. They use the same
+content-addressed Bun download keys, and browser workflows use the same
+content-addressed Chromium keys. GitHub ref scope controls writes. Exact
 candidate checks, provider plans or mutations, hosted readback and receipt
 promotion are always live and cannot be satisfied by a cache hit.
 
