@@ -32,8 +32,10 @@ project, expiring team-scoped token, GitHub `TURBO_TOKEN` secret and
 `taxkit-turbo-ci-team-2026-08-20` item read back from the Corbett Family
 `taxkit` 1Password vault without exposing the bearer. Pull-request run
 `32323001841`, attempt 2, proved Remote Cache connectivity in read-only mode,
-and the superseded project-scoped token is revoked. TCC-001 admits TCC-002
-workflow mutation. Deployment, publication, merge, release, package
+and the superseded project-scoped token is revoked. PR #55 merged the accepted
+TCC-002 source to `main`; a trusted write followed by same-commit main and
+pull-request read hits. TCC-002 now admits TCC-003 workflow mutation.
+Deployment, publication, future merge, release, package
 publication, DNS and unrelated provider mutation remain outside this cache
 authority.
 
@@ -42,8 +44,8 @@ authority.
 | Task | Status | Bounded result |
 | --- | --- | --- |
 | TCC-001 | Complete | Cold and hosted baselines, Turbo inputs, cache keys, event matrix, cache authority and names-only provider/secret/vault readback are accepted. |
-| TCC-002 | In progress | The Quality graph uses audited Turbo tasks; pull-request read-only Remote Cache connectivity passed, while trusted-main write/hit proof still needs separately authorised merge. |
-| TCC-003 | Pending | Add separate Bun and Chromium caches after TCC-002. |
+| TCC-002 | Complete | The Quality graph uses audited Turbo tasks; trusted main wrote and reused the cache, while a pull request reused the same hash under read-only authority. The same-commit hosted main run fell from 5m36s to 1m09s. |
+| TCC-003 | In progress | Add separate Bun package and Chromium binary caches while frozen install, system dependencies and browser proof stay live. |
 | TCC-004 | Pending | Change trusted deployment and receipt workflows after the Quality slices. |
 | TCC-005 | Pending | Measure hosted cold/warm outcomes and close the lifecycle. |
 

@@ -7,14 +7,15 @@ last_reviewed: 2026-08-20
 review_trigger: TCC-002 source, hosted Quality run, Turbo task, cache credential, event mode, fallback, or acceptance change
 ---
 
-# TCC-002 Quality Turbo candidate
+# TCC-002 Quality Turbo evidence
 
 ## Current decision
 
-TCC-002 remains an implementation candidate until the same source revision has
-claim-matched pull-request, trusted-main and forced-uncached evidence. The local
-policy, task graph and fallback proofs below admit a hosted pull-request spike;
-they do not yet accept the slice.
+TCC-002 is accepted. The merged source has claim-matched pull-request,
+trusted-main, remote-hit, forced-uncached and fallback evidence. Pull requests
+read the Vercel Remote Cache without writing it; trusted `main` runs read and
+write it. The complete ordered release graph remains the source of success or
+failure.
 
 ## Candidate call graph
 
@@ -97,7 +98,7 @@ because port 4173 was already in use; no process was killed or hidden.
 | API, SDK and public docs contracts | N/A | No runtime or package contract changes. |
 | Changeset | N/A | Repository tooling and CI configuration only. |
 
-## Hosted acceptance still required
+## Hosted acceptance
 
 Hosted pull-request run
 [32323001841](https://github.com/crcorbett/taxkit/actions/runs/32323001841)
@@ -122,7 +123,8 @@ Turbo reported `Remote caching enabled`, then one remote miss for the Quality
 policy task and `Remote cache is read-only, skipping upload`. There was no
 connection warning. This proves the team-scoped replacement can read the
 Remote Cache service and that pull-request execution does not upload. It does
-not prove a remote hit because no trusted run has seeded this task hash.
+did not prove a remote hit because no trusted run had yet seeded this task
+hash.
 
 Names-only readback retained current token
 `taxkit-turbo-ci-team-2026-08-20`, team
@@ -132,16 +134,37 @@ Names-only readback retained current token
 attempt 2 and no longer appears in Vercel's active-token list. No bearer is in
 the repository or evidence.
 
-Remaining acceptance steps:
+PR #55 merged approved head `948de55` as main commit `ee463744`. Trusted main
+[run 32337825523 attempt 1](https://github.com/crcorbett/taxkit/actions/runs/32337825523/attempts/1)
+passed in 5m36s with `local:rw,remote:rw`, a working Vercel connection and a
+miss for eligible task hash `44e6cd988f5b2785`. Bun install took 17s,
+Chromium setup took 27s and the complete nine-check release graph took 4m40s.
 
-1. Treat attempt 1 as the hosted cache-unavailable/fresh-run observation and
-   retain the complete browser postcondition; local `TURBO_FORCE=true` proof
-   separately confirms forced execution of the same nine-check graph.
-2. After separately authorised merge/default-branch publication, record a
-   trusted-main remote write followed by a hit for an eligible task.
-3. Rerun the pull request after the trusted seed and record a remote hit without
-   a pull-request upload.
-4. Accept, revise or remove TCC-002 from those observations before TCC-003.
+[Attempt 2](https://github.com/crcorbett/taxkit/actions/runs/32337825523/attempts/2)
+ran the identical main commit and passed in 1m09s. Turbo replayed the same
+`44e6cd988f5b2785` task from Remote Cache. The complete nine-check graph took
+20s and retained docs browser proof. Compared with attempt 1, worker time fell
+by 4m27s, or about 79%. This same-hash readback proves that the trusted first
+run wrote an entry which a fresh hosted runner could use.
+
+The merged pull-request
+[run 32337381827 attempt 2](https://github.com/crcorbett/taxkit/actions/runs/32337381827/attempts/2)
+then passed in 1m15s with `local:rw,remote:r`. It replayed the same eligible
+task hash from Remote Cache in 724ms and passed all nine release checks,
+including docs browser proof. The event remained `pull_request`; policy tests
+reject remote writes and the hosted environment exposed only `remote:r`.
+Therefore the pull request could read the trusted entry but could not replace
+it.
+
+The separately retained `TURBO_FORCE=true` local run passed the same ordered
+nine-check source graph, including API and browser proof. Hosted attempt 1
+proved cache-unavailable fallback with the same complete Quality postcondition.
+Together these observations establish that cache use changes elapsed time, not
+the commands, order, true exit status or proof owner.
+
+The 79% observation is one same-commit hosted pair, not a long-term promise.
+Install and Chromium setup stayed live and still consumed 39s in the warm main
+run. TCC-003 owns those separate caches and their own cold/warm evidence.
 
 Rollback removes the three Turbo workflow bindings and restores the direct
 leaf command entrypoints while preserving the complete nine-check graph.

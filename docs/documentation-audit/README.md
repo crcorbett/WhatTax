@@ -29,10 +29,10 @@ This grants no provider
 deployment created merely to host the cache, publication, release, DNS or
 unrelated Production authority.
 
-The TCC-002 candidate records the Turbo-backed Quality graph, event-scoped
-remote-cache policy, local miss/hit and missing-token fallback. It remains
-inconclusive until claim-matched pull-request, trusted-main and forced-uncached
-hosted evidence exists.
+The TCC-002 evidence records the Turbo-backed Quality graph, event-scoped
+remote-cache policy, local forced and missing-token fallback, trusted-main
+write/read proof and pull-request read-only reuse. It accepts the Quality slice
+without making deployment, publication or public-availability claims.
 
 Accepted native Alchemy docs integration evidence:
 

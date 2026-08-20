@@ -20,10 +20,10 @@ SPEC, [task list](../../product-specs/ci-cache-efficiency.tasks.json) and
 [execution plan](./ci-cache-efficiency.md) own the current CI cache work.
 TCC-001 has qualified the exact cache inputs, event boundary and cold baseline.
 The cache owner approved the complete SPEC implementation in the
-`cooper-corbetts-projects` Hobby team. TCC-002 now has a working team-scoped
-credential, pull-request read-only Remote Cache connectivity and the complete
-hosted Quality graph. Trusted-main write/hit proof remains the next acceptance
-boundary and still needs separately authorised merge.
+`cooper-corbetts-projects` Hobby team. TCC-002 is accepted: trusted main wrote
+and reused the Vercel Remote Cache, the pull request reused the same eligible
+hash under read-only authority, and both retained the complete hosted Quality
+graph. TCC-003 now owns separate Bun package and Chromium binary caches.
 
 The completed deployment goal is retained in the
 [`Native Alchemy docs deployment`](../completed/native-alchemy-docs-deployment.md)

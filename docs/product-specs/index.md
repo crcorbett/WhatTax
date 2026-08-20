@@ -21,7 +21,7 @@ Specs:
 
 | Spec | Status | Notes |
 | --- | --- | --- |
-| [Turbo and CI Cache Efficiency](./ci-cache-efficiency.md) | Active | TCC-001 qualified the cache boundary; TCC-002 has pull-request read-only Remote Cache connectivity and the complete Quality graph, with trusted-main hit proof still outstanding before TCC-003. |
+| [Turbo and CI Cache Efficiency](./ci-cache-efficiency.md) | Active | TCC-001 and TCC-002 are complete. Trusted main and read-only pull-request runs reused the same Vercel Remote Cache entry with the full Quality graph; TCC-003 now adds separate Bun package and Chromium caches. |
 | [Quality Trigger Efficiency](./quality-trigger-efficiency.md) | Implemented | Candidate `1b45489` passed hosted Quality run `32315275636`; feature-branch push duplication is removed while pull-request and main-branch coverage remains. |
 | [Native Alchemy docs deployment](./native-alchemy-docs-deployment.md) | Implemented | Candidate `7a23bf3` passed exact Git, Preview, Production, public-journey and named-stage teardown proof; future changes require a successor SPEC. |
 | [Native Alchemy docs integration](./native-alchemy-docs-integration.md) | Implemented | The manual docs build/Worker graph is replaced by beta.64's first-class Website.Vite lifecycle; current proof owns one resource and the ephemeral GitHub orphan subprocess helper is retired. |
