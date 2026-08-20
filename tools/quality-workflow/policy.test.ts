@@ -21,7 +21,6 @@ on:
 permissions:
   contents: read
 env:
-  PLAYWRIGHT_BROWSERS_PATH: ${"${{"} runner.temp }}/ms-playwright
   TAXKIT_ACTION_PIN_UPDATE_OWNER: taxkit-ci-release-maintainer
   TURBO_CACHE: ${"${{"} github.event_name == 'pull_request' && 'local:rw,remote:r' || 'local:rw,remote:rw' }}
   TURBO_TEAM: ${"${{"} vars.TURBO_TEAM }}
@@ -56,6 +55,7 @@ jobs:
         with:
           path: ${"${{"} steps.bun-cache-path.outputs.path }}
           key: ${"${{"} steps.bun-cache-restore.outputs.cache-primary-key }}
+      - run: echo "PLAYWRIGHT_BROWSERS_PATH=$RUNNER_TEMP/ms-playwright" >> "$GITHUB_ENV"
       - id: playwright-identity
         run: echo "version=$(apps/docs/node_modules/.bin/playwright --version | cut -d' ' -f2)" >> "$GITHUB_OUTPUT"
       - id: playwright-cache-restore
@@ -106,6 +106,10 @@ describe("quality workflow policy", () => {
       acceptedWorkflow.replace(
         "      - run: apps/docs/node_modules/.bin/playwright install --with-deps chromium\n",
         ""
+      ),
+      acceptedWorkflow.replace(
+        "$RUNNER_TEMP/ms-playwright",
+        "$GITHUB_WORKSPACE/.cache/ms-playwright"
       ),
     ]) {
       expect(findingsFor(workflow).map((item) => item.invariant)).toContain(

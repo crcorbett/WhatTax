@@ -33,14 +33,12 @@ const expectedTurboToken = [
   workflowExpressionPrefix,
   "{{ secrets.TURBO_TOKEN }}",
 ].join("");
-const expectedPlaywrightBrowsersPath = [
-  workflowExpressionPrefix,
-  "{{ runner.temp }}/ms-playwright",
-].join("");
 const cacheActionSha = "55cc8345863c7cc4c66a329aec7e433d2d1c52a9";
 const cacheRestoreAction = `actions/cache/restore@${cacheActionSha}`;
 const cacheSaveAction = `actions/cache/save@${cacheActionSha}`;
 const bunCachePathCommand = 'echo "path=$(bun pm cache)" >> "$GITHUB_OUTPUT"';
+const playwrightCachePathCommand =
+  'echo "PLAYWRIGHT_BROWSERS_PATH=$RUNNER_TEMP/ms-playwright" >> "$GITHUB_ENV"';
 const playwrightIdentityCommand =
   'echo "version=$(apps/docs/node_modules/.bin/playwright --version | cut -d\' \' -f2)" >> "$GITHUB_OUTPUT"';
 const expectedBunCachePath = [
@@ -89,6 +87,7 @@ const allowedRunSteps = new Set([
   "git show-ref --verify --quiet refs/heads/main || git branch --track main origin/main",
   bunCachePathCommand,
   "bun install --frozen-lockfile",
+  playwrightCachePathCommand,
   playwrightIdentityCommand,
   "apps/docs/node_modules/.bin/playwright install --with-deps chromium",
   "bun run check:quality-workflow",
@@ -272,16 +271,17 @@ const inspectSteps = (steps: unknown): readonly QualityWorkflowFinding[] => {
   const installStep = asRecord(steps[5]);
   const bunCacheSaveStep = asRecord(steps[6]);
   const bunCacheSaveWith = asRecord(bunCacheSaveStep?.with);
-  const playwrightIdentityStep = asRecord(steps[7]);
-  const playwrightCacheRestoreStep = asRecord(steps[8]);
+  const playwrightCachePathStep = asRecord(steps[7]);
+  const playwrightIdentityStep = asRecord(steps[8]);
+  const playwrightCacheRestoreStep = asRecord(steps[9]);
   const playwrightCacheRestoreWith = asRecord(playwrightCacheRestoreStep?.with);
-  const browserStep = asRecord(steps[9]);
-  const playwrightCacheSaveStep = asRecord(steps[10]);
+  const browserStep = asRecord(steps[10]);
+  const playwrightCacheSaveStep = asRecord(steps[11]);
   const playwrightCacheSaveWith = asRecord(playwrightCacheSaveStep?.with);
-  const policyStep = asRecord(steps[11]);
-  const releaseStep = asRecord(steps[12]);
+  const policyStep = asRecord(steps[12]);
+  const releaseStep = asRecord(steps[13]);
   const exactSteps =
-    steps.length === 13 &&
+    steps.length === 14 &&
     checkoutStep !== null &&
     hasOnly(checkoutStep, ["uses", "with"]) &&
     checkoutStep.uses ===
@@ -326,6 +326,9 @@ const inspectSteps = (steps: unknown): readonly QualityWorkflowFinding[] => {
     hasOnly(bunCacheSaveWith, ["path", "key"]) &&
     bunCacheSaveWith.path === expectedBunCachePath &&
     bunCacheSaveWith.key === expectedBunSaveKey &&
+    playwrightCachePathStep !== null &&
+    hasOnly(playwrightCachePathStep, ["run"]) &&
+    playwrightCachePathStep.run === playwrightCachePathCommand &&
     playwrightIdentityStep !== null &&
     hasOnly(playwrightIdentityStep, ["id", "run"]) &&
     playwrightIdentityStep.id === "playwright-identity" &&
@@ -421,13 +424,11 @@ const hasExactWorkflowCachePolicy = (
   return (
     workflow.env !== undefined &&
     hasOnly(workflow.env, [
-      "PLAYWRIGHT_BROWSERS_PATH",
       "TAXKIT_ACTION_PIN_UPDATE_OWNER",
       "TURBO_CACHE",
       "TURBO_TEAM",
       "TURBO_TOKEN",
     ]) &&
-    workflow.env.PLAYWRIGHT_BROWSERS_PATH === expectedPlaywrightBrowsersPath &&
     workflow.env.TURBO_CACHE === expectedTurboCache &&
     workflow.env.TURBO_TEAM === expectedTurboTeam &&
     workflow.env.TURBO_TOKEN === expectedTurboToken &&
