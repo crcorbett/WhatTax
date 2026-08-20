@@ -21,6 +21,7 @@ Specs:
 
 | Spec | Status | Notes |
 | --- | --- | --- |
+| [Pull-request Turbo Write-through Cache](./pull-request-turbo-write-through.md) | Implemented | PWC-001 enables Vercel Remote Cache writes for token-bearing same-repository pull requests. Exact run `32351432522` proved a pull-request miss/write and same-commit remote hit; fork fallback and live frozen install remain. |
 | [Turbo and CI Cache Efficiency](./ci-cache-efficiency.md) | Implemented | TCC-001 through TCC-005 retain event-safe Vercel task caching plus separate Bun-package and Chromium caches. Same-commit hosted proof records a 79% Turbo worker saving; dependency savings remain step-bounded, and trusted Preview plan-only proof retained live authority boundaries. |
 | [Quality Trigger Efficiency](./quality-trigger-efficiency.md) | Implemented | Candidate `1b45489` passed hosted Quality run `32315275636`; feature-branch push duplication is removed while pull-request and main-branch coverage remains. |
 | [Native Alchemy docs deployment](./native-alchemy-docs-deployment.md) | Implemented | Candidate `7a23bf3` passed exact Git, Preview, Production, public-journey and named-stage teardown proof; future changes require a successor SPEC. |

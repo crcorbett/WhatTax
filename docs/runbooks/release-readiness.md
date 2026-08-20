@@ -40,6 +40,12 @@ scoped candidate packet. It does not include versioning or any external state.
 - Eligible deterministic checks run through Turbo. Remote caching is optional
   acceleration; a miss, missing token or unavailable service must leave the
   complete local graph runnable.
+- Token-bearing same-repository pull requests and `main` use remote read/write.
+  Fork pull requests receive no repository token and must keep using the full
+  local fallback. Never change this route to `pull_request_target` merely to
+  make remote caching available to a fork.
+- Do not cache `node_modules`. Bun's package-download cache may accelerate the
+  live `bun install --frozen-lockfile`; it must not replace that install.
 
 ## Authority
 

@@ -124,18 +124,21 @@ browser proof and Changeset status.
 
 Deterministic repository commands run through Turbo, including the root
 validators used by `verification` and the app/package checks used by
-`release:check`. GitHub Quality runs may read Vercel Remote Cache on pull
-requests and read/write it on `main`; a missing token or cache service leaves
-the same full command graph running locally. Local remote-cache use is an
-explicit developer choice through `TURBO_TOKEN` and `TURBO_TEAM`. Never commit
-either credential or treat a cache hit as test, release, deployment or public
+`release:check`. Token-bearing GitHub Quality runs may read and write Vercel
+Remote Cache on same-repository pull requests and `main`; fork pull requests
+receive no token and run the same full command graph locally. A missing token
+or cache service also falls back locally. Local remote-cache use is an explicit
+developer choice through `TURBO_TOKEN` and `TURBO_TEAM`. Never commit either
+credential or treat a cache hit as test, release, deployment or public
 availability proof.
 
 Quality also keeps separate GitHub caches for Bun package downloads and the
-Playwright Chromium binary. It does not cache `node_modules`, and it still runs
-the frozen Bun install plus Playwright system-dependency setup on every run.
-Pull-request and main cache keys are separate; a miss or cache outage only
-changes download time.
+Playwright Chromium binary. It does not cache `node_modules`: current warm
+hosted evidence shows the frozen Bun install takes only 1–2 seconds after the
+package cache restores, while the installed tree is about 1.4 GB. The workflow
+still runs frozen install plus Playwright system-dependency setup on every run.
+Pull-request and main dependency-cache keys are separate; a miss or cache
+outage only changes download time.
 
 The trusted docs Preview, Production, teardown and receipt workflows use the
 same remote task cache for deterministic Turbo work. They keep event-scoped Bun

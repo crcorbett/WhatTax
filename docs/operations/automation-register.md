@@ -20,12 +20,15 @@ length or keywords. `externalState.status` remains `not-established` and its
 nonclaims must match the proof envelope.
 
 Quality CI is convergent validation of one immutable revision with `contents:
-read`, Vercel Remote Cache read access on pull requests and remote-cache write
-access only on `main`. Pull requests use the workflow-enforced
-`local:rw,remote:r` mode; a missing secret falls back to the complete local
-graph. The remote cache resource contains Turbo task artifacts and logs only.
-Its CI report has no candidate identity or attempt-receipt claim, and a cache
-hit does not establish provider state.
+read` and Vercel Remote Cache read/write access on token-bearing events.
+Same-repository pull requests and `main` use the workflow-enforced
+`local:rw,remote:rw` mode. Fork pull requests receive no repository secret and
+fall back to the complete local graph. Same-repository pull-request code can
+access the team-scoped remote-cache token under Cooper's accepted
+contributor-trust boundary.
+The remote cache resource contains Turbo task artifacts and logs only. Its CI
+report has no candidate identity or attempt-receipt claim, and a cache hit does
+not establish provider state.
 Documentation/context freshness is not an unattended editor: it stages an
 untrusted report-only candidate outside canonical/default retrieval, excludes
 prior candidates and mutable/generated evidence, and requires a named reviewer,

@@ -5,7 +5,7 @@ authority: supporting
 owner: taxkit-product-owner
 last_reviewed: 2026-08-20
 review_trigger: cache provider, workflow, action pin, release graph, dependency, browser, authority, or proof change
-successor: null
+successor: ./pull-request-turbo-write-through.md
 tombstone: false
 status: implemented
 source_of_truth: docs

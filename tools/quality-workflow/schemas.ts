@@ -162,7 +162,7 @@ const AutomationAuthority = Schema.Struct({
       "dependency-cache:read",
       "dependency-cache:write-event-scoped",
       "remote-cache:read",
-      "remote-cache:write-on-main",
+      "remote-cache:write-on-token-bearing-events",
     ])
   ),
   principal: Schema.NonEmptyString,

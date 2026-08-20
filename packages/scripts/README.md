@@ -72,10 +72,17 @@ skip the release check, replace a failure, create candidate evidence or grant
 publication or deployment authority. Missing remote-cache access falls back to
 the complete local task graph.
 
+Token-bearing same-repository pull requests, `main` and the trusted deployment
+workflows use Turbo read/write. Fork pull requests receive no repository token
+and therefore take the same complete local fallback. Cache writes remain task
+artifacts and logs only; they do not grant release or provider authority.
+
 The workflow may restore Bun package downloads and the Playwright Chromium
 binary before this graph starts. Those GitHub caches do not cache
-`node_modules`, skip frozen installation, replace Playwright `--with-deps` or
-change this orchestrator's nine checks and true exit codes.
+`node_modules`: measured warm frozen install is only 1–2 seconds and the
+installed tree is about 1.4 GB. They do not skip frozen installation, replace
+Playwright `--with-deps` or change this orchestrator's nine checks and true
+exit codes.
 
 Deployment workflow receipt, plan, provider and teardown checkers also enter
 through named root Turbo tasks. Those tasks are explicitly non-cacheable and
