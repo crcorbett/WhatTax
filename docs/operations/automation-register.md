@@ -3,7 +3,7 @@ document_type: automation-register
 lifecycle: current
 authority: canonical
 owner: taxkit-ci-release-maintainer
-last_reviewed: 2026-08-13
+last_reviewed: 2026-08-20
 review_trigger: workflow, signal, authority, proof, stopping, escalation, rollback, or retirement change
 ---
 
@@ -20,7 +20,12 @@ length or keywords. `externalState.status` remains `not-established` and its
 nonclaims must match the proof envelope.
 
 Quality CI is convergent validation of one immutable revision with `contents:
-read`; its CI report has no candidate identity or attempt-receipt claim.
+read`, Vercel Remote Cache read access on pull requests and remote-cache write
+access only on `main`. Pull requests use the workflow-enforced
+`local:rw,remote:r` mode; a missing secret falls back to the complete local
+graph. The remote cache resource contains Turbo task artifacts and logs only.
+Its CI report has no candidate identity or attempt-receipt claim, and a cache
+hit does not establish provider state.
 Documentation/context freshness is not an unattended editor: it stages an
 untrusted report-only candidate outside canonical/default retrieval, excludes
 prior candidates and mutable/generated evidence, and requires a named reviewer,

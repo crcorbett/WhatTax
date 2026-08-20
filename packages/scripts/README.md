@@ -1,6 +1,6 @@
 ---
 status: canonical
-last_reviewed: 2026-07-22
+last_reviewed: 2026-08-20
 source_of_truth: package-readme
 confidence: high
 ---
@@ -58,11 +58,19 @@ failure:
 2. `bun run test`
 3. `bun run build`
 4. `bun run docs:validate`
-5. `bun run --filter=@taxkit/sdk check-packed-artifact`
-6. `bun run --filter=@taxkit/sdk validate:downstream`
-7. `bun run --filter=api smoke`
-8. `bun run --filter=docs test:browser`
-9. `bun run changeset status --verbose`
+5. `bun run sdk:check-packed-artifact`
+6. `bun run sdk:validate-downstream`
+7. `bun run api:smoke`
+8. `bun run docs:test:browser`
+9. `bun run changeset:status`
+
+The nine checks and their order are unchanged. Their deterministic root,
+workspace and app/package leaves now use Turbo tasks, while
+`@taxkit/scripts` remains the live sequential orchestrator and records each
+real exit code. Turbo may replay a correct local or remote result; it does not
+skip the release check, replace a failure, create candidate evidence or grant
+publication or deployment authority. Missing remote-cache access falls back to
+the complete local task graph.
 
 Each invocation records its exact executable, arguments and true exit code in a
 schema-backed outcome. Complete stdout and stderr are streamed through a
@@ -124,7 +132,7 @@ root release:check
      -> ReleaseCommandRunnerLive -> ChildProcessSpawner
   -> runReleaseReadiness -> ReleaseCommandRunner
   -> ChildProcess Command
-  -> existing root and package-owned commands
+  -> Turbo-backed root and package-owned commands
 ```
 
 `runReleaseReadiness` is the primary linear Effect program. The service

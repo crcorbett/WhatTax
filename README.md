@@ -1,6 +1,6 @@
 ---
 status: canonical
-last_reviewed: 2026-07-21
+last_reviewed: 2026-08-20
 source_of_truth: root-docs
 confidence: high
 ---
@@ -121,6 +121,15 @@ run test:skills` runs that focused stale-pattern suite directly. `bun run
 release:check` runs the complete ordered
 release evidence, including tests, builds, package artifacts, API smoke, docs
 browser proof and Changeset status.
+
+Deterministic repository commands run through Turbo, including the root
+validators used by `verification` and the app/package checks used by
+`release:check`. GitHub Quality runs may read Vercel Remote Cache on pull
+requests and read/write it on `main`; a missing token or cache service leaves
+the same full command graph running locally. Local remote-cache use is an
+explicit developer choice through `TURBO_TOKEN` and `TURBO_TEAM`. Never commit
+either credential or treat a cache hit as test, release, deployment or public
+availability proof.
 
 Package-facing changes must include a Changeset. Use `bun run changeset` during
 implementation to record the user-facing package impact, and use

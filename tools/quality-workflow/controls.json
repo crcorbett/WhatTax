@@ -22,6 +22,17 @@
     "retirementCondition": "A stronger canonical graph replaces all nine ordered checks."
   },
   {
+    "id": "turbo-remote-cache-boundary",
+    "owner": "taxkit-ci-release-maintainer",
+    "signal": "A Turbo task, cache credential binding, cache mode or Quality event changes.",
+    "preventedFailure": "Pull-request code writes trusted remote cache entries, a missing cache blocks the full graph, or a cache hit is treated as release proof.",
+    "fixture": "tools/quality-workflow/policy.test.ts",
+    "evidence": "bun run check:quality-workflow",
+    "recovery": "Remove the remote-cache bindings while preserving every uncached Quality command and true exit status.",
+    "reviewTrigger": "Turbo config, root task, credential, event, cache mode, task input/output or fallback change.",
+    "retirementCondition": "A stronger event-scoped cache authority and fallback control replaces this contract."
+  },
+  {
     "id": "context-candidate-admission",
     "owner": "taxkit-documentation-owner",
     "signal": "A proposal adds recurring documentation or context freshness work.",
