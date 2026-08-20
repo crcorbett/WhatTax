@@ -80,6 +80,30 @@
     },
     "//#check:docs-deployment:task": { "outputs": [] },
     "//#check:docs-deployment-automation:task": { "outputs": [] },
+    "//#check:docs-deployment-inventory:task": {
+      "cache": false,
+      "passThroughEnv": ["ALCHEMY_PROFILE", "CLOUDFLARE_*", "TAXKIT_*"]
+    },
+    "//#check:docs-deployment-workflow-proof:task": {
+      "cache": false,
+      "passThroughEnv": ["TAXKIT_*"]
+    },
+    "//#check:docs-deployment-workflow-input:task": {
+      "cache": false,
+      "passThroughEnv": ["TAXKIT_*"]
+    },
+    "//#check:docs-deployment-workflow-run:task": {
+      "cache": false,
+      "passThroughEnv": ["TAXKIT_*"]
+    },
+    "//#check:docs-deployment-workflow-plan:task": {
+      "cache": false,
+      "passThroughEnv": ["TAXKIT_*"]
+    },
+    "//#check:docs-deployment-workflow-teardown-proof:task": {
+      "cache": false,
+      "passThroughEnv": ["TAXKIT_*"]
+    },
     "//#check:docs-deployment:types:task": { "outputs": [] },
     "//#check:docs-deployment-tools:types:task": { "outputs": [] },
     "//#check:docs:types:task": { "outputs": [] },

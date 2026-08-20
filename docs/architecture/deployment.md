@@ -64,6 +64,16 @@ intent and task state belong in the active SPEC and execution plan.
   excess properties. The executables contain no direct environment, Bun file,
   Promise, console or process-exit orchestration. This internal boundary does
   not change workflow commands, the provider graph or historical receipts.
+- The four deployment and receipt workflows bind the approved Vercel Remote
+  Cache in read/write mode because they execute reviewed, exact-source workflow
+  code. Frozen Bun installation remains live and is preceded by an event-scoped
+  package-download cache. Preview, Production and teardown also restore an
+  event-scoped Playwright Chromium cache from the runner temporary directory,
+  then still run the pinned browser install. The provider-free docs build uses
+  the existing Turbo `docs#build` task and its declared `dist/**` output.
+  Receipt-file checks, Alchemy plans and mutations, provider inventory, hosted
+  proof and receipt promotion enter through live or explicitly non-cacheable
+  tasks; no cache result can replace their current input or postcondition.
 - `@taxkit/api-http` builds as a package and exposes health, generated docs,
   OpenAPI JSON, metadata and public calculation route contracts.
 - `@taxkit/sdk` builds as a private package for local and downstream

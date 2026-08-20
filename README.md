@@ -137,6 +137,12 @@ the frozen Bun install plus Playwright system-dependency setup on every run.
 Pull-request and main cache keys are separate; a miss or cache outage only
 changes download time.
 
+The trusted docs Preview, Production, teardown and receipt workflows use the
+same remote task cache for deterministic Turbo work. They keep event-scoped Bun
+download caches, and browser workflows keep a separate Chromium cache. Exact
+candidate checks, provider plans or mutations, hosted readback and receipt
+promotion are always live and cannot be satisfied by a cache hit.
+
 Package-facing changes must include a Changeset. Use `bun run changeset` during
 implementation to record the user-facing package impact, and use
 `bun run version-repo` only when intentionally consuming pending Changesets into

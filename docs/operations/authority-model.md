@@ -96,6 +96,16 @@ complete Quality graph. Cache operations are non-fatal. This grants no GitHub
 secret administration, deployment, publication, release or unrelated cache
 deletion authority.
 
+TCC-004 applies that cache-only authority to the reviewed docs Preview,
+Production, exact-stage teardown and completed-run receipt workflows. They may
+read and write the named Vercel Remote Cache and event-scoped Bun package
+caches; the three browser workflows may also read and write their event-scoped
+Chromium caches. This does not add Cloudflare, Alchemy, mutation, artifact,
+hosted-proof or receipt-promotion authority. Those boundaries remain live under
+the separate dated docs deployment envelope below. Cache-only rollback removes
+the remote bindings and restore/save steps while preserving every install,
+candidate, plan, provider and receipt command.
+
 ## Dated TaxKit docs deployment envelope
 
 The generic table remains the fail-closed default. Cooper's bounded 2026-07-30

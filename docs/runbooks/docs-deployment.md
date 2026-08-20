@@ -31,7 +31,7 @@ Website action. Stop on any other resource or action.
    account, protected environment and operation. Run
    `bun run check:docs-deployment` and the repository verification appropriate
    to the change.
-2. Run `bun run --filter=docs build:cloudflare` and
+2. Run `bun run docs:build` and
    `bun run --filter=docs test:cloudflare-built -- --screenshots` as
    provider-free preflight. These commands do not produce the Alchemy-owned
    deployment artifact or prove provider state.
@@ -56,6 +56,31 @@ For integrated local Cloudflare development run `bun run docs:dev:cloudflare`
 (`alchemy dev`). Use `bun run docs:dev:vite` only for the explicitly
 infrastructure-free portless path. The former scheduled open-PR/orphan command
 is retired; PR-close teardown is the sole current Preview cleanup owner.
+
+### Workflow acceleration and cache recovery
+
+Preview, Production, teardown and completed-run reconciliation use the approved
+Vercel Remote Cache for Turbo tasks. All four restore the event-scoped Bun
+package cache and still run `bun install --frozen-lockfile`. The three workflows
+that build or probe docs also restore Playwright Chromium under
+`$RUNNER_TEMP/ms-playwright` and still run the pinned Chromium install. They do
+not cache `node_modules` or operating-system packages.
+
+Only deterministic repository work may replay. The docs build and static
+deployment-owner check are cacheable. Workflow input, plan, provider, hosted,
+teardown and completed-run receipt checks are routed through non-cacheable
+Turbo tasks so their temporary receipt paths and external identities are read
+again. Alchemy login/bootstrap, plan, deploy and destroy; GitHub API/artifact
+readback; Cloudflare inventory; hosted browser proof; and receipt promotion all
+remain live.
+
+A cache miss or service error is a speed change only. To reproduce a local docs
+build without replay, run `TURBO_FORCE=true bun run docs:build`. To recover a
+hosted workflow from suspected stale or unsafe cache behaviour, revert only the
+three `TURBO_*` bindings and GitHub restore/save steps in the exact reviewed
+workflow revision, preserve frozen installation, browser installation and all
+provider/receipt steps, then issue a new authorised attempt. Do not redeploy,
+destroy, clear Alchemy state or promote a receipt as cache recovery.
 
 The sections below retain the original two-resource deployment epochs and
 authority receipts as historical operational evidence. Their `DocsBuild`,

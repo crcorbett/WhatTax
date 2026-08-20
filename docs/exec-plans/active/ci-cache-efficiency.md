@@ -75,6 +75,7 @@ authority.
 | `turbo.json`, package scripts and workflows | Preserve for TCC-001 | This task audits them; executable changes begin in TCC-002. |
 | Root and scripts READMEs, testing architecture, CI controls, automation register and release-readiness runbook | Change required for TCC-002 | They now own the Turbo-backed leaf graph, event-scoped remote access, fallback and proof limits. |
 | Quality workflow/policy, CI controls, automation register, testing architecture, authority model, root/scripts READMEs and TCC-003 evidence | Change required for TCC-003 | They own separate event-scoped Bun-package and Chromium-binary caches, live install order, fallback and hosted proof limits. |
+| Four docs deployment/receipt workflows, Turbo task map, deployment contracts/controls, deployment architecture/runbook, automation register, root/scripts READMEs and TCC-004 evidence | Change required for TCC-004 | They own trusted remote access, event-scoped dependency caches, cacheable provider-free build work, explicitly live external checks and plan-only proof. |
 | Public docs, API, SDK and package READMEs | N/A | Qualification changes no public or package contract. |
 | Harness profile and critical journeys | N/A | Cache evidence does not create a consumer-visible journey or general effectiveness claim. |
 | Changeset | N/A | Planning and CI qualification do not change a published package. |

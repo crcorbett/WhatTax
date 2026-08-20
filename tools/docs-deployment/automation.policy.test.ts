@@ -36,7 +36,7 @@ const decodeRegisters = () =>
   );
 
 describe("docs deployment automation admission", () => {
-  test("accepts the exact three deployment automations and four controls before hosted establishment", async () => {
+  test("accepts the exact three deployment automations and five controls before hosted establishment", async () => {
     const [automations, controls] = await decodeRegisters();
     expect(inspectDeploymentAutomationRegisters(automations, controls)).toEqual(
       []

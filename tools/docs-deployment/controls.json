@@ -42,5 +42,16 @@
     "retirementCondition": "A stronger provider-independent receipt reconciler preserves completed-run, artifact, source/input and failure-readback coverage.",
     "reviewTrigger": "Workflow_run trigger, receipt schema/checker, artifact naming, source checkout or external-state promotion change.",
     "signal": "A named Preview, Production or teardown workflow completes."
+  },
+  {
+    "evidence": "bun run test:docs-deployment",
+    "fixture": "tools/docs-deployment/workflow.contract.test.ts",
+    "id": "docs-workflow-cache-boundary",
+    "owner": "taxkit-docs-deployment-automation-owner",
+    "preventedFailure": "A cache skips live install, plan, provider mutation, readback, hosted proof or receipt promotion; reuses node_modules; accepts a mutable action; or exposes a deployment credential through a cached task.",
+    "recovery": "Remove only the remote and GitHub cache bindings, retain frozen installation and Chromium setup, then rerun the exact live workflow path.",
+    "retirementCondition": "A stronger deployment acceleration control preserves exact source, live authority checks and cache-free recovery.",
+    "reviewTrigger": "Turbo task, remote binding, cache action, key, path, install order, workflow event, credential or proof-boundary change.",
+    "signal": "A deployment or receipt workflow restores, executes or saves accelerated repository work."
   }
 ]
