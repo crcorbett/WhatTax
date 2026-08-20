@@ -21,6 +21,7 @@ Specs:
 
 | Spec | Status | Notes |
 | --- | --- | --- |
+| [Turbo and CI Cache Efficiency](./ci-cache-efficiency.md) | Proposed | Successor planning for Vercel Remote Cache across eligible Turbo commands in pull requests, main, trusted deployment/receipt workflows and explicit local use, plus Bun and Playwright GitHub Actions caches; implementation has not started. |
 | [Quality Trigger Efficiency](./quality-trigger-efficiency.md) | Implemented | Candidate `1b45489` passed hosted Quality run `32315275636`; feature-branch push duplication is removed while pull-request and main-branch coverage remains. |
 | [Native Alchemy docs deployment](./native-alchemy-docs-deployment.md) | Implemented | Candidate `7a23bf3` passed exact Git, Preview, Production, public-journey and named-stage teardown proof; future changes require a successor SPEC. |
 | [Native Alchemy docs integration](./native-alchemy-docs-integration.md) | Implemented | The manual docs build/Worker graph is replaced by beta.64's first-class Website.Vite lifecycle; current proof owns one resource and the ephemeral GitHub orphan subprocess helper is retired. |

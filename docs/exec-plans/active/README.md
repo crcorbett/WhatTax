@@ -14,6 +14,12 @@ tombstone: false
 Live implementation plans belong here while work is in progress. Maintainer
 lifecycle is owned by [`../../README.md`](../../README.md).
 
+The proposed [Turbo and CI Cache Efficiency](../../product-specs/ci-cache-efficiency.md)
+SPEC and
+[task list](../../product-specs/ci-cache-efficiency.tasks.json) are the current
+planning route for the next CI efficiency slice. No implementation execution
+plan is active yet; create one when the first task is approved and work begins.
+
 The completed deployment goal is retained in the
 [`Native Alchemy docs deployment`](../completed/native-alchemy-docs-deployment.md)
 plan. It records the implemented native Website.Vite candidate through the
