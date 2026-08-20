@@ -122,6 +122,15 @@ boundary are retired. They did not provide a contributor-neutral lifecycle
 model. PR-close teardown remains the explicit Preview cleanup owner; retained
 orphan reports are immutable historical observations only.
 
+Preview deployment and exact-stage PR-close teardown share the
+`taxkit-docs-preview` GitHub environment and its narrow mutation credential.
+That environment has no required reviewer: the Preview dispatch or trusted
+same-repository PR-close event supplies operation authority, while reviewed
+source, exact `pr-N` decoding, the non-cancellable stage lock, equal plans and
+provider/state readback enforce the target. Production keeps its separate
+reviewer-protected environment. A GitHub environment controls credential
+custody; Alchemy stage identity controls which infrastructure can change.
+
 The accepted Preview requalification used candidate
 `d9cb8945529fb72158e59ca0daf02a98e1e4de1a` at deterministic stage `pr-1`.
 Alchemy created one prebuilt Worker/assets resource after two equal sanitized

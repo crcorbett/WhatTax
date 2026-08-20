@@ -82,7 +82,7 @@ const inspectMutation = (
         "release-or-publication",
         "unrelated-provider-resource",
       ],
-      environment: "taxkit-docs-preview-teardown",
+      environment: "taxkit-docs-preview",
       group: previewMutationGroup,
       operation: "preview-destroy",
       principal: "taxkit-docs-preview-teardown-workflow",
@@ -131,7 +131,7 @@ const inspectMutation = (
         finding(
           "mutation-lock",
           `tools/docs-deployment/automation-register.json:${automation.id}`,
-          "Bind the exact protected environment, operation and non-cancellable stage lock."
+          "Bind the exact environment-scoped credential, operation and non-cancellable stage lock."
         ),
       ]
     : [];

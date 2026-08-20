@@ -310,7 +310,7 @@ describe("docs deployment workflow admission", () => {
     );
   });
 
-  test("uses the three exact protected environment identities", async () => {
+  test("shares Preview credentials for deploy and exact-stage teardown", async () => {
     const [preview, production, teardown] = await Promise.all([
       readWorkflow(workflowPaths.preview),
       readWorkflow(workflowPaths.production),
@@ -318,7 +318,8 @@ describe("docs deployment workflow admission", () => {
     ]);
     expect(preview).toContain("environment: taxkit-docs-preview");
     expect(production).toContain("environment: taxkit-docs-production");
-    expect(teardown).toContain("environment: taxkit-docs-preview-teardown");
+    expect(teardown).toContain("environment: taxkit-docs-preview");
+    expect(teardown).not.toContain("environment: taxkit-docs-preview-teardown");
   });
 
   test("keeps the first default-branch bootstrap source-bound", async () => {

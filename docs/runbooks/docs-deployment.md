@@ -28,7 +28,7 @@ resource; a first successor plan may include its deletion beside the required
 Website action. Stop on any other resource or action.
 
 1. Bind the exact candidate SHA, reviewed workflow SHA, `pr-N` or `prod` stage,
-   account, protected environment and operation. Run
+   account, environment-scoped credential and operation. Run
    `bun run check:docs-deployment` and the repository verification appropriate
    to the change.
 2. Run `bun run docs:build` and
@@ -48,9 +48,17 @@ Website action. Stop on any other resource or action.
    closed PR, require two equal dry-runs, destroy only exact `pr-N`, and prove
    both Alchemy stage and Worker absence. A missing stage is a bounded no-op.
 6. Promote a receipt only after workflow-run reconciliation and Schema checks.
-   The current native-graph Preview, Production and exact-stage teardown
-   receipts are retained under the 2026-08-20 evidence directories and are
-   the current external-state observations for those three owners.
+   The current native-graph Preview and Production receipts remain accepted.
+   The prior exact-stage teardown receipts remain dated proof for their former
+   environment identity; teardown needs a fresh shared-Preview-environment
+   receipt before it returns to `established`.
+
+Preview deploy and teardown use `taxkit-docs-preview`. It contains the narrow
+mutation credential and has no required reviewer. This removes a second blind
+approval after an operator dispatches Preview and lets a trusted PR-close event
+clean up automatically. Production remains in reviewer-protected
+`taxkit-docs-production`. Restore the Preview reviewer rule and the former
+teardown workflow environment binding if automatic admission is found unsafe.
 
 For integrated local Cloudflare development run `bun run docs:dev:cloudflare`
 (`alchemy dev`). Use `bun run docs:dev:vite` only for the explicitly
@@ -707,11 +715,14 @@ requires `preview` with `pr-N` for Preview, `production` or `rollback` with
 `prod` for Production, and exactly one desktop plus one mobile screenshot whose
 retained PNG bytes hash to the manifest.
 
-The current register records four established entries after their separate
-receipt contracts were satisfied: main-sourced Preview, fixed Production with
-normal rollback, exact-stage Preview teardown and report-only inventory. Each
-receipt remains candidate/source-bound; a later workflow, provider,
-environment, credential or deployment-input change requires fresh promotion.
+Before the shared Preview-environment change, the register recorded four
+established classes: main-sourced Preview, fixed Production with normal
+rollback, exact-stage Preview teardown and report-only inventory. Preview and
+Production remain accepted; teardown is now `not-established` because its
+environment identity changed. Report-only inventory remains a separate
+read-only class. Each receipt remains candidate/source-bound; a later workflow,
+provider, environment, credential or deployment-input change requires fresh
+promotion.
 The read-only reconciler is governed by the separate
 `docs-workflow-receipt-reconciliation` control; it does not add provider
 authority or a fifth mutation automation.
@@ -977,7 +988,7 @@ from the pinned beta.64 dry-run before any destroy. No teardown absence,
 custom-domain/DNS, billing, release, publication or public-domain claim is
 made from this epoch.
 
-## 2026-08-10 — current Preview teardown receipt
+## 2026-08-10 — historical Preview teardown receipt
 
 Reviewed-main teardown run `31350160353` for closed PR #24 completed through
 the direct pinned beta.64 entrypoint after the parser and freshness corrections.
@@ -1066,6 +1077,12 @@ Post-merge `main` Quality run `32305069327`, exact Preview teardown
 `32305072590` and workflow-receipt reconciliation `32305214604` passed. No
 provider, DNS, custom-domain, publication or release claim follows from this
 readback.
+
+Those teardown receipts used the former dedicated teardown environment. They
+remain valid dated absence observations, but they do not establish the current
+shared `taxkit-docs-preview` environment identity. The current automation
+entry therefore remains `not-established` until a successor PR-close receipt
+is promoted.
 
 ## Stop conditions
 

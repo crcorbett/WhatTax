@@ -14,6 +14,13 @@ tombstone: false
 Live implementation plans belong here while work is in progress. Maintainer
 lifecycle is owned by [`../../README.md`](../../README.md).
 
+The active
+[Automatic Preview Teardown Admission](./automatic-preview-teardown-admission.md)
+plan moves exact-stage PR-close cleanup onto the shared Preview credential
+environment without a required reviewer. Production remains protected and the
+former teardown environment remains until the reviewed workflow reaches
+`main`.
+
 The implemented
 [Pull-request Turbo Write-through Cache](../../product-specs/pull-request-turbo-write-through.md)
 SPEC and [completed plan](../completed/pull-request-turbo-write-through.md)

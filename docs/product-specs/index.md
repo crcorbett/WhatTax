@@ -21,6 +21,7 @@ Specs:
 
 | Spec | Status | Notes |
 | --- | --- | --- |
+| [Automatic Preview Teardown Admission](./automatic-preview-teardown-admission.md) | Active | Reuse the Preview credential environment without a blind reviewer step, while retaining exact-stage Alchemy planning, locking and absence proof. The old teardown environment remains until the workflow reaches `main`. |
 | [Shared Dependency Cache and Checkout Upgrade](./shared-dependency-cache-and-checkout.md) | Implemented | PR #59 run `32357219491` passed twice on the same source commit; attempt 2 restored both exact shared keys, kept live installs and completed in 54 seconds with checkout v7.0.1. Cross-ref restore from `main` remains a post-merge proof boundary. |
 | [Pull-request Turbo Write-through Cache](./pull-request-turbo-write-through.md) | Implemented | PWC-001 enables Vercel Remote Cache writes for token-bearing same-repository pull requests. Exact run `32351432522` proved a pull-request miss/write and same-commit remote hit; fork fallback and live frozen install remain. |
 | [Turbo and CI Cache Efficiency](./ci-cache-efficiency.md) | Implemented | TCC-001 through TCC-005 retain event-safe Vercel task caching plus separate Bun-package and Chromium caches. Same-commit hosted proof records a 79% Turbo worker saving; dependency savings remain step-bounded, and trusted Preview plan-only proof retained live authority boundaries. |
