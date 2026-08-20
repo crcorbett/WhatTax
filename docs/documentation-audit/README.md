@@ -13,6 +13,21 @@ This route owns dated audit and corpus-accounting evidence, not current
 maintainer policy. Lifecycle and semantic ownership are defined by
 [`../README.md`](../README.md).
 
+Active CI cache qualification evidence:
+
+- [`ci-cache-efficiency/TCC-001-qualification.md`](ci-cache-efficiency/TCC-001-qualification.md)
+- [`ci-cache-efficiency/TCC-001-read-only-authority.json`](ci-cache-efficiency/TCC-001-read-only-authority.json)
+- [`ci-cache-efficiency/TCC-001-cache-authority.json`](ci-cache-efficiency/TCC-001-cache-authority.json)
+- [`ci-cache-efficiency/TCC-001-provider-readback.json`](ci-cache-efficiency/TCC-001-provider-readback.json)
+
+This dated evidence records read-only identities, current cache configuration,
+hosted Quality timings, local forced Turbo timings, the successor cache-only
+implementation authority, and the bounded Vercel project/token, GitHub
+secret/variable names and 1Password item identity. The bearer is not recorded.
+This grants no provider
+deployment created merely to host the cache, publication, release, DNS or
+unrelated Production authority.
+
 Accepted native Alchemy docs integration evidence:
 
 - [`native-alchemy-docs-integration/NAI-005-validation.json`](native-alchemy-docs-integration/NAI-005-validation.json)

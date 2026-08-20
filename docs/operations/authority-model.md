@@ -3,7 +3,7 @@ document_type: authority-model
 lifecycle: current
 authority: canonical
 owner: taxkit-authority-model-owner
-last_reviewed: 2026-08-10
+last_reviewed: 2026-08-20
 review_trigger: identity, release, Git, registry, deployment, provider, credential, or recovery change
 ---
 
@@ -39,6 +39,45 @@ The exact machine-checked records live in
 `tools/documentation/runbook-contract.json`. That sidecar and this table must
 agree; neither grants authority. Provider/registry/deployment claims require
 current target-system readback by the authorized principal.
+
+## 2026-08-20 — Vercel Remote Cache qualification
+
+TCC-001 has read-only authority to inspect the TaxKit repository, GitHub
+Actions metadata and the currently authenticated Vercel identity. The dated
+receipt is
+[`../documentation-audit/ci-cache-efficiency/TCC-001-read-only-authority.json`](../documentation-audit/ci-cache-efficiency/TCC-001-read-only-authority.json).
+It proves that GitHub and Vercel both identified the current user as
+`crcorbett`, and that Vercel returned two possible teams. It does not choose a
+team or grant cache mutation authority.
+
+The initial readback found no repository-level or environment-level GitHub
+Actions secret or variable matching `TURBO`, `VERCEL` or `CACHE`. The successor
+authority below now replaces that initial stop only for the named cache work.
+Existing deployment credentials and their historical authority still do not
+grant this separate cache authority.
+
+Cooper's 2026-08-20 successor approval names the complete active SPEC as the
+bounded implementation goal and selects the `cooper-corbetts-projects` Hobby
+team. The executable envelope is
+[`../documentation-audit/ci-cache-efficiency/TCC-001-cache-authority.json`](../documentation-audit/ci-cache-efficiency/TCC-001-cache-authority.json).
+It permits the dedicated TaxKit cache project and expiring cache credential,
+the named GitHub Actions secrets/variables and environments, workflow cache
+configuration, hosted verification and cache-only rollback needed by TCC-001
+through TCC-005. It excludes deployment or publication created merely to host
+the cache, unrelated Vercel resources, token disclosure, merge, release,
+package publication, DNS and destructive provider cleanup outside the recorded
+cache rollback.
+
+Under that envelope, Vercel read back team
+`team_1LX7ZujbijowTv8J9k0aU7nD`, the enabled team Remote Cache, and empty
+project `prj_5AOSvL1mowN48x15MnwhvRWPZc9k`. The project-scoped token
+`taxkit-turbo-ci-2026-08-20` expires on 2026-11-18. GitHub reads back
+`TURBO_TEAM=cooper-corbetts-projects` and the encrypted `TURBO_TOKEN` secret
+name. 1Password reads back API Credential item
+`taxkit-turbo-ci-2026-08-20` in the Corbett Family `taxkit` vault. The bearer
+was transferred directly, no repository content records its value, and the
+system clipboard was cleared. This names-only readback admits the TCC-002
+workflow slice under the same expiry, revocation and rollback boundary.
 
 ## Dated TaxKit docs deployment envelope
 

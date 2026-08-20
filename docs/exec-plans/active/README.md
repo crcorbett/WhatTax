@@ -14,11 +14,14 @@ tombstone: false
 Live implementation plans belong here while work is in progress. Maintainer
 lifecycle is owned by [`../../README.md`](../../README.md).
 
-The proposed [Turbo and CI Cache Efficiency](../../product-specs/ci-cache-efficiency.md)
-SPEC and
-[task list](../../product-specs/ci-cache-efficiency.tasks.json) are the current
-planning route for the next CI efficiency slice. No implementation execution
-plan is active yet; create one when the first task is approved and work begins.
+The active
+[Turbo and CI Cache Efficiency](../../product-specs/ci-cache-efficiency.md)
+SPEC, [task list](../../product-specs/ci-cache-efficiency.tasks.json) and
+[execution plan](./ci-cache-efficiency.md) own the current CI cache work.
+TCC-001 has qualified the exact cache inputs, event boundary and cold baseline.
+The cache owner has now approved the complete SPEC implementation in the
+`cooper-corbetts-projects` Hobby team, so the task is establishing the bounded
+project, credential and GitHub readback before workflow changes.
 
 The completed deployment goal is retained in the
 [`Native Alchemy docs deployment`](../completed/native-alchemy-docs-deployment.md)
