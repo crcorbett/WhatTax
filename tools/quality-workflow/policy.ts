@@ -33,17 +33,75 @@ const expectedTurboToken = [
   workflowExpressionPrefix,
   "{{ secrets.TURBO_TOKEN }}",
 ].join("");
+const expectedPlaywrightBrowsersPath = [
+  workflowExpressionPrefix,
+  "{{ github.workspace }}/../.cache/ms-playwright",
+].join("");
+const cacheActionSha = "55cc8345863c7cc4c66a329aec7e433d2d1c52a9";
+const cacheRestoreAction = `actions/cache/restore@${cacheActionSha}`;
+const cacheSaveAction = `actions/cache/save@${cacheActionSha}`;
+const bunCachePathCommand = 'echo "path=$(bun pm cache)" >> "$GITHUB_OUTPUT"';
+const playwrightIdentityCommand =
+  'echo "version=$(apps/docs/node_modules/.bin/playwright --version | cut -d\' \' -f2)" >> "$GITHUB_OUTPUT"';
+const expectedBunCachePath = [
+  workflowExpressionPrefix,
+  "{{ steps.bun-cache-path.outputs.path }}",
+].join("");
+const expectedBunCacheKey = [
+  "bun-packages-",
+  workflowExpressionPrefix,
+  "{{ github.event_name }}-",
+  workflowExpressionPrefix,
+  "{{ runner.os }}-",
+  workflowExpressionPrefix,
+  "{{ runner.arch }}-",
+  workflowExpressionPrefix,
+  "{{ hashFiles('.bun-version') }}-",
+  workflowExpressionPrefix,
+  "{{ hashFiles('bun.lock') }}",
+].join("");
+const expectedPlaywrightCachePath = [
+  workflowExpressionPrefix,
+  "{{ env.PLAYWRIGHT_BROWSERS_PATH }}",
+].join("");
+const expectedPlaywrightCacheKey = [
+  "playwright-chromium-",
+  workflowExpressionPrefix,
+  "{{ github.event_name }}-",
+  workflowExpressionPrefix,
+  "{{ runner.os }}-",
+  workflowExpressionPrefix,
+  "{{ runner.arch }}-",
+  workflowExpressionPrefix,
+  "{{ steps.playwright-identity.outputs.version }}-",
+  workflowExpressionPrefix,
+  "{{ hashFiles('bun.lock') }}",
+].join("");
+const expectedBunSaveKey = [
+  workflowExpressionPrefix,
+  "{{ steps.bun-cache-restore.outputs.cache-primary-key }}",
+].join("");
+const expectedPlaywrightSaveKey = [
+  workflowExpressionPrefix,
+  "{{ steps.playwright-cache-restore.outputs.cache-primary-key }}",
+].join("");
 const allowedRunSteps = new Set([
   "git show-ref --verify --quiet refs/heads/main || git branch --track main origin/main",
+  bunCachePathCommand,
   "bun install --frozen-lockfile",
+  playwrightIdentityCommand,
   "apps/docs/node_modules/.bin/playwright install --with-deps chromium",
   "bun run check:quality-workflow",
   "bun run release:check -- --ci",
 ]);
-const expectedActionSteps = new Set([
+const expectedActionSteps = [
   "actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5",
   "oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6",
-]);
+  cacheRestoreAction,
+  cacheSaveAction,
+  cacheRestoreAction,
+  cacheSaveAction,
+];
 const UnknownRecord = Schema.Record(Schema.String, Schema.Unknown);
 
 const finding = (
@@ -191,9 +249,14 @@ const inspectSteps = (steps: unknown): readonly QualityWorkflowFinding[] => {
     .filter((step): step is Record<string, unknown> => step !== null)
     .flatMap((step) => (typeof step.run === "string" ? [step.run] : []));
   const validActionSteps =
-    actionSteps.length === expectedActionSteps.size &&
+    actionSteps.length === expectedActionSteps.length &&
     actionSteps.every(
-      (step) => actionPin.test(step) && expectedActionSteps.has(step)
+      (step) => actionPin.test(step) && expectedActionSteps.includes(step)
+    ) &&
+    expectedActionSteps.every(
+      (step) =>
+        actionSteps.filter((actual) => actual === step).length ===
+        expectedActionSteps.filter((expected) => expected === step).length
     );
   const validRunSteps =
     runSteps.length === allowedRunSteps.size &&
@@ -203,12 +266,22 @@ const inspectSteps = (steps: unknown): readonly QualityWorkflowFinding[] => {
   const historyStep = asRecord(steps[1]);
   const setupStep = asRecord(steps[2]);
   const setupWith = asRecord(setupStep?.with);
-  const installStep = asRecord(steps[3]);
-  const browserStep = asRecord(steps[4]);
-  const policyStep = asRecord(steps[5]);
-  const releaseStep = asRecord(steps[6]);
+  const bunCachePathStep = asRecord(steps[3]);
+  const bunCacheRestoreStep = asRecord(steps[4]);
+  const bunCacheRestoreWith = asRecord(bunCacheRestoreStep?.with);
+  const installStep = asRecord(steps[5]);
+  const bunCacheSaveStep = asRecord(steps[6]);
+  const bunCacheSaveWith = asRecord(bunCacheSaveStep?.with);
+  const playwrightIdentityStep = asRecord(steps[7]);
+  const playwrightCacheRestoreStep = asRecord(steps[8]);
+  const playwrightCacheRestoreWith = asRecord(playwrightCacheRestoreStep?.with);
+  const browserStep = asRecord(steps[9]);
+  const playwrightCacheSaveStep = asRecord(steps[10]);
+  const playwrightCacheSaveWith = asRecord(playwrightCacheSaveStep?.with);
+  const policyStep = asRecord(steps[11]);
+  const releaseStep = asRecord(steps[12]);
   const exactSteps =
-    steps.length === 7 &&
+    steps.length === 13 &&
     checkoutStep !== null &&
     hasOnly(checkoutStep, ["uses", "with"]) &&
     checkoutStep.uses ===
@@ -227,13 +300,69 @@ const inspectSteps = (steps: unknown): readonly QualityWorkflowFinding[] => {
     setupWith !== null &&
     hasOnly(setupWith, ["bun-version-file"]) &&
     setupWith["bun-version-file"] === ".bun-version" &&
+    bunCachePathStep !== null &&
+    hasOnly(bunCachePathStep, ["id", "run"]) &&
+    bunCachePathStep.id === "bun-cache-path" &&
+    bunCachePathStep.run === bunCachePathCommand &&
+    bunCacheRestoreStep !== null &&
+    hasOnly(bunCacheRestoreStep, ["id", "uses", "continue-on-error", "with"]) &&
+    bunCacheRestoreStep.id === "bun-cache-restore" &&
+    bunCacheRestoreStep.uses === cacheRestoreAction &&
+    bunCacheRestoreStep["continue-on-error"] === true &&
+    bunCacheRestoreWith !== null &&
+    hasOnly(bunCacheRestoreWith, ["path", "key"]) &&
+    bunCacheRestoreWith.path === expectedBunCachePath &&
+    bunCacheRestoreWith.key === expectedBunCacheKey &&
     installStep !== null &&
     hasOnly(installStep, ["run"]) &&
     installStep.run === "bun install --frozen-lockfile" &&
+    bunCacheSaveStep !== null &&
+    hasOnly(bunCacheSaveStep, ["uses", "if", "continue-on-error", "with"]) &&
+    bunCacheSaveStep.uses === cacheSaveAction &&
+    bunCacheSaveStep.if ===
+      "steps.bun-cache-restore.outputs.cache-hit != 'true'" &&
+    bunCacheSaveStep["continue-on-error"] === true &&
+    bunCacheSaveWith !== null &&
+    hasOnly(bunCacheSaveWith, ["path", "key"]) &&
+    bunCacheSaveWith.path === expectedBunCachePath &&
+    bunCacheSaveWith.key === expectedBunSaveKey &&
+    playwrightIdentityStep !== null &&
+    hasOnly(playwrightIdentityStep, ["id", "run"]) &&
+    playwrightIdentityStep.id === "playwright-identity" &&
+    playwrightIdentityStep.run === playwrightIdentityCommand &&
+    playwrightCacheRestoreStep !== null &&
+    hasOnly(playwrightCacheRestoreStep, [
+      "id",
+      "uses",
+      "continue-on-error",
+      "with",
+    ]) &&
+    playwrightCacheRestoreStep.id === "playwright-cache-restore" &&
+    playwrightCacheRestoreStep.uses === cacheRestoreAction &&
+    playwrightCacheRestoreStep["continue-on-error"] === true &&
+    playwrightCacheRestoreWith !== null &&
+    hasOnly(playwrightCacheRestoreWith, ["path", "key"]) &&
+    playwrightCacheRestoreWith.path === expectedPlaywrightCachePath &&
+    playwrightCacheRestoreWith.key === expectedPlaywrightCacheKey &&
     browserStep !== null &&
     hasOnly(browserStep, ["run"]) &&
     browserStep.run ===
       "apps/docs/node_modules/.bin/playwright install --with-deps chromium" &&
+    playwrightCacheSaveStep !== null &&
+    hasOnly(playwrightCacheSaveStep, [
+      "uses",
+      "if",
+      "continue-on-error",
+      "with",
+    ]) &&
+    playwrightCacheSaveStep.uses === cacheSaveAction &&
+    playwrightCacheSaveStep.if ===
+      "steps.playwright-cache-restore.outputs.cache-hit != 'true'" &&
+    playwrightCacheSaveStep["continue-on-error"] === true &&
+    playwrightCacheSaveWith !== null &&
+    hasOnly(playwrightCacheSaveWith, ["path", "key"]) &&
+    playwrightCacheSaveWith.path === expectedPlaywrightCachePath &&
+    playwrightCacheSaveWith.key === expectedPlaywrightSaveKey &&
     policyStep !== null &&
     hasOnly(policyStep, ["run"]) &&
     policyStep.run === "bun run check:quality-workflow" &&
@@ -292,11 +421,13 @@ const hasExactWorkflowCachePolicy = (
   return (
     workflow.env !== undefined &&
     hasOnly(workflow.env, [
+      "PLAYWRIGHT_BROWSERS_PATH",
       "TAXKIT_ACTION_PIN_UPDATE_OWNER",
       "TURBO_CACHE",
       "TURBO_TEAM",
       "TURBO_TOKEN",
     ]) &&
+    workflow.env.PLAYWRIGHT_BROWSERS_PATH === expectedPlaywrightBrowsersPath &&
     workflow.env.TURBO_CACHE === expectedTurboCache &&
     workflow.env.TURBO_TEAM === expectedTurboTeam &&
     workflow.env.TURBO_TOKEN === expectedTurboToken &&
@@ -511,6 +642,21 @@ const expectedControls = {
     signal:
       "A proposal adds recurring documentation or context freshness work.",
   },
+  "quality-dependency-cache-boundary": {
+    evidence: "bun run check:quality-workflow",
+    fixture: "tools/quality-workflow/policy.test.ts",
+    owner: "taxkit-ci-release-maintainer",
+    preventedFailure:
+      "CI caches node_modules, reuses an incompatible browser binary, lets pull-request entries replace trusted main entries, skips frozen or system installation, or turns cache failure into Quality failure.",
+    recovery:
+      "Remove the dependency-cache restore/save steps while preserving frozen Bun install, Chromium system dependencies, browser proof and the full Quality graph.",
+    retirementCondition:
+      "A stronger event-scoped dependency-cache control replaces this contract.",
+    reviewTrigger:
+      "Bun version, lockfile, Playwright version, runner platform, cache action, key, path, event scope or install command change.",
+    signal:
+      "A Bun package or Playwright Chromium cache path, key, action, event scope or install order changes.",
+  },
   "quality-workflow-semantics": {
     evidence: "bun run check:quality-workflow",
     fixture: "tools/quality-workflow/policy.test.ts",
@@ -544,6 +690,7 @@ const expectedControls = {
 const expectedControlIds = [
   "canonical-release-graph",
   "context-candidate-admission",
+  "quality-dependency-cache-boundary",
   "quality-workflow-semantics",
   "turbo-remote-cache-boundary",
 ] as const;
@@ -568,7 +715,7 @@ const inspectControls = (controls: readonly ControlRegisterEntry[]) => [
         finding(
           "control-register",
           "tools/quality-workflow/controls.json",
-          "Keep exactly the four registered controls; reject unowned additions."
+          "Keep exactly the five registered controls; reject unowned additions."
         ),
       ]),
   ...expectedControlIds.flatMap((id) => {
@@ -744,11 +891,12 @@ const inspectQualityAutomation = (
     quality.durableState.kind !== "immutable-revision-validation" ||
     quality.durableState.location !== "checked-out-repository-revision" ||
     quality.authority.principal !== "taxkit-ci-release-maintainer" ||
-    quality.authority.resource !==
-      "taxkit-repository-runner-and-vercel-cache" ||
+    quality.authority.resource !== "taxkit-repository-runner-and-ci-caches" ||
     quality.authority.environment !== "github-actions-ci" ||
     !hasExactMembers(quality.authority.grants, [
       "contents:read",
+      "dependency-cache:read",
+      "dependency-cache:write-event-scoped",
       "remote-cache:read",
       "remote-cache:write-on-main",
     ]) ||
@@ -757,6 +905,8 @@ const inspectQualityAutomation = (
       "immutable repository revision",
       "configured Actions runner",
       "Vercel team remote-cache task artifacts and logs",
+      "event-scoped GitHub Bun package cache",
+      "event-scoped GitHub Playwright Chromium cache",
     ]) ||
     quality.environment.trigger !== "configured-pull-request-or-push" ||
     quality.proof.command !== "bun run release:check -- --ci" ||
@@ -769,13 +919,15 @@ const inspectQualityAutomation = (
       "first tagged check failure",
       "unknown workflow shape",
       "pull-request remote write mode",
+      "pull-request dependency cache uses a trusted main key",
+      "dependency cache skips frozen install or Chromium system dependencies",
       "cache-only success or missing uncached fallback",
     ]) ||
     quality.rollback.action !==
-      "remove Turbo cache bindings while preserving the complete uncached Quality graph" ||
+      "remove Turbo and dependency-cache bindings while preserving frozen installs and the complete uncached Quality graph" ||
     quality.rollback.authorityRequired !== "taxkit-ci-release-maintainer" ||
     quality.recovery.action !==
-      "repair the named source or cache boundary and run the canonical graph uncached on a new revision" ||
+      "repair the named source or cache boundary, remove dependency-cache restore/save when needed, and run frozen installs plus the canonical graph on a new revision" ||
     quality.recovery.verificationCommand !== "bun run release:check -- --ci" ||
     quality.retirementCondition.condition !==
       "a stronger canonical CI owner replaces the quality workflow" ||

@@ -72,6 +72,11 @@ skip the release check, replace a failure, create candidate evidence or grant
 publication or deployment authority. Missing remote-cache access falls back to
 the complete local task graph.
 
+The workflow may restore Bun package downloads and the Playwright Chromium
+binary before this graph starts. Those GitHub caches do not cache
+`node_modules`, skip frozen installation, replace Playwright `--with-deps` or
+change this orchestrator's nine checks and true exit codes.
+
 Each invocation records its exact executable, arguments and true exit code in a
 schema-backed outcome. Complete stdout and stderr are streamed through a
 cross-chunk redactor into unique ignored files under `tmp/release-readiness`;

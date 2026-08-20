@@ -21,6 +21,7 @@ on:
 permissions:
   contents: read
 env:
+  PLAYWRIGHT_BROWSERS_PATH: ${"${{"} github.workspace }}/../.cache/ms-playwright
   TAXKIT_ACTION_PIN_UPDATE_OWNER: taxkit-ci-release-maintainer
   TURBO_CACHE: ${"${{"} github.event_name == 'pull_request' && 'local:rw,remote:r' || 'local:rw,remote:rw' }}
   TURBO_TEAM: ${"${{"} vars.TURBO_TEAM }}
@@ -40,8 +41,36 @@ jobs:
       - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6
         with:
           bun-version-file: .bun-version
+      - id: bun-cache-path
+        run: echo "path=$(bun pm cache)" >> "$GITHUB_OUTPUT"
+      - id: bun-cache-restore
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9
+        continue-on-error: true
+        with:
+          path: ${"${{"} steps.bun-cache-path.outputs.path }}
+          key: bun-packages-${"${{"} github.event_name }}-${"${{"} runner.os }}-${"${{"} runner.arch }}-${"${{"} hashFiles('.bun-version') }}-${"${{"} hashFiles('bun.lock') }}
       - run: bun install --frozen-lockfile
+      - uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9
+        if: steps.bun-cache-restore.outputs.cache-hit != 'true'
+        continue-on-error: true
+        with:
+          path: ${"${{"} steps.bun-cache-path.outputs.path }}
+          key: ${"${{"} steps.bun-cache-restore.outputs.cache-primary-key }}
+      - id: playwright-identity
+        run: echo "version=$(apps/docs/node_modules/.bin/playwright --version | cut -d' ' -f2)" >> "$GITHUB_OUTPUT"
+      - id: playwright-cache-restore
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9
+        continue-on-error: true
+        with:
+          path: ${"${{"} env.PLAYWRIGHT_BROWSERS_PATH }}
+          key: playwright-chromium-${"${{"} github.event_name }}-${"${{"} runner.os }}-${"${{"} runner.arch }}-${"${{"} steps.playwright-identity.outputs.version }}-${"${{"} hashFiles('bun.lock') }}
       - run: apps/docs/node_modules/.bin/playwright install --with-deps chromium
+      - uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9
+        if: steps.playwright-cache-restore.outputs.cache-hit != 'true'
+        continue-on-error: true
+        with:
+          path: ${"${{"} env.PLAYWRIGHT_BROWSERS_PATH }}
+          key: ${"${{"} steps.playwright-cache-restore.outputs.cache-primary-key }}
       - run: bun run check:quality-workflow
       - run: bun run release:check -- --ci
 `;
@@ -77,6 +106,50 @@ describe("quality workflow policy", () => {
       acceptedWorkflow.replace(
         "      - run: apps/docs/node_modules/.bin/playwright install --with-deps chromium\n",
         ""
+      ),
+    ]) {
+      expect(findingsFor(workflow).map((item) => item.invariant)).toContain(
+        "workflow-mutation-step"
+      );
+    }
+  });
+
+  test("rejects node_modules caches and keys without event or version identity", () => {
+    for (const workflow of [
+      acceptedWorkflow.replace(
+        ["path: $", "{{ steps.bun-cache-path.outputs.path }}"].join(""),
+        "path: node_modules"
+      ),
+      acceptedWorkflow.replace("bun-packages-${", "bun-packages-"),
+      acceptedWorkflow.replace(
+        ["-$", "{{ hashFiles('.bun-version') }}"].join(""),
+        ""
+      ),
+      acceptedWorkflow.replace(
+        ["-$", "{{ steps.playwright-identity.outputs.version }}"].join(""),
+        ""
+      ),
+    ]) {
+      expect(findingsFor(workflow).map((item) => item.invariant)).toContain(
+        "workflow-mutation-step"
+      );
+    }
+  });
+
+  test("rejects trusted-key reuse, cache failures that stop Quality and early saves", () => {
+    for (const workflow of [
+      acceptedWorkflow.replace(
+        ["$", "{{ github.event_name }}"].join(""),
+        "push"
+      ),
+      acceptedWorkflow.replace("        continue-on-error: true\n", ""),
+      acceptedWorkflow.replace(
+        "      - run: bun install --frozen-lockfile\n      - uses: actions/cache/save@",
+        "      - uses: actions/cache/save@"
+      ),
+      acceptedWorkflow.replace(
+        "      - run: apps/docs/node_modules/.bin/playwright install --with-deps chromium\n      - uses: actions/cache/save@",
+        "      - uses: actions/cache/save@"
       ),
     ]) {
       expect(findingsFor(workflow).map((item) => item.invariant)).toContain(

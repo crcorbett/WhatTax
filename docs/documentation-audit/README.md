@@ -20,6 +20,7 @@ Active CI cache qualification evidence:
 - [`ci-cache-efficiency/TCC-001-cache-authority.json`](ci-cache-efficiency/TCC-001-cache-authority.json)
 - [`ci-cache-efficiency/TCC-001-provider-readback.json`](ci-cache-efficiency/TCC-001-provider-readback.json)
 - [`ci-cache-efficiency/TCC-002-quality-turbo-candidate.md`](ci-cache-efficiency/TCC-002-quality-turbo-candidate.md)
+- [`ci-cache-efficiency/TCC-003-dependency-cache-candidate.md`](ci-cache-efficiency/TCC-003-dependency-cache-candidate.md)
 
 This dated evidence records read-only identities, current cache configuration,
 hosted Quality timings, local forced Turbo timings, the successor cache-only
@@ -33,6 +34,10 @@ The TCC-002 evidence records the Turbo-backed Quality graph, event-scoped
 remote-cache policy, local forced and missing-token fallback, trusted-main
 write/read proof and pull-request read-only reuse. It accepts the Quality slice
 without making deployment, publication or public-availability claims.
+
+The TCC-003 candidate records the separate Bun-package and Chromium-binary
+cache paths, exact event/platform/version keys, install order and fallback. It
+remains inconclusive until cold and warm hosted Quality evidence exists.
 
 Accepted native Alchemy docs integration evidence:
 

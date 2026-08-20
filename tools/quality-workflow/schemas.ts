@@ -159,6 +159,8 @@ const AutomationAuthority = Schema.Struct({
   grants: Schema.Array(
     Schema.Literals([
       "contents:read",
+      "dependency-cache:read",
+      "dependency-cache:write-event-scoped",
       "remote-cache:read",
       "remote-cache:write-on-main",
     ])
@@ -167,6 +169,7 @@ const AutomationAuthority = Schema.Struct({
   resource: Schema.Literals([
     "taxkit-repository-and-runner",
     "taxkit-repository-runner-and-vercel-cache",
+    "taxkit-repository-runner-and-ci-caches",
     "explicit-source-set-and-candidate",
   ]),
 });
@@ -175,6 +178,7 @@ const AutomationResource = Schema.Struct({
   id: Schema.Literals([
     "taxkit-repository-and-runner",
     "taxkit-repository-runner-and-vercel-cache",
+    "taxkit-repository-runner-and-ci-caches",
     "explicit-source-set-and-candidate",
   ]),
   scope: Schema.NonEmptyArray(Schema.NonEmptyString),
