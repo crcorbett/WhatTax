@@ -366,7 +366,8 @@ jobs:
           TAXKIT_WORKFLOW_PLAN_SHA256="$ACCEPTED_PLAN_SHA256" \
           TAXKIT_WORKFLOW_PLAN_REQUIRE_REPLAN=1 \
             bun run check:docs-deployment-workflow-plan
-          ALCHEMY_PROFILE="$ALCHEMY_PROFILE" CI=1 bun run check:docs-deployment-inventory > "$RUNNER_TEMP/docs-deployment/provider-inventory-before.json"
+          TAXKIT_DOCS_DEPLOYMENT_INVENTORY_REPORT="$RUNNER_TEMP/docs-deployment/provider-inventory-before.json" \
+          ALCHEMY_PROFILE="$ALCHEMY_PROFILE" CI=1 bun run check:docs-deployment-inventory
           previous_version_id=""
           current_stage_count="$(jq '[.stages[] | select(.stage == "prod")] | length' "$RUNNER_TEMP/docs-deployment/provider-inventory-before.json")"
           test "$current_stage_count" -eq 0 || test "$current_stage_count" -eq 1
@@ -382,7 +383,8 @@ jobs:
             test -n "$ROLLBACK_RECOVERY_IDENTITY"
           fi
           ALCHEMY_PLAIN=1 CI=1 bunx alchemy deploy --stage prod --profile "$ALCHEMY_PROFILE" --yes
-          ALCHEMY_PROFILE="$ALCHEMY_PROFILE" CI=1 bun run check:docs-deployment-inventory > "$RUNNER_TEMP/docs-deployment/provider-inventory.json"
+          TAXKIT_DOCS_DEPLOYMENT_INVENTORY_REPORT="$RUNNER_TEMP/docs-deployment/provider-inventory.json" \
+          ALCHEMY_PROFILE="$ALCHEMY_PROFILE" CI=1 bun run check:docs-deployment-inventory
           jq -e '
             .agreement == "state-provider-agree" and
             ([.stages[] | select(.stage == "prod")] | length == 1) and

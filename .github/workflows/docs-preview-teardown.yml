@@ -170,7 +170,8 @@ jobs:
             local stderr_bytes=0
             : > "$attempts_path"
             for retry in 1 2 3; do
-              ALCHEMY_PROFILE="$ALCHEMY_PROFILE" CI=1 bun run check:docs-deployment-inventory > "$output_path" 2> "$stderr_path" && inventory_status=0 || inventory_status=$?
+              TAXKIT_DOCS_DEPLOYMENT_INVENTORY_REPORT="$output_path" \
+              ALCHEMY_PROFILE="$ALCHEMY_PROFILE" CI=1 bun run check:docs-deployment-inventory 2> "$stderr_path" && inventory_status=0 || inventory_status=$?
               stderr_bytes="$(wc -c < "$stderr_path" | tr -d ' ')"
               sed -E 's/(Bearer[[:space:]]+|token[=:])[A-Za-z0-9._-]+/\1[REDACTED]/g' "$stderr_path" > "${stderr_path}.redacted"
               mv "${stderr_path}.redacted" "$stderr_path"

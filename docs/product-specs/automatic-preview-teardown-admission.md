@@ -16,7 +16,7 @@ confidence: high
 
 ## Overview
 
-TaxKit will let a trusted same-repository PR-close event clean up its exact
+TaxKit lets a trusted same-repository PR-close event clean up its exact
 Alchemy Preview stage without a second human approval. Preview deploy and
 teardown will share `taxkit-docs-preview`, which already holds the required
 narrow Cloudflare secret names. Production remains separately protected.
@@ -43,14 +43,14 @@ Alchemy stage isolation.
 
 The accepted settings mutation removed the Preview reviewer and read back zero
 protection rules with the same two secret names. Production still requires
-`crcorbett`; the old teardown environment remains protected until cutover. The
-bounded receipt is
+`crcorbett`; the old teardown environment remains protected until accepted
+post-cutover proof. The bounded settings receipt is
 [`APT-001-github-environment-readback.json`](../documentation-audit/automatic-preview-teardown/APT-001-github-environment-readback.json).
 
 ## Call graphs
 
 ```text
-Current PR-close cleanup
+Former PR-close cleanup
   -> taxkit-docs-preview-teardown reviewer approval
   -> reviewed main source and exact closed PR checks
   -> Alchemy exact pr-N inventory and two equal dry-runs
@@ -59,7 +59,7 @@ Current PR-close cleanup
 ```
 
 ```text
-Target PR-close cleanup
+Merged PR-close cleanup
   -> trusted same-repository PR closes against main
   -> taxkit-docs-preview releases its narrow credential without a reviewer
   -> reviewed main source and exact closed PR checks
@@ -67,6 +67,22 @@ Target PR-close cleanup
   -> allowed destroy or proved no-op
   -> state, provider and former-URL absence receipt
 ```
+
+## First automatic run and correction
+
+PR #59 merged as `6535b2840c8eeea4bc462fdf317304f03d9aa144`.
+Main Quality passed and teardown run `32364848093` started without approval,
+which proves the new admission path. It stopped before dry-run or destroy: the
+Turbo-routed inventory command produced valid JSON plus Turbo status text on
+standard output, and `jq` rejected the mixed file. The retained sanitized
+inventory showed state/provider agreement and no `pr-59` stage or Worker, but
+the failed run cannot establish the required no-op receipt.
+
+The focused correction keeps every command behind Turbo while the Effect
+inventory runtime writes machine JSON directly to a named temporary file. It
+also stops the completed-run reconciler from entering positive promotion for a
+failed source run. The bounded failure receipt is
+[`APT-002-first-automatic-run-failure.json`](../documentation-audit/automatic-preview-teardown/APT-002-first-automatic-run-failure.json).
 
 ## Scope and boundaries
 
