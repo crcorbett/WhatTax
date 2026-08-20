@@ -83,6 +83,12 @@ again. Alchemy login/bootstrap, plan, deploy and destroy; GitHub API/artifact
 readback; Cloudflare inventory; hosted browser proof; and receipt promotion all
 remain live.
 
+For machine readback, the workflows set
+`TAXKIT_DOCS_DEPLOYMENT_INVENTORY_REPORT` to the exact temporary JSON path.
+The Effect inventory runtime writes that file directly. Turbo status text
+remains in the job log and must never be redirected into a file consumed by
+`jq` or a receipt decoder.
+
 A cache miss or service error is a speed change only. To reproduce a local docs
 build without replay, run `TURBO_FORCE=true bun run docs:build`. To recover a
 hosted workflow from suspected stale or unsafe cache behaviour, revert only the
@@ -1083,6 +1089,25 @@ remain valid dated absence observations, but they do not establish the current
 shared `taxkit-docs-preview` environment identity. The current automation
 entry therefore remains `not-established` until a successor PR-close receipt
 is promoted.
+
+## 2026-08-20 — first shared-environment automatic run stopped safely
+
+PR #59 merged as `6535b2840c8eeea4bc462fdf317304f03d9aa144` and main Quality
+run `32364847756` passed. PR-close teardown run `32364848093` started without
+approval in `taxkit-docs-preview`, proving automatic credential admission. It
+then stopped before either dry-run or destroy because Turbo status text had
+been redirected around the inventory JSON and `jq` rejected the mixed file.
+The retained sanitized inventory reported state/provider agreement and no
+`pr-59` stage or Worker, but that observation is not the formal no-op receipt.
+
+Receipt reconciliation run `32364954781` retained the failure receipt but also
+failed because its success-only promotion step was not conditioned on the
+source conclusion. The corrective slice gives the inventory runtime a direct
+machine-report path for all three mutation workflows and restricts positive
+receipt promotion to successful source runs. The bounded failure receipt is
+[`APT-002-first-automatic-run-failure.json`](../documentation-audit/automatic-preview-teardown/APT-002-first-automatic-run-failure.json).
+Teardown remains `not-established`; do not delete the old environment until a
+corrected reviewed-main run and its reconciliation both pass.
 
 ## Stop conditions
 

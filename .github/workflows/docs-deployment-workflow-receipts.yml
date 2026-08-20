@@ -212,7 +212,7 @@ jobs:
           bun run check:docs-deployment-workflow-run
 
       - name: Promote the validated workflow receipt
-        if: success()
+        if: success() && github.event.workflow_run.conclusion == 'success'
         run: |
           set -euo pipefail
           mv "$RUNNER_TEMP/docs-deployment/workflow-run-candidate.json" \

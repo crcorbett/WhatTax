@@ -98,6 +98,8 @@
       "browserVerification": [],
       "qualityAudits": [
         "Review the final workflow for unchanged source, stage, plan, resource, lock and absence boundaries.",
+        "Review machine inventory output so Turbo status text cannot enter JSON evidence.",
+        "Review failed-source receipt reconciliation so it cannot enter positive promotion.",
         "Review current policy and documentation for a duplicate or stale protected-teardown claim.",
         "Review historical Schemas and receipts for accidental rewriting.",
         "Review the diff for Production, credential-value, Cloudflare resource or unrelated changes."

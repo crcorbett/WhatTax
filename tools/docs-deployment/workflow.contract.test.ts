@@ -143,10 +143,17 @@ describe("docs deployment workflow admission", () => {
   });
 
   test("routes repository checks through cache-safe Turbo tasks", async () => {
-    const [packageSource, turboSource] = await Promise.all([
-      readFile("package.json", "utf-8"),
-      readFile("turbo.json", "utf-8"),
-    ]);
+    const [packageSource, turboSource, inventoryRuntime, ...workflows] =
+      await Promise.all([
+        readFile("package.json", "utf-8"),
+        readFile("turbo.json", "utf-8"),
+        readFile("tools/docs-deployment/inventory.runtime.ts", "utf-8"),
+        ...[
+          workflowPaths.preview,
+          workflowPaths.production,
+          workflowPaths.teardown,
+        ].map(readWorkflow),
+      ]);
     expect(packageSource).toContain(
       '"docs:build": "turbo run build --filter=docs"'
     );
@@ -166,6 +173,18 @@ describe("docs deployment workflow admission", () => {
     expect(turboSource).toContain(
       '"passThroughEnv": ["ALCHEMY_PROFILE", "CLOUDFLARE_*", "TAXKIT_*"]'
     );
+    expect(inventoryRuntime).toContain(
+      '"TAXKIT_DOCS_DEPLOYMENT_INVENTORY_REPORT"'
+    );
+    expect(inventoryRuntime).toContain(
+      "fileSystem.writeFileString(path, output)"
+    );
+    for (const workflow of workflows) {
+      expect(workflow).toContain("TAXKIT_DOCS_DEPLOYMENT_INVENTORY_REPORT=");
+      expect(workflow).not.toContain(
+        "bun run check:docs-deployment-inventory >"
+      );
+    }
   });
 
   test("materializes only the ephemeral Alchemy state-store cache before inventory", async () => {
@@ -459,6 +478,9 @@ describe("docs deployment workflow admission", () => {
     expect(receipts).toContain("git checkout --detach");
     expect(receipts).toContain("workflow-run-candidate.json");
     expect(receipts).toContain("Promote the validated workflow receipt");
+    expect(receipts).toContain(
+      "if: success() && github.event.workflow_run.conclusion == 'success'"
+    );
     expect(receipts).toContain(
       "always() && github.event.workflow_run.conclusion"
     );

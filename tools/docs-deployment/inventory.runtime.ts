@@ -18,6 +18,7 @@ import {
   Redacted,
   Schema,
 } from "effect";
+import * as FileSystem from "effect/FileSystem";
 import * as FetchHttpClient from "effect/unstable/http/FetchHttpClient";
 
 import { docsCloudflareStackName } from "../../apps/docs/src/lib/build/cloudflare-stack.js";
@@ -38,6 +39,9 @@ import {
 const InventoryRuntimeConfig = Config.unwrap({
   ci: Config.schema(Schema.Literals(["1", "true"]), "CI"),
   profile: Config.string("ALCHEMY_PROFILE").pipe(Config.withDefault("default")),
+  reportPath: Config.string("TAXKIT_DOCS_DEPLOYMENT_INVENTORY_REPORT").pipe(
+    Config.option
+  ),
   stateCredentialsJson: Config.redacted(
     "ALCHEMY_STATE_STORE_CREDENTIALS_JSON"
   ).pipe(Config.option),
@@ -98,14 +102,24 @@ const makeInventoryLayer = (credentials: DocsDeploymentStateStoreCredentials) =>
     )
   );
 
-const readInventoryProgram = Effect.gen(function* readInventoryProgram() {
-  const inventory = yield* DocsDeploymentInventory;
-  const report = yield* inventory.read();
-  const encoded = yield* Schema.encodeUnknownEffect(
-    DocsDeploymentInventoryReport
-  )(report);
-  yield* Console.log(JSON.stringify(encoded, null, 2));
-});
+const readInventoryProgram = (reportPath: Option.Option<string>) =>
+  Effect.gen(function* readInventory() {
+    const inventory = yield* DocsDeploymentInventory;
+    const report = yield* inventory.read();
+    const encoded = yield* Schema.encodeUnknownEffect(
+      DocsDeploymentInventoryReport
+    )(report);
+    const output = `${JSON.stringify(encoded, null, 2)}\n`;
+    yield* Option.match(reportPath, {
+      onNone: () => Console.log(output.trimEnd()),
+      onSome: (path) =>
+        FileSystem.FileSystem.pipe(
+          Effect.flatMap((fileSystem) =>
+            fileSystem.writeFileString(path, output)
+          )
+        ),
+    });
+  });
 
 const program = Effect.gen(function* inventoryProgram() {
   const config = yield* InventoryRuntimeConfig.pipe(
@@ -125,7 +139,7 @@ const program = Effect.gen(function* inventoryProgram() {
     currentEnvironment.accountId,
     decodedStateCredentials
   );
-  return yield* readInventoryProgram.pipe(
+  return yield* readInventoryProgram(config.reportPath).pipe(
     Effect.provide(makeInventoryLayer(decodedStateCredentials))
   );
 }).pipe(

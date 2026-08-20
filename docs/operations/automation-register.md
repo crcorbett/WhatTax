@@ -69,6 +69,14 @@ provider-free Vite/workerd build is preflight proof; the deployment-input
 digest binds the tracked Website source set rather than claiming byte identity
 with Alchemy's internal build.
 
+The first shared-environment PR-close run started automatically but stopped
+before dry-run or destroy because Turbo console framing surrounded the
+inventory JSON. The corrected contract writes machine inventory directly from
+the Effect runtime to a named temporary report, while Turbo remains the command
+engine. The same slice prevents failed source runs from entering the positive
+receipt-promotion step. Teardown remains `not-established` until the corrected
+run and reconciliation produce accepted receipts.
+
 The scheduled/open-PR orphan automation and its child-process implementation
 are retired. PR-close teardown remains the explicit lifecycle owner. Historical
 orphan schemas and receipts remain decodable evidence only and cannot establish

@@ -158,8 +158,9 @@ Production still requires `crcorbett`. The sanitized receipt is
 [`../documentation-audit/automatic-preview-teardown/APT-001-github-environment-readback.json`](../documentation-audit/automatic-preview-teardown/APT-001-github-environment-readback.json).
 Rollback restores the Preview reviewer rule and the former teardown environment
 binding. The old teardown environment must not be removed until the reviewed
-workflow reaches `main`; its presence grants no current workflow authority
-after that cutover.
+workflow reaches `main` and a corrected automatic or reviewed-main dispatch
+produces accepted absence and reconciliation receipts; its presence grants no
+current workflow authority after cutover.
 
 ## Dated TaxKit docs deployment envelope
 

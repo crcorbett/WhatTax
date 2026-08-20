@@ -107,6 +107,12 @@ Alchemy APIs, fails on disagreement and emits only sanitized identities and
 non-claims. It is deliberately outside root verification and does not build,
 plan, apply, destroy or prove hosted behavior.
 
+Interactive use prints the encoded report. Workflows instead set
+`TAXKIT_DOCS_DEPLOYMENT_INVENTORY_REPORT` so the Effect runtime writes the
+machine-readable JSON directly to the named temporary file while Turbo keeps
+its own status text in the job log. Preview, Production and teardown must not
+parse Turbo's combined console output as provider evidence.
+
 Ephemeral GitHub runners do not retain Alchemy's derived
 `cloudflare-state-store` credential after a plan or apply. The three mutation
 workflows therefore run the supported `alchemy cloudflare bootstrap` operation
