@@ -3,7 +3,7 @@ document_type: architecture
 lifecycle: current
 authority: canonical
 owner: taxkit-quality-owner
-last_reviewed: 2026-08-13
+last_reviewed: 2026-08-20
 review_trigger: verification graph, proof boundary, CI, deployment, or test-owner change
 ---
 
@@ -244,11 +244,28 @@ filters. Feature-branch pushes are covered by the pull-request event, so the
 same Quality graph is not run twice for one change. The explicit CI mode runs
 the same nine ordered checks without consuming or
 rewriting an HGI-203 candidate packet; it returns bounded local command detail
-only. Its exact read-only runner bootstrap fetches complete Git history,
+only. The sequential release orchestrator stays live, while every eligible
+deterministic root, workspace and app/package leaf runs through Turbo. Root
+commands use explicit `//#...:task` entries so a public wrapper never calls
+itself. Builds declare their output paths and environment-sensitive inputs;
+provider, candidate, receipt, dependency-install and browser-install work
+remain live. Its exact read-only runner bootstrap fetches complete Git history,
 materialises the configured `main` comparison ref and installs Chromium through
 the frozen app-local Playwright executable before the canonical graph. This
 keeps Changesets and docs build/browser proof bound to the checked-out graph;
-floating `bunx` resolution is rejected. A non-CI `release:check` remains the authority-bound new-candidate
+floating `bunx` resolution is rejected.
+
+Quality binds Vercel Remote Cache through `TURBO_TEAM` and `TURBO_TOKEN` for
+each Turbo invocation. Pull requests use `local:rw,remote:r`; pushes to `main`
+use `local:rw,remote:rw`. Fork pull requests receive no repository secret and
+run the complete local fallback. The policy rejects missing bindings,
+pull-request remote writes and step-level overrides. A cache miss, missing
+token or unavailable service therefore changes speed only: the full command
+still runs and its real exit status remains authoritative. Cache logs and
+artifacts are not candidate, release, provider, deployment or public-site
+proof.
+
+A non-CI `release:check` remains the authority-bound new-candidate
 operation in the release-readiness runbook. Its static contract is owned by
 [`../../tools/quality-workflow/check.runtime.ts`](../../tools/quality-workflow/check.runtime.ts): it rejects missing read-only permissions, timeout or concurrency
 limits, floating action or browser-tool resolution, shallow/ambiguous release
@@ -516,7 +533,8 @@ supporting gate and cannot replace semantic ownership or call-graph review.
   production inputs without admitting the unused generated dynamic entry.
   Exact exceptions need a named owner and runtime reason.
   Knip does not replace SDK packed-artifact or downstream-consumer proof.
-- Keep `bun run release:check` as orchestration over canonical commands. A new
+- Keep `bun run release:check` as live orchestration over canonical
+  Turbo-backed commands. A new
   release gate must first have an owning package command and focused tests; do
   not implement its validation policy inside `@taxkit/scripts`.
 

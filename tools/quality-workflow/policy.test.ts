@@ -22,6 +22,9 @@ permissions:
   contents: read
 env:
   TAXKIT_ACTION_PIN_UPDATE_OWNER: taxkit-ci-release-maintainer
+  TURBO_CACHE: ${"${{"} github.event_name == 'pull_request' && 'local:rw,remote:r' || 'local:rw,remote:rw' }}
+  TURBO_TEAM: ${"${{"} vars.TURBO_TEAM }}
+  TURBO_TOKEN: ${"${{"} secrets.TURBO_TOKEN }}
 concurrency:
   group: quality-${"${{"} github.workflow }}-${"${{"} github.ref }}
   cancel-in-progress: true
@@ -155,6 +158,31 @@ describe("quality workflow policy", () => {
       "workflow-pin-update-owner",
       "workflow-timeout",
     ]);
+  });
+
+  test("rejects missing cache identity, pull-request writes and step overrides", () => {
+    for (const workflow of [
+      acceptedWorkflow.replace(
+        ["  TURBO_TEAM: $", "{{ vars.TURBO_TEAM }}\n"].join(""),
+        ""
+      ),
+      acceptedWorkflow.replace(
+        ["  TURBO_TOKEN: $", "{{ secrets.TURBO_TOKEN }}\n"].join(""),
+        ""
+      ),
+      acceptedWorkflow.replace(
+        "github.event_name == 'pull_request' && 'local:rw,remote:r'",
+        "github.event_name == 'pull_request' && 'local:rw,remote:rw'"
+      ),
+      acceptedWorkflow.replace(
+        "      - run: bun run release:check -- --ci",
+        "      - run: bun run release:check -- --ci\n        env:\n          TURBO_CACHE: local:rw,remote:rw"
+      ),
+    ]) {
+      expect(findingsFor(workflow).map((item) => item.invariant)).toContain(
+        "workflow-cache-policy"
+      );
+    }
   });
 
   test("rejects every job-level permission override including equivalent write scopes", () => {

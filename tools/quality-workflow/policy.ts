@@ -21,6 +21,18 @@ const expectedConcurrencyGroup = [
   `${workflowExpressionPrefix}{{ github.workflow }}-`,
   `${workflowExpressionPrefix}{{ github.ref }}`,
 ].join("");
+const expectedTurboCache = [
+  workflowExpressionPrefix,
+  "{{ github.event_name == 'pull_request' && 'local:rw,remote:r' || 'local:rw,remote:rw' }}",
+].join("");
+const expectedTurboTeam = [
+  workflowExpressionPrefix,
+  "{{ vars.TURBO_TEAM }}",
+].join("");
+const expectedTurboToken = [
+  workflowExpressionPrefix,
+  "{{ secrets.TURBO_TOKEN }}",
+].join("");
 const allowedRunSteps = new Set([
   "git show-ref --verify --quiet refs/heads/main || git branch --track main origin/main",
   "bun install --frozen-lockfile",
@@ -272,9 +284,33 @@ export const decodeQualityWorkflow = (text: string) => {
       );
 };
 
+const hasExactWorkflowCachePolicy = (
+  workflow: QualityWorkflowDocument,
+  quality: Record<string, unknown> | null
+) => {
+  const steps = Array.isArray(quality?.steps) ? quality.steps : [];
+  return (
+    workflow.env !== undefined &&
+    hasOnly(workflow.env, [
+      "TAXKIT_ACTION_PIN_UPDATE_OWNER",
+      "TURBO_CACHE",
+      "TURBO_TEAM",
+      "TURBO_TOKEN",
+    ]) &&
+    workflow.env.TURBO_CACHE === expectedTurboCache &&
+    workflow.env.TURBO_TEAM === expectedTurboTeam &&
+    workflow.env.TURBO_TOKEN === expectedTurboToken &&
+    steps.every((step) => {
+      const record = asRecord(step);
+      return record !== null && !Reflect.has(record, "env");
+    })
+  );
+};
+
 export const inspectQualityWorkflow = (workflow: QualityWorkflowDocument) => {
   const { concurrency, jobs, permissions } = workflow;
   const quality = asRecord(jobs.quality);
+  const cachePolicyIsExact = hasExactWorkflowCachePolicy(workflow, quality);
   const findings = [
     ...inspectTrigger(workflow.on),
     ...(hasOnly(permissions, ["contents"]) && permissions.contents === "read"
@@ -327,15 +363,22 @@ export const inspectQualityWorkflow = (workflow: QualityWorkflowDocument) => {
             "Use the bounded 30-minute timeout on the actual quality job."
           ),
         ]),
-    ...(workflow.env !== undefined &&
-    hasOnly(workflow.env, ["TAXKIT_ACTION_PIN_UPDATE_OWNER"]) &&
-    workflow.env.TAXKIT_ACTION_PIN_UPDATE_OWNER === expectedActionPinOwner
+    ...(workflow.env?.TAXKIT_ACTION_PIN_UPDATE_OWNER === expectedActionPinOwner
       ? []
       : [
           finding(
             "workflow-pin-update-owner",
             ".github/workflows/quality.yml:env.TAXKIT_ACTION_PIN_UPDATE_OWNER",
             "Name taxkit-ci-release-maintainer as the action-pin update owner."
+          ),
+        ]),
+    ...(cachePolicyIsExact
+      ? []
+      : [
+          finding(
+            "workflow-cache-policy",
+            ".github/workflows/quality.yml:env",
+            "Bind the approved Vercel cache identity once, keep pull requests remote-read-only, allow trusted main read/write, and reject step-level cache overrides."
           ),
         ]),
     ...inspectSteps(quality?.steps),
@@ -482,11 +525,27 @@ const expectedControls = {
       "Workflow, trigger, job, action, permission, timeout, concurrency or release graph change.",
     signal: "A quality workflow or action pin changes.",
   },
+  "turbo-remote-cache-boundary": {
+    evidence: "bun run check:quality-workflow",
+    fixture: "tools/quality-workflow/policy.test.ts",
+    owner: "taxkit-ci-release-maintainer",
+    preventedFailure:
+      "Pull-request code writes trusted remote cache entries, a missing cache blocks the full graph, or a cache hit is treated as release proof.",
+    recovery:
+      "Remove the remote-cache bindings while preserving every uncached Quality command and true exit status.",
+    retirementCondition:
+      "A stronger event-scoped cache authority and fallback control replaces this contract.",
+    reviewTrigger:
+      "Turbo config, root task, credential, event, cache mode, task input/output or fallback change.",
+    signal:
+      "A Turbo task, cache credential binding, cache mode or Quality event changes.",
+  },
 } as const;
 const expectedControlIds = [
   "canonical-release-graph",
   "context-candidate-admission",
   "quality-workflow-semantics",
+  "turbo-remote-cache-boundary",
 ] as const;
 
 const matchesControlContract = (
@@ -509,7 +568,7 @@ const inspectControls = (controls: readonly ControlRegisterEntry[]) => [
         finding(
           "control-register",
           "tools/quality-workflow/controls.json",
-          "Keep exactly the three registered controls; reject unowned additions."
+          "Keep exactly the four registered controls; reject unowned additions."
         ),
       ]),
   ...expectedControlIds.flatMap((id) => {
@@ -685,29 +744,38 @@ const inspectQualityAutomation = (
     quality.durableState.kind !== "immutable-revision-validation" ||
     quality.durableState.location !== "checked-out-repository-revision" ||
     quality.authority.principal !== "taxkit-ci-release-maintainer" ||
-    quality.authority.resource !== "taxkit-repository-and-runner" ||
+    quality.authority.resource !==
+      "taxkit-repository-runner-and-vercel-cache" ||
     quality.authority.environment !== "github-actions-ci" ||
-    !hasExactMembers(quality.authority.grants, ["contents:read"]) ||
+    !hasExactMembers(quality.authority.grants, [
+      "contents:read",
+      "remote-cache:read",
+      "remote-cache:write-on-main",
+    ]) ||
     !hasExactMembers(quality.authority.denied, deniedExternalMutation) ||
     !hasExactMembers(quality.resource.scope, [
       "immutable repository revision",
       "configured Actions runner",
+      "Vercel team remote-cache task artifacts and logs",
     ]) ||
     quality.environment.trigger !== "configured-pull-request-or-push" ||
     quality.proof.command !== "bun run release:check -- --ci" ||
     quality.proof.failureIdentity !== "first failed ordered check and target" ||
     quality.proof.successPostcondition !==
-      "all nine ordered repository checks passed for the immutable revision" ||
+      "all nine ordered repository checks passed for the immutable revision regardless of cache hit, miss or fallback" ||
     !hasExactMembers(quality.proof.nonClaims, qualityNonClaims) ||
     quality.stopAndEscalation.mode !== "fail-closed" ||
     !hasExactMembers(quality.stopAndEscalation.stopConditions, [
       "first tagged check failure",
       "unknown workflow shape",
+      "pull-request remote write mode",
+      "cache-only success or missing uncached fallback",
     ]) ||
-    quality.rollback.action !== "revert the workflow or control change" ||
+    quality.rollback.action !==
+      "remove Turbo cache bindings while preserving the complete uncached Quality graph" ||
     quality.rollback.authorityRequired !== "taxkit-ci-release-maintainer" ||
     quality.recovery.action !==
-      "repair the named source boundary and run the canonical graph on a new revision" ||
+      "repair the named source or cache boundary and run the canonical graph uncached on a new revision" ||
     quality.recovery.verificationCommand !== "bun run release:check -- --ci" ||
     quality.retirementCondition.condition !==
       "a stronger canonical CI owner replaces the quality workflow" ||
@@ -742,7 +810,7 @@ export const renderQualityWorkflowReport = (
   findings: readonly QualityWorkflowFinding[]
 ): string =>
   findings.length === 0
-    ? "Quality workflow policy passed: decoded immutable, bounded, read-only canonical release graph."
+    ? "Quality workflow policy passed: decoded immutable, bounded, event-scoped cache and canonical release graph."
     : [
         `Quality workflow policy failed with ${findings.length} finding(s):`,
         ...findings

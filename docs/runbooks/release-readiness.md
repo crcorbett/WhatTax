@@ -3,7 +3,7 @@ document_type: runbook
 lifecycle: current
 authority: canonical
 owner: taxkit-release-readiness-operation-owner
-last_reviewed: 2026-07-25
+last_reviewed: 2026-08-20
 review_trigger: release graph, current or historical journey inventory, proof schema, package graph, or accepted HGI-203 evidence change
 ---
 
@@ -37,6 +37,9 @@ scoped candidate packet. It does not include versioning or any external state.
 - Report-only CI mode is distinct from a candidate attempt. It requires no
   candidate packet, reads or writes no candidate/attempt receipt, and makes no
   candidate claim.
+- Eligible deterministic checks run through Turbo. Remote caching is optional
+  acceleration; a miss, missing token or unavailable service must leave the
+  complete local graph runnable.
 
 ## Authority
 
@@ -55,6 +58,9 @@ everything else. An accepted packet proves an observation, not authority.
 5. To validate only the checked-out CI revision, run `bun run release:check --
    --ci`. Its nine-check report may be repeated after a material revision or
    environment change, but cannot be promoted into candidate or release proof.
+   For an explicit developer-managed remote-cache run, provide `TURBO_TEAM` and
+   `TURBO_TOKEN`; do not commit or print them. Run without those values to prove
+   the uncached fallback.
 6. Only for an explicitly prepared new candidate, run `bun run release:check`
    once. Do not rerun merely to improve presentation or conceal a failure.
 7. Preserve the immutable attempt, bounded summary, candidate identity,

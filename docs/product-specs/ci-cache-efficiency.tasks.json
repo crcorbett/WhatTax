@@ -199,7 +199,7 @@
     },
     {
       "id": "TCC-002",
-      "status": "pending",
+      "status": "in_progress",
       "title": "Route Quality commands through Turbo and enable Vercel Remote Cache",
       "type": "ci-cache",
       "dependsOn": [

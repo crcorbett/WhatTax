@@ -9,6 +9,7 @@ const QualityWorkflowInvariant = Schema.Literals([
   "workflow-timeout",
   "workflow-action-pin",
   "workflow-pin-update-owner",
+  "workflow-cache-policy",
   "canonical-release-graph",
   "workflow-mutation-step",
   "release-boundary-corpus",
@@ -155,10 +156,17 @@ const AutomationAuthority = Schema.Struct({
     ])
   ),
   environment: Schema.Literals(["github-actions-ci", "local-report-only"]),
-  grants: Schema.Array(Schema.Literal("contents:read")),
+  grants: Schema.Array(
+    Schema.Literals([
+      "contents:read",
+      "remote-cache:read",
+      "remote-cache:write-on-main",
+    ])
+  ),
   principal: Schema.NonEmptyString,
   resource: Schema.Literals([
     "taxkit-repository-and-runner",
+    "taxkit-repository-runner-and-vercel-cache",
     "explicit-source-set-and-candidate",
   ]),
 });
@@ -166,6 +174,7 @@ const AutomationAuthority = Schema.Struct({
 const AutomationResource = Schema.Struct({
   id: Schema.Literals([
     "taxkit-repository-and-runner",
+    "taxkit-repository-runner-and-vercel-cache",
     "explicit-source-set-and-candidate",
   ]),
   scope: Schema.NonEmptyArray(Schema.NonEmptyString),

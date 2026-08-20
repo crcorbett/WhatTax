@@ -112,26 +112,21 @@ describe("release readiness", () => {
           [
             "packed-artifact",
             "bun",
-            ["run", "--filter=@taxkit/sdk", "check-packed-artifact"],
+            ["run", "sdk:check-packed-artifact"],
             workspaceRoot,
           ],
           [
             "downstream-consumer",
             "bun",
-            ["run", "--filter=@taxkit/sdk", "validate:downstream"],
+            ["run", "sdk:validate-downstream"],
             workspaceRoot,
           ],
-          ["api-smoke", "bun", ["run", "--filter=api", "smoke"], workspaceRoot],
-          [
-            "docs-browser",
-            "bun",
-            ["run", "--filter=docs", "test:browser"],
-            workspaceRoot,
-          ],
+          ["api-smoke", "bun", ["run", "api:smoke"], workspaceRoot],
+          ["docs-browser", "bun", ["run", "docs:test:browser"], workspaceRoot],
           [
             "changeset-status",
             "bun",
-            ["run", "changeset", "status", "--verbose"],
+            ["run", "changeset:status"],
             workspaceRoot,
           ],
         ]);

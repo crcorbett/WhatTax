@@ -3,7 +3,7 @@ document_type: standard
 lifecycle: current
 authority: canonical
 owner: taxkit-ci-release-maintainer
-last_reviewed: 2026-08-13
+last_reviewed: 2026-08-20
 review_trigger: public boundary, workflow, action, release graph, or repeated-review finding change
 ---
 
@@ -23,10 +23,19 @@ floating browser-tool resolution fails policy. The Schema-decoded workflow,
 control register and negative corpus are owned by `tools/quality-workflow/` and
 run through `bun run check:quality-workflow`.
 
+Every eligible deterministic command under that graph is a Turbo task. Quality
+binds the Vercel team cache on all configured events: pull requests are remote
+read-only and `main` is remote read/write. Forks do not receive the token. The
+workflow policy rejects a missing binding, pull-request remote writes and
+step-level cache-mode overrides. Local cache writes and the full uncached graph
+remain available if the credential or service is absent; cache success cannot
+replace a command exit status or release proof.
+
 | Signal and named failure | Owner, fixture, evidence and recovery | Review trigger | Retirement |
 | --- | --- | --- | --- |
 | Workflow change; a floating action/browser tool, shallow or ambiguous base history, write permission, unbounded run, other-job/comment spoof, or bypassed graph | `tools/quality-workflow/controls.json` entry `quality-workflow-semantics`; `policy.test.ts`, `check:quality-workflow`, bounded tagged finding and recovery | Workflow, action, browser dependency, public-boundary, or release-graph change | A stronger schema-decoded workflow policy replaces this exact contract. |
 | Release-relevant revision; a boundary passes a partial local CI graph | `controls.json` entry `canonical-release-graph`; `@taxkit/scripts` CI report with owning failed command | Package, API, SDK, docs, manifest, workflow, or release-script change | A stronger canonical graph owns all nine ordered checks. |
+| Turbo task, cache credential or event mode changes; pull-request code writes trusted remote entries, missing cache blocks execution, or a hit is treated as proof | `controls.json` entry `turbo-remote-cache-boundary`; `policy.test.ts`, `check:quality-workflow`, full local fallback and exact mode recovery | Turbo config, task input/output, workflow event, credential or fallback change | A stronger event-scoped cache authority and fallback control replaces this contract. |
 | Proposed recurring context work; untrusted output enters canonical context or corroborates itself | `controls.json` entry `context-candidate-admission`; Schema-decoded report-only envelope | Candidate source, retrieval, reviewer, publisher, retention or recovery change | A separately accepted canonical context-governance owner replaces this contract. |
 
 Controls are admitted only when their exact signal, prevented failure, owner,
