@@ -1,7 +1,7 @@
 ---
 document_type: product-spec
-lifecycle: active
-authority: canonical
+lifecycle: implemented
+authority: supporting
 owner: taxkit-product-owner
 last_reviewed: 2026-08-20
 review_trigger: workflow trigger, CI policy, release graph, or proof change
@@ -10,6 +10,14 @@ tombstone: false
 ---
 
 # Quality Trigger Efficiency
+
+## Outcome
+
+Implemented in candidate commit `1b45489` and verified by hosted Quality run
+`32315275636` on pull request #54. The workflow now runs on pull requests and
+on pushes to `main`; the duplicate feature-branch push trigger is rejected by
+the local policy test. The change is CI policy and documentation only, with no
+package, deployment, provider, publication or public-site mutation.
 
 ## Purpose
 

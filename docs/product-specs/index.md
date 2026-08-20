@@ -21,7 +21,7 @@ Specs:
 
 | Spec | Status | Notes |
 | --- | --- | --- |
-| [Quality Trigger Efficiency](./quality-trigger-efficiency.md) | Active | Removes duplicate feature-branch push Quality runs while preserving pull-request and main-branch coverage; the separate CI/CD investigation will propose later changes. |
+| [Quality Trigger Efficiency](./quality-trigger-efficiency.md) | Implemented | Candidate `1b45489` passed hosted Quality run `32315275636`; feature-branch push duplication is removed while pull-request and main-branch coverage remains. |
 | [Native Alchemy docs deployment](./native-alchemy-docs-deployment.md) | Implemented | Candidate `7a23bf3` passed exact Git, Preview, Production, public-journey and named-stage teardown proof; future changes require a successor SPEC. |
 | [Native Alchemy docs integration](./native-alchemy-docs-integration.md) | Implemented | The manual docs build/Worker graph is replaced by beta.64's first-class Website.Vite lifecycle; current proof owns one resource and the ephemeral GitHub orphan subprocess helper is retired. |
 | [Strict apps and IaC](./strict-apps-and-iac.md) | Implemented | APP-IAC-001 through APP-IAC-005 hardened docs-app runtime proof and Alchemy/Cloudflare verification and inventory boundaries; the terminal audit retains four bounded adapters without changing the deployed resource graph or external state. |
