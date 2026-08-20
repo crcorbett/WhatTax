@@ -146,16 +146,15 @@ const inspectTrigger = (
       (pullRequestRecord !== null && hasOnly(pullRequestRecord, []))) &&
     push !== null &&
     hasOnly(push, ["branches"]) &&
-    branches.length === 2 &&
+    branches.length === 1 &&
     branches.includes("main") &&
-    branches.includes("codex/**") &&
     noPathFilters
     ? []
     : [
         finding(
           "workflow-triggers",
           ".github/workflows/quality.yml:on",
-          "Use only pull_request and the main/codex/** push triggers; do not add path filters because new or renamed boundaries must fail closed."
+          "Use only pull_request and the main push trigger; do not add path filters because new or renamed boundaries must fail closed."
         ),
       ];
 };

@@ -18,7 +18,6 @@ on:
   push:
     branches:
       - main
-      - "codex/**"
 permissions:
   contents: read
 env:
@@ -130,6 +129,17 @@ describe("quality workflow policy", () => {
         ).map((item) => item.invariant)
       ).toContain("workflow-triggers");
     }
+  });
+
+  test("rejects branch pushes that duplicate pull-request coverage", () => {
+    expect(
+      findingsFor(
+        acceptedWorkflow.replace(
+          "    branches:\n      - main\n",
+          '    branches:\n      - main\n      - "codex/**"\n'
+        )
+      ).map((item) => item.invariant)
+    ).toContain("workflow-triggers");
   });
 
   test("rejects missing action owner, timeout and cancellation semantics", () => {

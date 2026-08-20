@@ -16,6 +16,7 @@ evidence remains useful.
 
 Completed plans:
 
+- [Quality Trigger Efficiency](./quality-trigger-efficiency.md)
 - [Native Alchemy docs deployment](./native-alchemy-docs-deployment.md)
 - [Native Alchemy docs integration](./native-alchemy-docs-integration.md)
 - [Strict apps and IaC](./strict-apps-and-iac.md)

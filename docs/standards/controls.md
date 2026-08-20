@@ -13,9 +13,11 @@ The Quality workflow is the executable CI owner for the local release-facing
 graph. It has read-only repository permission, a timeout, cancellation
 concurrency, an explicit `taxkit-ci-release-maintainer` pin-update owner, and
 full-SHA action pins. It invokes `bun run release:check -- --ci` on every
-configured pull request and push; there are deliberately no path filters, so a
-new or renamed release boundary cannot be skipped. The only preceding run
-steps materialise complete `main` comparison history and install Chromium
+configured pull request and on pushes to `main`; feature-branch pushes are
+intentionally covered by the pull-request event rather than running the same
+Quality graph a second time. There are deliberately no path filters, so a new
+or renamed release boundary cannot be skipped. The only preceding run steps
+materialise complete `main` comparison history and install Chromium
 through the frozen app-local Playwright executable; a shallow checkout or
 floating browser-tool resolution fails policy. The Schema-decoded workflow,
 control register and negative corpus are owned by `tools/quality-workflow/` and
