@@ -1,22 +1,22 @@
 ---
 document_type: product-spec
-lifecycle: current
+lifecycle: implemented
 authority: supporting
 owner: taxkit-product-owner
 last_reviewed: 2026-08-20
 review_trigger: cache provider, workflow, action pin, release graph, dependency, browser, authority, or proof change
 successor: null
 tombstone: false
-status: active
+status: implemented
 source_of_truth: docs
 confidence: medium
 ---
 
 # Turbo and CI Cache Efficiency
 
-## Decision
+## Implemented outcome
 
-Admit a successor CI-efficiency SPEC for three separate cache layers:
+The completed implementation retains three separate cache layers:
 
 1. Turborepo task outputs and logs through Vercel Remote Cache.
 2. Bun's global package cache through GitHub Actions cache.
@@ -30,6 +30,15 @@ tasks. Vercel Remote Cache read/write authority must still be event-scoped so a
 pull request cannot overwrite trusted main entries or expose a deployment
 credential. Bun packages and Chromium use separate GitHub-hosted cache entries
 and must remain usable when a cache is absent.
+
+TCC-001 through TCC-005 are complete. Same-commit main evidence reduced one
+Turbo-backed Quality worker from 5m36s to 1m09s. Exact warm Bun and Chromium
+entries reduced their own setup steps, although job-level variation means no
+general end-to-end dependency-cache saving is claimed. A trusted Preview
+plan-only run and its exact rerun recorded remote Turbo hits, cold then warm
+dependency-cache behaviour, an unchanged plan digest and no deploy step. The
+terminal decision is `retain`; dated measurements and their limits are in
+[`TCC-005-closeout.md`](../documentation-audit/ci-cache-efficiency/TCC-005-closeout.md).
 
 This SPEC does not reopen the implemented Quality Trigger Efficiency SPEC. That
 SPEC still owns the pull-request and main trigger split.

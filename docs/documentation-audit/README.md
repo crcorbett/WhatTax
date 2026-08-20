@@ -13,7 +13,7 @@ This route owns dated audit and corpus-accounting evidence, not current
 maintainer policy. Lifecycle and semantic ownership are defined by
 [`../README.md`](../README.md).
 
-Active CI cache qualification evidence:
+Accepted CI cache qualification and closeout evidence:
 
 - [`ci-cache-efficiency/TCC-001-qualification.md`](ci-cache-efficiency/TCC-001-qualification.md)
 - [`ci-cache-efficiency/TCC-001-read-only-authority.json`](ci-cache-efficiency/TCC-001-read-only-authority.json)
@@ -22,6 +22,7 @@ Active CI cache qualification evidence:
 - [`ci-cache-efficiency/TCC-002-quality-turbo-candidate.md`](ci-cache-efficiency/TCC-002-quality-turbo-candidate.md)
 - [`ci-cache-efficiency/TCC-003-dependency-cache-candidate.md`](ci-cache-efficiency/TCC-003-dependency-cache-candidate.md)
 - [`ci-cache-efficiency/TCC-004-deployment-cache-candidate.md`](ci-cache-efficiency/TCC-004-deployment-cache-candidate.md)
+- [`ci-cache-efficiency/TCC-005-closeout.md`](ci-cache-efficiency/TCC-005-closeout.md)
 
 This dated evidence records read-only identities, current cache configuration,
 hosted Quality timings, local forced Turbo timings, the successor cache-only
@@ -40,8 +41,10 @@ The TCC-003 candidate records the separate Bun-package and Chromium-binary
 cache paths, exact event/platform/version keys, install order and accepted
 cold/warm hosted Quality evidence.
 
-The TCC-004 candidate records the deployment and receipt cache call graph,
-live authority boundaries and plan-only hosted proof still required.
+The TCC-004 evidence records the deployment and receipt cache call graph, live
+authority boundaries and accepted cold/warm Preview plan-only proof. TCC-005
+retains the three cache layers, their bounded measurements, carrying costs,
+review triggers, retirement conditions, rollback and explicit non-claims.
 
 Accepted native Alchemy docs integration evidence:
 
