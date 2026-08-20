@@ -60,11 +60,19 @@ early saves and any release-graph replacement. The automation register names
 the GitHub dependency caches and retains no deployment, publication, release,
 provider-write or credential-write grant.
 
+Cold hosted run `32340895568` disconfirmed the first candidate after both cache
+miss/install/save paths succeeded: Turbo's strict environment mode did not pass
+the explicit browser path into `docs#build`, which then looked in the default
+directory and failed with a missing Chromium executable. The correction names
+`PLAYWRIGHT_BROWSERS_PATH` as an explicit `build` and `test:browser` task input.
+The failed run is retained as path-propagation evidence, not browser or Quality
+acceptance.
+
 ## Documentation impact
 
 | Owner | Decision | Reason |
 | --- | --- | --- |
-| Quality workflow, policy, controls and automation register | Change required | They own the exact cache actions, event authority, paths, keys, install order and fallback. |
+| Quality workflow, Turbo task inputs, policy, controls and automation register | Change required | They own the exact cache actions, event authority, paths, keys, environment propagation, install order and fallback. |
 | Testing architecture and CI controls | Change required | They own the dependency-cache call graph and proof limits. |
 | Root and release-readiness READMEs | Change required | They must distinguish download reuse from Turbo task replay and live installs. |
 | Operational authority model | Change required | It owns the bounded GitHub cache write authority and denied operations. |

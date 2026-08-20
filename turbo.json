@@ -17,6 +17,7 @@
       "env": [
         "ALCHEMY_CLOUDFLARE_VITE_INJECTED",
         "NODE_ENV",
+        "PLAYWRIGHT_BROWSERS_PATH",
         "TAXKIT_API_BASE_URL",
         "VITE_*"
       ],
@@ -60,6 +61,7 @@
     },
     "test:browser": {
       "dependsOn": ["build"],
+      "env": ["PLAYWRIGHT_BROWSERS_PATH"],
       "outputs": []
     },
     "//#check:docs:task": {

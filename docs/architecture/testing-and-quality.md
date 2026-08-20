@@ -275,6 +275,9 @@ Playwright version. Restore/save actions are pinned to the full v6.1.0 commit,
 are non-fatal, and save only after their install succeeds. Pull-request and
 main keys are different. Frozen dependency installation, system-package setup
 and the complete browser check remain live on hits, misses and cache outages.
+Turbo treats `PLAYWRIGHT_BROWSERS_PATH` as an explicit build and browser-test
+input so strict environment filtering cannot detach those tasks from the
+installed Chromium identity.
 
 A non-CI `release:check` remains the authority-bound new-candidate
 operation in the release-readiness runbook. Its static contract is owned by
