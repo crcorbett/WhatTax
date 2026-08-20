@@ -35,8 +35,8 @@ replace a command exit status or release proof.
 
 Quality separately caches Bun package downloads and Playwright Chromium
 binaries through full-SHA GitHub cache restore/save actions. Bun's path comes
-from `bun pm cache`; Chromium uses an explicit `.cache/ms-playwright` directory
-beside the GitHub workspace, outside the checkout. Keys include the event class, runner OS and architecture. The Bun
+from `bun pm cache`; Chromium uses an explicit `ms-playwright` directory under
+GitHub's runner temporary directory, outside the checkout. Keys include the event class, runner OS and architecture. The Bun
 key also includes `.bun-version` and `bun.lock`; the Chromium key includes the
 resolved app-local Playwright version and `bun.lock`. Pull requests and `main`
 therefore cannot write the same key, and GitHub's ref scoping adds a second

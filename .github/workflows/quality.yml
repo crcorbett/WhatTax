@@ -10,7 +10,7 @@ permissions:
   contents: read
 
 env:
-  PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/../.cache/ms-playwright
+  PLAYWRIGHT_BROWSERS_PATH: ${{ runner.temp }}/ms-playwright
   TAXKIT_ACTION_PIN_UPDATE_OWNER: taxkit-ci-release-maintainer
   TURBO_CACHE: ${{ github.event_name == 'pull_request' && 'local:rw,remote:r' || 'local:rw,remote:rw' }}
   TURBO_TEAM: ${{ vars.TURBO_TEAM }}

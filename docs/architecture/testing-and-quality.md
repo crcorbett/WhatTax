@@ -268,8 +268,8 @@ proof.
 
 The GitHub dependency caches are separate from Turbo. The Bun cache resolves
 its user-level path with `bun pm cache` and never contains `node_modules`.
-Chromium uses an explicit `.cache/ms-playwright` directory beside the GitHub
-workspace and outside the checkout. Both keys include event class, OS, architecture and `bun.lock`; Bun
+Chromium uses an explicit `ms-playwright` directory under GitHub's runner
+temporary directory and outside the checkout. Both keys include event class, OS, architecture and `bun.lock`; Bun
 also includes `.bun-version`, while Chromium includes the resolved app-local
 Playwright version. Restore/save actions are pinned to the full v6.1.0 commit,
 are non-fatal, and save only after their install succeeds. Pull-request and

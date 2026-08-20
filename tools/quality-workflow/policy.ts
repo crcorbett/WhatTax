@@ -35,7 +35,7 @@ const expectedTurboToken = [
 ].join("");
 const expectedPlaywrightBrowsersPath = [
   workflowExpressionPrefix,
-  "{{ github.workspace }}/../.cache/ms-playwright",
+  "{{ runner.temp }}/ms-playwright",
 ].join("");
 const cacheActionSha = "55cc8345863c7cc4c66a329aec7e433d2d1c52a9";
 const cacheRestoreAction = `actions/cache/restore@${cacheActionSha}`;

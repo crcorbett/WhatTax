@@ -43,7 +43,7 @@ The install steps and Quality graph remain authoritative.
 | Cache | Path | Exact key inputs | Excluded |
 | --- | --- | --- | --- |
 | Bun packages | Runtime output of `bun pm cache`, outside the checkout | event name, runner OS, runner architecture, `.bun-version` hash, `bun.lock` hash | `node_modules`, Turbo outputs, browser binaries |
-| Playwright Chromium | Explicit `.cache/ms-playwright` directory beside the GitHub workspace and outside the checkout | event name, runner OS, runner architecture, resolved app-local Playwright version, `bun.lock` hash | operating-system packages, `node_modules`, non-Chromium browsers |
+| Playwright Chromium | Explicit `ms-playwright` directory under GitHub's runner temporary directory and outside the checkout | event name, runner OS, runner architecture, resolved app-local Playwright version, `bun.lock` hash | operating-system packages, `node_modules`, non-Chromium browsers |
 
 Pull requests and main use different event-name key segments. GitHub cache ref
 scoping is a second boundary, so pull-request code cannot replace a trusted
