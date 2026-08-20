@@ -199,8 +199,8 @@
       "trigger": "same-repository pull request closed"
     },
     "externalState": {
-      "receipt": null,
-      "status": "not-established"
+      "receipt": "docs/evidence/deployments/2026-08-20-preview-teardown-pr-60/workflow-receipt-32367035323.json",
+      "status": "established"
     },
     "failure": {
       "escalationOwner": "taxkit-docs-deployment-operation-owner",

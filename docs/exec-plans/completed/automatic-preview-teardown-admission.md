@@ -1,8 +1,8 @@
 ---
 document_type: execution-plan
-lifecycle: current
+lifecycle: historical
 authority: supporting
-owner: taxkit-execution-plan-owner
+owner: taxkit-execution-history-owner
 last_reviewed: 2026-08-20
 review_trigger: APT task, workflow, environment, reviewer, policy, proof, rollback, or successor change
 successor: ../../product-specs/automatic-preview-teardown-admission.md
@@ -16,7 +16,7 @@ Spec: [Automatic Preview Teardown Admission](../../product-specs/automatic-previ
 Task list:
 [`automatic-preview-teardown-admission.tasks.json`](../../product-specs/automatic-preview-teardown-admission.tasks.json)
 
-## APT-001 — in progress
+## Outcome
 
 The teardown workflow and current automation owners now share
 `taxkit-docs-preview`. Focused policy proof passed before the required reviewer
@@ -34,16 +34,26 @@ stage or Worker, but it is not an accepted no-op receipt. Reconciliation run
 success-promotion condition bug. The failure evidence is
 [`APT-002-first-automatic-run-failure.json`](../../documentation-audit/automatic-preview-teardown/APT-002-first-automatic-run-failure.json).
 
-The current corrective slice keeps the inventory command behind Turbo, writes
-machine JSON directly from the Effect runtime to the named temporary report,
-and limits positive reconciliation to successful source runs. Merge that slice,
-then dispatch reviewed `main` for closed same-repository PR #59. Require the
-formal no-op and successful reconciliation receipts before environment
-retirement.
+PR #60 merged the focused correction as
+`34b065b6bbab695234628dffb7925d59fb6eaaee`. Automatic PR-close teardown run
+`32367035323` started without approval, retained two equal `noop` plans for
+exact stage `pr-60`, and proved Alchemy state-stage and Cloudflare Worker
+absence. Separate reconciliation run `32367125582` validated the completed
+source run and promoted the accepted receipt. The exact evidence is under
+[`2026-08-20-preview-teardown-pr-60`](../../evidence/deployments/2026-08-20-preview-teardown-pr-60/).
 
-Do not change Production, Cloudflare credentials, Alchemy resources or manual
-recovery. Keep the old teardown environment until the corrected run is
-accepted. Then delete the unused environment and close the SPEC.
+After that proof, the unused `taxkit-docs-preview-teardown` environment was
+deleted. A non-creating repository environment-list readback found only
+`github-actions-report-only`, `taxkit-docs-preview` and
+`taxkit-docs-production`. Preview retained only the two required secret names
+and no reviewer; Production retained its `crcorbett` reviewer. The terminal
+receipt is
+[`APT-003-automatic-noop-and-retirement.json`](../../documentation-audit/automatic-preview-teardown/APT-003-automatic-noop-and-retirement.json).
+
+Production, Cloudflare credential values, Alchemy resources and manual recovery
+were not changed. The accepted run was a formal no-op because `pr-60` did not
+exist; it does not claim that a live Worker was deleted or that any other
+Preview stage is absent.
 
 No Changeset is required because the slice changes repository deployment
 policy and GitHub environment settings only.
