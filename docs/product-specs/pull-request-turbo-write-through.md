@@ -1,29 +1,38 @@
 ---
 document_type: product-spec
-lifecycle: active
+lifecycle: implemented
 authority: supporting
 owner: taxkit-product-owner
 last_reviewed: 2026-08-20
 review_trigger: pull-request trust, Turbo cache mode, credential, task input/output, dependency install, or hosted proof change
 successor: null
 tombstone: false
-status: active
+status: implemented
 source_of_truth: docs
 confidence: high
 ---
 
 # Pull-request Turbo Write-through Cache
 
+## Implemented outcome
+
+PWC-001 is complete. Pull request #58, run `32351432522`, attempt 1 missed
+Turbo task hash `8cf9ff8f2a792e94` under `local:rw,remote:rw`; attempt 2 on the
+same commit replayed that exact hash remotely. The complete job fell from
+5m45s to 54 seconds for this pair. Bun and Chromium keys also hit while frozen
+install and system dependency setup stayed live. The bounded receipt is
+[`PWC-001-hosted-proof.md`](../documentation-audit/pr-write-through-cache/PWC-001-hosted-proof.md).
+
 ## Decision
 
-TaxKit will let same-repository pull requests read and write the existing
+TaxKit lets same-repository pull requests read and write the existing
 Vercel Remote Cache. This allows a pull-request run to populate deterministic
 Turbo results for its own rerun and for later runs with the same task hash.
 Fork pull requests receive no `TURBO_TOKEN`, so they continue through Turbo's
 complete local fallback even though the configured cache mode is read/write.
 
 The Bun package-download cache and Playwright Chromium cache remain separate
-GitHub Actions caches. TaxKit will not cache `node_modules` in this slice.
+GitHub Actions caches. TaxKit does not cache `node_modules` in this slice.
 Every run still executes `bun install --frozen-lockfile`, installs Chromium
 system dependencies, and runs the complete nine-check Quality graph.
 
