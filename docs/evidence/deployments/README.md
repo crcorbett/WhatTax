@@ -636,3 +636,21 @@ The original checkout was fast-forwarded to the same remote SHA without a
 reset or discard, and its pre-reconciliation dirty candidate remains
 preserved in a local stash. This readback adds no provider, DNS, custom-domain,
 publication, release, byte-promotion or permanent-availability claim.
+
+## 2026-08-20 shared-environment automatic no-op promotion
+
+PR #60 merged the machine-report and reconciler correction as
+`34b065b6bbab695234628dffb7925d59fb6eaaee`. Automatic PR-close teardown run
+`32367035323` started without approval, retained two equal no-op plans for
+exact stage `pr-60`, and proved Alchemy state-stage and Cloudflare Worker
+absence. Reconciliation run `32367125582` validated the completed source run.
+The promoted evidence is in `2026-08-20-preview-teardown-pr-60/`.
+
+The unused teardown approval environment was removed only after that proof.
+The terminal receipt at
+`../../documentation-audit/automatic-preview-teardown/APT-003-automatic-noop-and-retirement.json`
+retains artifact identity, environment-list absence, unchanged Preview secret
+names and unchanged Production reviewer protection. The accepted no-op proves
+exact `pr-60` absence only; it does not claim deletion of a live Worker,
+absence of other Preview stages, Production mutation, DNS, release or
+publication.

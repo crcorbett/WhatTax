@@ -61,21 +61,20 @@ That preparation is bounded to the named state-store control plane; no local
 OAuth profile is copied into CI.
 
 The current native `Cloudflare.Website.Vite` graph has one `DocsWebsite`
-resource. Preview and Production retain their accepted observations. Teardown
-returns to `not-established` when its environment identity changes and needs a
-fresh default-branch PR-close receipt before promotion. Plan v2 admits one
-Website action and, only during migration, an adjacent `DocsBuild` delete. The
-provider-free Vite/workerd build is preflight proof; the deployment-input
-digest binds the tracked Website source set rather than claiming byte identity
-with Alchemy's internal build.
+resource. Preview, Production and teardown retain accepted observations. Plan
+v2 admits one Website action and, only during migration, an adjacent
+`DocsBuild` delete. The provider-free Vite/workerd build is preflight proof;
+the deployment-input digest binds the tracked Website source set rather than
+claiming byte identity with Alchemy's internal build.
 
 The first shared-environment PR-close run started automatically but stopped
 before dry-run or destroy because Turbo console framing surrounded the
 inventory JSON. The corrected contract writes machine inventory directly from
 the Effect runtime to a named temporary report, while Turbo remains the command
-engine. The same slice prevents failed source runs from entering the positive
-receipt-promotion step. Teardown remains `not-established` until the corrected
-run and reconciliation produce accepted receipts.
+engine. It also prevents failed source runs from entering positive receipt
+promotion. Corrected run `32367035323` and reconciliation `32367125582` passed
+for exact stage `pr-60`; the promoted receipt establishes teardown under the
+shared Preview environment. The old approval environment is now absent.
 
 The scheduled/open-PR orphan automation and its child-process implementation
 are retired. PR-close teardown remains the explicit lifecycle owner. Historical

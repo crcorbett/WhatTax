@@ -2,12 +2,12 @@
   "$schema": "https://taxkit.local/schemas/product-spec-task-plan.v1.json",
   "spec": "docs/product-specs/automatic-preview-teardown-admission.md",
   "title": "Automatic Preview Teardown Admission Tasks",
-  "status": "active",
+  "status": "completed",
   "last_reviewed": "2026-08-20",
   "principles": [
     "Use Alchemy pr-N stage isolation and TaxKit's exact-stage checks as the cleanup safety boundary.",
     "Use one Preview credential environment for Preview deploy and teardown without changing Production.",
-    "Preserve historical receipts and keep teardown external proof open until a fresh default-branch run passes."
+    "Preserve historical receipts and establish teardown external proof only from a fresh default-branch run."
   ],
   "globalVerification": {
     "commitPolicy": "Commit only after focused workflow, automation, documentation and full repository verification pass.",
@@ -66,7 +66,7 @@
   "tasks": [
     {
       "id": "APT-001",
-      "status": "in_progress",
+      "status": "completed",
       "title": "Automate exact-stage Preview teardown admission",
       "type": "deployment-policy",
       "dependsOn": [],

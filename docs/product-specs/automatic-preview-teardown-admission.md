@@ -1,24 +1,24 @@
 ---
 document_type: product-spec
-lifecycle: current
+lifecycle: implemented
 authority: supporting
 owner: taxkit-product-owner
 last_reviewed: 2026-08-20
 review_trigger: Preview environment, required reviewer, teardown workflow, Alchemy stage, credential, provider readback, or hosted proof change
 successor: null
 tombstone: false
-status: canonical
+status: implemented
 source_of_truth: docs
 confidence: high
 ---
 
 # Automatic Preview Teardown Admission
 
-## Overview
+## Implemented outcome
 
-TaxKit lets a trusted same-repository PR-close event clean up its exact
+TaxKit now lets a trusted same-repository PR-close event clean up its exact
 Alchemy Preview stage without a second human approval. Preview deploy and
-teardown will share `taxkit-docs-preview`, which already holds the required
+teardown share `taxkit-docs-preview`, which already holds the required
 narrow Cloudflare secret names. Production remains separately protected.
 
 Alchemy recommends automatic `alchemy destroy --stage pr-N --yes` on PR close
@@ -43,8 +43,9 @@ Alchemy stage isolation.
 
 The accepted settings mutation removed the Preview reviewer and read back zero
 protection rules with the same two secret names. Production still requires
-`crcorbett`; the old teardown environment remains protected until accepted
-post-cutover proof. The bounded settings receipt is
+`crcorbett`. Corrected automatic teardown run `32367035323` and receipt
+reconciliation run `32367125582` passed for exact stage `pr-60`, after which
+the unused teardown environment was removed. The bounded settings receipt is
 [`APT-001-github-environment-readback.json`](../documentation-audit/automatic-preview-teardown/APT-001-github-environment-readback.json).
 
 ## Call graphs
@@ -84,6 +85,17 @@ also stops the completed-run reconciler from entering positive promotion for a
 failed source run. The bounded failure receipt is
 [`APT-002-first-automatic-run-failure.json`](../documentation-audit/automatic-preview-teardown/APT-002-first-automatic-run-failure.json).
 
+PR #60 merged the correction as
+`34b065b6bbab695234628dffb7925d59fb6eaaee`. Its pull-request and main
+Quality runs passed. Automatic teardown run `32367035323` started without
+approval, produced two equal no-op plans for exact stage `pr-60`, and proved
+that both the Alchemy state stage and Cloudflare Worker were absent. Separate
+reconciliation run `32367125582` validated the completed run and promoted the
+receipt. The old environment was then removed; a repository environment-list
+readback retained only report-only, Preview and Production. The terminal
+receipt is
+[`APT-003-automatic-noop-and-retirement.json`](../documentation-audit/automatic-preview-teardown/APT-003-automatic-noop-and-retirement.json).
+
 ## Scope and boundaries
 
 In scope:
@@ -93,10 +105,11 @@ In scope:
 - remove the required reviewer from `taxkit-docs-preview` and retain names-only
   secret readback;
 - update current automation policy, register, tests and durable owners;
-- mark teardown external proof `not-established` until a fresh default-branch
-  PR-close receipt proves the new environment identity; and
+- establish teardown external proof only from a fresh default-branch PR-close
+  receipt proving the new environment identity; and
 - remove the unused `taxkit-docs-preview-teardown` environment only after the
-  workflow change reaches `main` and no default-branch workflow references it.
+  workflow change reaches `main`, no default-branch workflow references it,
+  and the corrected no-op and reconciliation receipts pass.
 
 Out of scope:
 
@@ -109,9 +122,9 @@ Out of scope:
 ## Authority, safety and rollback
 
 Cooper approved this exact automatic-cleanup change on 2026-08-20. The GitHub
-setting mutation is limited to the `taxkit-docs-preview` required-reviewer
-rule. Secret values must remain unread and unchanged. The old teardown
-environment remains while `main` still references it.
+setting mutations were limited to removing the `taxkit-docs-preview` reviewer
+and, after accepted proof, deleting the unused teardown environment. Secret
+values remained unread and unchanged. Production was not changed.
 
 The automatic destroy remains authorised only by the trusted close event plus
 the executable source, stage, resource, plan and provider checks. Unknown,
@@ -129,12 +142,13 @@ workflow environment binding.
   exact-stage safety graph.
 - Focused deployment checks and `bun run verification` pass.
 - Hosted Quality passes for the candidate branch.
-- After merge, one same-repository PR-close run starts without approval and
-  produces an accepted exact-stage absence or no-op receipt before the old
-  environment is removed.
+- After merge, same-repository PR-close run `32367035323` started without
+  approval and produced an accepted exact-stage no-op receipt before the old
+  environment was removed.
 
-Local and pull-request proof do not establish the post-merge teardown result,
-Cloudflare mutation, public availability, Production, release or publication.
+The retained run proves exact `pr-60` absence, not deletion of a live Worker or
+absence of other Preview stages. It does not establish public availability,
+Production mutation, release or publication.
 
 ## Impact ledger
 

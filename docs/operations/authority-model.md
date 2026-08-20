@@ -157,10 +157,12 @@ unchanged secret names `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_API_TOKEN`.
 Production still requires `crcorbett`. The sanitized receipt is
 [`../documentation-audit/automatic-preview-teardown/APT-001-github-environment-readback.json`](../documentation-audit/automatic-preview-teardown/APT-001-github-environment-readback.json).
 Rollback restores the Preview reviewer rule and the former teardown environment
-binding. The old teardown environment must not be removed until the reviewed
-workflow reaches `main` and a corrected automatic or reviewed-main dispatch
-produces accepted absence and reconciliation receipts; its presence grants no
-current workflow authority after cutover.
+binding. Corrected automatic run `32367035323` and reconciliation run
+`32367125582` produced accepted exact-`pr-60` no-op and absence receipts from
+reviewed `main`. The unused environment was then removed and a non-creating
+repository environment-list readback proved its absence. Preview retained its
+two secret names and no reviewer; Production retained `crcorbett`. The run did
+not delete a live Worker because `pr-60` was already absent.
 
 ## Dated TaxKit docs deployment envelope
 
