@@ -14,12 +14,6 @@ tombstone: false
 Live implementation plans belong here while work is in progress. Maintainer
 lifecycle is owned by [`../../README.md`](../../README.md).
 
-The active
-[Shared Dependency Cache and Checkout Upgrade](./shared-dependency-cache-and-checkout.md)
-plan removes event-name key splits while preserving GitHub ref-scoped writes,
-and upgrades all workflow checkout pins to v7.0.1. It requires focused local
-policy proof and one immutable hosted pull-request Quality receipt.
-
 The implemented
 [Pull-request Turbo Write-through Cache](../../product-specs/pull-request-turbo-write-through.md)
 SPEC and [completed plan](../completed/pull-request-turbo-write-through.md)
@@ -27,7 +21,9 @@ retain exact same-commit hosted write/read proof for token-bearing pull
 requests, secret-free fork fallback and live frozen installation. The earlier
 cache implementation history remains in the
 [`completed predecessor plan`](../completed/ci-cache-efficiency.md). No CI
-cache execution plan is active.
+cache execution plan is active. The completed
+[Shared Dependency Cache and Checkout Upgrade](../completed/shared-dependency-cache-and-checkout.md)
+plan retains the successor key-scope and checkout-v7 proof.
 
 The completed deployment goal is retained in the
 [`Native Alchemy docs deployment`](../completed/native-alchemy-docs-deployment.md)

@@ -16,6 +16,7 @@ evidence remains useful.
 
 Completed plans:
 
+- [Shared Dependency Cache and Checkout Upgrade](./shared-dependency-cache-and-checkout.md)
 - [Turbo and CI Cache Efficiency](./ci-cache-efficiency.md)
 - [Quality Trigger Efficiency](./quality-trigger-efficiency.md)
 - [Native Alchemy docs deployment](./native-alchemy-docs-deployment.md)

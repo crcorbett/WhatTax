@@ -1,22 +1,32 @@
 ---
 document_type: product-spec
-lifecycle: current
+lifecycle: implemented
 authority: supporting
 owner: taxkit-product-owner
 last_reviewed: 2026-08-20
 review_trigger: dependency-cache key, GitHub cache scope, checkout action, runner runtime, workflow policy, or hosted proof change
 successor: null
 tombstone: false
-status: canonical
+status: implemented
 source_of_truth: docs
 confidence: high
 ---
 
 # Shared Dependency Cache and Checkout Upgrade
 
+## Implemented outcome
+
+SDC-001 and SDC-002 are complete. Pull request #59 run `32357219491` passed
+twice on source commit `05fc7328db6d9468c0e616d498155213f4357b03`.
+Attempt 1 created the new content-addressed Bun and Chromium cache entries;
+attempt 2 restored both exact keys and passed in 54 seconds. Checkout v7.0.1
+ran by exact commit, frozen Bun installation and Playwright system setup stayed
+live, and the complete Quality graph passed. The bounded receipt is
+[`SDC-hosted-proof.md`](../documentation-audit/shared-dependency-cache-and-checkout/SDC-hosted-proof.md).
+
 ## Overview
 
-TaxKit will let pull requests restore content-identical Bun package downloads
+TaxKit lets pull requests restore content-identical Bun package downloads
 and Playwright Chromium binaries that `main` has already saved. GitHub will
 continue to isolate writes by Git ref, so a pull-request cache cannot replace a
 default-branch cache. The same slice upgrades every workflow from the pinned
@@ -27,7 +37,7 @@ Task plan:
 
 ## Problem and evidence
 
-The current keys include `github.event_name`. Identical Bun, lockfile, runner
+The previous keys included `github.event_name`. Identical Bun, lockfile, runner
 and Playwright inputs therefore produce different keys for `pull_request`,
 `push`, `workflow_dispatch` and `workflow_run`. GitHub already searches the
 current ref and then the default branch for a matching cache, while caches
@@ -40,7 +50,8 @@ Chromium download-cache setup difference between cold and warm runs. This is a
 step-level observation, not a forecast for every job. Frozen installation and
 Chromium system-package setup remain live.
 
-All five workflows still pin `actions/checkout` v4.2.0. Hosted runs now warn
+All five workflows previously pinned `actions/checkout` v4.2.0. Hosted runs
+warned
 that Node.js 20 actions are deprecated. Checkout v7.0.1 uses the newer action
 runtime and retains the inputs TaxKit already uses. TaxKit remains a Bun
 repository: checkout only places Git source in the runner workspace, then
@@ -50,7 +61,7 @@ repository.
 ## Current and target call graphs
 
 ```text
-Current dependency-cache path
+Previous dependency-cache path
   -> workflow event name enters the cache key
   -> identical pull_request and push inputs produce different keys
   -> pull request cannot find the matching main key
@@ -58,7 +69,7 @@ Current dependency-cache path
 ```
 
 ```text
-Target dependency-cache path
+Implemented dependency-cache path
   -> OS, architecture, Bun version, lockfile and Playwright version form the key
   -> GitHub searches the current ref and then the default branch
   -> pull request may restore a matching main cache
@@ -67,7 +78,7 @@ Target dependency-cache path
 ```
 
 ```text
-Target workflow bootstrap
+Implemented workflow bootstrap
   -> pinned actions/checkout v7.0.1 places reviewed Git source in the workspace
   -> pinned setup-bun installs the repository Bun version
   -> GitHub caches restore downloads only
