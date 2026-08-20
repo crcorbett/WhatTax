@@ -11,10 +11,11 @@ review_trigger: TCC-003 workflow, cache action, path, key, event scope, install 
 
 ## Current decision
 
-TCC-003 remains an implementation candidate until one cold and one warm hosted
-Quality run prove both GitHub cache layers and the complete browser graph. The
-checked-in workflow and policy establish the intended path, key, order and
-fallback only; they do not yet prove a hosted restore or saving.
+TCC-003 is accepted. Hosted Quality run `32342247926` at source
+`fa2467e338c2dd41e04bc763533731b110d73f98` saved a cold Chromium cache in
+attempt 1, then restored the exact Bun and Chromium keys in attempt 2. Both
+attempts passed the complete nine-check graph. The warm attempt kept frozen Bun
+installation, Playwright system-dependency installation and browser proof live.
 
 ## Candidate call graph
 
@@ -26,6 +27,7 @@ Quality pull request or push to main
   -> restore event-scoped Bun package cache
   -> live `bun install --frozen-lockfile`
   -> save Bun package cache after install when the exact key missed
+  -> resolve the Playwright browser path from the runner temporary directory
   -> resolve app-local Playwright version
   -> restore event-scoped Chromium binary cache
   -> live `playwright install --with-deps chromium`
@@ -53,7 +55,7 @@ live install because cache steps are acceleration only.
 
 ## Local policy evidence
 
-The workflow policy decodes the exact 13-step graph. It rejects mutable action
+The workflow policy decodes the exact 14-step graph. It rejects mutable action
 pins, `node_modules` paths, missing event/Bun/lockfile/Playwright identities,
 trusted-key reuse, skipped installs, changed `--with-deps`, fatal cache steps,
 early saves and any release-graph replacement. The automation register names
@@ -68,6 +70,27 @@ directory and failed with a missing Chromium executable. The correction names
 The failed run is retained as path-propagation evidence, not browser or Quality
 acceptance.
 
+Run `32341511100` then passed the complete graph, but its non-fatal Chromium
+save logged `Invalid pattern` because the path contained `..`. Run
+`32342108554` separately rejected a follow-up that placed `runner.temp` in a
+workflow-level expression, before any job started. The accepted workflow now
+resolves `$RUNNER_TEMP/ms-playwright` through `GITHUB_ENV` inside the job. These
+failures are retained as path-validation evidence and are not acceptance runs.
+
+## Hosted acceptance
+
+| Observation | Cold or earlier evidence | Warm exact-source evidence | Result |
+| --- | --- | --- | --- |
+| Bun packages | Run `32340895568` missed, installed 1,737 packages in 15.24s and saved the event-scoped key. | Run `32342247926` attempt 2 restored the exact 307 MB key, still ran frozen install and installed 1,737 packages in 1.65s; save skipped. | Package installation saved 13.59s. Restore itself took about 10s, so end-to-end setup savings are smaller. |
+| Chromium binaries | Run `32342247926` attempt 1 missed, installed system packages, downloaded Chromium 1228 plus its supporting binaries in 22s and saved the 261 MB exact key in 5s. | Attempt 2 restored that exact key in 7s, still ran `--with-deps` in 10s, logged no browser download and skipped save. | The install step saved 12s; restore plus retained system setup saved about 5s against miss plus install, or about 10s when the cold save cost is included. |
+| Complete Quality graph | Attempt 1 passed all nine ordered checks in a 4m44s job. | Attempt 2 passed all nine ordered checks, including docs browser proof, in a 5m03s job. | No overall job saving is claimed: release-graph variation added about 29s and outweighed dependency setup savings in this pair. |
+| Cache-free fallback | Local forced release and verification graphs passed without GitHub cache services; earlier hosted Quality run `32323001841` passed before these dependency-cache steps existed. The accepted cold Chromium miss also continued through the live install. | Cache operations remain non-fatal and neither install can be skipped by a hit. | Evidence supports an uncached correctness path, not GitHub cache-service availability. |
+
+The Chromium identity was Playwright `1.61.1`, Chromium revision `1228`, on
+Linux X64 with the current `bun.lock` hash. This proves binary reuse for that
+identity only. It does not prove operating-system packages were cached, and it
+does not establish deployment, publication, provider or public-site state.
+
 ## Documentation impact
 
 | Owner | Decision | Reason |
@@ -80,19 +103,8 @@ acceptance.
 | Changeset | N/A | Repository CI tooling only. |
 | Harness profile and consumer journeys | N/A | A dependency download cache does not create a consumer-visible claim. |
 
-## Hosted acceptance still required
+## Recovery
 
-1. Run one hosted Quality candidate with both exact keys absent. Record misses,
-   successful installs, successful saves and the complete docs browser
-   postcondition.
-2. Rerun the exact source and event. Record exact Bun and Chromium hits,
-   retained frozen/system installation and the complete docs browser
-   postcondition.
-3. Compare worker, Bun install, Chromium setup and release-graph time without
-   attributing operating-system package time to the Chromium binary cache.
-4. Prove the complete graph with dependency caches absent or unavailable, then
-   accept, revise or remove TCC-003 before TCC-004.
-
-Rollback removes the four GitHub cache restore/save steps and two identity
-steps while preserving exact Bun setup, frozen install, Playwright
+Rollback removes the four GitHub cache restore/save steps and three path or
+identity steps while preserving exact Bun setup, frozen install, Playwright
 `--with-deps`, Turbo bindings and the complete release graph.

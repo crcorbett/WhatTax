@@ -23,7 +23,8 @@ The cache owner approved the complete SPEC implementation in the
 `cooper-corbetts-projects` Hobby team. TCC-002 is accepted: trusted main wrote
 and reused the Vercel Remote Cache, the pull request reused the same eligible
 hash under read-only authority, and both retained the complete hosted Quality
-graph. TCC-003 now owns separate Bun package and Chromium binary caches.
+graph. TCC-003 accepted separate Bun package and Chromium binary caches;
+TCC-004 now owns deployment and receipt workflow treatment.
 
 The completed deployment goal is retained in the
 [`Native Alchemy docs deployment`](../completed/native-alchemy-docs-deployment.md)

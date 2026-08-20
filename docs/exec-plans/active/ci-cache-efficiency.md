@@ -45,8 +45,8 @@ authority.
 | --- | --- | --- |
 | TCC-001 | Complete | Cold and hosted baselines, Turbo inputs, cache keys, event matrix, cache authority and names-only provider/secret/vault readback are accepted. |
 | TCC-002 | Complete | The Quality graph uses audited Turbo tasks; trusted main wrote and reused the cache, while a pull request reused the same hash under read-only authority. The same-commit hosted main run fell from 5m36s to 1m09s. |
-| TCC-003 | In progress | Add separate Bun package and Chromium binary caches while frozen install, system dependencies and browser proof stay live. |
-| TCC-004 | Pending | Change trusted deployment and receipt workflows after the Quality slices. |
+| TCC-003 | Complete | Exact hosted keys reused Bun packages and Chromium while frozen install, system dependencies and the nine-check browser graph stayed live; setup steps improved, but the two-run sample did not reduce total job time. |
+| TCC-004 | In progress | Change trusted deployment and receipt workflows after the accepted Quality slices. |
 | TCC-005 | Pending | Measure hosted cold/warm outcomes and close the lifecycle. |
 
 ## TCC-001 working set
