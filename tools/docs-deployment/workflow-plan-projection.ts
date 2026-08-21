@@ -56,6 +56,7 @@ const timestampLog = /^\[\d{2}:\d{2}:\d{2}(?:\.\d+)?\] [A-Z]+ /u;
 const resourceLine = /^\[[^\]]+\] /u;
 const nativeResourceLine = /^\[DocsWebsite\] (create|update|noop|delete)$/u;
 const legacyMigrationResourceLine = /^\[DocsBuild\] delete$/u;
+const legacyMigrationWebsiteLine = /^\[DocsWebsite\] (update|noop)$/u;
 
 const fail = (reason: string) =>
   Effect.fail(new WorkflowPlanProjectionError({ reason }));
@@ -72,15 +73,15 @@ export const projectAlchemyPlanText = (
       .filter((line) => !timestampLog.test(line));
     if (kind === "migrate") {
       const websiteLine = resourceLines.find((line) =>
-        line.startsWith("[DocsWebsite] ")
+        legacyMigrationWebsiteLine.test(line)
       );
       if (
         resourceLines.length !== 2 ||
         !resourceLines.some((line) => legacyMigrationResourceLine.test(line)) ||
-        websiteLine !== "[DocsWebsite] noop"
+        websiteLine === undefined
       ) {
         return yield* fail(
-          "a legacy migration plan must contain exactly DocsBuild delete and DocsWebsite noop"
+          "a legacy migration plan must contain exactly DocsBuild delete and DocsWebsite update or noop"
         );
       }
       return [
@@ -90,7 +91,7 @@ export const projectAlchemyPlanText = (
           resourceType: "Command.Build" as const,
         },
         {
-          action: "noop" as const,
+          action: websiteLine === "[DocsWebsite] update" ? "update" : "noop",
           logicalId: "DocsWebsite" as const,
           resourceType: "Cloudflare.Worker" as const,
         },
