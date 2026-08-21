@@ -326,20 +326,6 @@ describe("docs deployment workflow admission", () => {
     );
   });
 
-  test("advances one exact legacy stage per migration", async () => {
-    const preview = await readWorkflow(workflowPaths.preview);
-    expect(preview).toContain('test "$legacy_stage_count" -ge 1');
-    expect(preview).toContain(
-      'test "$post_legacy_stage_count" -eq "$((legacy_stage_count - 1))"'
-    );
-    expect(preview).toContain("legacyStageCountBefore");
-    expect(preview).toContain("legacyStageCountAfter");
-    expect(preview).not.toContain('test "$legacy_stage_count" -eq 1');
-    expect(
-      preview.match(/TAXKIT_DOCS_DEPLOYMENT_ALLOW_LEGACY=1/gu)
-    ).toHaveLength(2);
-  });
-
   test("shares Preview credentials for deploy and exact-stage teardown", async () => {
     const [preview, production, teardown] = await Promise.all([
       readWorkflow(workflowPaths.preview),
@@ -360,7 +346,7 @@ describe("docs deployment workflow admission", () => {
     const group = [
       "group: taxkit-docs-preview-pr-",
       "$",
-      "{{ inputs.target_stage || github.event.pull_request.number || inputs.pr_number }}",
+      "{{ github.event.pull_request.number || inputs.pr_number }}",
     ].join("");
     expect(preview).toContain(group);
     expect(teardown).toContain(group);

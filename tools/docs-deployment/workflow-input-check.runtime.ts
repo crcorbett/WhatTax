@@ -29,20 +29,13 @@ export const checkWorkflowInput = Effect.gen(function* workflowInputCheck() {
     config.TAXKIT_WORKFLOW_INPUT_PR_NUMBER === ""
       ? null
       : config.TAXKIT_WORKFLOW_INPUT_PR_NUMBER;
-  const expectedTargetStage =
-    config.TAXKIT_WORKFLOW_INPUT_TARGET_STAGE === undefined ||
-    config.TAXKIT_WORKFLOW_INPUT_TARGET_STAGE === ""
-      ? null
-      : config.TAXKIT_WORKFLOW_INPUT_TARGET_STAGE;
-
   if (
     input.candidateCommit !== config.TAXKIT_WORKFLOW_INPUT_CANDIDATE_COMMIT ||
     input.workflowCommit !== config.TAXKIT_WORKFLOW_INPUT_WORKFLOW_COMMIT ||
     input.workflowRunId !== config.TAXKIT_WORKFLOW_INPUT_RUN_ID ||
     input.workflowPath !== config.TAXKIT_WORKFLOW_INPUT_WORKFLOW_PATH ||
     input.operation !== config.TAXKIT_WORKFLOW_INPUT_OPERATION ||
-    input.prNumber !== expectedPrNumber ||
-    (input.targetStage ?? null) !== expectedTargetStage
+    input.prNumber !== expectedPrNumber
   ) {
     return yield* new WorkflowCheckMismatchError({
       check,

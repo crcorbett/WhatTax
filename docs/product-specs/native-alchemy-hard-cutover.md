@@ -1,6 +1,6 @@
 ---
 document_type: product-spec
-lifecycle: proposed
+lifecycle: implemented
 authority: supporting
 owner: taxkit-product-owner
 last_reviewed: 2026-08-21
@@ -20,8 +20,9 @@ the deployment lock and build-input gaps found in the Alchemy audit, and leave
 only immutable historical evidence for the old graph.
 
 This is a hard repository cutover. It is not a new deployment architecture and
-it does not authorise Preview, Production, teardown, credential, Cloudflare or
-Alchemy mutation while this SPEC is being written.
+the SPEC itself does not authorise Preview, Production, teardown, credential,
+Cloudflare or Alchemy mutation. The separately authorised Preview state
+reconciliation is recorded as evidence below.
 
 ## Problem
 
@@ -260,37 +261,44 @@ generic child-process wrapper may cross an owning boundary.
 
 ### Implementation status
 
-The repository slices for HAC-001, HAC-003, HAC-004, HAC-005 and HAC-006 are
-implemented and locally verified. HAC-002 remains in progress because this
-thread did not have authority to inspect or mutate live Alchemy/Cloudflare
-state. Current repository admission is native-only; a separately authorised
-exact-stage operation must still provide any required legacy-state deletion and
-absence readback before that task can close.
+All six repository slices are implemented and locally verified. HAC-002 is
+complete after a separately authorised Preview state reconciliation. The
+sanitised terminal receipt is
+[`legacy-state-cutover.json`](../evidence/deployments/2026-08-21-native-alchemy-hard-cutover/legacy-state-cutover.json).
 
 The first separately authorised Preview attempt, run `32436973454`, stopped
 before `alchemy deploy` when inventory found the legacy `DocsBuild` resource in
-exact stage `pr-16`. It did not create or delete the application resources.
-The later read-only inventory in run `32438980355` found five exact legacy
-stages — `pr-15`, `pr-16`, `pr-17`, `pr-18` and `pr-23` — and stopped before
+exact stage `pr-16`. It did not create or delete application resources. The
+later read-only inventory in run `32438980355` found five exact legacy stages —
+`pr-15`, `pr-16`, `pr-17`, `pr-18` and `pr-23` — and stopped before
 `alchemy deploy` because the temporary migration preflight was still limited to
 one globally discovered stage. It did not create or delete application
-resources. The temporary migration path now permits one exact target stage per
-run, requires the global legacy-stage count to decrease by one, and remains
-open until every target has post-delete absence and Website-retention readback.
-The first apply attempt for `pr-15`, run `32440967336`, passed the equal
-replan and Alchemy reported `DocsBuild` deleted and `DocsWebsite` updated, but
-the workflow stopped in its post-mutation inventory step because the temporary
-legacy-readback allowance was not applied there. It is retained as failed or
-incomplete evidence, not as a successful cutover receipt; the next corrected
-stage readback must confirm the `pr-15` result before the remaining stages are
-processed.
+resources.
+
+The approved one-stage reconciliation then processed those five stages in
+order. The first `pr-15` apply, run `32440967336`, passed the equal replan and
+Alchemy reported `DocsBuild` deleted and `DocsWebsite` updated, but stopped in
+post-mutation inventory because the temporary legacy-readback allowance was
+not applied there. It remains incomplete evidence, not a same-run success.
+The corrected `pr-16` run `32441466447` confirmed the resulting `pr-15`
+native-only state before reducing the count from four to three. Runs
+`32441635009`, `32441777832` and `32441944207` then reduced the global legacy
+stage count from three to zero for `pr-17`, `pr-18` and `pr-23`. The final
+readback retained `DocsWebsite` for every recorded stage and reported
+state/provider agreement.
+
+This is a bounded observation of the separately authorised Preview operation.
+It does not claim a Production deployment or Production cutover. The final
+inventory included `prod` as a read-only native-only observation only.
 
 ### Local
 
-The implementer must run the repository commands that exist for this checkout,
-including focused docs-deployment type/tests, workflow policy tests,
-`bun run check:docs`, `bun run check:runbooks`, `bun run check:repository-paths`,
-`bun run verification` and `git diff --check`.
+The cleanup candidate passed the focused docs-deployment tests and type checks,
+documentation and runbook checks, repository path check, lint, formatting,
+`git diff --check` and `bun run verification`. Full verification exited 0 and
+reported zero violations for both deployment and deployment-automation
+validation. These local checks do not establish provider state, hosted
+behaviour or public availability.
 
 The direct local oracles are:
 
@@ -333,7 +341,7 @@ evidence and does not promote the current automation register.
 | Surface | Decision | Evidence and required postcondition |
 | --- | --- | --- |
 | This SPEC and sibling task list | Change required | Own current hard-cutover intent and requirement-to-proof mapping. |
-| Active execution plan and product-spec index | Change required | Route the work as current proposed intent; no completed SPEC is reopened. |
+| Active execution plan and product-spec index | Change required | Record the implemented closeout and receipt; no completed SPEC is reopened. |
 | `alchemy.run.ts`, docs Vite config and app README | Change required | Document one native resource and explicit memo ownership. |
 | Deployment workflows and deployment tooling | Change required | Remove current legacy admission, unify locks and use one native projection. |
 | Deployment architecture, runbook, standards and automation register | Change required | State the actual native graph, lock and cutover/rollback procedure. |
@@ -345,29 +353,29 @@ evidence and does not promote the current automation register.
 
 ## Acceptance criteria
 
-- [ ] The current Alchemy composition contains only
+- [x] The current Alchemy composition contains only
   `Cloudflare.Website.Vite("DocsWebsite")` for the docs application.
-- [ ] A controlled, exact-stage cutover deletes `DocsBuild` only if it is
+- [x] A controlled, exact-stage cutover deletes `DocsBuild` only if it is
   actually present, never creates or updates it, and proves its absence after
   the operation.
-- [ ] After cutover, active source, workflow, policy, Schema, fixture and
+- [x] After cutover, active source, workflow, policy, Schema, fixture and
   README searches contain no `DocsBuild` or `Command.Build` deployment surface.
-- [ ] Historical receipts remain immutable and are explicitly excluded from
+- [x] Historical receipts remain immutable and are explicitly excluded from
   current deployment admission.
-- [ ] The beta.64-supported Alchemy memo includes both sibling docs packages
+- [x] The beta.64-supported Alchemy memo includes both sibling docs packages
   and the lockfile, with a focused invalidation proof.
-- [ ] Preview deploy and PR-close teardown use the same non-cancellable stage
+- [x] Preview deploy and PR-close teardown use the same non-cancellable stage
   concurrency group, and a contract test asserts that exact equality.
-- [ ] One fail-closed plan projection replaces duplicated legacy-aware shell
+- [x] One fail-closed plan projection replaces duplicated legacy-aware shell
   projections, or a separately evidenced reason records why a supported
   structured Alchemy interface is unavailable in beta.64.
-- [ ] Architecture, runbook, automation/policy owners, active plan and index
+- [x] Architecture, runbook, automation/policy owners, active plan and index
   agree with the final graph and lock.
-- [ ] Focused checks, documentation/runbook checks, repository path checks,
+- [x] Focused checks, documentation/runbook checks, repository path checks,
   full verification and `git diff --check` pass on the exact candidate.
-- [ ] Provider and hosted claims, if performed, are separately receipt-bound
+- [x] Provider and hosted claims, if performed, are separately receipt-bound
   and do not exceed their actual authority or observation boundary.
-- [ ] No Changeset is created because this is repository deployment policy and
+- [x] No Changeset is created because this is repository deployment policy and
   app/IaC configuration, not a published package contract.
 
 ## References

@@ -4,26 +4,19 @@ on:
   workflow_dispatch:
     inputs:
       operation:
-        description: Plan, deploy or perform one exact-stage legacy migration
+        description: Plan or deploy one trusted same-repository PR candidate
         required: true
         type: choice
         options:
           - plan
           - deploy
-          - migrate-plan
-          - migrate
       candidate_sha:
         description: Exact trusted pull-request head SHA
         required: true
         type: string
       pr_number:
-        description: Trusted same-repository pull-request number for the candidate
+        description: Open same-repository pull-request number
         required: true
-        type: string
-      target_stage:
-        description: Exact existing stage for the bounded legacy migration
-        required: false
-        default: ""
         type: string
       accepted_plan_sha256:
         description: Accepted canonical plan digest for deploy
@@ -36,7 +29,7 @@ permissions:
   checks: read
 
 concurrency:
-  group: taxkit-docs-preview-pr-${{ inputs.target_stage || github.event.pull_request.number || inputs.pr_number }}
+  group: taxkit-docs-preview-pr-${{ github.event.pull_request.number || inputs.pr_number }}
   cancel-in-progress: false
 
 jobs:
@@ -52,7 +45,6 @@ jobs:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CANDIDATE_SHA: ${{ inputs.candidate_sha }}
       PR_NUMBER: ${{ inputs.pr_number }}
-      TARGET_STAGE: ${{ inputs.target_stage }}
       OPERATION: ${{ inputs.operation }}
       ACCEPTED_PLAN_SHA256: ${{ inputs.accepted_plan_sha256 }}
       TURBO_CACHE: local:rw,remote:rw
@@ -67,13 +59,6 @@ jobs:
           mkdir -p "$RUNNER_TEMP/docs-deployment"
           test "$GITHUB_REF" = "refs/heads/main"
           test "$GITHUB_SHA" = "$(gh api "repos/${GITHUB_REPOSITORY}/git/ref/heads/main" --jq .object.sha)"
-          if [ -n "$TARGET_STAGE" ]; then
-            test "$OPERATION" = "migrate-plan" || test "$OPERATION" = "migrate"
-            printf '%s' "$TARGET_STAGE" | grep -Eq '^pr-[1-9][0-9]*$'
-          else
-            test "$OPERATION" != "migrate-plan"
-            test "$OPERATION" != "migrate"
-          fi
           printf '%s' "$PR_NUMBER" | grep -Eq '^[1-9][0-9]*$'
           pr_json="$(gh api "repos/${GITHUB_REPOSITORY}/pulls/${PR_NUMBER}")"
           test "$(jq -r .base.ref <<<"$pr_json")" = "main"
@@ -93,10 +78,9 @@ jobs:
             --arg candidate "$CANDIDATE_SHA" \
             --arg operation "$OPERATION" \
             --arg pr "$PR_NUMBER" \
-            --arg targetStage "$TARGET_STAGE" \
             --arg workflow "$GITHUB_SHA" \
             --arg run "$GITHUB_RUN_ID" \
-            '{candidateCommit:$candidate,operation:$operation,prNumber:($pr|tonumber),targetStage:(if $targetStage == "" then null else $targetStage end),sourceRef:"refs/heads/main",workflowCommit:$workflow,workflowName:"Docs Preview Deployment",workflowPath:".github/workflows/docs-preview.yml",workflowRunId:$run}' \
+            '{candidateCommit:$candidate,operation:$operation,prNumber:($pr|tonumber),sourceRef:"refs/heads/main",workflowCommit:$workflow,workflowName:"Docs Preview Deployment",workflowPath:".github/workflows/docs-preview.yml",workflowRunId:$run}' \
             > "$RUNNER_TEMP/docs-deployment/workflow-input.json"
           checks="$(gh api "repos/${GITHUB_REPOSITORY}/commits/${CANDIDATE_SHA}/check-runs?per_page=100")"
           # A rerun can leave a cancelled historical Quality check on the same
@@ -157,7 +141,6 @@ jobs:
           TAXKIT_WORKFLOW_INPUT_WORKFLOW_PATH: .github/workflows/docs-preview.yml
           TAXKIT_WORKFLOW_INPUT_OPERATION: ${{ inputs.operation }}
           TAXKIT_WORKFLOW_INPUT_PR_NUMBER: ${{ inputs.pr_number }}
-          TAXKIT_WORKFLOW_INPUT_TARGET_STAGE: ${{ inputs.target_stage }}
         run: bun run check:docs-deployment-workflow-input
 
       - name: Resolve Playwright cache identity
@@ -202,13 +185,7 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p "$RUNNER_TEMP/docs-deployment"
-          stage="${TARGET_STAGE:-pr-${PR_NUMBER}}"
-          plan_kind="deploy"
-          plan_operation="preview-plan"
-          if [ "$OPERATION" = "migrate-plan" ] || [ "$OPERATION" = "migrate" ]; then
-            plan_kind="migrate"
-            plan_operation="preview-legacy-migration-plan"
-          fi
+          stage="pr-${PR_NUMBER}"
           ALCHEMY_PLAIN=1 CI=1 bunx alchemy plan --stage "$stage" --profile "$ALCHEMY_PROFILE" > "$RUNNER_TEMP/docs-deployment/alchemy-plan.txt"
           lockfile_sha256="$(shasum -a 256 bun.lock | cut -d ' ' -f1)"
           config_sha256="$(for file in alchemy.run.ts apps/docs/package.json apps/docs/vite.config.ts apps/docs/src/lib/build/cloudflare-stack.ts apps/docs/src/lib/build/docs-deployment-stage.ts apps/docs/public/_headers; do shasum -a 256 "$file"; done | shasum -a 256 | cut -d ' ' -f1)"
@@ -217,7 +194,7 @@ jobs:
             TAXKIT_WORKFLOW_PLAN_CANDIDATE_COMMIT="$CANDIDATE_SHA" \
             TAXKIT_WORKFLOW_PLAN_CONFIG_SHA256="$config_sha256" \
             TAXKIT_WORKFLOW_PLAN_DEPLOYMENT_INPUT_SHA256="$deployment_input_sha256" \
-            TAXKIT_WORKFLOW_PLAN_KIND="$plan_kind" \
+            TAXKIT_WORKFLOW_PLAN_KIND=deploy \
             TAXKIT_WORKFLOW_PLAN_LOCKFILE_SHA256="$lockfile_sha256" \
             TAXKIT_WORKFLOW_PLAN_PROJECTION_PATH="$RUNNER_TEMP/docs-deployment/projection.json" \
             TAXKIT_WORKFLOW_PLAN_STAGE="$stage" \
@@ -227,37 +204,30 @@ jobs:
           jq -nS \
             --arg acceptedBy "$GITHUB_ACTOR" \
             --arg acceptedPlanSha256 "$plan_sha256" \
-            --arg operation "$plan_operation" \
+            --arg operation "preview-plan" \
             --arg receiptPath "docs/evidence/deployments/workflow-${GITHUB_RUN_ID}/plan.json" \
             --arg observedAt "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
             --slurpfile projection "$RUNNER_TEMP/docs-deployment/projection.json" \
             '{acceptedBy:$acceptedBy,acceptedPlanSha256:$acceptedPlanSha256,observedAt:$observedAt,operation:$operation,projection:$projection[0],receiptPath:$receiptPath,replanSha256:null,schemaVersion:2}' \
             > "$RUNNER_TEMP/docs-deployment/plan.json"
           echo "plan_sha256=$plan_sha256" >> "$GITHUB_OUTPUT"
-          echo "plan_operation=$plan_operation" >> "$GITHUB_OUTPUT"
 
       - name: Schema-check initial Preview plan
         env:
           TAXKIT_WORKFLOW_PLAN_RECEIPT: ${{ runner.temp }}/docs-deployment/plan.json
           TAXKIT_WORKFLOW_PLAN_CANDIDATE_COMMIT: ${{ inputs.candidate_sha }}
-          TAXKIT_WORKFLOW_PLAN_OPERATION: ${{ steps.plan.outputs.plan_operation }}
-          TAXKIT_WORKFLOW_PLAN_STAGE: ${{ inputs.target_stage || format('pr-{0}', inputs.pr_number) }}
+          TAXKIT_WORKFLOW_PLAN_OPERATION: preview-plan
+          TAXKIT_WORKFLOW_PLAN_STAGE: pr-${{ inputs.pr_number }}
           TAXKIT_WORKFLOW_PLAN_SHA256: ${{ steps.plan.outputs.plan_sha256 }}
         run: bun run check:docs-deployment-workflow-plan
 
       - name: Replan and deploy accepted Preview candidate
-        if: inputs.operation == 'deploy' || inputs.operation == 'migrate'
+        if: inputs.operation == 'deploy'
         run: |
           set -euo pipefail
           test -n "$ACCEPTED_PLAN_SHA256"
           test "$ACCEPTED_PLAN_SHA256" = "${{ steps.plan.outputs.plan_sha256 }}"
-          stage="${TARGET_STAGE:-pr-${PR_NUMBER}}"
-          replan_kind="deploy"
-          replan_operation="preview-equal-replan"
-          if [ "$OPERATION" = "migrate" ]; then
-            replan_kind="migrate"
-            replan_operation="preview-legacy-migration-replan"
-          fi
+          stage="pr-${PR_NUMBER}"
           ALCHEMY_PLAIN=1 CI=1 bunx alchemy plan --stage "$stage" --profile "$ALCHEMY_PROFILE" > "$RUNNER_TEMP/docs-deployment/alchemy-replan.txt"
           replan_lockfile_sha256="$(shasum -a 256 bun.lock | cut -d ' ' -f1)"
           replan_config_sha256="$(for file in alchemy.run.ts apps/docs/package.json apps/docs/vite.config.ts apps/docs/src/lib/build/cloudflare-stack.ts apps/docs/src/lib/build/docs-deployment-stage.ts apps/docs/public/_headers; do shasum -a 256 "$file"; done | shasum -a 256 | cut -d ' ' -f1)"
@@ -266,7 +236,7 @@ jobs:
             TAXKIT_WORKFLOW_PLAN_CANDIDATE_COMMIT="$CANDIDATE_SHA" \
             TAXKIT_WORKFLOW_PLAN_CONFIG_SHA256="$replan_config_sha256" \
             TAXKIT_WORKFLOW_PLAN_DEPLOYMENT_INPUT_SHA256="$replan_deployment_input_sha256" \
-            TAXKIT_WORKFLOW_PLAN_KIND="$replan_kind" \
+            TAXKIT_WORKFLOW_PLAN_KIND=deploy \
             TAXKIT_WORKFLOW_PLAN_LOCKFILE_SHA256="$replan_lockfile_sha256" \
             TAXKIT_WORKFLOW_PLAN_PROJECTION_PATH="$RUNNER_TEMP/docs-deployment/replan-projection.json" \
             TAXKIT_WORKFLOW_PLAN_STAGE="$stage" \
@@ -279,57 +249,29 @@ jobs:
           find "$RUNNER_TEMP/docs-deployment" -maxdepth 1 -type f -print | LC_ALL=C sort
           test "$ACCEPTED_PLAN_SHA256" = "${{ steps.plan.outputs.plan_sha256 }}"
           test "$ACCEPTED_PLAN_SHA256" = "$replan_sha256"
-          jq --arg operation "$replan_operation" --arg replan "$replan_sha256" '.operation=$operation | .replanSha256=$replan' "$RUNNER_TEMP/docs-deployment/plan.json" > "$RUNNER_TEMP/docs-deployment/plan.with-replan.json"
+          jq --arg replan "$replan_sha256" '.operation="preview-equal-replan" | .replanSha256=$replan' "$RUNNER_TEMP/docs-deployment/plan.json" > "$RUNNER_TEMP/docs-deployment/plan.with-replan.json"
           mv "$RUNNER_TEMP/docs-deployment/plan.with-replan.json" "$RUNNER_TEMP/docs-deployment/plan.json"
           TAXKIT_WORKFLOW_PLAN_RECEIPT="$RUNNER_TEMP/docs-deployment/plan.json" \
           TAXKIT_WORKFLOW_PLAN_CANDIDATE_COMMIT="$CANDIDATE_SHA" \
-          TAXKIT_WORKFLOW_PLAN_OPERATION="$replan_operation" \
+          TAXKIT_WORKFLOW_PLAN_OPERATION=preview-equal-replan \
           TAXKIT_WORKFLOW_PLAN_STAGE="$stage" \
           TAXKIT_WORKFLOW_PLAN_SHA256="$ACCEPTED_PLAN_SHA256" \
           TAXKIT_WORKFLOW_PLAN_REQUIRE_REPLAN=1 \
             bun run check:docs-deployment-workflow-plan
-          if [ "$OPERATION" = "migrate" ]; then
-            TAXKIT_DOCS_DEPLOYMENT_ALLOW_LEGACY=1 \
-            TAXKIT_DOCS_DEPLOYMENT_INVENTORY_REPORT="$RUNNER_TEMP/docs-deployment/provider-inventory-before.json" \
-            ALCHEMY_PROFILE="$ALCHEMY_PROFILE" CI=1 bun run check:docs-deployment-inventory
-          else
-            TAXKIT_DOCS_DEPLOYMENT_INVENTORY_REPORT="$RUNNER_TEMP/docs-deployment/provider-inventory-before.json" \
-            ALCHEMY_PROFILE="$ALCHEMY_PROFILE" CI=1 bun run check:docs-deployment-inventory
-          fi
+          TAXKIT_DOCS_DEPLOYMENT_INVENTORY_REPORT="$RUNNER_TEMP/docs-deployment/provider-inventory-before.json" \
+          ALCHEMY_PROFILE="$ALCHEMY_PROFILE" CI=1 bun run check:docs-deployment-inventory
           stage_count_before="$(jq --arg stage "$stage" '[.stages[] | select(.stage == $stage)] | length' "$RUNNER_TEMP/docs-deployment/provider-inventory-before.json")"
           test "$stage_count_before" -eq 0 || test "$stage_count_before" -eq 1
-          legacy_stage_count="$(jq '[.stages[] | select(any(.resources[]; .logicalId == "DocsBuild"))] | length' "$RUNNER_TEMP/docs-deployment/provider-inventory-before.json")"
-          if [ "$OPERATION" = "migrate" ]; then
-            test "$stage_count_before" -eq 1
-            test "$legacy_stage_count" -ge 1
-            jq -e --arg stage "$stage" '
-              ([.stages[] | select(.stage == $stage) | .resources | map(.logicalId) | sort] == [["DocsBuild", "DocsWebsite"]]) and
-              ([.stages[] | select(.stage == $stage) | .resources[] | select(.logicalId == "DocsBuild") | .resourceType] == ["Command.Build"]) and
-              ([.stages[] | select(.stage == $stage) | .resources[] | select(.logicalId == "DocsWebsite") | .resourceType] == ["Cloudflare.Worker"]) and
-              ([.providerWorkers[] | select(.stage == $stage and .logicalId == "DocsWebsite")] | length == 1) and
-              ([.stages[] | select(.stage == $stage) | .resources[] | select(.logicalId == "DocsWebsite") | .workerName] == [.providerWorkers[] | select(.stage == $stage and .logicalId == "DocsWebsite") | .workerName])
-            ' "$RUNNER_TEMP/docs-deployment/provider-inventory-before.json" > /dev/null
-          else
-            test "$legacy_stage_count" -eq 0
-          fi
           previous_version_id=""
-          if [ "$OPERATION" = "deploy" ] && [ "$stage_count_before" -eq 1 ]; then
+          if [ "$stage_count_before" -eq 1 ]; then
             jq -e --arg stage "$stage" '([.stages[] | select(.stage == $stage) | .resources | map(.logicalId) | sort] | . == [["DocsWebsite"]]) and ([.providerWorkers[] | select(.stage == $stage and .logicalId == "DocsWebsite")] | length == 1)' "$RUNNER_TEMP/docs-deployment/provider-inventory-before.json" > /dev/null
             previous_worker_name="$(jq -er --arg stage "$stage" '.stages[] | select(.stage == $stage) | .resources[] | select(.logicalId == "DocsWebsite") | .workerName' "$RUNNER_TEMP/docs-deployment/provider-inventory-before.json")"
             previous_deployments="$(bunx wrangler deployments list --name "$previous_worker_name" --json)"
             previous_version_id="$(jq -er '.[-1].versions[0].version_id' <<<"$previous_deployments")"
           fi
           ALCHEMY_PLAIN=1 CI=1 bunx alchemy deploy --stage "$stage" --profile "$ALCHEMY_PROFILE" --yes
-          if [ "$OPERATION" = "migrate" ]; then
-            TAXKIT_DOCS_DEPLOYMENT_ALLOW_LEGACY=1 \
-            TAXKIT_DOCS_DEPLOYMENT_INVENTORY_REPORT="$RUNNER_TEMP/docs-deployment/provider-inventory.json" \
-            ALCHEMY_PROFILE="$ALCHEMY_PROFILE" CI=1 bun run check:docs-deployment-inventory
-          else
-            TAXKIT_DOCS_DEPLOYMENT_INVENTORY_REPORT="$RUNNER_TEMP/docs-deployment/provider-inventory.json" \
-            ALCHEMY_PROFILE="$ALCHEMY_PROFILE" CI=1 bun run check:docs-deployment-inventory
-          fi
-          post_legacy_stage_count="$(jq '[.stages[] | select(any(.resources[]; .logicalId == "DocsBuild"))] | length' "$RUNNER_TEMP/docs-deployment/provider-inventory.json")"
-          test "$post_legacy_stage_count" -eq "$((legacy_stage_count - 1))"
+          TAXKIT_DOCS_DEPLOYMENT_INVENTORY_REPORT="$RUNNER_TEMP/docs-deployment/provider-inventory.json" \
+          ALCHEMY_PROFILE="$ALCHEMY_PROFILE" CI=1 bun run check:docs-deployment-inventory
           jq -e --arg stage "$stage" '
             .agreement == "state-provider-agree" and
             ([.stages[] | select(.stage == $stage)] | length == 1) and
@@ -338,48 +280,28 @@ jobs:
           ' "$RUNNER_TEMP/docs-deployment/provider-inventory.json" > /dev/null
           worker_name="$(jq -er --arg stage "$stage" '.stages[] | select(.stage == $stage) | .resources[] | select(.logicalId == "DocsWebsite") | .workerName' "$RUNNER_TEMP/docs-deployment/provider-inventory.json")"
           worker_url="$(jq -er --arg stage "$stage" '.stages[] | select(.stage == $stage) | .resources[] | select(.logicalId == "DocsWebsite") | .workerUrl' "$RUNNER_TEMP/docs-deployment/provider-inventory.json" | sed -E 's:/*$::')"
+          deployments="$(bunx wrangler deployments list --name "$worker_name" --json)"
+          deployment_id="$(jq -er '.[-1].id // .[-1].deployment_id' <<<"$deployments")"
+          version_id="$(jq -er '.[-1].versions[0].version_id' <<<"$deployments")"
           state_store_id="$(jq -er '.stateStore.id' "$RUNNER_TEMP/docs-deployment/provider-inventory.json")"
-          if [ "$OPERATION" = "migrate" ]; then
-            before_resources="$(jq -c --arg stage "$stage" '[.stages[] | select(.stage == $stage) | .resources[] | {logicalId,resourceType,status,workerName,workerUrl}]' "$RUNNER_TEMP/docs-deployment/provider-inventory-before.json")"
-            after_resources="$(jq -c --arg stage "$stage" '[.stages[] | select(.stage == $stage) | .resources[] | {logicalId,resourceType,status,workerName,workerUrl}]' "$RUNNER_TEMP/docs-deployment/provider-inventory.json")"
-            before_website_worker="$(jq -er --arg stage "$stage" '.stages[] | select(.stage == $stage) | .resources[] | select(.logicalId == "DocsWebsite") | .workerName' "$RUNNER_TEMP/docs-deployment/provider-inventory-before.json")"
-            after_website_worker="$(jq -er --arg stage "$stage" '.stages[] | select(.stage == $stage) | .resources[] | select(.logicalId == "DocsWebsite") | .workerName' "$RUNNER_TEMP/docs-deployment/provider-inventory.json")"
-            jq -nS \
-              --arg acceptedPlanSha256 "$ACCEPTED_PLAN_SHA256" \
-              --arg candidateCommit "$CANDIDATE_SHA" \
-              --arg stage "$stage" \
-              --arg stateStoreId "$state_store_id" \
-              --arg beforeWebsiteWorker "$before_website_worker" \
-              --arg afterWebsiteWorker "$after_website_worker" \
-              --argjson legacyStageCountBefore "$legacy_stage_count" \
-              --argjson legacyStageCountAfter "$post_legacy_stage_count" \
-              --argjson beforeResources "$before_resources" \
-              --argjson afterResources "$after_resources" \
-              '{acceptedPlanSha256:$acceptedPlanSha256,after:{resources:$afterResources,websiteWorker:$afterWebsiteWorker},before:{resources:$beforeResources,websiteWorker:$beforeWebsiteWorker},candidateCommit:$candidateCommit,deletedLogicalId:"DocsBuild",legacyStageCountAfter:$legacyStageCountAfter,legacyStageCountBefore:$legacyStageCountBefore,nonClaims:["This receipt proves only the exact target stage state/provider observation and one exact-stage native reconciliation.","It does not establish Production, custom-domain, DNS, publication or unrelated stages."],operation:"preview-legacy-migration",postcondition:"DocsBuild-absent-DocsWebsite-retained",rollback:"native-source-redeploy-only",schemaVersion:1,stage:$stage,stateProviderAgreement:"state-provider-agree",stateStoreId:$stateStoreId}' \
-              > "$RUNNER_TEMP/docs-deployment/legacy-migration-readback.json"
-          else
-            deployments="$(bunx wrangler deployments list --name "$worker_name" --json)"
-            deployment_id="$(jq -er '.[-1].id // .[-1].deployment_id' <<<"$deployments")"
-            version_id="$(jq -er '.[-1].versions[0].version_id' <<<"$deployments")"
-            jq -nS --arg accountId "$CLOUDFLARE_ACCOUNT_ID" --arg stateStoreId "$state_store_id" --arg stage "$stage" --arg workerName "$worker_name" --arg url "$worker_url" --arg deploymentId "$deployment_id" --arg versionId "$version_id" --arg candidate "$CANDIDATE_SHA" --arg plan "$ACCEPTED_PLAN_SHA256" --arg config "$replan_config_sha256" --arg deployment "$replan_deployment_input_sha256" --arg lockfile "$replan_lockfile_sha256" --arg previousVersionId "$previous_version_id" --arg rollbackRecoveryIdentity "preview-$GITHUB_RUN_ID" --argjson previewPrNumber "$PR_NUMBER" '{accountId:$accountId,acceptedPlanSha256:$plan,candidateCommit:$candidate,configSha256:$config,deploymentId:$deploymentId,deploymentInputSha256:$deployment,lockfileSha256:$lockfile,previousVersionId:(if $previousVersionId == "" then null else $previousVersionId end),previewPrNumber:$previewPrNumber,rollbackRecoveryIdentity:$rollbackRecoveryIdentity,schemaVersion:1,stage:$stage,stateStoreId:$stateStoreId,url:$url,versionId:$versionId,workerName:$workerName}' > "$RUNNER_TEMP/docs-deployment/provider-readback.json"
-            printf 'TAXKIT_DOCS_HOSTED_URL=%s\n' "$worker_url" >> "$GITHUB_ENV"
-            printf 'TAXKIT_DOCS_DEPLOYMENT_ID=%s\n' "$deployment_id" >> "$GITHUB_ENV"
-            printf 'TAXKIT_DOCS_VERSION_ID=%s\n' "$version_id" >> "$GITHUB_ENV"
-            printf 'TAXKIT_DOCS_WORKER_NAME=%s\n' "$worker_name" >> "$GITHUB_ENV"
-            printf 'TAXKIT_DOCS_CANDIDATE_COMMIT=%s\n' "$CANDIDATE_SHA" >> "$GITHUB_ENV"
-            printf 'TAXKIT_DOCS_ACCOUNT_ID=%s\n' "$CLOUDFLARE_ACCOUNT_ID" >> "$GITHUB_ENV"
-            printf 'TAXKIT_DOCS_STATE_STORE_ID=%s\n' "$state_store_id" >> "$GITHUB_ENV"
-            if [ -n "$previous_version_id" ]; then printf 'TAXKIT_DOCS_PREVIOUS_VERSION_ID=%s\n' "$previous_version_id" >> "$GITHUB_ENV"; else printf 'TAXKIT_DOCS_PREVIOUS_VERSION_ID=\n' >> "$GITHUB_ENV"; fi
-            printf 'TAXKIT_DOCS_PREVIEW_PR_NUMBER=%s\n' "$PR_NUMBER" >> "$GITHUB_ENV"
-            printf 'TAXKIT_DOCS_STAGE=%s\n' "$stage" >> "$GITHUB_ENV"
-            printf 'TAXKIT_DOCS_PLAN_SHA256=%s\n' "$ACCEPTED_PLAN_SHA256" >> "$GITHUB_ENV"
-            printf 'TAXKIT_DOCS_CONFIG_SHA256=%s\n' "$replan_config_sha256" >> "$GITHUB_ENV"
-            printf 'TAXKIT_DOCS_DEPLOYMENT_INPUT_SHA256=%s\n' "$replan_deployment_input_sha256" >> "$GITHUB_ENV"
-            printf 'TAXKIT_DOCS_LOCKFILE_SHA256=%s\n' "$replan_lockfile_sha256" >> "$GITHUB_ENV"
-            printf 'TAXKIT_DOCS_ROLLBACK_RECOVERY_IDENTITY=preview-%s\n' "$GITHUB_RUN_ID" >> "$GITHUB_ENV"
-            printf 'TAXKIT_DOCS_ENVIRONMENT=preview\n' >> "$GITHUB_ENV"
-            printf 'TAXKIT_DOCS_EVIDENCE_DIRECTORY=docs/evidence/deployments/workflow-%s\n' "$GITHUB_RUN_ID" >> "$GITHUB_ENV"
-          fi
+          jq -nS --arg accountId "$CLOUDFLARE_ACCOUNT_ID" --arg stateStoreId "$state_store_id" --arg stage "$stage" --arg workerName "$worker_name" --arg url "$worker_url" --arg deploymentId "$deployment_id" --arg versionId "$version_id" --arg candidate "$CANDIDATE_SHA" --arg plan "$ACCEPTED_PLAN_SHA256" --arg config "$replan_config_sha256" --arg deployment "$replan_deployment_input_sha256" --arg lockfile "$replan_lockfile_sha256" --arg previousVersionId "$previous_version_id" --arg rollbackRecoveryIdentity "preview-$GITHUB_RUN_ID" --argjson previewPrNumber "$PR_NUMBER" '{accountId:$accountId,acceptedPlanSha256:$plan,candidateCommit:$candidate,configSha256:$config,deploymentId:$deploymentId,deploymentInputSha256:$deployment,lockfileSha256:$lockfile,previousVersionId:(if $previousVersionId == "" then null else $previousVersionId end),previewPrNumber:$previewPrNumber,rollbackRecoveryIdentity:$rollbackRecoveryIdentity,schemaVersion:1,stage:$stage,stateStoreId:$stateStoreId,url:$url,versionId:$versionId,workerName:$workerName}' > "$RUNNER_TEMP/docs-deployment/provider-readback.json"
+          printf 'TAXKIT_DOCS_HOSTED_URL=%s\n' "$worker_url" >> "$GITHUB_ENV"
+          printf 'TAXKIT_DOCS_DEPLOYMENT_ID=%s\n' "$deployment_id" >> "$GITHUB_ENV"
+          printf 'TAXKIT_DOCS_VERSION_ID=%s\n' "$version_id" >> "$GITHUB_ENV"
+          printf 'TAXKIT_DOCS_WORKER_NAME=%s\n' "$worker_name" >> "$GITHUB_ENV"
+          printf 'TAXKIT_DOCS_CANDIDATE_COMMIT=%s\n' "$CANDIDATE_SHA" >> "$GITHUB_ENV"
+          printf 'TAXKIT_DOCS_ACCOUNT_ID=%s\n' "$CLOUDFLARE_ACCOUNT_ID" >> "$GITHUB_ENV"
+          printf 'TAXKIT_DOCS_STATE_STORE_ID=%s\n' "$state_store_id" >> "$GITHUB_ENV"
+          if [ -n "$previous_version_id" ]; then printf 'TAXKIT_DOCS_PREVIOUS_VERSION_ID=%s\n' "$previous_version_id" >> "$GITHUB_ENV"; else printf 'TAXKIT_DOCS_PREVIOUS_VERSION_ID=\n' >> "$GITHUB_ENV"; fi
+          printf 'TAXKIT_DOCS_PREVIEW_PR_NUMBER=%s\n' "$PR_NUMBER" >> "$GITHUB_ENV"
+          printf 'TAXKIT_DOCS_STAGE=%s\n' "$stage" >> "$GITHUB_ENV"
+          printf 'TAXKIT_DOCS_PLAN_SHA256=%s\n' "$ACCEPTED_PLAN_SHA256" >> "$GITHUB_ENV"
+          printf 'TAXKIT_DOCS_CONFIG_SHA256=%s\n' "$replan_config_sha256" >> "$GITHUB_ENV"
+          printf 'TAXKIT_DOCS_DEPLOYMENT_INPUT_SHA256=%s\n' "$replan_deployment_input_sha256" >> "$GITHUB_ENV"
+          printf 'TAXKIT_DOCS_LOCKFILE_SHA256=%s\n' "$replan_lockfile_sha256" >> "$GITHUB_ENV"
+          printf 'TAXKIT_DOCS_ROLLBACK_RECOVERY_IDENTITY=preview-%s\n' "$GITHUB_RUN_ID" >> "$GITHUB_ENV"
+          printf 'TAXKIT_DOCS_ENVIRONMENT=preview\n' >> "$GITHUB_ENV"
+          printf 'TAXKIT_DOCS_EVIDENCE_DIRECTORY=docs/evidence/deployments/workflow-%s\n' "$GITHUB_RUN_ID" >> "$GITHUB_ENV"
 
       - name: Run hosted Preview HTTP/browser/screenshot proof
         if: inputs.operation == 'deploy'
@@ -419,18 +341,5 @@ jobs:
             ${{ runner.temp }}/docs-deployment/docs/evidence/deployments
             ${{ runner.temp }}/docs-deployment/hosted-proof.raw.json
             ${{ runner.temp }}/docs-deployment/hosted-proof.json
-          retention-days: 30
-          if-no-files-found: error
-
-      - name: Upload legacy migration readback
-        if: inputs.operation == 'migrate' && always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
-        with:
-          name: taxkit-docs-preview-legacy-migration-${{ github.run_id }}
-          path: |
-            ${{ runner.temp }}/docs-deployment/legacy-migration-readback.json
-            ${{ runner.temp }}/docs-deployment/provider-inventory-before.json
-            ${{ runner.temp }}/docs-deployment/provider-inventory.json
-            ${{ runner.temp }}/docs-deployment/workflow-input.json
           retention-days: 30
           if-no-files-found: error

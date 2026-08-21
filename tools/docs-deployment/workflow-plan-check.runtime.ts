@@ -1,11 +1,8 @@
 import * as BunRuntime from "@effect/platform-bun/BunRuntime";
 import * as BunServices from "@effect/platform-bun/BunServices";
-import { Config, Console, Effect, Match, Schema } from "effect";
+import { Config, Console, Effect, Match } from "effect";
 
-import {
-  DeploymentPlanReceipt,
-  LegacyMigrationDeploymentPlanReceipt,
-} from "./schemas.js";
+import { DeploymentPlanReceipt } from "./schemas.js";
 import {
   readWorkflowReceipt,
   workflowSha256,
@@ -29,7 +26,7 @@ export const checkWorkflowPlan = Effect.gen(function* workflowPlanCheck() {
     check,
     config.TAXKIT_WORKFLOW_PLAN_RECEIPT,
     "plan-receipt",
-    Schema.Union([DeploymentPlanReceipt, LegacyMigrationDeploymentPlanReceipt])
+    DeploymentPlanReceipt
   );
   const { projection } = plan;
   const projectionDigest = yield* workflowSha256(

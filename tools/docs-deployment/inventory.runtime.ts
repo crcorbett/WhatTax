@@ -37,10 +37,6 @@ import {
 } from "./inventory.service.js";
 
 const InventoryRuntimeConfig = Config.unwrap({
-  allowLegacy: Config.schema(
-    Schema.Literals(["0", "1"]),
-    "TAXKIT_DOCS_DEPLOYMENT_ALLOW_LEGACY"
-  ).pipe(Config.withDefault("0")),
   ci: Config.schema(Schema.Literals(["1", "true"]), "CI"),
   profile: Config.string("ALCHEMY_PROFILE").pipe(Config.withDefault("default")),
   reportPath: Config.string("TAXKIT_DOCS_DEPLOYMENT_INVENTORY_REPORT").pipe(
@@ -106,23 +102,10 @@ const makeInventoryLayer = (credentials: DocsDeploymentStateStoreCredentials) =>
     )
   );
 
-const readInventoryProgram = (
-  reportPath: Option.Option<string>,
-  allowLegacy: boolean
-) =>
+const readInventoryProgram = (reportPath: Option.Option<string>) =>
   Effect.gen(function* readInventory() {
     const inventory = yield* DocsDeploymentInventory;
     const report = yield* inventory.read();
-    if (
-      !allowLegacy &&
-      report.stages.some((stage) =>
-        stage.resources.some((resource) => resource.logicalId === "DocsBuild")
-      )
-    ) {
-      return yield* new DocsDeploymentInventoryInputError({
-        target: "legacy DocsBuild resource in current inventory",
-      });
-    }
     const encoded = yield* Schema.encodeUnknownEffect(
       DocsDeploymentInventoryReport
     )(report);
@@ -156,10 +139,9 @@ const program = Effect.gen(function* inventoryProgram() {
     currentEnvironment.accountId,
     decodedStateCredentials
   );
-  return yield* readInventoryProgram(
-    config.reportPath,
-    config.allowLegacy === "1"
-  ).pipe(Effect.provide(makeInventoryLayer(decodedStateCredentials)));
+  return yield* readInventoryProgram(config.reportPath).pipe(
+    Effect.provide(makeInventoryLayer(decodedStateCredentials))
+  );
 }).pipe(
   Effect.tapErrorTag("DocsDeploymentInventoryInputError", (error) =>
     Console.error(

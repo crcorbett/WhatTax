@@ -3,7 +3,7 @@ document_type: automation-register
 lifecycle: current
 authority: canonical
 owner: taxkit-ci-release-maintainer
-last_reviewed: 2026-08-20
+last_reviewed: 2026-08-21
 review_trigger: workflow, signal, authority, proof, stopping, escalation, rollback, or retirement change
 ---
 
@@ -62,21 +62,24 @@ OAuth profile is copied into CI.
 
 The current native `Cloudflare.Website.Vite` graph has one `DocsWebsite`
 resource. Preview, Production and teardown retain accepted observations. Plan
-v2 admits exactly one native Website action. The separately authorised
-one-time legacy state cutover is tracked by the native Alchemy hard-cutover
-SPEC; it is not a current `DocsBuild` admission. The provider-free Vite/workerd
-build is preflight proof; the deployment-input digest binds the tracked
-Website source set rather than claiming byte identity with Alchemy's internal
-build.
+v2 admits exactly one native Website action. The separately authorised Preview
+state reconciliation is recorded at
+[`2026-08-21-native-alchemy-hard-cutover/legacy-state-cutover.json`](../evidence/deployments/2026-08-21-native-alchemy-hard-cutover/legacy-state-cutover.json).
+It processed the five exact stages found by read-only inventory — `pr-15`,
+`pr-16`, `pr-17`, `pr-18` and `pr-23` — and the final sanitised inventory
+observed zero legacy stages. The current Preview, Production and teardown
+workflows now admit the native Website graph only. The provider-free
+Vite/workerd build is preflight proof; the deployment-input digest binds the
+tracked Website source set rather than claiming byte identity with Alchemy's
+internal build.
 
-While HAC-002 is in progress, the Preview workflow has one separately gated
-`migrate-plan`/`migrate` path for one exact existing stage found by preflight per
-run. It admits only `DocsBuild` delete beside a matching `DocsWebsite` update or
-no-op, then requires state/provider readback showing `DocsBuild` absent and
-`DocsWebsite` retained. The global legacy-stage count must decrease by one on
-each run; repeat the operation for every stage found. Normal Preview deploy,
-Production deploy and teardown remain native-only. This temporary path is
-removed after all absence readbacks succeed.
+The first `pr-15` apply produced an incomplete same-run receipt after Alchemy
+reported the legacy deletion; the subsequent `pr-16` pre-inventory confirmed
+the resulting native-only `pr-15` state. The remaining four stages have
+successful post-mutation readback. Provider/state agreement is established for
+the recorded snapshots only; this does not establish Production deployment,
+custom-domain/DNS, publication, permanent availability or unrelated provider
+resources.
 
 The first shared-environment PR-close run started automatically but stopped
 before dry-run or destroy because Turbo console framing surrounded the
