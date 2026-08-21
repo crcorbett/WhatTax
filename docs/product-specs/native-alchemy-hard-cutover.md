@@ -267,6 +267,12 @@ state. Current repository admission is native-only; a separately authorised
 exact-stage operation must still provide any required legacy-state deletion and
 absence readback before that task can close.
 
+The first separately authorised Preview attempt, run `32436973454`, stopped
+before `alchemy deploy` when inventory found the legacy `DocsBuild` resource in
+exact stage `pr-16`. It did not create or delete the application resources.
+The temporary migration path is limited to that exact-stage observation and
+remains open until post-delete absence and Website-retention readback succeeds.
+
 ### Local
 
 The implementer must run the repository commands that exist for this checkout,
