@@ -270,8 +270,13 @@ absence readback before that task can close.
 The first separately authorised Preview attempt, run `32436973454`, stopped
 before `alchemy deploy` when inventory found the legacy `DocsBuild` resource in
 exact stage `pr-16`. It did not create or delete the application resources.
-The temporary migration path is limited to that exact-stage observation and
-remains open until post-delete absence and Website-retention readback succeeds.
+The later read-only inventory in run `32438980355` found five exact legacy
+stages — `pr-15`, `pr-16`, `pr-17`, `pr-18` and `pr-23` — and stopped before
+`alchemy deploy` because the temporary migration preflight was still limited to
+one globally discovered stage. It did not create or delete application
+resources. The temporary migration path now permits one exact target stage per
+run, requires the global legacy-stage count to decrease by one, and remains
+open until every target has post-delete absence and Website-retention readback.
 
 ### Local
 
