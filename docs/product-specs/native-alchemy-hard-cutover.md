@@ -175,6 +175,13 @@ changes under `packages/docs-content` and `packages/docs-fumadocs`, together
 with the lockfile, change the Alchemy build input. Confirm the exact option
 shape against installed beta.64 types before editing.
 
+The Fumadocs `configPath` and generated-source `outDir` must be resolved from
+the app's Vite configuration location, not from the caller's working
+directory. Alchemy invokes the native Vite build from the repository root,
+while the standalone package build runs from `apps/docs`; both paths must
+therefore target the same `packages/docs-content/.source` directory and
+regenerate its collection maps after a cached package build.
+
 The receipt deployment-input digest may remain as evidence, but it must not be
 treated as a substitute for Alchemy's own resource memo.
 
@@ -306,6 +313,9 @@ The direct local oracles are:
   `Command.Build` admission after the cutover branch is removed;
 - the native plan fixture contains exactly `DocsWebsite`;
 - changing each sibling docs package changes the Alchemy memo/input result;
+- a repository-root Alchemy Vite invocation regenerates the shared Fumadocs
+  source and includes authored page modules after a cached sibling-package
+  build;
 - Preview and teardown group expressions are byte-for-byte equal;
 - historical evidence remains readable only through explicitly historical
   paths and cannot satisfy current plan admission.

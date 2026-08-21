@@ -1,3 +1,5 @@
+import { fileURLToPath } from "node:url";
+
 import { cloudflare } from "@cloudflare/vite-plugin";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import * as docsConfig from "@taxkit/docs-content/source.config";
@@ -5,14 +7,21 @@ import viteReact from "@vitejs/plugin-react";
 import fumadocsMdx from "fumadocs-mdx/vite";
 import { defineConfig } from "vite";
 
+const docsContentConfigPath = fileURLToPath(
+  new URL("../../packages/docs-content/source.config.ts", import.meta.url)
+);
+const docsContentSourceDirectory = fileURLToPath(
+  new URL("../../packages/docs-content/.source", import.meta.url)
+);
+
 export default defineConfig(async () => {
   const alchemyOwnsCloudflareVite =
     // oxlint-disable-next-line effect/no-process-outside-boundaries -- Vite configuration is the exact host boundary for Alchemy's documented process-local injection signal.
     process.env.ALCHEMY_CLOUDFLARE_VITE_INJECTED === "1";
 
   const docsMdx = await fumadocsMdx(docsConfig, {
-    configPath: "../../packages/docs-content/source.config.ts",
-    outDir: "../../packages/docs-content/.source",
+    configPath: docsContentConfigPath,
+    outDir: docsContentSourceDirectory,
   });
   const originalDocsMdxBuildStart = docsMdx.buildStart;
   if (typeof originalDocsMdxBuildStart !== "function") {

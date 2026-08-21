@@ -218,6 +218,7 @@
       "completionCriteria": [
         "Both sibling packages and the lockfile are explicit Alchemy build inputs.",
         "A sibling source change invalidates the build input.",
+        "The Vite config resolves Fumadocs paths independently of the caller's working directory, and a repository-root Alchemy build includes authored page modules after a cached sibling-package build.",
         "Built Worker/browser proof passes without legacy build orchestration."
       ],
       "commitAfterPassing": true
