@@ -9,7 +9,7 @@ import {
   stringifyWorkflowPlanProjection,
 } from "./workflow-plan-projection.js";
 
-const project = (source: string, kind: "deploy" | "destroy" | "migrate") =>
+const project = (source: string, kind: "deploy" | "destroy") =>
   Effect.runPromise(projectAlchemyPlanText(source, kind));
 
 describe("beta.64 Alchemy plan projection", () => {
@@ -84,43 +84,6 @@ describe("beta.64 Alchemy plan projection", () => {
         resourceType: "Cloudflare.Worker",
       },
     ]);
-  });
-
-  test("accepts only the bounded legacy deletion projection", async () => {
-    await expect(
-      project("[DocsBuild] delete\n[DocsWebsite] noop\n", "migrate")
-    ).resolves.toEqual([
-      {
-        action: "delete",
-        logicalId: "DocsBuild",
-        resourceType: "Command.Build",
-      },
-      {
-        action: "noop",
-        logicalId: "DocsWebsite",
-        resourceType: "Cloudflare.Worker",
-      },
-    ]);
-    await expect(
-      project("[DocsBuild] delete\n[DocsWebsite] update\n", "migrate")
-    ).resolves.toEqual([
-      {
-        action: "delete",
-        logicalId: "DocsBuild",
-        resourceType: "Command.Build",
-      },
-      {
-        action: "update",
-        logicalId: "DocsWebsite",
-        resourceType: "Cloudflare.Worker",
-      },
-    ]);
-    await expect(
-      project("[DocsBuild] delete\n[DocsWebsite] create\n", "migrate")
-    ).rejects.toHaveProperty("_tag", "WorkflowPlanProjectionError");
-    await expect(
-      project("[DocsWebsite] noop\n", "migrate")
-    ).rejects.toHaveProperty("_tag", "WorkflowPlanProjectionError");
   });
 
   test("rejects unknown resources and deployment deletion", async () => {

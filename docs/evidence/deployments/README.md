@@ -3,7 +3,7 @@ document_type: deployment-evidence-index
 lifecycle: current
 authority: canonical
 owner: taxkit-docs-deployment-proof-owner
-last_reviewed: 2026-08-20
+last_reviewed: 2026-08-21
 review_trigger: docs deployment candidate, provider, stage, URL, proof, screenshot, teardown or rollback receipt change
 ---
 
@@ -654,3 +654,19 @@ names and unchanged Production reviewer protection. The accepted no-op proves
 exact `pr-60` absence only; it does not claim deletion of a live Worker,
 absence of other Preview stages, Production mutation, DNS, release or
 publication.
+
+## 2026-08-21 native Alchemy hard-cutover state reconciliation
+
+The separately authorised Preview state reconciliation processed the five exact
+legacy stages found by read-only inventory: `pr-15`, `pr-16`, `pr-17`, `pr-18`
+and `pr-23`. Each recorded target retained its native `DocsWebsite` Worker;
+the final sanitised inventory in run `32441944207` observed zero legacy stages
+and state/provider agreement. The durable receipt is
+`2026-08-21-native-alchemy-hard-cutover/legacy-state-cutover.json`.
+
+The first `pr-15` apply had an incomplete same-run receipt after Alchemy
+reported the deletion. The corrected `pr-16` pre-inventory confirmed the
+resulting `pr-15` state before the remaining stages were processed. This is
+provider/state observation for the recorded Preview operation only. It does
+not claim a Production deployment or cutover, custom-domain/DNS, publication,
+permanent availability, hosted proof or unrelated provider resources.

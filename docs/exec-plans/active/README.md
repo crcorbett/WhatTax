@@ -14,13 +14,15 @@ tombstone: false
 Live implementation plans belong here while work is in progress. Maintainer
 lifecycle is owned by [`../../README.md`](../../README.md).
 
-The proposed [Native Alchemy docs hard cutover](../../product-specs/native-alchemy-hard-cutover.md)
+The implemented [Native Alchemy docs hard cutover](../../product-specs/native-alchemy-hard-cutover.md)
 SPEC and [`native-alchemy-hard-cutover.tasks.json`](../../product-specs/native-alchemy-hard-cutover.tasks.json)
-are admitted as the successor intent for the completed native Alchemy graph.
-Implementation is in progress; the current repository graph now removes
-`DocsBuild`/`Command.Build` admission, uses one Preview/teardown lock, and
-includes the beta.64 Vite memo boundary. Any provider mutation or hosted proof
-still requires separate authority and receipt-bound readback.
+were implemented and closed as the successor to the completed native Alchemy
+graph. The current repository graph removes `DocsBuild`/`Command.Build`
+admission, uses one Preview/teardown lock, and includes the beta.64 Vite memo
+boundary. The separate Preview state reconciliation is recorded in the
+[cutover receipt](../../evidence/deployments/2026-08-21-native-alchemy-hard-cutover/legacy-state-cutover.json).
+It does not establish Production deployment, publication or permanent
+availability.
 
 There are no other active execution plans. The completed
 [Automatic Preview Teardown Admission](../completed/automatic-preview-teardown-admission.md)

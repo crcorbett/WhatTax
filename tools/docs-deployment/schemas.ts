@@ -228,12 +228,6 @@ const RetiredBuildResource = Schema.Struct({
   resourceType: Schema.Literal("Command.Build"),
 });
 
-const LegacyMigrationWebsiteResource = Schema.Struct({
-  action: Schema.Literals(["noop", "update"]),
-  logicalId: Schema.Literal("DocsWebsite"),
-  resourceType: Schema.Literal("Cloudflare.Worker"),
-});
-
 const HistoricalNativeDeploymentPlanProjection = Schema.Struct({
   ...DeploymentPlanProjectionFields,
   logicalResources: Schema.Union([
@@ -257,18 +251,6 @@ export const DeploymentPlanProjection = Schema.Struct({
 });
 export type DeploymentPlanProjection = typeof DeploymentPlanProjection.Type;
 
-/** Temporary exact-stage migration receipt; remove after legacy absence readback. */
-export const LegacyMigrationDeploymentPlanProjection = Schema.Struct({
-  ...DeploymentPlanProjectionFields,
-  logicalResources: Schema.Tuple([
-    RetiredBuildResource,
-    LegacyMigrationWebsiteResource,
-  ]),
-  schemaVersion: Schema.Literal(2),
-});
-export type LegacyMigrationDeploymentPlanProjection =
-  typeof LegacyMigrationDeploymentPlanProjection.Type;
-
 export const DeploymentPlanReceipt = Schema.Struct({
   acceptedBy: Schema.NonEmptyString,
   acceptedPlanSha256: Sha256,
@@ -288,25 +270,6 @@ export const DeploymentPlanReceipt = Schema.Struct({
   schemaVersion: Schema.Literal(2),
 });
 export type DeploymentPlanReceipt = typeof DeploymentPlanReceipt.Type;
-
-/** Temporary exact-stage migration receipt; remove after legacy absence readback. */
-export const LegacyMigrationDeploymentPlanReceipt = Schema.Struct({
-  acceptedBy: Schema.NonEmptyString,
-  acceptedPlanSha256: Sha256,
-  observedAt: Schema.String.check(
-    Schema.isPattern(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/u)
-  ),
-  operation: Schema.Literals([
-    "preview-legacy-migration-plan",
-    "preview-legacy-migration-replan",
-  ]),
-  projection: LegacyMigrationDeploymentPlanProjection,
-  receiptPath: RepositoryEvidencePath,
-  replanSha256: Schema.NullOr(Sha256),
-  schemaVersion: Schema.Literal(2),
-});
-export type LegacyMigrationDeploymentPlanReceipt =
-  typeof LegacyMigrationDeploymentPlanReceipt.Type;
 
 export const HistoricalDeploymentPlanReceipt = Schema.Struct({
   acceptedBy: Schema.NonEmptyString,

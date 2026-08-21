@@ -2,7 +2,7 @@
   "$schema": "https://taxkit.local/schemas/product-spec-task-plan.v1.json",
   "spec": "docs/product-specs/native-alchemy-hard-cutover.md",
   "title": "Native Alchemy Docs Hard Cutover Tasks",
-  "status": "in_progress",
+  "status": "completed",
   "last_reviewed": "2026-08-21",
   "principles": [
     "Alchemy Website.Vite is the only current docs deployment owner.",
@@ -28,7 +28,7 @@
       "Native-only current resource and policy search result",
       "Sibling docs package memo invalidation proof",
       "Exact equality proof for Preview and teardown concurrency groups",
-      "Cutover state/provider receipt or a bounded no-legacy-state receipt",
+      "Cutover state/provider receipt or a bounded no-legacy-state receipt at `docs/evidence/deployments/2026-08-21-native-alchemy-hard-cutover/legacy-state-cutover.json`",
       "Historical evidence preservation and current-admission exclusion proof"
     ]
   },
@@ -130,7 +130,7 @@
     },
     {
       "id": "HAC-002",
-      "status": "in_progress",
+      "status": "completed",
       "title": "Perform the native-only legacy resource cutover",
       "type": "migration",
       "dependsOn": ["HAC-001"],
@@ -149,7 +149,7 @@
         "post-cutover absence proof",
         "historical evidence exclusion rule"
       ],
-      "implementationPrompt": "Keep current repository admission native-only: reject DocsBuild create, update and noop, unknown resources, state/provider disagreement and identity mismatch. A separately authorised exact-stage operation may delete DocsBuild only when preflight proves it exists beside the matching DocsWebsite and must retain post-delete absence readback. This implementation thread performs no provider mutation or absence claim.",
+      "implementationPrompt": "Keep current repository admission native-only: reject DocsBuild create, update and noop, unknown resources, state/provider disagreement and identity mismatch. The separately authorised Preview operation processed exact stages pr-15, pr-16, pr-17, pr-18 and pr-23, with the first pr-15 same-run receipt retained as incomplete and subsequent readback confirming its result. The final sanitised inventory observed zero legacy stages; no migration branch remains in current code.",
       "mandatoryVerification": [
         "Focused policy and Schema tests for native-only create/update/noop/delete cases",
         "Exact-stage preflight and post-cutover state/provider readback when separately authorised",

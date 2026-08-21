@@ -4,10 +4,7 @@ import { Config, Console, Effect, Match, Schema } from "effect";
 import * as FileSystem from "effect/FileSystem";
 
 import { DocsDeploymentStage } from "../../apps/docs/src/lib/build/docs-deployment-stage.js";
-import {
-  DeploymentPlanProjection,
-  LegacyMigrationDeploymentPlanProjection,
-} from "./schemas.js";
+import { DeploymentPlanProjection } from "./schemas.js";
 import { workflowSha256 } from "./workflow-check.boundary.js";
 import {
   projectAlchemyPlanText,
@@ -57,11 +54,9 @@ export const projectWorkflowPlan = Effect.gen(function* () {
     source,
     config.TAXKIT_WORKFLOW_PLAN_KIND
   );
-  const projectionSchema =
-    config.TAXKIT_WORKFLOW_PLAN_KIND === "migrate"
-      ? LegacyMigrationDeploymentPlanProjection
-      : DeploymentPlanProjection;
-  const projection = yield* Schema.decodeUnknownEffect(projectionSchema)({
+  const projection = yield* Schema.decodeUnknownEffect(
+    DeploymentPlanProjection
+  )({
     candidate: {
       deploymentInputSha256:
         config.TAXKIT_WORKFLOW_PLAN_DEPLOYMENT_INPUT_SHA256,

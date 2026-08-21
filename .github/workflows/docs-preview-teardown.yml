@@ -20,7 +20,7 @@ permissions:
   actions: read
 
 concurrency:
-  group: taxkit-docs-preview-pr-${{ inputs.target_stage || github.event.pull_request.number || inputs.pr_number }}
+  group: taxkit-docs-preview-pr-${{ github.event.pull_request.number || inputs.pr_number }}
   cancel-in-progress: false
 
 jobs:
