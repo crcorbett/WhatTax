@@ -2,9 +2,11 @@ import { Schema } from "effect";
 
 import { DocsDeploymentStage } from "../../apps/docs/src/lib/build/docs-deployment-stage.js";
 
-const DocsDeploymentLogicalResourceId = Schema.Literal("DocsWebsite").pipe(
-  Schema.brand("taxkit/DocsDeploymentLogicalResourceId")
-);
+// Temporary migration decoder; remove after the exact-stage absence readback.
+const DocsDeploymentLogicalResourceId = Schema.Literals([
+  "DocsBuild",
+  "DocsWebsite",
+]).pipe(Schema.brand("taxkit/DocsDeploymentLogicalResourceId"));
 
 const DocsDeploymentWorkerName = Schema.NonEmptyString.pipe(
   Schema.brand("taxkit/DocsDeploymentWorkerName")
@@ -19,7 +21,7 @@ export const PersistedDocsDeploymentResource = Schema.Struct({
   fqn: Schema.NonEmptyString,
   instanceId: Schema.NonEmptyString,
   logicalId: DocsDeploymentLogicalResourceId,
-  resourceType: Schema.Literal("Cloudflare.Worker"),
+  resourceType: Schema.Literals(["Command.Build", "Cloudflare.Worker"]),
   status: Schema.NonEmptyString,
 });
 
@@ -45,7 +47,7 @@ export type DocsDeploymentStateStoreCredentials =
 const InventoryResource = Schema.Struct({
   instanceId: Schema.NonEmptyString,
   logicalId: DocsDeploymentLogicalResourceId,
-  resourceType: Schema.Literal("Cloudflare.Worker"),
+  resourceType: Schema.Literals(["Command.Build", "Cloudflare.Worker"]),
   status: Schema.NonEmptyString,
   workerName: Schema.optional(DocsDeploymentWorkerName),
   workerUrl: Schema.optional(DocsDeploymentWorkerUrl),
