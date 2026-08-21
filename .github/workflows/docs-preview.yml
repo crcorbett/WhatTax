@@ -301,7 +301,7 @@ jobs:
           legacy_stage_count="$(jq '[.stages[] | select(any(.resources[]; .logicalId == "DocsBuild"))] | length' "$RUNNER_TEMP/docs-deployment/provider-inventory-before.json")"
           if [ "$OPERATION" = "migrate" ]; then
             test "$stage_count_before" -eq 1
-            test "$legacy_stage_count" -eq 1
+            test "$legacy_stage_count" -ge 1
             jq -e --arg stage "$stage" '
               ([.stages[] | select(.stage == $stage) | .resources | map(.logicalId) | sort] == [["DocsBuild", "DocsWebsite"]]) and
               ([.stages[] | select(.stage == $stage) | .resources[] | select(.logicalId == "DocsBuild") | .resourceType] == ["Command.Build"]) and
@@ -323,7 +323,7 @@ jobs:
           TAXKIT_DOCS_DEPLOYMENT_INVENTORY_REPORT="$RUNNER_TEMP/docs-deployment/provider-inventory.json" \
           ALCHEMY_PROFILE="$ALCHEMY_PROFILE" CI=1 bun run check:docs-deployment-inventory
           post_legacy_stage_count="$(jq '[.stages[] | select(any(.resources[]; .logicalId == "DocsBuild"))] | length' "$RUNNER_TEMP/docs-deployment/provider-inventory.json")"
-          test "$post_legacy_stage_count" -eq 0
+          test "$post_legacy_stage_count" -eq "$((legacy_stage_count - 1))"
           jq -e --arg stage "$stage" '
             .agreement == "state-provider-agree" and
             ([.stages[] | select(.stage == $stage)] | length == 1) and
@@ -345,9 +345,11 @@ jobs:
               --arg stateStoreId "$state_store_id" \
               --arg beforeWebsiteWorker "$before_website_worker" \
               --arg afterWebsiteWorker "$after_website_worker" \
+              --argjson legacyStageCountBefore "$legacy_stage_count" \
+              --argjson legacyStageCountAfter "$post_legacy_stage_count" \
               --argjson beforeResources "$before_resources" \
               --argjson afterResources "$after_resources" \
-              '{acceptedPlanSha256:$acceptedPlanSha256,after:{resources:$afterResources,websiteWorker:$afterWebsiteWorker},before:{resources:$beforeResources,websiteWorker:$beforeWebsiteWorker},candidateCommit:$candidateCommit,deletedLogicalId:"DocsBuild",nonClaims:["This receipt proves only the exact target stage state/provider observation and one-time native reconciliation.","It does not establish Production, custom-domain, DNS, publication or unrelated stages."],operation:"preview-legacy-migration",postcondition:"DocsBuild-absent-DocsWebsite-retained",rollback:"native-source-redeploy-only",schemaVersion:1,stage:$stage,stateProviderAgreement:"state-provider-agree",stateStoreId:$stateStoreId}' \
+              '{acceptedPlanSha256:$acceptedPlanSha256,after:{resources:$afterResources,websiteWorker:$afterWebsiteWorker},before:{resources:$beforeResources,websiteWorker:$beforeWebsiteWorker},candidateCommit:$candidateCommit,deletedLogicalId:"DocsBuild",legacyStageCountAfter:$legacyStageCountAfter,legacyStageCountBefore:$legacyStageCountBefore,nonClaims:["This receipt proves only the exact target stage state/provider observation and one exact-stage native reconciliation.","It does not establish Production, custom-domain, DNS, publication or unrelated stages."],operation:"preview-legacy-migration",postcondition:"DocsBuild-absent-DocsWebsite-retained",rollback:"native-source-redeploy-only",schemaVersion:1,stage:$stage,stateProviderAgreement:"state-provider-agree",stateStoreId:$stateStoreId}' \
               > "$RUNNER_TEMP/docs-deployment/legacy-migration-readback.json"
           else
             deployments="$(bunx wrangler deployments list --name "$worker_name" --json)"

@@ -70,11 +70,13 @@ Website source set rather than claiming byte identity with Alchemy's internal
 build.
 
 While HAC-002 is in progress, the Preview workflow has one separately gated
-`migrate-plan`/`migrate` path for the exact existing stage found by preflight.
-It admits only `DocsBuild` delete beside a matching `DocsWebsite` no-op, then
-requires state/provider readback showing `DocsBuild` absent and
-`DocsWebsite` retained. Normal Preview deploy, Production deploy and teardown
-remain native-only. This temporary path is removed after the absence readback.
+`migrate-plan`/`migrate` path for one exact existing stage found by preflight per
+run. It admits only `DocsBuild` delete beside a matching `DocsWebsite` update or
+no-op, then requires state/provider readback showing `DocsBuild` absent and
+`DocsWebsite` retained. The global legacy-stage count must decrease by one on
+each run; repeat the operation for every stage found. Normal Preview deploy,
+Production deploy and teardown remain native-only. This temporary path is
+removed after all absence readbacks succeed.
 
 The first shared-environment PR-close run started automatically but stopped
 before dry-run or destroy because Turbo console framing surrounded the
