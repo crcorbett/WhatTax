@@ -77,9 +77,10 @@ Its Schema and negative fixtures admit only these controls:
 
 `bun run check:docs-deployment-automation` proves these local records and
 cross-field invariants only. The native one-resource successor has three
-automation entries—Preview, Production and exact-stage teardown—and all are
-`not-established`. Historical two-resource and orphan receipts recorded below
-remain evidence for their dated graph, not admission for the successor.
+automation entries—Preview, Production and exact-stage teardown—and all three
+have claim-matched established receipts. Historical two-resource and orphan
+receipts recorded below remain evidence for their dated graph, not admission
+for the successor.
 
 The dated manual Preview/Production/rollback receipts under
 `docs/evidence/deployments/` prove the same candidate, plan, provider/state and

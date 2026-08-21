@@ -22,12 +22,10 @@ Implementation is in progress; the current repository graph now removes
 includes the beta.64 Vite memo boundary. Any provider mutation or hosted proof
 still requires separate authority and receipt-bound readback.
 
-The active
-[Automatic Preview Teardown Admission](./automatic-preview-teardown-admission.md)
-plan moves exact-stage PR-close cleanup onto the shared Preview credential
-environment without a required reviewer. Production remains protected and the
-former teardown environment remains until the reviewed workflow reaches
-`main`.
+There are no other active execution plans. The completed
+[Automatic Preview Teardown Admission](../completed/automatic-preview-teardown-admission.md)
+plan records the exact-stage PR-close cleanup under the shared Preview
+credential environment. Production remains protected.
 
 The implemented
 [Pull-request Turbo Write-through Cache](../../product-specs/pull-request-turbo-write-through.md)

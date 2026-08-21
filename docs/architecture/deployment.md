@@ -288,9 +288,10 @@ are dated workers.dev and report-only observations; custom-domain/DNS, billing,
 publication, release, byte-promotion and future public availability remain
 outside the claim envelope.
 
-The native `Website.Vite` successor deliberately resets the three current
-automation entries to `not-established`. No local migration check establishes
-Preview, Production, teardown or current Cloudflare state.
+The native `Website.Vite` successor initially reset all three automation
+entries to `not-established`. Later claim-matched default-branch receipts now
+establish Preview, Production and exact-stage teardown separately. Local
+migration checks alone still establish none of those provider results.
 
 ## Local runtime shape
 

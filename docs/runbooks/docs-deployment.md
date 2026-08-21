@@ -1103,8 +1103,26 @@ source conclusion. The corrective slice gives the inventory runtime a direct
 machine-report path for all three mutation workflows and restricts positive
 receipt promotion to successful source runs. The bounded failure receipt is
 [`APT-002-first-automatic-run-failure.json`](../documentation-audit/automatic-preview-teardown/APT-002-first-automatic-run-failure.json).
-Teardown remains `not-established`; do not delete the old environment until a
-corrected reviewed-main run and its reconciliation both pass.
+That failure remains historical evidence and cannot establish teardown.
+
+## 2026-08-20 — shared-environment automatic no-op accepted
+
+PR #60 merged the machine-report and reconciler correction as
+`34b065b6bbab695234628dffb7925d59fb6eaaee`. Automatic PR-close teardown run
+`32367035323` started without approval in `taxkit-docs-preview`, decoded exact
+stage `pr-60`, produced two equal `noop` plans for `DocsWebsite`, and proved
+both the Alchemy state stage and Cloudflare Worker absent. Reconciliation run
+`32367125582` checked the completed source run and promoted the receipt under
+[`workflow-receipt-32367035323.json`](../evidence/deployments/2026-08-20-preview-teardown-pr-60/workflow-receipt-32367035323.json).
+
+Only after those receipts passed, the unused
+`taxkit-docs-preview-teardown` environment was deleted. Verify its absence via
+the repository environment list; do not use an exact-name GET for deletion
+readback because GitHub creates a missing environment at that endpoint.
+Preview retains no reviewer and only the two Cloudflare secret names.
+Production retains its required `crcorbett` reviewer. The no-op receipt proves
+exact `pr-60` absence only; it did not delete a live Worker and says nothing
+about other Preview stages.
 
 ## Stop conditions
 
