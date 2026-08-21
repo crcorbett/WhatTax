@@ -277,6 +277,13 @@ one globally discovered stage. It did not create or delete application
 resources. The temporary migration path now permits one exact target stage per
 run, requires the global legacy-stage count to decrease by one, and remains
 open until every target has post-delete absence and Website-retention readback.
+The first apply attempt for `pr-15`, run `32440967336`, passed the equal
+replan and Alchemy reported `DocsBuild` deleted and `DocsWebsite` updated, but
+the workflow stopped in its post-mutation inventory step because the temporary
+legacy-readback allowance was not applied there. It is retained as failed or
+incomplete evidence, not as a successful cutover receipt; the next corrected
+stage readback must confirm the `pr-15` result before the remaining stages are
+processed.
 
 ### Local
 

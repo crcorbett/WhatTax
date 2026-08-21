@@ -335,6 +335,9 @@ describe("docs deployment workflow admission", () => {
     expect(preview).toContain("legacyStageCountBefore");
     expect(preview).toContain("legacyStageCountAfter");
     expect(preview).not.toContain('test "$legacy_stage_count" -eq 1');
+    expect(
+      preview.match(/TAXKIT_DOCS_DEPLOYMENT_ALLOW_LEGACY=1/gu)
+    ).toHaveLength(2);
   });
 
   test("shares Preview credentials for deploy and exact-stage teardown", async () => {
