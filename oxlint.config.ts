@@ -52,6 +52,9 @@ const decodingBoundaryFiles = [
   "tools/docs-deployment/inventory.service.test.ts",
   "tools/docs-deployment/inventory.service.ts",
   "tools/docs-deployment/policy.test.ts",
+  "tools/docs-deployment/workflow-plan-projection.runtime.ts",
+  "tools/docs-deployment/workflow-plan-projection.test.ts",
+  "tools/docs-deployment/workflow-plan-projection.ts",
   "tools/repository-paths/check.runtime.ts",
   "tools/repository-paths/policy.test.ts",
   "tools/repository-paths/policy.ts",
@@ -162,6 +165,7 @@ const throwingCodecTestFiles = [
   "apps/docs/src/lib/docs/route-boundary.browser.test.tsx",
   "apps/docs/src/lib/docs/route-boundary.test.js",
   "packages/docs-content/src/validation/policy.runtime.test.ts",
+  "tools/docs-deployment/workflow-plan-projection.test.ts",
 ];
 
 const runtimeBoundaryFiles = [
@@ -207,6 +211,9 @@ const runtimeBoundaryFiles = [
   "tools/docs-deployment/inventory.runtime.ts",
   "tools/docs-deployment/inventory.service.test.ts",
   "tools/docs-deployment/policy.test.ts",
+  "tools/docs-deployment/alchemy-memo.test.ts",
+  "tools/docs-deployment/workflow-plan-projection.runtime.ts",
+  "tools/docs-deployment/workflow-plan-projection.test.ts",
   "tools/docs-deployment/workflow-proof-check.runtime.ts",
   "tools/docs-deployment/workflow-input-check.runtime.ts",
   "tools/docs-deployment/workflow-run-check.runtime.ts",
@@ -318,6 +325,7 @@ const bunRuntimeEntrypointFiles = [
   "tools/docs-deployment/workflow-run-check.runtime.ts",
   "tools/docs-deployment/workflow-plan-check.runtime.ts",
   "tools/docs-deployment/workflow-teardown-proof-check.runtime.ts",
+  "tools/docs-deployment/workflow-plan-projection.runtime.ts",
 ];
 
 export default defineConfig({

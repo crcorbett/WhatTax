@@ -3,7 +3,7 @@ document_type: product-spec-index
 lifecycle: current
 authority: canonical
 owner: taxkit-product-owner
-last_reviewed: 2026-08-20
+last_reviewed: 2026-08-21
 review_trigger: product-spec admission, lifecycle, evidence, or successor change
 successor: null
 tombstone: false
@@ -21,6 +21,7 @@ Specs:
 
 | Spec | Status | Notes |
 | --- | --- | --- |
+| [Native Alchemy docs hard cutover](./native-alchemy-hard-cutover.md) | Proposed | Make `Cloudflare.Website.Vite("DocsWebsite")` the only current docs deployment graph; remove current `DocsBuild`/`Command.Build` admission after a bounded one-time state deletion, correct the Preview/teardown lock, and add explicit sibling-package memo coverage. |
 | [Automatic Preview Teardown Admission](./automatic-preview-teardown-admission.md) | Active | Reuse the Preview credential environment without a blind reviewer step, while retaining exact-stage Alchemy planning, locking and absence proof. The first automatic run stopped before destroy; the old environment remains until corrected no-op and reconciliation receipts pass. |
 | [Shared Dependency Cache and Checkout Upgrade](./shared-dependency-cache-and-checkout.md) | Implemented | PR #59 run `32357219491` passed twice on the same source commit; attempt 2 restored both exact shared keys, kept live installs and completed in 54 seconds with checkout v7.0.1. Cross-ref restore from `main` remains a post-merge proof boundary. |
 | [Pull-request Turbo Write-through Cache](./pull-request-turbo-write-through.md) | Implemented | PWC-001 enables Vercel Remote Cache writes for token-bearing same-repository pull requests. Exact run `32351432522` proved a pull-request miss/write and same-commit remote hit; fork fallback and live frozen install remain. |

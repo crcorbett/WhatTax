@@ -188,14 +188,6 @@ const readInventory = Effect.fn("DocsDeploymentInventory.read")(function* () {
                 rawResource,
                 `alchemy-state-resource:${stage}:${fqn}`
               );
-              if (resource.logicalId !== "DocsWebsite") {
-                return {
-                  instanceId: resource.instanceId,
-                  logicalId: resource.logicalId,
-                  resourceType: resource.resourceType,
-                  status: resource.status,
-                };
-              }
               const attributes = yield* decode(
                 PersistedDocsWorkerAttributes,
                 resource.attr,

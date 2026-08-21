@@ -23,9 +23,9 @@ application state services, credentials or repository publication.
 
 The current composition is one
 `Cloudflare.Website.Vite("DocsWebsite")` resource. Alchemy beta.64 owns its
-Vite build, SSR Worker, assets and lifecycle. `DocsBuild` is not a current
-resource; a first successor plan may include its deletion beside the required
-Website action. Stop on any other resource or action.
+Vite build, SSR Worker, assets and lifecycle. No legacy resource is admitted by
+the current plan, inventory or receipt boundary. Stop on any other resource or
+action.
 
 1. Bind the exact candidate SHA, reviewed workflow SHA, `pr-N` or `prod` stage,
    account, environment-scoped credential and operation. Run
@@ -36,10 +36,9 @@ Website action. Stop on any other resource or action.
    provider-free preflight. These commands do not produce the Alchemy-owned
    deployment artifact or prove provider state.
 3. Let `alchemy plan` execute the native Website build. The sanitized v2 plan
-   must contain exactly `DocsWebsite` create/update/noop, optionally preceded
-   by `DocsBuild` delete during migration. The tracked Website source digest,
-   lockfile digest, configuration digest, exact candidate and stage form the
-   accepted projection.
+   must contain exactly one `DocsWebsite` create/update/noop action. The
+   tracked Website source digest, lockfile digest, configuration digest, exact
+   candidate and stage form the accepted projection.
 4. For Preview or Production apply, require an equal replan and accepted
    digest before `alchemy deploy`. Read back the exact Alchemy stage, one
    `DocsWebsite` Worker, provider deployment/version and workers.dev URL, then
@@ -265,12 +264,10 @@ stage and plan identities. Every later Preview dispatch must use an open,
 trusted draft PR; a merged PR is not a general Preview admission path.
 
 PR-close teardown is convergent and safe when no stage exists. Its equal dry-run
-projection records `noop` for both logical resources and performs no destroy;
-when both exact `DocsBuild` and `DocsWebsite` resources exist, it records equal
-`delete` actions, destroys only that `pr-N` stage, and requires absence readback.
+projection records a native `DocsWebsite` `noop` and performs no destroy; when
+the exact `DocsWebsite` resource exists, it records a `delete` action, destroys
+only that `pr-N` stage, and requires absence readback.
 The plan parser removes ANSI escapes and ignores only Alchemy's timestamped
-uppercase log-diagnostic lines; every other bracketed action/resource line is
-retained and rejected unless it is one of the two owned `delete`/`noop` lines.
 The workflow retries each dry-run at most twice after a non-zero Alchemy exit,
 with a five-second bounded delay, and retries each read-only inventory
 readback at most twice only when the inventory process exits with empty

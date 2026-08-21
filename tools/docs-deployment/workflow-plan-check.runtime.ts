@@ -12,6 +12,7 @@ import {
   WorkflowCheckMismatchError,
   WorkflowPlanCheckConfig,
 } from "./workflow-check.schemas.js";
+import { stringifyWorkflowPlanProjection } from "./workflow-plan-projection.js";
 
 const check = "workflow-plan" as const;
 
@@ -30,19 +31,7 @@ export const checkWorkflowPlan = Effect.gen(function* workflowPlanCheck() {
   const { projection } = plan;
   const projectionDigest = yield* workflowSha256(
     check,
-    JSON.stringify({
-      candidate: {
-        deploymentInputSha256: projection.candidate.deploymentInputSha256,
-        exactCommit: projection.candidate.exactCommit,
-        lockfileSha256: projection.candidate.lockfileSha256,
-      },
-      configSha256: projection.configSha256,
-      logicalResources: projection.logicalResources,
-      redaction: projection.redaction,
-      schemaVersion: projection.schemaVersion,
-      stack: projection.stack,
-      stage: projection.stage,
-    })
+    stringifyWorkflowPlanProjection(projection)
   );
   const requireReplan = config.TAXKIT_WORKFLOW_PLAN_REQUIRE_REPLAN === "1";
 

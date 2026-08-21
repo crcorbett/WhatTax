@@ -20,12 +20,6 @@ const rawReport = {
     {
       resources: [
         {
-          instanceId: "build-instance",
-          logicalId: "DocsBuild",
-          resourceType: "Command.Build",
-          status: "updated",
-        },
-        {
           instanceId: "worker-instance",
           logicalId: "DocsWebsite",
           resourceType: "Cloudflare.Worker",

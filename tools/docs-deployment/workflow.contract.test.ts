@@ -210,6 +210,7 @@ describe("docs deployment workflow admission", () => {
       expect(source).toContain(
         "git ls-files -z -- alchemy.run.ts apps/docs packages/docs-content packages/docs-fumadocs"
       );
+      expect(source).toContain("workflow-plan-projection.runtime.ts");
       expect(source).not.toContain("find apps/docs/dist");
     }
   });
@@ -223,13 +224,18 @@ describe("docs deployment workflow admission", () => {
     for (const path of [workflowPaths.preview, workflowPaths.production]) {
       const source = await readWorkflow(path);
       expect(source).toContain("checks: read");
-      expect(source).toContain(planCancellation);
+      if (path === workflowPaths.preview) {
+        expect(source).toContain("cancel-in-progress: false");
+      } else {
+        expect(source).toContain(planCancellation);
+      }
       expect(source).toContain("CLOUDFLARE_ACCOUNT_ID");
       expect(source).toContain("CLOUDFLARE_API_TOKEN");
       expect(source).toContain(
         'test "$ACCEPTED_PLAN_SHA256" = "$replan_sha256"'
       );
-      expect(source).toContain("unexpected_replan_resources");
+      expect(source).toContain("workflow-plan-projection.runtime.ts");
+      expect(source).not.toContain("unexpected_replan_resources");
       expect(source).toContain("wrangler deployments list");
       expect(source).toContain(
         'bun apps/docs/scripts/test-cloudflare-hosted.tsx > "$RUNNER_TEMP/docs-deployment/hosted-proof.raw.json"'
@@ -249,7 +255,7 @@ describe("docs deployment workflow admission", () => {
       expect(source).toContain("workflow-input.json");
       expect(source).not.toContain("Materialize successful");
       expect(source).not.toContain("workflow-run.json");
-      expect(source).toContain("all_replan_resources");
+      expect(source).not.toContain("all_replan_resources");
       expect(source).toContain("docs/evidence/deployments");
       expect(source).toContain("configSha256");
       expect(source).toContain("deploymentInputSha256");
@@ -281,18 +287,10 @@ describe("docs deployment workflow admission", () => {
     expect(teardown).toContain("inventory_status");
     expect(teardown).toContain("stderr_bytes");
     expect(teardown).toContain("stage_count_before");
-    expect(teardown).toContain("unexpected_destroy_resources");
-    expect(teardown).toContain(
-      "grep -Ev '^[[][0-9]{2}:[0-9]{2}:[0-9]{2}([.][0-9]+)?[]] [A-Z]+ '"
-    );
-    expect(teardown).toContain("grep -E '^[[][^]]+[]] '");
-    expect(teardown).toContain(
-      "grep -Ev '^[[](DocsBuild|DocsWebsite)[]] (delete|noop)$'"
-    );
-    expect(teardown).toContain(
-      "grep -E '^[[](DocsBuild|DocsWebsite)[]] delete$'"
-    );
-    expect(teardown).toContain("printf '%s' \"$destroy_resource_lines\"");
+    expect(teardown).toContain("workflow-plan-projection.runtime.ts");
+    expect(teardown).toContain("destroy-two-projection.json");
+    expect(teardown).not.toContain(["Docs", "Build"].join(""));
+    expect(teardown).not.toContain(["Command", "Build"].join("."));
     expect(teardown).toContain("dry_run_status");
     expect(teardown).toContain(
       "ALCHEMY_TELEMETRY_DISABLED=1 ALCHEMY_PLAIN=1 CI=1 bun node_modules/alchemy/bin/alchemy.ts destroy --dry-run"
@@ -320,7 +318,6 @@ describe("docs deployment workflow admission", () => {
     expect(teardown).toContain("pulls/");
     expect(teardown).toContain('= "closed"');
     expect(teardown).toContain("grep -Eq '^[1-9][0-9]*$'");
-    expect(teardown).toContain("(delete|noop)");
     expect(teardown).toContain("check:docs-deployment-workflow-teardown-proof");
     expect(teardown).toContain("check:docs-deployment-workflow-input");
     expect(teardown).not.toContain("Materialize successful");
@@ -339,6 +336,22 @@ describe("docs deployment workflow admission", () => {
     expect(production).toContain("environment: taxkit-docs-production");
     expect(teardown).toContain("environment: taxkit-docs-preview");
     expect(teardown).not.toContain("environment: taxkit-docs-preview-teardown");
+  });
+
+  test("uses one non-cancellable Preview deploy and teardown group", async () => {
+    const [preview, teardown] = await Promise.all([
+      readWorkflow(workflowPaths.preview),
+      readWorkflow(workflowPaths.teardown),
+    ]);
+    const group = [
+      "group: taxkit-docs-preview-pr-",
+      "$",
+      "{{ github.event.pull_request.number || inputs.pr_number }}",
+    ].join("");
+    expect(preview).toContain(group);
+    expect(teardown).toContain(group);
+    expect(preview).toContain("cancel-in-progress: false");
+    expect(teardown).toContain("cancel-in-progress: false");
   });
 
   test("keeps the first default-branch bootstrap source-bound", async () => {

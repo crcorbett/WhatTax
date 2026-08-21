@@ -3,7 +3,7 @@ document_type: app-readme
 lifecycle: current
 authority: canonical
 owner: taxkit-docs-app-owner
-last_reviewed: 2026-08-13
+last_reviewed: 2026-08-21
 review_trigger: docs route, content boundary, build target, runtime, proof or deployment ownership change
 ---
 
@@ -161,10 +161,12 @@ report-only Alchemy state boundary remain separate claims.
 Root `alchemy.run.ts` uses public Alchemy
 `Cloudflare.Website.Vite("DocsWebsite")`. Alchemy owns Vite build execution,
 assets, the SSR Worker lifecycle and the physical Worker name as one logical
-resource. The standalone `build:cloudflare` alias and workerd harness are
-provider-free preflight proof; their `dist/**` output is not asserted to be the
-exact artifact produced inside an Alchemy plan/apply. `.wrangler/**` and
-`dist/**` remain ignored generated output and are never deployment receipts.
+resource. Its beta.64 memo includes the lockfile and both sibling docs
+packages, so those authored inputs participate in Alchemy's resource input.
+The standalone `build:cloudflare` alias and workerd harness are provider-free
+preflight proof; their `dist/**` output is not asserted to be the exact artifact
+produced inside an Alchemy plan/apply. `.wrangler/**` and `dist/**` remain
+ignored generated output and are never deployment receipts.
 
 Exact Preview, Production, teardown, rollback and Alchemy-state operations
 belong to `docs/runbooks/docs-deployment.md`; dated sanitized observations

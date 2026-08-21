@@ -235,11 +235,6 @@ describe("docs deployment automation admission", () => {
       logicalResources: [
         {
           action: "create" as const,
-          logicalId: "DocsBuild" as const,
-          resourceType: "Command.Build" as const,
-        },
-        {
-          action: "create" as const,
           logicalId: "DocsWebsite" as const,
           resourceType: "Cloudflare.Worker" as const,
         },
@@ -249,7 +244,7 @@ describe("docs deployment automation admission", () => {
         secretValuesIncluded: false as const,
         timestampsExcludedFromDigest: true as const,
       },
-      schemaVersion: 1 as const,
+      schemaVersion: 2 as const,
       stack: "TaxKitDocsCloudflare" as const,
       stage,
     };
@@ -296,12 +291,9 @@ describe("docs deployment automation admission", () => {
         projection,
         receiptPath: receipt.planPath ?? "docs/evidence/deployments/plan.json",
         replanSha256: receipt.acceptedPlanSha256,
-        schemaVersion: 1,
+        schemaVersion: 2,
       })
     );
-    if (plan.projection.schemaVersion !== 1) {
-      throw new Error("Expected the historical v1 plan fixture.");
-    }
     const provider = await Effect.runPromise(
       Schema.decodeUnknownEffect(DeploymentWorkflowProviderReadback)({
         acceptedPlanSha256: receipt.acceptedPlanSha256,
@@ -476,7 +468,6 @@ describe("docs deployment automation admission", () => {
                       ...plan.projection.logicalResources[0],
                       action: "delete" as const,
                     },
-                    plan.projection.logicalResources[1],
                   ],
                 },
               },

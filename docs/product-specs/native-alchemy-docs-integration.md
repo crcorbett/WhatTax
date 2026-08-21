@@ -3,9 +3,9 @@ document_type: product-spec
 lifecycle: implemented
 authority: supporting
 owner: taxkit-product-owner
-last_reviewed: 2026-08-13
+last_reviewed: 2026-08-21
 review_trigger: native Alchemy docs resource, development path, deployment graph, inventory, workflow, or proof change
-successor: null
+successor: ./native-alchemy-hard-cutover.md
 tombstone: false
 ---
 

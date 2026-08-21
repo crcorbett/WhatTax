@@ -29,8 +29,8 @@ permissions:
   checks: read
 
 concurrency:
-  group: taxkit-docs-preview-pr-${{ inputs.pr_number }}
-  cancel-in-progress: ${{ inputs.operation == 'plan' }}
+  group: taxkit-docs-preview-pr-${{ github.event.pull_request.number || inputs.pr_number }}
+  cancel-in-progress: false
 
 jobs:
   preview:
@@ -187,35 +187,20 @@ jobs:
           mkdir -p "$RUNNER_TEMP/docs-deployment"
           stage="pr-${PR_NUMBER}"
           ALCHEMY_PLAIN=1 CI=1 bunx alchemy plan --stage "$stage" --profile "$ALCHEMY_PROFILE" > "$RUNNER_TEMP/docs-deployment/alchemy-plan.txt"
-          sed -E $'s/\\033\\[[0-9;]*m//g' "$RUNNER_TEMP/docs-deployment/alchemy-plan.txt" > "$RUNNER_TEMP/docs-deployment/alchemy-plan.clean.txt"
-          all_resource_lines="$(grep -E '^\[[^]]+\] ' "$RUNNER_TEMP/docs-deployment/alchemy-plan.clean.txt" || true)"
-          unexpected_resource_lines="$(printf '%s\n' "$all_resource_lines" | grep -Ev '^(\[DocsBuild\] delete|\[DocsWebsite\] (create|update|noop))$' || true)"
-          test -z "$unexpected_resource_lines"
-          resources="$(printf '%s\n' "$all_resource_lines" | grep -E '^(\[DocsBuild\] delete|\[DocsWebsite\] (create|update|noop))$' || true)"
-          resource_count="$(printf '%s\n' "$resources" | sed '/^$/d' | wc -l | tr -d ' ')"
-          test "$resource_count" -eq 1 || test "$resource_count" -eq 2
-          build_resource="$(printf '%s\n' "$resources" | grep -E '^\[DocsBuild\] delete$' || true)"
-          website_resource="$(printf '%s\n' "$resources" | grep -E '^\[DocsWebsite\] (create|update|noop)$' || true)"
-          test "$(printf '%s\n' "$website_resource" | sed '/^$/d' | wc -l | tr -d ' ')" -eq 1
-          website_action="$(printf '%s\n' "$website_resource" | sed -E 's/^\[[^]]+\] //')"
-          if [ -n "$build_resource" ]; then
-            logical_resources="$(jq -n --arg website "$website_action" '[{action:"delete",logicalId:"DocsBuild",resourceType:"Command.Build"},{action:$website,logicalId:"DocsWebsite",resourceType:"Cloudflare.Worker"}]')"
-          else
-            logical_resources="$(jq -n --arg website "$website_action" '[{action:$website,logicalId:"DocsWebsite",resourceType:"Cloudflare.Worker"}]')"
-          fi
           lockfile_sha256="$(shasum -a 256 bun.lock | cut -d ' ' -f1)"
           config_sha256="$(for file in alchemy.run.ts apps/docs/package.json apps/docs/vite.config.ts apps/docs/src/lib/build/cloudflare-stack.ts apps/docs/src/lib/build/docs-deployment-stage.ts apps/docs/public/_headers; do shasum -a 256 "$file"; done | shasum -a 256 | cut -d ' ' -f1)"
           deployment_input_sha256="$(git ls-files -z -- alchemy.run.ts apps/docs packages/docs-content packages/docs-fumadocs | LC_ALL=C sort -z | xargs -0 shasum -a 256 | shasum -a 256 | cut -d ' ' -f1)"
-          jq -nS \
-            --arg commit "$CANDIDATE_SHA" \
-            --arg lockfile "$lockfile_sha256" \
-            --arg deployment "$deployment_input_sha256" \
-            --arg config "$config_sha256" \
-            --arg stage "$stage" \
-            --argjson logicalResources "$logical_resources" \
-            '{candidate:{deploymentInputSha256:$deployment,exactCommit:$commit,lockfileSha256:$lockfile},configSha256:$config,logicalResources:$logicalResources,redaction:{ansiRemoved:true,secretValuesIncluded:false,timestampsExcludedFromDigest:true},schemaVersion:2,stack:"TaxKitDocsCloudflare",stage:$stage}' \
-            > "$RUNNER_TEMP/docs-deployment/projection.json"
-          plan_sha256="$(jq -cS . "$RUNNER_TEMP/docs-deployment/projection.json" | tr -d '\n' | shasum -a 256 | cut -d ' ' -f1)"
+          plan_sha256="$(
+            TAXKIT_WORKFLOW_PLAN_CANDIDATE_COMMIT="$CANDIDATE_SHA" \
+            TAXKIT_WORKFLOW_PLAN_CONFIG_SHA256="$config_sha256" \
+            TAXKIT_WORKFLOW_PLAN_DEPLOYMENT_INPUT_SHA256="$deployment_input_sha256" \
+            TAXKIT_WORKFLOW_PLAN_KIND=deploy \
+            TAXKIT_WORKFLOW_PLAN_LOCKFILE_SHA256="$lockfile_sha256" \
+            TAXKIT_WORKFLOW_PLAN_PROJECTION_PATH="$RUNNER_TEMP/docs-deployment/projection.json" \
+            TAXKIT_WORKFLOW_PLAN_STAGE="$stage" \
+            TAXKIT_WORKFLOW_PLAN_TEXT_PATH="$RUNNER_TEMP/docs-deployment/alchemy-plan.txt" \
+            bun --conditions=source run tools/docs-deployment/workflow-plan-projection.runtime.ts
+          )"
           jq -nS \
             --arg acceptedBy "$GITHUB_ACTOR" \
             --arg acceptedPlanSha256 "$plan_sha256" \
@@ -244,35 +229,20 @@ jobs:
           test "$ACCEPTED_PLAN_SHA256" = "${{ steps.plan.outputs.plan_sha256 }}"
           stage="pr-${PR_NUMBER}"
           ALCHEMY_PLAIN=1 CI=1 bunx alchemy plan --stage "$stage" --profile "$ALCHEMY_PROFILE" > "$RUNNER_TEMP/docs-deployment/alchemy-replan.txt"
-          sed -E $'s/\\033\\[[0-9;]*m//g' "$RUNNER_TEMP/docs-deployment/alchemy-replan.txt" > "$RUNNER_TEMP/docs-deployment/alchemy-replan.clean.txt"
-          all_replan_resources="$(grep -E '^\[[^]]+\] ' "$RUNNER_TEMP/docs-deployment/alchemy-replan.clean.txt" || true)"
-          unexpected_replan_resources="$(printf '%s\n' "$all_replan_resources" | grep -Ev '^(\[DocsBuild\] delete|\[DocsWebsite\] (create|update|noop))$' || true)"
-          test -z "$unexpected_replan_resources"
-          replan_resources="$(printf '%s\n' "$all_replan_resources" | grep -E '^(\[DocsBuild\] delete|\[DocsWebsite\] (create|update|noop))$' || true)"
-          replan_resource_count="$(printf '%s\n' "$replan_resources" | sed '/^$/d' | wc -l | tr -d ' ')"
-          test "$replan_resource_count" -eq 1 || test "$replan_resource_count" -eq 2
-          replan_build_resource="$(printf '%s\n' "$replan_resources" | grep -E '^\[DocsBuild\] delete$' || true)"
-          replan_website_resource="$(printf '%s\n' "$replan_resources" | grep -E '^\[DocsWebsite\] (create|update|noop)$' || true)"
-          test "$(printf '%s\n' "$replan_website_resource" | sed '/^$/d' | wc -l | tr -d ' ')" -eq 1
-          replan_website_action="$(printf '%s\n' "$replan_website_resource" | sed -E 's/^\[[^]]+\] //')"
-          if [ -n "$replan_build_resource" ]; then
-            replan_logical_resources="$(jq -n --arg website "$replan_website_action" '[{action:"delete",logicalId:"DocsBuild",resourceType:"Command.Build"},{action:$website,logicalId:"DocsWebsite",resourceType:"Cloudflare.Worker"}]')"
-          else
-            replan_logical_resources="$(jq -n --arg website "$replan_website_action" '[{action:$website,logicalId:"DocsWebsite",resourceType:"Cloudflare.Worker"}]')"
-          fi
           replan_lockfile_sha256="$(shasum -a 256 bun.lock | cut -d ' ' -f1)"
           replan_config_sha256="$(for file in alchemy.run.ts apps/docs/package.json apps/docs/vite.config.ts apps/docs/src/lib/build/cloudflare-stack.ts apps/docs/src/lib/build/docs-deployment-stage.ts apps/docs/public/_headers; do shasum -a 256 "$file"; done | shasum -a 256 | cut -d ' ' -f1)"
           replan_deployment_input_sha256="$(git ls-files -z -- alchemy.run.ts apps/docs packages/docs-content packages/docs-fumadocs | LC_ALL=C sort -z | xargs -0 shasum -a 256 | shasum -a 256 | cut -d ' ' -f1)"
-          jq -nS \
-            --arg commit "$CANDIDATE_SHA" \
-            --arg lockfile "$replan_lockfile_sha256" \
-            --arg deployment "$replan_deployment_input_sha256" \
-            --arg config "$replan_config_sha256" \
-            --arg stage "$stage" \
-            --argjson logicalResources "$replan_logical_resources" \
-            '{candidate:{deploymentInputSha256:$deployment,exactCommit:$commit,lockfileSha256:$lockfile},configSha256:$config,logicalResources:$logicalResources,redaction:{ansiRemoved:true,secretValuesIncluded:false,timestampsExcludedFromDigest:true},schemaVersion:2,stack:"TaxKitDocsCloudflare",stage:$stage}' \
-            > "$RUNNER_TEMP/docs-deployment/replan-projection.json"
-          replan_sha256="$(jq -cS . "$RUNNER_TEMP/docs-deployment/replan-projection.json" | tr -d '\n' | shasum -a 256 | cut -d ' ' -f1)"
+          replan_sha256="$(
+            TAXKIT_WORKFLOW_PLAN_CANDIDATE_COMMIT="$CANDIDATE_SHA" \
+            TAXKIT_WORKFLOW_PLAN_CONFIG_SHA256="$replan_config_sha256" \
+            TAXKIT_WORKFLOW_PLAN_DEPLOYMENT_INPUT_SHA256="$replan_deployment_input_sha256" \
+            TAXKIT_WORKFLOW_PLAN_KIND=deploy \
+            TAXKIT_WORKFLOW_PLAN_LOCKFILE_SHA256="$replan_lockfile_sha256" \
+            TAXKIT_WORKFLOW_PLAN_PROJECTION_PATH="$RUNNER_TEMP/docs-deployment/replan-projection.json" \
+            TAXKIT_WORKFLOW_PLAN_STAGE="$stage" \
+            TAXKIT_WORKFLOW_PLAN_TEXT_PATH="$RUNNER_TEMP/docs-deployment/alchemy-replan.txt" \
+            bun --conditions=source run tools/docs-deployment/workflow-plan-projection.runtime.ts
+          )"
           echo "accepted_plan_sha256=$ACCEPTED_PLAN_SHA256"
           echo "replan_sha256=$replan_sha256"
           jq -cS . "$RUNNER_TEMP/docs-deployment/replan-projection.json"
@@ -294,7 +264,7 @@ jobs:
           test "$stage_count_before" -eq 0 || test "$stage_count_before" -eq 1
           previous_version_id=""
           if [ "$stage_count_before" -eq 1 ]; then
-            jq -e --arg stage "$stage" '([.stages[] | select(.stage == $stage) | .resources | map(.logicalId) | sort] | . == [["DocsWebsite"]] or . == [["DocsBuild", "DocsWebsite"]]) and ([.providerWorkers[] | select(.stage == $stage and .logicalId == "DocsWebsite")] | length == 1)' "$RUNNER_TEMP/docs-deployment/provider-inventory-before.json" > /dev/null
+            jq -e --arg stage "$stage" '([.stages[] | select(.stage == $stage) | .resources | map(.logicalId) | sort] | . == [["DocsWebsite"]]) and ([.providerWorkers[] | select(.stage == $stage and .logicalId == "DocsWebsite")] | length == 1)' "$RUNNER_TEMP/docs-deployment/provider-inventory-before.json" > /dev/null
             previous_worker_name="$(jq -er --arg stage "$stage" '.stages[] | select(.stage == $stage) | .resources[] | select(.logicalId == "DocsWebsite") | .workerName' "$RUNNER_TEMP/docs-deployment/provider-inventory-before.json")"
             previous_deployments="$(bunx wrangler deployments list --name "$previous_worker_name" --json)"
             previous_version_id="$(jq -er '.[-1].versions[0].version_id' <<<"$previous_deployments")"
