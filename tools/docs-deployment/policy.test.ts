@@ -1,6 +1,9 @@
 import { describe, expect, test } from "bun:test";
 
 import { Effect, Schema } from "effect";
+// These fixtures are immutable historical deployment evidence. They are
+// decoded through the explicitly historical plan Schemas and do not test
+// current workflow admission.
 
 import credentialReadbackJson from "../../docs/evidence/deployments/2026-07-30-preview-pr-1/credential-readback-d9cb894.json";
 import destroyPlanJson from "../../docs/evidence/deployments/2026-07-30-preview-pr-1/destroy-plan-d9cb894.json";
@@ -39,11 +42,11 @@ import inventoryJson from "../../docs/verification/docs-deployment-journeys.json
 import {
   deploymentRecordDigest,
   inspectDeploymentOwners,
-  inspectDeploymentPlanActions,
+  inspectHistoricalDeploymentPlanActions as inspectDeploymentPlanActions,
   inspectCredentialCapabilityReceipt,
   inspectGitAuthorityReceipt,
   inspectGitReadbackReceipt,
-  inspectDeploymentPlanReceipt,
+  inspectHistoricalDeploymentPlanReceipt as inspectDeploymentPlanReceipt,
   inspectHostedDeploymentProof,
   inspectInitialProductionPreflight,
   inspectPreviewEvidenceChain,
@@ -63,8 +66,8 @@ import {
   DeploymentGitReadbackReceipt,
   DeploymentHostedProofReceipt,
   DeploymentJourneyInventory,
-  DeploymentPlanProjection,
-  DeploymentPlanReceipt,
+  HistoricalDeploymentPlanProjection as DeploymentPlanProjection,
+  HistoricalDeploymentPlanReceipt as DeploymentPlanReceipt,
   DeploymentProductionPreflightReceipt,
   DeploymentProductionMutationPreflightReceipt,
   DeploymentProductionRollbackReceipt,

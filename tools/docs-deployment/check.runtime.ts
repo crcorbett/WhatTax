@@ -4,14 +4,16 @@ import { Array, Console, Effect, Match } from "effect";
 import * as Path from "effect/Path";
 
 import { readDeploymentJson, readDeploymentSha256 } from "./input.boundary.js";
+// This checker reads retained historical receipts. Current workflow plan
+// admission uses DeploymentPlanReceipt in the workflow receipt boundary.
 import {
   inspectDeploymentOwners,
   inspectAuthorityCapabilityReceipt,
   inspectCredentialCapabilityReceipt,
   inspectGitAuthorityReceipt,
   inspectGitReadbackReceipt,
-  inspectDeploymentPlanReceipt,
-  inspectDeploymentPlanActions,
+  inspectHistoricalDeploymentPlanReceipt as inspectDeploymentPlanReceipt,
+  inspectHistoricalDeploymentPlanActions as inspectDeploymentPlanActions,
   inspectInitialProductionPreflight,
   inspectPreviewEvidenceChain,
   inspectPreviewHostedEvidenceChain,
@@ -33,7 +35,7 @@ import {
   DeploymentGitAuthorityReceipt,
   DeploymentGitReadbackReceipt,
   DeploymentJourneyInventory,
-  DeploymentPlanReceipt,
+  HistoricalDeploymentPlanReceipt as DeploymentPlanReceipt,
   DeploymentProductionMutationPreflightReceipt,
   DeploymentProductionPreflightReceipt,
   DeploymentProductionRollbackReceipt,

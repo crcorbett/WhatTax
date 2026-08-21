@@ -10,6 +10,7 @@ import {
   docsWorkerAssetHeaders,
   docsWorkerCompatibilityDate,
   docsWorkerCompatibilityFlags,
+  docsWorkerMemo,
   docsWorkerObservability,
   docsWorkerResourceId,
 } from "./apps/docs/src/lib/build/cloudflare-stack.js";
@@ -39,6 +40,7 @@ export default Alchemy.Stack(
         date: docsWorkerCompatibilityDate,
         flags: [...docsWorkerCompatibilityFlags],
       },
+      memo: docsWorkerMemo,
       observability: docsWorkerObservability,
       rootDir: "apps/docs",
       url: true,

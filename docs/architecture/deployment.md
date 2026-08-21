@@ -3,7 +3,7 @@ document_type: architecture
 lifecycle: current
 authority: canonical
 owner: taxkit-architecture-owner
-last_reviewed: 2026-08-13
+last_reviewed: 2026-08-21
 review_trigger: deployment target, runtime adapter, provider resource, state, domain, or rollback change
 ---
 
@@ -43,6 +43,8 @@ intent and task state belong in the active SPEC and execution plan.
   nested process cannot see that cache. Missing, malformed and unreadable
   credential input remain distinct safe failures; neither path can bootstrap,
   write or delete state.
+  The beta.64 Vite memo also includes the lockfile and the sibling
+  `docs-content` and `docs-fumadocs` package trees as native build inputs.
 - The Worker uses compatibility date `2026-06-24`, `nodejs_compat`, default
   asset-first full-stack routing, a provider Worker URL, built-in invocation
   logs and disabled traces. Hashed `/assets/*` responses are immutable.

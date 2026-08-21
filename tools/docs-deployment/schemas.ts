@@ -53,6 +53,12 @@ export const DeploymentJourneyInventory = Schema.Struct({
 });
 export type DeploymentJourneyInventory = typeof DeploymentJourneyInventory.Type;
 
+/**
+ * The receipt Schemas below are retained historical evidence decoders. Current
+ * workflow admission uses DeploymentPlanReceipt, inventory.schemas.ts and
+ * workflow-receipts.schemas.ts, which admit only the native Website resource.
+ */
+
 const AuthorityOperation = Schema.Literals([
   "credential-account-preflight",
   "state-inventory",
@@ -193,7 +199,7 @@ const DeploymentPlanProjectionFields = {
   stage: DocsDeploymentStage,
 } as const;
 
-const LegacyDeploymentPlanProjection = Schema.Struct({
+const HistoricalLegacyDeploymentPlanProjection = Schema.Struct({
   ...DeploymentPlanProjectionFields,
   logicalResources: Schema.Tuple([
     Schema.Struct({
@@ -222,7 +228,7 @@ const RetiredBuildResource = Schema.Struct({
   resourceType: Schema.Literal("Command.Build"),
 });
 
-const NativeDeploymentPlanProjection = Schema.Struct({
+const HistoricalNativeDeploymentPlanProjection = Schema.Struct({
   ...DeploymentPlanProjectionFields,
   logicalResources: Schema.Union([
     Schema.Tuple([NativeWebsiteResource]),
@@ -231,10 +237,18 @@ const NativeDeploymentPlanProjection = Schema.Struct({
   schemaVersion: Schema.Literal(2),
 });
 
-export const DeploymentPlanProjection = Schema.Union([
-  LegacyDeploymentPlanProjection,
-  NativeDeploymentPlanProjection,
+export const HistoricalDeploymentPlanProjection = Schema.Union([
+  HistoricalLegacyDeploymentPlanProjection,
+  HistoricalNativeDeploymentPlanProjection,
 ]);
+export type HistoricalDeploymentPlanProjection =
+  typeof HistoricalDeploymentPlanProjection.Type;
+
+export const DeploymentPlanProjection = Schema.Struct({
+  ...DeploymentPlanProjectionFields,
+  logicalResources: Schema.Tuple([NativeWebsiteResource]),
+  schemaVersion: Schema.Literal(2),
+});
 export type DeploymentPlanProjection = typeof DeploymentPlanProjection.Type;
 
 export const DeploymentPlanReceipt = Schema.Struct({
@@ -253,9 +267,30 @@ export const DeploymentPlanReceipt = Schema.Struct({
   projection: DeploymentPlanProjection,
   receiptPath: RepositoryEvidencePath,
   replanSha256: Schema.NullOr(Sha256),
-  schemaVersion: Schema.Literals([1, 2]),
+  schemaVersion: Schema.Literal(2),
 });
 export type DeploymentPlanReceipt = typeof DeploymentPlanReceipt.Type;
+
+export const HistoricalDeploymentPlanReceipt = Schema.Struct({
+  acceptedBy: Schema.NonEmptyString,
+  acceptedPlanSha256: Sha256,
+  observedAt: Schema.String.check(
+    Schema.isPattern(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/u)
+  ),
+  operation: Schema.Literals([
+    "preview-plan",
+    "preview-equal-replan",
+    "production-plan",
+    "production-equal-replan",
+    "preview-destroy",
+  ]),
+  projection: HistoricalDeploymentPlanProjection,
+  receiptPath: RepositoryEvidencePath,
+  replanSha256: Schema.NullOr(Sha256),
+  schemaVersion: Schema.Literals([1, 2]),
+});
+export type HistoricalDeploymentPlanReceipt =
+  typeof HistoricalDeploymentPlanReceipt.Type;
 
 export const DeploymentProviderReadback = Schema.Struct({
   acceptedPlanSha256: Sha256,

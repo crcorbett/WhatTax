@@ -8,6 +8,7 @@ import type {
   DeploymentGitReadbackReceipt,
   DeploymentHostedProofReceipt,
   DeploymentJourneyInventory,
+  HistoricalDeploymentPlanReceipt,
   DeploymentPlanReceipt,
   DeploymentProductionMutationPreflightReceipt,
   DeploymentProductionPreflightReceipt,
@@ -225,9 +226,12 @@ const canonicalJson = (value: unknown): string => {
 export const deploymentRecordDigest = (value: unknown): string =>
   new Bun.CryptoHasher("sha256").update(canonicalJson(value)).digest("hex");
 
-export const inspectDeploymentPlanReceipt = (
-  receipt: DeploymentPlanReceipt
-): readonly string[] => {
+const inspectPlanReceipt = (receipt: {
+  readonly acceptedPlanSha256: string;
+  readonly operation: string;
+  readonly projection: unknown;
+  readonly replanSha256: string | null;
+}): readonly string[] => {
   const findings: string[] = [];
   if (
     deploymentRecordDigest(receipt.projection) !== receipt.acceptedPlanSha256
@@ -251,8 +255,16 @@ export const inspectDeploymentPlanReceipt = (
   return findings;
 };
 
-export const inspectDeploymentPlanActions = (
-  receipt: DeploymentPlanReceipt,
+export const inspectDeploymentPlanReceipt = (
+  receipt: DeploymentPlanReceipt
+): readonly string[] => inspectPlanReceipt(receipt);
+
+export const inspectHistoricalDeploymentPlanReceipt = (
+  receipt: HistoricalDeploymentPlanReceipt
+): readonly string[] => inspectPlanReceipt(receipt);
+
+export const inspectHistoricalDeploymentPlanActions = (
+  receipt: HistoricalDeploymentPlanReceipt,
   expectedAction: "create" | "update" | "delete"
 ): readonly string[] => {
   const resources = receipt.projection.logicalResources;
@@ -271,7 +283,7 @@ export const inspectDeploymentPlanActions = (
   return valid
     ? []
     : [
-        `plan-actions: the website must use ${expectedAction}; a beta.64 native migration may additionally delete only the retired build resource`,
+        `historical-plan-actions: the website must use ${expectedAction}; the recorded historical migration may additionally contain its retired build action`,
       ];
 };
 
@@ -339,14 +351,14 @@ export const inspectScreenshotImageDigest = (
 
 export const inspectPreviewEvidenceChain = (
   gitReadback: DeploymentGitReadbackReceipt,
-  plan: DeploymentPlanReceipt,
+  plan: HistoricalDeploymentPlanReceipt,
   provider: DeploymentProviderReadback,
   hosted: DeploymentHostedProofReceipt,
   screenshots: readonly DeploymentScreenshotManifest[]
 ): readonly string[] => {
   const findings = [
-    ...inspectDeploymentPlanReceipt(plan),
-    ...inspectDeploymentPlanActions(plan, "create"),
+    ...inspectHistoricalDeploymentPlanReceipt(plan),
+    ...inspectHistoricalDeploymentPlanActions(plan, "create"),
     ...inspectHostedDeploymentProof(hosted),
     ...Array.flatMap(screenshots, (manifest) =>
       inspectScreenshotProviderBinding(manifest, provider)
@@ -386,14 +398,14 @@ export const inspectPreviewEvidenceChain = (
 };
 
 export const inspectPreviewHostedEvidenceChain = (
-  plan: DeploymentPlanReceipt,
+  plan: HistoricalDeploymentPlanReceipt,
   provider: DeploymentProviderReadback,
   hosted: DeploymentHostedProofReceipt,
   screenshots: readonly DeploymentScreenshotManifest[]
 ): readonly string[] => {
   const findings = [
-    ...inspectDeploymentPlanReceipt(plan),
-    ...inspectDeploymentPlanActions(plan, "create"),
+    ...inspectHistoricalDeploymentPlanReceipt(plan),
+    ...inspectHistoricalDeploymentPlanActions(plan, "create"),
     ...inspectHostedDeploymentProof(hosted),
     ...Array.flatMap(screenshots, (manifest) =>
       inspectScreenshotProviderBinding(manifest, provider)
@@ -428,7 +440,7 @@ export const inspectPreviewHostedEvidenceChain = (
 };
 
 export const inspectProductionEvidenceChain = (
-  plan: DeploymentPlanReceipt,
+  plan: HistoricalDeploymentPlanReceipt,
   provider: DeploymentProviderReadback,
   hosted: DeploymentHostedProofReceipt,
   screenshots: readonly DeploymentScreenshotManifest[],
@@ -436,8 +448,8 @@ export const inspectProductionEvidenceChain = (
   expectedAction: "create" | "update"
 ): readonly string[] => {
   const findings = [
-    ...inspectDeploymentPlanReceipt(plan),
-    ...inspectDeploymentPlanActions(plan, expectedAction),
+    ...inspectHistoricalDeploymentPlanReceipt(plan),
+    ...inspectHistoricalDeploymentPlanActions(plan, expectedAction),
     ...inspectHostedDeploymentProof(hosted),
     ...Array.flatMap(screenshots, (manifest) =>
       inspectScreenshotProviderBinding(manifest, provider)
@@ -484,7 +496,7 @@ export const inspectProductionEvidenceChain = (
 
 export const inspectInitialProductionPreflight = (
   receipt: DeploymentProductionPreflightReceipt,
-  plan: DeploymentPlanReceipt,
+  plan: HistoricalDeploymentPlanReceipt,
   acceptedPreviewProvider: DeploymentProviderReadback,
   acceptedPreviewHosted: DeploymentHostedProofReceipt,
   acceptedPreviewTeardown: DeploymentPreviewTeardownReceipt,
@@ -492,7 +504,7 @@ export const inspectInitialProductionPreflight = (
   resultingProvider: DeploymentProviderReadback
 ): readonly string[] => {
   const mismatch = [
-    inspectDeploymentPlanActions(plan, "create").length > 0,
+    inspectHistoricalDeploymentPlanActions(plan, "create").length > 0,
     receipt.acceptedPlanSha256 !== plan.acceptedPlanSha256,
     receipt.candidate.exactCommit !== plan.projection.candidate.exactCommit,
     receipt.candidate.deploymentInputSha256 !==
@@ -548,7 +560,7 @@ export const inspectInitialProductionPreflight = (
 
 export const inspectProductionMutationPreflight = (
   receipt: DeploymentProductionMutationPreflightReceipt,
-  plan: DeploymentPlanReceipt,
+  plan: HistoricalDeploymentPlanReceipt,
   currentProvider: DeploymentProviderReadback,
   resultingProvider: DeploymentProviderReadback,
   credentialReadback: DeploymentPreviewCredentialReadbackReceipt
@@ -558,7 +570,7 @@ export const inspectProductionMutationPreflight = (
       ? currentProvider.candidateCommit
       : resultingProvider.candidateCommit;
   const mismatch = [
-    inspectDeploymentPlanActions(plan, "update").length > 0,
+    inspectHistoricalDeploymentPlanActions(plan, "update").length > 0,
     receipt.acceptedPlanSha256 !== plan.acceptedPlanSha256,
     receipt.candidate.exactCommit !== plan.projection.candidate.exactCommit,
     receipt.candidate.deploymentInputSha256 !==
@@ -734,13 +746,13 @@ export const inspectProductionRollbackReceipt = (
 export const inspectPreviewMutationPreflight = (
   receipt: DeploymentPreviewMutationPreflightReceipt,
   gitReadback: DeploymentGitReadbackReceipt,
-  plan: DeploymentPlanReceipt,
+  plan: HistoricalDeploymentPlanReceipt,
   authority: DeploymentAuthorityPreflightReceipt,
   credentialReadback: DeploymentPreviewCredentialReadbackReceipt,
   providerAfterApply?: DeploymentProviderReadback
 ): readonly string[] => {
   const findings = [
-    ...inspectDeploymentPlanActions(
+    ...inspectHistoricalDeploymentPlanActions(
       plan,
       receipt.operation === "preview-deploy-preflight" ? "create" : "delete"
     ),
@@ -808,12 +820,12 @@ export const inspectPreviewMutationPreflight = (
 
 export const inspectPreviewTeardownReceipt = (
   receipt: DeploymentPreviewTeardownReceipt,
-  plan: DeploymentPlanReceipt,
+  plan: HistoricalDeploymentPlanReceipt,
   provider: DeploymentProviderReadback
 ): readonly string[] => {
   const findings = [
-    ...inspectDeploymentPlanReceipt(plan),
-    ...inspectDeploymentPlanActions(plan, "delete"),
+    ...inspectHistoricalDeploymentPlanReceipt(plan),
+    ...inspectHistoricalDeploymentPlanActions(plan, "delete"),
   ];
   if (
     plan.operation !== "preview-destroy" ||
@@ -835,12 +847,12 @@ export const inspectPreviewTeardownReceipt = (
 
 export const inspectPreviewWorkflowTeardownReceipt = (
   receipt: DeploymentPreviewWorkflowTeardownReceipt,
-  plan: DeploymentPlanReceipt,
+  plan: HistoricalDeploymentPlanReceipt,
   provider: DeploymentProviderReadback
 ): readonly string[] => {
   const findings = [
-    ...inspectDeploymentPlanReceipt(plan),
-    ...inspectDeploymentPlanActions(plan, "delete"),
+    ...inspectHistoricalDeploymentPlanReceipt(plan),
+    ...inspectHistoricalDeploymentPlanActions(plan, "delete"),
   ];
   if (
     plan.operation !== "preview-destroy" ||
@@ -1023,7 +1035,7 @@ export const inspectProviderPreflightReceipt = (
 export const inspectResumePreflightReceipt = (
   receipt: DeploymentResumePreflightReceipt,
   gitReadback: DeploymentGitReadbackReceipt,
-  plan: DeploymentPlanReceipt
+  plan: HistoricalDeploymentPlanReceipt
 ): readonly string[] => {
   const findings: string[] = [];
   if (

@@ -3,9 +3,9 @@ document_type: product-spec
 lifecycle: implemented
 authority: supporting
 owner: taxkit-product-owner
-last_reviewed: 2026-08-20
+last_reviewed: 2026-08-21
 review_trigger: docs deployment candidate, Git identity, workflow run, provider readback, public journey, screenshot, teardown, rollback, or credential capability change
-successor: null
+successor: ./native-alchemy-hard-cutover.md
 tombstone: false
 ---
 

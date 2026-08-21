@@ -19,9 +19,9 @@ operator procedure and authority live in
 
 - `schemas.ts`, `workflow-receipts.schemas.ts`, `workflow-check.schemas.ts` and
   `inventory.schemas.ts` own current external representations and closed safe
-  errors. `schemas.ts` also decodes immutable two-resource v1 receipts while
-  current v2 plans admit the native one-resource graph and its bounded
-  `DocsBuild` deletion migration.
+  errors. `schemas.ts` also decodes immutable historical v1/v2 receipts, while
+  current v2 plans admit only the native one-resource graph. Historical
+  decoders are not current deployment admission.
 - `input.boundary.ts` owns repository-relative retained-evidence reads.
 - `workflow-check.boundary.ts` owns workflow-provided file, JSON and SHA-256
   ingress through Effect FileSystem, Crypto and Schema.
@@ -41,6 +41,9 @@ operator procedure and authority live in
 - Root `alchemy.run.ts` owns the native
   `Cloudflare.Website.Vite("DocsWebsite")` resource. This directory does not
   build or spawn the docs app.
+- `workflow-plan-projection.ts` is the single beta.64-bound host adapter for
+  Alchemy's text plan output. It admits only the current native Website
+  resource and fails closed on any other resource line.
 
 The retired orphan classifier has no current workflow, command, Schema,
 service, runtime or child-process boundary. Its immutable JSON receipts remain

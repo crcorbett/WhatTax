@@ -3,7 +3,7 @@ document_type: execution-plan-index
 lifecycle: current
 authority: canonical
 owner: taxkit-documentation-owner
-last_reviewed: 2026-08-20
+last_reviewed: 2026-08-21
 review_trigger: active execution-plan admission, lifecycle, dependency, or successor change
 successor: null
 tombstone: false
@@ -14,8 +14,18 @@ tombstone: false
 Live implementation plans belong here while work is in progress. Maintainer
 lifecycle is owned by [`../../README.md`](../../README.md).
 
-There are no active execution plans. New implementation work requires an
-admitted SPEC, task list and plan before changes begin.
+The proposed [Native Alchemy docs hard cutover](../../product-specs/native-alchemy-hard-cutover.md)
+SPEC and [`native-alchemy-hard-cutover.tasks.json`](../../product-specs/native-alchemy-hard-cutover.tasks.json)
+are admitted as the successor intent for the completed native Alchemy graph.
+Implementation is in progress; the current repository graph now removes
+`DocsBuild`/`Command.Build` admission, uses one Preview/teardown lock, and
+includes the beta.64 Vite memo boundary. Any provider mutation or hosted proof
+still requires separate authority and receipt-bound readback.
+
+There are no other active execution plans. The completed
+[Automatic Preview Teardown Admission](../completed/automatic-preview-teardown-admission.md)
+plan records the exact-stage PR-close cleanup under the shared Preview
+credential environment. Production remains protected.
 
 The implemented
 [Pull-request Turbo Write-through Cache](../../product-specs/pull-request-turbo-write-through.md)

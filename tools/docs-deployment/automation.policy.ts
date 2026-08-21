@@ -340,8 +340,7 @@ export const inspectDeploymentAutomationRegisters = (
         receipt?.operation !== "preview-destroy" &&
         plan !== null &&
         plan.projection.logicalResources.some(
-          ({ action, logicalId }) =>
-            action === "delete" && logicalId !== "DocsBuild"
+          ({ action }) => action === "delete"
         );
       const planContractMismatch =
         plan === null ||

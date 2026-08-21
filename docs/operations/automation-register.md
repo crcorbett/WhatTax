@@ -62,10 +62,12 @@ OAuth profile is copied into CI.
 
 The current native `Cloudflare.Website.Vite` graph has one `DocsWebsite`
 resource. Preview, Production and teardown retain accepted observations. Plan
-v2 admits one Website action and, only during migration, an adjacent
-`DocsBuild` delete. The provider-free Vite/workerd build is preflight proof;
-the deployment-input digest binds the tracked Website source set rather than
-claiming byte identity with Alchemy's internal build.
+v2 admits exactly one native Website action. The separately authorised
+one-time legacy state cutover is tracked by the native Alchemy hard-cutover
+SPEC; it is not a current `DocsBuild` admission. The provider-free Vite/workerd
+build is preflight proof; the deployment-input digest binds the tracked
+Website source set rather than claiming byte identity with Alchemy's internal
+build.
 
 The first shared-environment PR-close run started automatically but stopped
 before dry-run or destroy because Turbo console framing surrounded the
@@ -93,9 +95,10 @@ This receipt is intentionally branch-bound and cannot alter the current
 register. No provider mutation, state write, teardown or credential-scope
 expansion is inferred from that historical observation.
 
-Each current mutation workflow enforces the remaining boundary in its own YAML:
-the initial plan and equal replan require `DocsWebsite` and admit `DocsBuild`
-only as a migration delete; provider inventory and the latest Wrangler
+In that historical epoch, each mutation workflow enforced the remaining
+boundary in its own YAML: the initial plan and equal replan required
+`DocsWebsite` and admitted `DocsBuild` only as a migration delete; provider
+inventory and the latest Wrangler
 deployment are bound to the candidate, stage, plan, account, Alchemy state,
 Worker, URL, version and pre-mutation version; and the shared hosted proof
 checker must pass after strict receipt filtering and screenshot-byte digest
