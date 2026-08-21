@@ -346,7 +346,7 @@ describe("docs deployment workflow admission", () => {
     const group = [
       "group: taxkit-docs-preview-pr-",
       "$",
-      "{{ github.event.pull_request.number || inputs.pr_number }}",
+      "{{ inputs.target_stage || github.event.pull_request.number || inputs.pr_number }}",
     ].join("");
     expect(preview).toContain(group);
     expect(teardown).toContain(group);
