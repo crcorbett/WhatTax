@@ -23,6 +23,8 @@ export const WorkflowInputCheckConfig = Schema.Struct({
   TAXKIT_WORKFLOW_INPUT_OPERATION: Schema.Literals([
     "deploy",
     "destroy",
+    "migrate",
+    "migrate-plan",
     "plan",
     "report",
     "rollback",
@@ -32,6 +34,9 @@ export const WorkflowInputCheckConfig = Schema.Struct({
   ),
   TAXKIT_WORKFLOW_INPUT_RECEIPT: Schema.NonEmptyString,
   TAXKIT_WORKFLOW_INPUT_RUN_ID: WorkflowRunId,
+  TAXKIT_WORKFLOW_INPUT_TARGET_STAGE: Schema.optional(
+    Schema.Union([Schema.Literal(""), DocsDeploymentStage])
+  ),
   TAXKIT_WORKFLOW_INPUT_WORKFLOW_COMMIT: CommitSha,
   TAXKIT_WORKFLOW_INPUT_WORKFLOW_PATH: Schema.NonEmptyString,
 });

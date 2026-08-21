@@ -1,6 +1,9 @@
 import { Effect, Schema } from "effect";
 
-import type { DeploymentPlanProjection } from "./schemas.js";
+import type {
+  DeploymentPlanProjection,
+  LegacyMigrationDeploymentPlanProjection,
+} from "./schemas.js";
 
 export const alchemyPlanTextVersion = "2.0.0-beta.64" as const;
 
@@ -12,8 +15,12 @@ const NativeResource = Schema.Struct({
 });
 type NativeResource = typeof NativeResource.Type;
 
+type WorkflowPlanProjection =
+  | DeploymentPlanProjection
+  | LegacyMigrationDeploymentPlanProjection;
+
 export const stringifyWorkflowPlanProjection = (
-  projection: DeploymentPlanProjection
+  projection: WorkflowPlanProjection
 ): string =>
   JSON.stringify({
     candidate: {
@@ -32,6 +39,7 @@ export const stringifyWorkflowPlanProjection = (
 export const WorkflowPlanProjectionKind = Schema.Literals([
   "deploy",
   "destroy",
+  "migrate",
 ]);
 export type WorkflowPlanProjectionKind = typeof WorkflowPlanProjectionKind.Type;
 
@@ -47,6 +55,7 @@ const ansiEscape = /\u001B\[[0-?]*[ -/]*[@-~]/gu;
 const timestampLog = /^\[\d{2}:\d{2}:\d{2}(?:\.\d+)?\] [A-Z]+ /u;
 const resourceLine = /^\[[^\]]+\] /u;
 const nativeResourceLine = /^\[DocsWebsite\] (create|update|noop|delete)$/u;
+const legacyMigrationResourceLine = /^\[DocsBuild\] delete$/u;
 
 const fail = (reason: string) =>
   Effect.fail(new WorkflowPlanProjectionError({ reason }));
@@ -61,6 +70,32 @@ export const projectAlchemyPlanText = (
       .split(/\r?\n/u)
       .filter((line) => resourceLine.test(line))
       .filter((line) => !timestampLog.test(line));
+    if (kind === "migrate") {
+      const websiteLine = resourceLines.find((line) =>
+        line.startsWith("[DocsWebsite] ")
+      );
+      if (
+        resourceLines.length !== 2 ||
+        !resourceLines.some((line) => legacyMigrationResourceLine.test(line)) ||
+        websiteLine !== "[DocsWebsite] noop"
+      ) {
+        return yield* fail(
+          "a legacy migration plan must contain exactly DocsBuild delete and DocsWebsite noop"
+        );
+      }
+      return [
+        {
+          action: "delete" as const,
+          logicalId: "DocsBuild" as const,
+          resourceType: "Command.Build" as const,
+        },
+        {
+          action: "noop" as const,
+          logicalId: "DocsWebsite" as const,
+          resourceType: "Cloudflare.Worker" as const,
+        },
+      ];
+    }
     const unexpected = resourceLines.filter(
       (line) => !nativeResourceLine.test(line)
     );
