@@ -229,7 +229,7 @@ const RetiredBuildResource = Schema.Struct({
 });
 
 const LegacyMigrationWebsiteResource = Schema.Struct({
-  action: Schema.Literal("noop"),
+  action: Schema.Literals(["noop", "update"]),
   logicalId: Schema.Literal("DocsWebsite"),
   resourceType: Schema.Literal("Cloudflare.Worker"),
 });

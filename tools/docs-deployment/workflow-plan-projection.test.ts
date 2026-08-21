@@ -103,6 +103,20 @@ describe("beta.64 Alchemy plan projection", () => {
     ]);
     await expect(
       project("[DocsBuild] delete\n[DocsWebsite] update\n", "migrate")
+    ).resolves.toEqual([
+      {
+        action: "delete",
+        logicalId: "DocsBuild",
+        resourceType: "Command.Build",
+      },
+      {
+        action: "update",
+        logicalId: "DocsWebsite",
+        resourceType: "Cloudflare.Worker",
+      },
+    ]);
+    await expect(
+      project("[DocsBuild] delete\n[DocsWebsite] create\n", "migrate")
     ).rejects.toHaveProperty("_tag", "WorkflowPlanProjectionError");
     await expect(
       project("[DocsWebsite] noop\n", "migrate")
