@@ -110,7 +110,10 @@ Run `build` before `preview`. Turbo orders the package-owned content build
 before the app, while a direct Vite app build regenerates the same package-owned
 source through `source.config.ts`. The config-only Fumadocs export is
 source-owned, so a clean direct app build does not require a prebuilt workspace
-artifact. `dev:vite` and `preview` expose the app through portless.
+artifact. The Vite config resolves the Fumadocs config and generated-source
+paths from its own file location, so the standalone and repository-root
+Alchemy builds use the same generated source even after a cached package
+build. `dev:vite` and `preview` expose the app through portless.
 
 `test:browser` runs the programmatic TanStack client-route harness in Chromium.
 It proves success, expected failures, malformed transport and framework error
