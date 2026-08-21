@@ -69,6 +69,13 @@ build is preflight proof; the deployment-input digest binds the tracked
 Website source set rather than claiming byte identity with Alchemy's internal
 build.
 
+While HAC-002 is in progress, the Preview workflow has one separately gated
+`migrate-plan`/`migrate` path for the exact existing stage found by preflight.
+It admits only `DocsBuild` delete beside a matching `DocsWebsite` no-op, then
+requires state/provider readback showing `DocsBuild` absent and
+`DocsWebsite` retained. Normal Preview deploy, Production deploy and teardown
+remain native-only. This temporary path is removed after the absence readback.
+
 The first shared-environment PR-close run started automatically but stopped
 before dry-run or destroy because Turbo console framing surrounded the
 inventory JSON. The corrected contract writes machine inventory directly from
