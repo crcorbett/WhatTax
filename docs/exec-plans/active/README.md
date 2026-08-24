@@ -3,7 +3,7 @@ document_type: execution-plan-index
 lifecycle: current
 authority: canonical
 owner: taxkit-documentation-owner
-last_reviewed: 2026-08-21
+last_reviewed: 2026-08-24
 review_trigger: active execution-plan admission, lifecycle, dependency, or successor change
 successor: null
 tombstone: false
@@ -14,13 +14,11 @@ tombstone: false
 Live implementation plans belong here while work is in progress. Maintainer
 lifecycle is owned by [`../../README.md`](../../README.md).
 
-The accepted
+There are no active execution plans. The implemented
 [Alchemy deployment structure corrections](../../product-specs/alchemy-deployment-structure-corrections.md)
-SPEC is active through its
-[canonical execution plan](./alchemy-deployment-structure-corrections.md).
-It preserves the native one-resource graph while correcting workflow locking,
-credential scope, typed evidence, hosted-proof input, beta.64 parser proof and
-the current deployment procedure.
+SPEC and its [completed plan](../completed/alchemy-deployment-structure-corrections.md)
+retain the workflow-locking, credential-scope, typed-evidence, hosted-proof,
+beta.64 parser and current-runbook implementation evidence.
 
 The implemented [Native Alchemy docs hard cutover](../../product-specs/native-alchemy-hard-cutover.md)
 SPEC and [`native-alchemy-hard-cutover.tasks.json`](../../product-specs/native-alchemy-hard-cutover.tasks.json)
@@ -32,7 +30,7 @@ boundary. The separate Preview state reconciliation is recorded in the
 It does not establish Production deployment, publication or permanent
 availability.
 
-There are no other active execution plans. The completed
+The completed
 [Automatic Preview Teardown Admission](../completed/automatic-preview-teardown-admission.md)
 plan records the exact-stage PR-close cleanup under the shared Preview
 credential environment. Production remains protected.

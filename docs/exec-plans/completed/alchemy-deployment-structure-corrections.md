@@ -1,6 +1,6 @@
 ---
 document_type: execution-plan
-lifecycle: active
+lifecycle: historical
 authority: supporting
 owner: taxkit-implementation-owner
 last_reviewed: 2026-08-24
@@ -75,7 +75,7 @@ verification and `git diff --check` before its coherent commit.
 
 | Surface | Decision | Owner and proof |
 | --- | --- | --- |
-| SPEC, task ledger, active plan and indexes | Change required | Keep admission, task status, evidence and lifecycle aligned; parse JSON and run documentation/path checks. |
+| SPEC, task ledger, execution plan and indexes | Change required | Keep admission, task status, evidence and lifecycle aligned; parse JSON and run documentation/path checks. |
 | Preview and Production workflows and deployment tools | Change required | Workflow YAML owns authority and order; focused contracts prove locking, token placement and command use. |
 | Deployment architecture, authority, controls, automation and runbook | Change required | Current owners state bootstrap effects, interruption, lock limits, typed evidence and the one-resource operation. |
 | Hosted-proof script and app README | Change required | Config, Schema, tagged errors, scoped browser tests and strict-boundary enforcement prove the local boundary. |
@@ -101,11 +101,26 @@ task ledger and `AGENTS.md`, hosted Quality on the exact final candidate, merge
 readback, relevant post-merge checks, completed validation receipts, all eight
 accepted findings reconciled, and movement of this plan to completed history.
 
-## Closeout in progress
+## Closeout
 
-All four implementation slices are complete locally. The remaining work is to
-run fresh full repository verification on the corrected ADS-004 bytes, commit
-and push the coherent slice, open the pull request, obtain hosted Quality on
-the exact final candidate, merge, read back the exact merged commit and
-relevant post-merge checks, move this plan to completed history and close the
-SPEC lifecycle.
+All four implementation slices completed in commits `6c03e8f`, `d612aac`,
+`25673d0` and `8901e3f`. The corrected final candidate
+`8901e3f532229903bb7ce59d47f173adb29f11c1` passed fresh full repository
+verification, independent review and hosted Quality run `32685832709`.
+
+[Pull request #71](https://github.com/crcorbett/taxkit/pull/71) merged that
+candidate as `28ed00f884e74460c5b5efc3314f67c6457cf558` on 2026-08-24. Readback
+confirmed that exact merge on `origin/main`; post-merge Quality run
+`32686064167` and receipt-reconciliation run `32686129314` also passed on that
+exact merge. The
+[closeout receipt](../../documentation-audit/alchemy-deployment-structure/closeout-validation.json)
+keeps the claim boundaries: existing GitHub artefacts were read for fixture
+provenance and no provider workflow was manually dispatched. Merge automatically
+triggered Preview teardown run `32686064320` for `pr-71`. Mutation-capable
+bootstrap completed, two equal no-change destroy plans and three provider/state
+inventories confirmed the stage was already absent, and actual destroy was
+skipped. The bootstrap receipt does not prove which allowed bootstrap effects
+occurred; its job log reported credential refresh and save, so no claim is made
+about credential creation or rotation. No separate or manual credential
+operation, Production deploy or rollback, DNS, custom-domain, package
+publication or public-site result was performed or proved.

@@ -2,14 +2,14 @@
   "$schema": "https://taxkit.local/schemas/product-spec-task-plan.v1.json",
   "spec": "docs/product-specs/alchemy-deployment-structure-corrections.md",
   "title": "Alchemy Deployment Structure Corrections Tasks",
-  "status": "active",
+  "status": "implemented",
   "last_reviewed": "2026-08-24",
   "principles": [
     "The existing one-resource DocsWebsite composition and Alchemy-owned Vite build are preserved.",
     "Workflow YAML owns authority, permissions, concurrency and sequencing; typed Effect code owns data meaning and evidence encoding.",
     "Cloudflare credentials are available only to exact provider steps and are never evidence.",
     "Local, GitHub, provider, hosted and public claims remain separate.",
-    "The accepted implementation stays bound to the canonical active execution plan and closes only with direct evidence."
+    "The implemented work is bound to the canonical completed execution plan and its direct evidence."
   ],
   "globalVerification": {
     "commitPolicy": "Commit each small vertical slice only after its focused checks, documentation checks, full repository verification and explicit no-Changeset rationale pass. Hosted and provider operations remain bound to the exact accepted authority and readback contract.",
@@ -48,8 +48,8 @@
         "docs/documentation-audit/alchemy-deployment-structure/accepted-findings.json",
         "docs/product-specs/index.md"
       ],
-      "verification": "Parse both JSON files, validate exact finding-to-requirement-to-task cross-references, run documentation and repository-path checks, and confirm the canonical active plan is routed.",
-      "nonClaims": ["Active planning artefacts do not prove completed implementation or external state."]
+      "verification": "Parse both JSON files, validate exact finding-to-requirement-to-task cross-references, run documentation and repository-path checks, and confirm the canonical completed plan is routed.",
+      "nonClaims": ["Implemented repository artefacts do not prove current external state."]
     },
     {
       "surface": "Deployment workflows, tools, tests, architecture, authority, automation, controls and runbook",
@@ -93,23 +93,24 @@
     },
     {
       "surface": "Historical evidence and completed plans",
-      "decision": "Preserve",
+      "decision": "Preserve existing history and add the completed ADS plan",
       "paths": [
         "docs/evidence/deployments/",
         "docs/documentation-audit/",
         "docs/exec-plans/completed/"
       ],
-      "verification": "Review the diff for immutable historical records and link the live runbook to history instead of rewriting it.",
+      "verification": "Review the diff for immutable pre-existing historical records, add only the completed ADS plan and index entry, and link the live runbook to history instead of rewriting it.",
       "nonClaims": ["Historical DocsBuild evidence is not a current resource instruction."]
     },
     {
-      "surface": "Active plan, public docs content, API, SDK, packages, versions, releases, DNS, skills and repository agent rules",
-      "decision": "Change required for the active plan; N/A for the other listed surfaces",
+      "surface": "Execution-plan lifecycle, public docs content, API, SDK, packages, versions, releases, DNS, skills and repository agent rules",
+      "decision": "Change required for plan closeout; N/A for the other listed surfaces",
       "paths": [
-        "docs/exec-plans/active/alchemy-deployment-structure-corrections.md",
-        "docs/exec-plans/active/README.md"
+        "docs/exec-plans/completed/alchemy-deployment-structure-corrections.md",
+        "docs/exec-plans/active/README.md",
+        "docs/exec-plans/completed/README.md"
       ],
-      "verification": "Confirm the accepted work has one canonical active plan, no public or package contract changes, no Changeset, and no release, publication, DNS, skill or AGENTS.md change.",
+      "verification": "Confirm the implemented work has one canonical completed plan, no active plan, no public or package contract changes, no Changeset, and no release, publication, DNS, skill or AGENTS.md change.",
       "nonClaims": ["No deployment, publication or public availability is authorised or proved."]
     }
   ],

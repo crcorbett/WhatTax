@@ -3,6 +3,15 @@
   "auditId": "TAXKIT-ALCHEMY-DEPLOYMENT-STRUCTURE-2026-08-24",
   "targetRevision": "42230517ad96ab20a260fad3ce75b29421e59975",
   "implementationBaseRevision": "0751c49e93c8f78fa774caae6d9e5ccd5b2a8749",
+  "implementationRevision": "8901e3f532229903bb7ce59d47f173adb29f11c1",
+  "pullRequest": 71,
+  "hostedQualityRunId": "32685832709",
+  "mergeRevision": "28ed00f884e74460c5b5efc3314f67c6457cf558",
+  "postMergeQualityRunId": "32686064167",
+  "postMergeTeardownRunId": "32686064320",
+  "postMergeTeardownArtifactId": "9505698780",
+  "postMergeReceiptReconciliationRunId": "32686129314",
+  "postMergeReceiptArtifactId": "9505706890",
   "lastReviewed": "2026-08-24",
   "entries": [
     {

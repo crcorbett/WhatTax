@@ -3,7 +3,7 @@ document_type: execution-plan-index
 lifecycle: historical
 authority: canonical
 owner: taxkit-execution-history-owner
-last_reviewed: 2026-08-20
+last_reviewed: 2026-08-24
 review_trigger: completed-plan retention, evidence, or successor correction
 successor: null
 tombstone: false
@@ -16,6 +16,7 @@ evidence remains useful.
 
 Completed plans:
 
+- [Alchemy deployment structure corrections](./alchemy-deployment-structure-corrections.md)
 - [Automatic Preview Teardown Admission](./automatic-preview-teardown-admission.md)
 - [Shared Dependency Cache and Checkout Upgrade](./shared-dependency-cache-and-checkout.md)
 - [Turbo and CI Cache Efficiency](./ci-cache-efficiency.md)
