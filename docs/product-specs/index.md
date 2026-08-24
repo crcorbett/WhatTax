@@ -3,7 +3,7 @@ document_type: product-spec-index
 lifecycle: current
 authority: canonical
 owner: taxkit-product-owner
-last_reviewed: 2026-08-21
+last_reviewed: 2026-08-24
 review_trigger: product-spec admission, lifecycle, evidence, or successor change
 successor: null
 tombstone: false
@@ -21,6 +21,7 @@ Specs:
 
 | Spec | Status | Notes |
 | --- | --- | --- |
+| [Alchemy deployment structure corrections](./alchemy-deployment-structure-corrections.md) | Proposed | Planning-only contract for accepted findings `ALC-AUD-001` through `ALC-AUD-005` and explicit decisions on `ALC-AUD-R001` through `ALC-AUD-R003`. No implementation or external operation is admitted until review acceptance and a separate active execution plan. |
 | [Native Alchemy docs hard cutover](./native-alchemy-hard-cutover.md) | Implemented | Native-only source/workflow admission, beta.64 sibling memo coverage and the exact Preview/teardown lock are implemented. The separately authorised five-stage Preview state reconciliation and zero-legacy final inventory are recorded in [`legacy-state-cutover.json`](../evidence/deployments/2026-08-21-native-alchemy-hard-cutover/legacy-state-cutover.json); Production was not deployed or cut over by that operation. |
 | [Automatic Preview Teardown Admission](./automatic-preview-teardown-admission.md) | Implemented | PR-close teardown now shares the unreviewed Preview credential environment. Corrected run `32367035323` and reconciliation `32367125582` proved the automatic exact-stage no-op path; the old approval environment is removed and Production remains protected. |
 | [Shared Dependency Cache and Checkout Upgrade](./shared-dependency-cache-and-checkout.md) | Implemented | PR #59 run `32357219491` passed twice on the same source commit; attempt 2 restored both exact shared keys, kept live installs and completed in 54 seconds with checkout v7.0.1. Cross-ref restore from `main` remains a post-merge proof boundary. |

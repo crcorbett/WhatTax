@@ -1,0 +1,71 @@
+{
+  "schemaVersion": "1",
+  "auditId": "TAXKIT-ALCHEMY-DEPLOYMENT-STRUCTURE-2026-08-24",
+  "targetRevision": "42230517ad96ab20a260fad3ce75b29421e59975",
+  "entries": [
+    {
+      "findingId": "ALC-AUD-001",
+      "requirementIds": ["ADS-RQ-001"],
+      "taskIds": ["ADS-001"],
+      "owningPaths": [".github/workflows/docs-production.yml", "tools/docs-deployment/workflow.contract.test.ts", "docs/architecture/deployment.md"],
+      "verification": ["bun run test:docs-deployment", "static exact-group and cancel-in-progress contract test", "bun run verification"],
+      "proof": ["docs/documentation-audit/alchemy-deployment-structure/ADS-001-validation.json", "separately authorised GitHub workflow readback if run"]
+    },
+    {
+      "findingId": "ALC-AUD-002",
+      "requirementIds": ["ADS-RQ-002"],
+      "taskIds": ["ADS-001"],
+      "owningPaths": [".github/workflows/docs-preview.yml", ".github/workflows/docs-production.yml", "tools/docs-deployment/workflow.contract.test.ts"],
+      "verification": ["bun run test:docs-deployment", "static no-job-token and exact provider-step allowlist test", "bun run verification"],
+      "proof": ["docs/documentation-audit/alchemy-deployment-structure/ADS-001-validation.json", "separately authorised workflow receipt if run"]
+    },
+    {
+      "findingId": "ALC-AUD-003",
+      "requirementIds": ["ADS-RQ-003"],
+      "taskIds": ["ADS-002"],
+      "owningPaths": ["tools/docs-deployment/", "docs/architecture/deployment.md", "docs/runbooks/docs-deployment.md"],
+      "verification": ["beta.64 source-bound bootstrap tests", "bun run test:docs-deployment", "bun run check:docs", "bun run check:runbooks"],
+      "proof": ["docs/documentation-audit/alchemy-deployment-structure/ADS-002-validation.json", "separately authorised bootstrap and provider readback receipt if run"]
+    },
+    {
+      "findingId": "ALC-AUD-004",
+      "requirementIds": ["ADS-RQ-004"],
+      "taskIds": ["ADS-003"],
+      "owningPaths": ["apps/docs/scripts/test-cloudflare-hosted.tsx", "apps/docs/README.md", "tools/docs-deployment/strict-boundaries.policy.ts"],
+      "verification": ["focused malformed-input and interruption tests", "bun run --filter=docs test", "bun run test:docs-deployment", "bun run verification"],
+      "proof": ["docs/documentation-audit/alchemy-deployment-structure/ADS-003-validation.json", "existing hosted journey receipt route when separately authorised"]
+    },
+    {
+      "findingId": "ALC-AUD-005",
+      "requirementIds": ["ADS-RQ-005"],
+      "taskIds": ["ADS-004"],
+      "owningPaths": ["docs/runbooks/docs-deployment.md", "docs/architecture/deployment.md", "docs/evidence/deployments/"],
+      "verification": ["current-surface DocsBuild exclusion check", "bun run check:docs", "bun run check:runbooks", "bun run check:repository-paths"],
+      "proof": ["docs/documentation-audit/alchemy-deployment-structure/ADS-004-validation.json", "preserved dated deployment evidence"]
+    },
+    {
+      "findingId": "ALC-AUD-R001",
+      "requirementIds": ["ADS-RQ-006"],
+      "taskIds": ["ADS-002"],
+      "owningPaths": ["tools/docs-deployment/", ".github/workflows/docs-preview.yml", ".github/workflows/docs-production.yml"],
+      "verification": ["typed command unit and contract tests", "repeated-shell exclusion check", "bun run test:docs-deployment", "bun run verification"],
+      "proof": ["docs/documentation-audit/alchemy-deployment-structure/ADS-002-validation.json", "separately authorised workflow receipt if run"]
+    },
+    {
+      "findingId": "ALC-AUD-R002",
+      "requirementIds": ["ADS-RQ-007"],
+      "taskIds": ["ADS-004"],
+      "owningPaths": ["tools/docs-deployment/workflow-plan-projection.ts", "tools/docs-deployment/workflow-plan-projection.test.ts", "tools/docs-deployment/fixtures/alchemy-beta.64/"],
+      "verification": ["fixture provenance and digest validation", "create, update, no-op, delete and empty-destroy parser tests", "bun run test:docs-deployment"],
+      "proof": ["tools/docs-deployment/fixtures/alchemy-beta.64/manifest.json", "docs/documentation-audit/alchemy-deployment-structure/ADS-004-validation.json"]
+    },
+    {
+      "findingId": "ALC-AUD-R003",
+      "requirementIds": ["ADS-RQ-008"],
+      "taskIds": ["ADS-001"],
+      "owningPaths": ["docs/operations/authority-model.md", "docs/runbooks/docs-deployment.md", "docs/architecture/deployment.md"],
+      "verification": ["manual-lock limitation and sole-writer recovery documentation check", "bun run check:docs", "bun run check:runbooks"],
+      "proof": ["docs/documentation-audit/alchemy-deployment-structure/ADS-001-validation.json"]
+    }
+  ]
+}
