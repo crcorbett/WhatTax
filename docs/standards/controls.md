@@ -99,6 +99,13 @@ environment protection, operation authority, locks and provider execution.
 The bootstrap receipt must describe beta.64 as mutation-capable and must not
 contain a credential or temporary secret-bearing URL.
 
+The plan parser is admitted only with the five real sanitised beta.64 fixtures
+and their strict manifest. The manifest binds the exact upstream commit,
+GitHub run/artefact capture route, redaction rule and raw/final digests. Fixture
+tests recompute each digest and fail on version drift, unsupported actions,
+unknown resources and malformed lines. A dependency upgrade must replace the
+parser binding and fixture proof together.
+
 The dated manual Preview/Production/rollback receipts under
 `docs/evidence/deployments/` prove the same candidate, plan, provider/state and
 hosted contracts for an authorized operator epoch, but they do not change

@@ -291,6 +291,15 @@ provider and GitHub output files. The command has no Alchemy, Wrangler or
 GitHub execution capability. YAML still owns environment protection,
 permissions, the exact non-cancellable lock, operation choice and provider
 command order.
+The plan parser and its proof move together. Five real sanitised plan captures
+under `tools/docs-deployment/fixtures/alchemy-beta.64/` bind create, update,
+no-op, delete and already-absent destroy to Alchemy `2.0.0-beta.64` and exact
+upstream commit `31edd3c4b2f0f3310fad07f5423aee20cf72be8d`. Their manifest records the
+GitHub run and artefact route, redaction rule and raw/final digests. Tests
+strictly decode the manifest, recompute fixture digests and reject version
+drift, unexpected resources, unsupported actions and malformed lines. These
+retained captures prove parser compatibility only, not current provider or
+hosted state.
 Report-only dispatch is
 forced to the reviewed default branch before installing dependencies or
 materialising the state bearer, while Preview rejects non-numeric PR identity

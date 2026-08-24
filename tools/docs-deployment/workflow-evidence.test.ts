@@ -101,7 +101,7 @@ const withFixture = <A, E>(
     );
     yield* fileSystem.writeFileString(
       `${directory}/alchemy-plan.txt`,
-      "[DocsWebsite] create\n"
+      "Plan: 1 to create\n[DocsWebsite] create\n"
     );
     return yield* use(directory, repositoryRoot);
   }).pipe(Effect.scoped, Effect.provide(BunServices.layer), Effect.runPromise);
@@ -338,7 +338,7 @@ describe("workflow evidence command", () => {
 
         yield* fileSystem.writeFileString(
           `${directory}/alchemy-plan.txt`,
-          "[DocsWebsite] create\n"
+          "Plan: 1 to create\n[DocsWebsite] create\n"
         );
         const writeFailure = yield* runWithConfig({
           ...makePlanConfig(repositoryRoot, directory),

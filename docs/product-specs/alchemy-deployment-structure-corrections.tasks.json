@@ -318,7 +318,7 @@
     {
       "id": "ADS-004",
       "invariantIds": ["HC-DOC-001", "HC-DEPENDENCY-001", "HC-EVIDENCE-001", "HC-PROOF-001", "HC-REPO-001"],
-      "status": "pending",
+      "status": "completed",
       "title": "Bind parser proof to beta.64 and restore one current runbook",
       "type": "proof-and-documentation",
       "dependsOn": ["ADS-001", "ADS-002", "ADS-003"],

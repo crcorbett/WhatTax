@@ -58,8 +58,13 @@ unrelated provider mutation remain outside authority.
    a scoped Playwright adapter close the browser on success, failure and
    interruption. The bounded proof is
    [`ADS-003-validation.json`](../../documentation-audit/alchemy-deployment-structure/ADS-003-validation.json).
-4. **ADS-004 — in progress:** retain provenance-bound real beta.64 plan fixtures,
-   restore one current `DocsWebsite` runbook and reconcile the eight findings.
+4. **ADS-004 — complete:** five provenance-bound real beta.64 plan fixtures
+   cover create, update, no-op, delete and empty destroy. The first fresh
+   independent review found one fail-open destroy defect and four contract
+   gaps; the corrected parser, dependency binding, exact crosswalk, runbook
+   inputs and review metadata passed focused proof and a fresh independent
+   re-review with no findings. Its bounded proof is
+   [`ADS-004-validation.json`](../../documentation-audit/alchemy-deployment-structure/ADS-004-validation.json).
 
 Each slice updates its implementation, focused tests, owning documentation,
 task status and bounded validation receipt together. Each slice must pass its
@@ -95,3 +100,12 @@ Closeout requires a fresh independent review, the full checks named by the
 task ledger and `AGENTS.md`, hosted Quality on the exact final candidate, merge
 readback, relevant post-merge checks, completed validation receipts, all eight
 accepted findings reconciled, and movement of this plan to completed history.
+
+## Closeout in progress
+
+All four implementation slices are complete locally. The remaining work is to
+run fresh full repository verification on the corrected ADS-004 bytes, commit
+and push the coherent slice, open the pull request, obtain hosted Quality on
+the exact final candidate, merge, read back the exact merged commit and
+relevant post-merge checks, move this plan to completed history and close the
+SPEC lifecycle.

@@ -3,6 +3,91 @@ import { Effect, Schema } from "effect";
 import type { DeploymentPlanProjection } from "./schemas.js";
 
 export const alchemyPlanTextVersion = "2.0.0-beta.64" as const;
+export const alchemyPlanSourceCommit =
+  "31edd3c4b2f0f3310fad07f5423aee20cf72be8d" as const;
+
+const Sha256 = Schema.String.check(Schema.isPattern(/^[0-9a-f]{64}$/u));
+const GitCommit = Schema.String.check(Schema.isPattern(/^[0-9a-f]{40}$/u));
+const Identifier = Schema.String.check(Schema.isPattern(/^[0-9]+$/u));
+
+const FixtureCaptureBase = {
+  artifactId: Identifier,
+  artifactName: Schema.NonEmptyString,
+  artifactPath: Schema.NonEmptyString,
+  candidateCommit: GitCommit,
+  capturedAt: Schema.DateTimeUtcFromString,
+  expiresAt: Schema.DateTimeUtcFromString,
+  finalBytes: Schema.Int.check(Schema.isGreaterThan(0)),
+  finalSha256: Sha256,
+  rawSha256: Sha256,
+  removedLineClasses: Schema.Array(Schema.NonEmptyString),
+  stage: Schema.NonEmptyString,
+  workflowCommit: GitCommit,
+  workflowPath: Schema.NonEmptyString,
+  workflowRunId: Identifier,
+} as const;
+
+const FixtureCapture = Schema.Union([
+  Schema.Struct({
+    ...FixtureCaptureBase,
+    action: Schema.Literal("create"),
+    fixture: Schema.Literal("create.txt"),
+    kind: Schema.Literal("deploy"),
+    scenario: Schema.Literal("create"),
+  }),
+  Schema.Struct({
+    ...FixtureCaptureBase,
+    action: Schema.Literal("update"),
+    fixture: Schema.Literal("update.txt"),
+    kind: Schema.Literal("deploy"),
+    scenario: Schema.Literal("update"),
+  }),
+  Schema.Struct({
+    ...FixtureCaptureBase,
+    action: Schema.Literal("noop"),
+    fixture: Schema.Literal("no-op.txt"),
+    kind: Schema.Literal("deploy"),
+    scenario: Schema.Literal("no-op"),
+  }),
+  Schema.Struct({
+    ...FixtureCaptureBase,
+    action: Schema.Literal("delete"),
+    fixture: Schema.Literal("delete.txt"),
+    kind: Schema.Literal("destroy"),
+    scenario: Schema.Literal("delete"),
+  }),
+  Schema.Struct({
+    ...FixtureCaptureBase,
+    action: Schema.Literal("noop"),
+    fixture: Schema.Literal("empty-destroy.txt"),
+    kind: Schema.Literal("destroy"),
+    scenario: Schema.Literal("empty-destroy"),
+  }),
+]);
+
+export const AlchemyPlanFixtureManifest = Schema.Struct({
+  alchemyVersion: Schema.Literal(alchemyPlanTextVersion),
+  captures: Schema.Array(FixtureCapture).pipe(
+    Schema.check(Schema.isLengthBetween(5, 5))
+  ),
+  sanitisation: Schema.Struct({
+    rules: Schema.Tuple([
+      Schema.Literal(
+        "retain only the Alchemy plan summary and logical-resource lines"
+      ),
+      Schema.Literal("remove timestamped tool-update warnings"),
+      Schema.Literal(
+        "reject account IDs, URLs, credential terms and absolute machine paths"
+      ),
+    ]),
+    secretValuesIncluded: Schema.Literal(false),
+  }),
+  schemaVersion: Schema.Literal(1),
+  upstream: Schema.Struct({
+    commit: Schema.Literal(alchemyPlanSourceCommit),
+    repository: Schema.Literal("https://github.com/sam-goodwin/alchemy"),
+  }),
+});
 
 const ResourceAction = Schema.Literals(["create", "update", "noop", "delete"]);
 const NativeResource = Schema.Struct({
@@ -47,6 +132,7 @@ const ansiEscape = /\u001B\[[0-?]*[ -/]*[@-~]/gu;
 const timestampLog = /^\[\d{2}:\d{2}:\d{2}(?:\.\d+)?\] [A-Z]+ /u;
 const resourceLine = /^\[[^\]]+\] /u;
 const nativeResourceLine = /^\[DocsWebsite\] (create|update|noop|delete)$/u;
+const planSummaryLine = /^Plan: /u;
 
 const fail = (reason: string) =>
   Effect.fail(new WorkflowPlanProjectionError({ reason }));
@@ -56,18 +142,33 @@ export const projectAlchemyPlanText = (
   kind: WorkflowPlanProjectionKind
 ) =>
   Effect.gen(function* () {
-    const resourceLines = source
+    const lines = source
       .replace(ansiEscape, "")
       .split(/\r?\n/u)
-      .filter((line) => resourceLine.test(line))
       .filter((line) => !timestampLog.test(line));
+    const planSummaries = lines.filter((line) => planSummaryLine.test(line));
+    if (planSummaries.length !== 1) {
+      return yield* fail(
+        "beta.64 Alchemy plan output must contain exactly one plan summary"
+      );
+    }
+    if (
+      lines.some(
+        (line) =>
+          line.length > 0 &&
+          !planSummaryLine.test(line) &&
+          !resourceLine.test(line)
+      )
+    ) {
+      return yield* fail("unsupported beta.64 Alchemy plan output line");
+    }
+
+    const resourceLines = lines.filter((line) => resourceLine.test(line));
     const unexpected = resourceLines.filter(
       (line) => !nativeResourceLine.test(line)
     );
     if (unexpected.length > 0) {
-      return yield* fail(
-        `unsupported beta.64 Alchemy plan resource line: ${unexpected[0]}`
-      );
+      return yield* fail("unsupported beta.64 Alchemy plan resource line");
     }
 
     const resources = yield* Effect.all(
@@ -118,6 +219,16 @@ export const projectAlchemyPlanText = (
     ) {
       return yield* fail(
         "a native teardown plan may only delete or noop the DocsWebsite resource"
+      );
+    }
+
+    const expectedSummary =
+      resources.length === 0
+        ? "Plan: no changes"
+        : `Plan: 1 to ${resources[0]?.action}`;
+    if (planSummaries[0] !== expectedSummary) {
+      return yield* fail(
+        "beta.64 Alchemy plan summary does not match its native resource action"
       );
     }
 

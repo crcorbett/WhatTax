@@ -181,6 +181,13 @@ The reconciler is governed by `docs-workflow-receipt-reconciliation` in the
 deployment control register; it adds no provider mutation or credential
 authority and does not create another deployment automation entry.
 
+The central plan parser is pinned to Alchemy `2.0.0-beta.64` and exact upstream
+commit `31edd3c4b2f0f3310fad07f5423aee20cf72be8d`. Its five real sanitised
+fixtures retain source run/artefact identities and raw/final digests for
+create, update, no-op, delete and already-absent destroy. This is local parser
+proof. It neither advances the automation register nor proves current
+Cloudflare state.
+
 The separate `docs-workflow-cache-boundary` control governs acceleration in all
 four workflows. The approved `TURBO_TOKEN` grants access only to the TaxKit
 Vercel Remote Cache; it does not extend Cloudflare, deployment, release or
