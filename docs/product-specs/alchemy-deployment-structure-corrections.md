@@ -1,6 +1,6 @@
 ---
 document_type: product-spec
-lifecycle: active
+lifecycle: implemented
 authority: supporting
 owner: taxkit-product-owner
 last_reviewed: 2026-08-24
@@ -14,13 +14,23 @@ tombstone: false
 ## Status and admission
 
 Cooper accepted this whole SPEC, all four tasks and all eight finding
-dispositions on 2026-08-24. The canonical
-[active execution plan](../exec-plans/active/alchemy-deployment-structure-corrections.md)
-now admits repository implementation, checks, commits, hosted Quality, pull
-request delivery and merge after the accepted checks pass.
+dispositions on 2026-08-24. All four tasks are implemented. The
+[completed execution plan](../exec-plans/completed/alchemy-deployment-structure-corrections.md)
+records the ordered slices and [pull request #71](https://github.com/crcorbett/taxkit/pull/71)
+merged the verified candidate as
+`28ed00f884e74460c5b5efc3314f67c6457cf558` after hosted Quality run
+`32685832709` passed. Post-merge Quality run `32686064167` and
+receipt-reconciliation run `32686129314` passed on that exact merge.
 
-The accepted provider boundary permits only the existing TaxKit docs Preview
+The accepted provider boundary permitted only the existing TaxKit docs Preview
 plan/bootstrap/state and provider readback needed for real beta.64 evidence.
+The implementation used existing retained GitHub artefacts and did not manually
+dispatch a provider workflow. Merging pull request #71 automatically ran the
+existing Preview teardown workflow for `pr-71`. Its mutation-capable bootstrap
+completed, two destroy dry-runs agreed on `Plan: no changes`, and provider/state
+readback confirmed that the stage and Worker were already absent, so the actual
+destroy was skipped. The bootstrap receipt cannot establish which of its
+allowed credential-refresh, secret-read or state-store effects occurred.
 Production deploy or rollback, DNS or custom-domain change, package
 publication, credential creation or rotation, broad Cloudflare cleanup and
 unrelated provider mutation remain outside authority. Every permitted provider
@@ -248,7 +258,7 @@ Production plan, deploy and rollback
 
 | Invariant | Application |
 | --- | --- |
-| `HC-OUTCOME-001` | The product owner accepts the whole SPEC; the later active plan will integrate all four slices and their closeout. |
+| `HC-OUTCOME-001` | The product owner accepted the whole SPEC; the completed plan integrates all four slices and their closeout. |
 | `HC-CTX-001`, `HC-CTX-002`, `HC-DOC-001` | Code owns runtime meaning, architecture owns design, the runbook owns the repeatable procedure, the task ledger owns pending work, receipts own observations, and dated evidence owns history. The live runbook links to history instead of copying it. |
 | `HC-REPO-001`, `HC-FEEDBACK-001` | Repeated workflow evidence becomes typed code and tests at the earliest owner; retired shell and retired live procedure text are removed from the current route. |
 | `HC-BOUNDARY-001` | Workflow JSON, environment input, provider output and receipt output decode or encode once through owning Schemas. |
@@ -443,9 +453,9 @@ concurrent manual mutation a supported operation. Evidence that manual mutation
 is frequent does not by itself justify a lease; the owner, failure model and
 recovery contract must also be accepted.
 
-## Acceptance criteria
+## Admission acceptance criteria
 
-This SPEC is review-ready when:
+This SPEC was admitted when:
 
 1. all five findings and all three recommendations map to stable requirements
    and executable tasks;
@@ -462,10 +472,13 @@ This SPEC is review-ready when:
 
 ## Explicit non-claims
 
-- This document does not prove that implementation exists.
-- It does not prove that GitHub workflow cancellation or secret scope has
-  changed.
-- It does not prove any Cloudflare state, deployment, rollback or hosted result.
-- It does not authorise access to credentials or providers.
-- It does not prove package publication, DNS or public availability.
-- It does not turn historical `DocsBuild` observations into current resources.
+- Local and hosted Quality prove the merged repository controls, not current
+  Cloudflare state or public behaviour.
+- Automatic post-merge Preview teardown ran mutation-capable bootstrap, two
+  no-change destroy plans and provider/state readback; it skipped the actual
+  stage destroy because `pr-71` was already absent.
+- The bootstrap receipt does not establish whether credential refresh,
+  edge-preview secret read or state-store creation or upgrade occurred.
+- No Production, DNS, custom-domain, credential, package-publication or public
+  availability claim follows from this SPEC.
+- Historical `DocsBuild` observations do not become current resources.

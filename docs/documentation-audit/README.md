@@ -3,7 +3,7 @@ document_type: evidence-index
 lifecycle: evidence
 authority: supporting
 owner: taxkit-documentation-owner
-last_reviewed: 2026-08-20
+last_reviewed: 2026-08-24
 review_trigger: documentation-audit receipt, evidence class, corpus inventory, or decision-record change
 ---
 
@@ -56,6 +56,27 @@ Alchemy `Website.Vite` resource and removes the ephemeral GitHub orphan query
 and its child-process boundary. Exact local source, built Worker, browser,
 screenshot and repository proof is retained; no provider plan, deployment,
 Cloudflare state or public availability is established.
+
+Accepted Alchemy deployment structure correction evidence:
+
+- [`alchemy-deployment-structure/accepted-findings.json`](alchemy-deployment-structure/accepted-findings.json)
+- [`alchemy-deployment-structure/ADS-001-validation.json`](alchemy-deployment-structure/ADS-001-validation.json)
+- [`alchemy-deployment-structure/ADS-002-validation.json`](alchemy-deployment-structure/ADS-002-validation.json)
+- [`alchemy-deployment-structure/ADS-003-validation.json`](alchemy-deployment-structure/ADS-003-validation.json)
+- [`alchemy-deployment-structure/ADS-004-validation.json`](alchemy-deployment-structure/ADS-004-validation.json)
+- [`alchemy-deployment-structure/closeout-validation.json`](alchemy-deployment-structure/closeout-validation.json)
+
+The accepted register closes all eight findings and links each one to its exact
+owners, checks and bounded receipt. The closeout records local and hosted
+repository proof plus automatic post-merge Preview teardown run `32686064320`.
+That run completed mutation-capable beta.64 bootstrap, read provider/state
+inventory three times, produced two equal no-change destroy plans, and
+confirmed `pr-71` was already absent, so it skipped actual destroy. Bootstrap
+command completion does not prove which allowed credential-refresh,
+edge-preview secret-read or state-store effects occurred. Post-merge Quality
+run `32686064167` and receipt-reconciliation run `32686129314` passed on the
+exact implementation merge. No Production, DNS, custom-domain,
+credential-creation, package-publication or public-site claim follows.
 
 Accepted strict apps and IaC audit and implementation evidence:
 
