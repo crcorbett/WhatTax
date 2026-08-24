@@ -395,6 +395,9 @@ jobs:
 
       - name: Run hosted Production HTTP/browser/screenshot proof
         if: inputs.operation == 'deploy' || inputs.operation == 'rollback'
+        env:
+          TAXKIT_DOCS_HOSTED_PROPAGATION_ATTEMPTS: "6"
+          TAXKIT_DOCS_HOSTED_PROPAGATION_DELAY_MS: "2000"
         run: |
           set -euo pipefail
           mkdir -p "$TAXKIT_DOCS_EVIDENCE_DIRECTORY"

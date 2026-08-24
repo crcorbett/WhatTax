@@ -176,8 +176,16 @@ belong to `docs/runbooks/docs-deployment.md`; dated sanitized observations
 belong below `docs/evidence/deployments/`. The hosted harness requires the
 read-back URL, candidate, stage, environment, plan/config/lock/deployment-input
 digests, Worker/deployment/version identities, evidence directory and rollback
-identity. It writes candidate-qualified desktop/mobile PNGs and emits the
-behavioral observation used to build Schema-decoded receipts. The first dated
+identity. Effect Config and the owning Schemas decode those values plus the
+whole-number retry count and delay before Chromium starts. Preview must pair
+`pr-N` with the same positive PR number; Production and rollback must pair
+`prod` with no PR number. Missing, empty, partial-number, unsafe-path and
+secret-bearing URL input fails with a value-free tagged error. Chromium is one
+focused host adapter acquired and closed through an Effect Scope, including on
+failure or interruption. Provider-free boundary tests prove those local input
+and cleanup rules only; they do not prove a hosted deployment. The harness
+writes candidate-qualified desktop/mobile PNGs and emits the behavioural
+observation used to build Schema-decoded receipts. The first dated
 Preview observation was torn down but did not meet the final evidence contract,
 so it remains disconfirming history. Fresh candidate `d9cb894…` passed the
 corrected hosted, screenshot and pre-mutation contracts, independent

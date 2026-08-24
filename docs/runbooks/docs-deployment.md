@@ -498,7 +498,9 @@ desktop and one mobile screenshot plus manifest. Screenshots supplement every
 other oracle.
 
 After independent Cloudflare and Alchemy-state readback supplies the exact
-values, the verified hosted proof invocation is:
+values, set `TAXKIT_DOCS_PREVIEW_PR_NUMBER` to the positive read-back PR number
+for Preview. Unset it for Production and rollback. The verified hosted proof
+invocation is:
 
 ```sh
 TAXKIT_DOCS_HOSTED_URL="${READ_BACK_WORKERS_DEV_URL}" \
@@ -517,12 +519,17 @@ TAXKIT_DOCS_DEPLOYMENT_INPUT_SHA256="${ACCEPTED_DEPLOYMENT_INPUT_SHA256}" \
 TAXKIT_DOCS_LOCKFILE_SHA256="${ACCEPTED_LOCKFILE_SHA256}" \
 TAXKIT_DOCS_EVIDENCE_DIRECTORY="${DATED_EVIDENCE_DIRECTORY}" \
 TAXKIT_DOCS_ROLLBACK_RECOVERY_IDENTITY="${ROLLBACK_RECOVERY_IDENTITY}" \
+TAXKIT_DOCS_HOSTED_PROPAGATION_ATTEMPTS=6 \
+TAXKIT_DOCS_HOSTED_PROPAGATION_DELAY_MS=2000 \
 bun run --filter=docs test:cloudflare-hosted
 ```
 
 Do not derive these inputs from an accepted plan or Alchemy output alone.
 Decode the current Cloudflare deployment/settings and Alchemy state output,
-require agreement, then retain only the sanitized receipt.
+require agreement, then retain only the sanitized receipt. The command decodes
+all inputs before Chromium starts and closes Chromium on success, failure or
+interruption. Do not loosen the retry limits or turn a local boundary test into
+a hosted claim.
 
 ### Preview destroy
 

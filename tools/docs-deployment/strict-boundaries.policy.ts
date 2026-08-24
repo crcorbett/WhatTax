@@ -1,4 +1,6 @@
 const strictAppBoundaryPaths = [
+  "apps/docs/scripts/cloudflare-hosted-proof.boundary.ts",
+  "apps/docs/scripts/test-cloudflare-hosted.tsx",
   "apps/docs/src/lib/runtime-factory.server.ts",
   "apps/docs/src/lib/runtime.server.ts",
   "apps/docs/src/server.ts",
@@ -21,6 +23,7 @@ export interface StrictAppBoundaryFinding {
   readonly invariant:
     | "credential-boundary"
     | "host-ingress"
+    | "hosted-proof-boundary"
     | "raw-concurrency"
     | "runtime-owner"
     | "runtime-probe"
@@ -30,6 +33,10 @@ export interface StrictAppBoundaryFinding {
 
 const workflowEvidenceRuntimePath =
   "tools/docs-deployment/workflow-evidence.runtime.ts" as const;
+const hostedProofBoundaryPath =
+  "apps/docs/scripts/cloudflare-hosted-proof.boundary.ts" as const;
+const hostedProofHostPath =
+  "apps/docs/scripts/test-cloudflare-hosted.tsx" as const;
 const workflowRuntimePaths = strictAppBoundaryPaths.filter(
   (path) => path.includes("workflow-") && path !== workflowEvidenceRuntimePath
 );
@@ -67,7 +74,11 @@ const inspectGenericBoundaries = (
 
   for (const path of strictAppBoundaryPaths) {
     const source = sources[path];
-    if (includesAny(source, hostIngressPatterns)) {
+    const applicableHostIngressPatterns =
+      path === hostedProofHostPath
+        ? hostIngressPatterns.filter((pattern) => !pattern.includes("node:fs"))
+        : hostIngressPatterns;
+    if (includesAny(source, applicableHostIngressPatterns)) {
       findings.push(finding("host-ingress", path));
     }
     if (includesAny(source, runtimeExecutionPatterns)) {
@@ -78,6 +89,31 @@ const inspectGenericBoundaries = (
     }
   }
   return findings;
+};
+
+const inspectHostedProofBoundary = (
+  sources: StrictAppBoundarySources
+): readonly StrictAppBoundaryFinding[] => {
+  const boundary = sources[hostedProofBoundaryPath];
+  const host = sources[hostedProofHostPath];
+  const validBoundary = includesEvery(boundary, [
+    "Config.schema(",
+    "Effect.acquireRelease(",
+    "Effect.tryPromise({",
+    "HostedProofConfigurationError",
+    "HostedProofExecutionError",
+    "HostedProofEvidenceError",
+  ]);
+  const validHost =
+    includesEvery(host, [
+      "runCloudflareHostedProof(",
+      "chromium.launch(",
+      "BunRuntime.runMain(program)",
+    ]) && !includesAny(host, ["process.env", "Number.parseInt("]);
+
+  return validBoundary && validHost
+    ? []
+    : [finding("hosted-proof-boundary", hostedProofBoundaryPath)];
 };
 
 const inspectWorkflowBoundaries = (
@@ -166,6 +202,7 @@ export const inspectStrictAppBoundaries = (
 ): readonly StrictAppBoundaryFinding[] => [
   ...inspectGenericBoundaries(sources),
   ...inspectWorkflowBoundaries(sources),
+  ...inspectHostedProofBoundary(sources),
   ...inspectCredentialBoundary(sources),
   ...inspectDocsRuntimeBoundary(sources),
 ];

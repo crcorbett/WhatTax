@@ -53,9 +53,12 @@ unrelated provider mutation remain outside authority.
    permissions, authority, provider execution and sequencing. The bounded
    proof is
    [`ADS-002-validation.json`](../../documentation-audit/alchemy-deployment-structure/ADS-002-validation.json).
-3. **ADS-003 — in progress:** decode hosted-proof input once with Effect Config and
-   Schema, use closed safe errors and scope the Playwright browser lifetime.
-4. **ADS-004 — pending:** retain provenance-bound real beta.64 plan fixtures,
+3. **ADS-003 — complete:** hosted-proof input is decoded once with Effect
+   Config and owning Schemas before browser acquisition; safe tagged errors and
+   a scoped Playwright adapter close the browser on success, failure and
+   interruption. The bounded proof is
+   [`ADS-003-validation.json`](../../documentation-audit/alchemy-deployment-structure/ADS-003-validation.json).
+4. **ADS-004 — in progress:** retain provenance-bound real beta.64 plan fixtures,
    restore one current `DocsWebsite` runbook and reconcile the eight findings.
 
 Each slice updates its implementation, focused tests, owning documentation,

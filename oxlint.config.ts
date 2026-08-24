@@ -15,6 +15,7 @@ const decodingBoundaryFiles = [
   "apps/docs/src/lib/docs/route-boundary.ts",
   "apps/docs/src/lib/docs/route-boundary.test.js",
   "apps/docs/scripts/test-cloudflare-built.tsx",
+  "apps/docs/scripts/cloudflare-hosted-proof.boundary.ts",
   "apps/docs/src/lib/build/cloudflare-stack.test.ts",
   "apps/docs/src/lib/build/cloudflare-stack.ts",
   "apps/docs/src/lib/build/docs-build-target.ts",
@@ -156,6 +157,7 @@ const schemaEncoderEgressFiles = [
   "apps/docs/src/lib/docs/route-boundary.browser.test.tsx",
   "apps/docs/src/lib/docs/route-boundary.test.js",
   "apps/docs/src/lib/docs/loaders.server.ts",
+  "apps/docs/scripts/cloudflare-hosted-proof.boundary.ts",
   "packages/scripts/src/release-readiness/evidence.boundary.ts",
   "tools/oxlint/fixtures/effect-accepted.ts",
   "tools/documentation/check.runtime.ts",
@@ -310,6 +312,7 @@ const bunAdapterFiles = [
 const bunRuntimeEntrypointFiles = [
   "apps/api/scripts/smoke-public-routes.runtime.ts",
   "apps/api/src/index.ts",
+  "apps/docs/scripts/test-cloudflare-hosted.tsx",
   "packages/docs-content/src/validate.runtime.ts",
   "packages/scripts/src/release-readiness/present.runtime.ts",
   "packages/scripts/src/release-readiness/release-readiness.runtime.ts",

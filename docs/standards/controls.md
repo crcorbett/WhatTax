@@ -137,6 +137,14 @@ dated observation until its outer receipt is promoted and admitted by the
 positive external-state path. Report-only scheduling remains reviewer-gated,
 and the 1,000-row pull-request bound fails closed at incomplete inventory.
 
+The hosted checker has a separate strict application boundary. Effect Config
+and owning Schemas reject missing, empty, malformed, partial-number,
+out-of-range, unsafe-path and mismatched stage/PR inputs before the Playwright
+host is acquired. Effect Scope closes that host on success, failure and
+interruption. The workflow owns the bounded retry count and delay. Local
+boundary tests prove no browser acquisition for invalid input and deterministic
+cleanup; they establish no Cloudflare deployment or hosted behaviour.
+
 ### 2026-08-10 current main-sourced Preview promotion
 
 The merged default-branch workflow at `bc2ac82f48cce67a6ee5b1b6caf9e8903bf9c182`

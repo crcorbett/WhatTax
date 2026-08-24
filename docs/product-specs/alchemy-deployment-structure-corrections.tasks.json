@@ -251,7 +251,7 @@
     {
       "id": "ADS-003",
       "invariantIds": ["HC-BOUNDARY-001", "HC-LIFETIME-001", "HC-PROOF-001"],
-      "status": "pending",
+      "status": "completed",
       "title": "Make hosted proof a strict Effect boundary",
       "type": "runtime-proof-boundary",
       "dependsOn": [],

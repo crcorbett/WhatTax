@@ -265,6 +265,13 @@ Schema-decoded receipt; screenshot bytes are copied into the artifact route and
 their digests are recomputed. Production consumes a successful,
 Schema-decoded Preview workflow receipt, exact workflow path and deterministic
 `pr-N` binding rather than trusting caller-supplied source or plan fields.
+The hosted command itself reads every URL, stage, digest, identity, output path,
+PR number and bounded retry value through Effect Config and owning Schemas
+before Chromium starts. One Playwright host adapter is wrapped by
+`Effect.tryPromise`; Effect Scope and `acquireRelease` close Chromium after
+success, expected failure or interruption. Its focused local tests establish
+only input rejection and resource cleanup, not GitHub, provider or public
+behaviour.
 The mutation jobs Schema-decode the initial plan, equal replan and teardown
 projection, including the operation (`preview-plan`, `preview-equal-replan`,
 `production-plan`, `production-equal-replan` or `preview-destroy`), before

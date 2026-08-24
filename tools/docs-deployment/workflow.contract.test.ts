@@ -254,6 +254,10 @@ describe("docs deployment workflow admission", () => {
       expect(source).toContain(
         'bun apps/docs/scripts/test-cloudflare-hosted.tsx > "$RUNNER_TEMP/docs-deployment/hosted-proof.raw.json"'
       );
+      expect(source).toContain('TAXKIT_DOCS_HOSTED_PROPAGATION_ATTEMPTS: "6"');
+      expect(source).toContain(
+        'TAXKIT_DOCS_HOSTED_PROPAGATION_DELAY_MS: "2000"'
+      );
       expect(source).toContain(
         'previousVersionId:(if .previousVersionId == "" then null else .previousVersionId end)'
       );
