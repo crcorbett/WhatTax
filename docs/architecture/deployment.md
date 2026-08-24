@@ -3,7 +3,7 @@ document_type: architecture
 lifecycle: current
 authority: canonical
 owner: taxkit-architecture-owner
-last_reviewed: 2026-08-21
+last_reviewed: 2026-08-24
 review_trigger: deployment target, runtime adapter, provider resource, state, domain, or rollback change
 ---
 
@@ -119,11 +119,20 @@ Ephemeral GitHub runners do not retain Alchemy's derived
 `cloudflare-state-store` credential after a plan or apply. The three mutation
 workflows therefore run the supported `alchemy cloudflare bootstrap` operation
 with `CI=0` immediately before planning or teardown. A preceding supported
-`alchemy login` with `CI=1` writes only the `method: "env"` profile selector;
-bootstrap then refreshes only the account-matched state-store cache for that
-runner, and the inventory command reads the cache under `CI=1`. This does not
-grant the report-only workflow mutation authority and does not copy the local
-OAuth profile into CI.
+`alchemy login` with `CI=1` writes only the `method: "env"` profile selector.
+Bootstrap is a mutation-capable control-plane operation: beta.64 may refresh
+credentials, use a short-lived edge-preview Worker to read the secret, and
+create or upgrade the state-store Worker before caching the account-matched
+credential on that runner. The inventory command reads the resulting cache
+under `CI=1`. This authority does not extend to the report-only workflow and no
+local OAuth profile is copied into CI.
+
+After bootstrap and plan complete, the closed `workflow-evidence` Effect
+command writes a sanitised bootstrap receipt. It binds the exact candidate,
+stage, workflow run, Alchemy `2.0.0-beta.64` and matching upstream source
+commit to those three allowed effects. It records state-store facts before and
+after as `not-observed`; successful bootstrap command completion is not a
+claim that no provider mutation occurred or that provider state was read back.
 
 The former scheduled GitHub/open-PR orphan classifier and nested subprocess
 boundary are retired. They did not provide a contributor-neutral lifecycle
@@ -138,6 +147,16 @@ source, exact `pr-N` decoding, the non-cancellable stage lock, equal plans and
 provider/state readback enforce the target. Production keeps its separate
 reviewer-protected environment. A GitHub environment controls credential
 custody; Alchemy stage identity controls which infrastructure can change.
+
+Preview and Production place `CLOUDFLARE_API_TOKEN` only on their named
+bootstrap, plan and replan/apply steps. Checkout, installation, provider-free
+builds, repository checks, hosted proof and artifact upload cannot read it.
+Production plan, deploy and rollback use the same fixed `prod` GitHub
+concurrency group with cancellation disabled. Preview and teardown keep their
+shared exact-`pr-N` non-cancellable group. These GitHub locks do not cover a
+manual Alchemy CLI process. Normal manual mutation must stop while the matching
+workflow is queued or running; break-glass recovery needs one separately
+authorised sole writer and state/provider readback before any retry.
 
 The accepted Preview requalification used candidate
 `d9cb8945529fb72158e59ca0daf02a98e1e4de1a` at deterministic stage `pr-1`.
@@ -246,6 +265,13 @@ Schema-decoded receipt; screenshot bytes are copied into the artifact route and
 their digests are recomputed. Production consumes a successful,
 Schema-decoded Preview workflow receipt, exact workflow path and deterministic
 `pr-N` binding rather than trusting caller-supplied source or plan fields.
+The hosted command itself reads every URL, stage, digest, identity, output path,
+PR number and bounded retry value through Effect Config and owning Schemas
+before Chromium starts. One Playwright host adapter is wrapped by
+`Effect.tryPromise`; Effect Scope and `acquireRelease` close Chromium after
+success, expected failure or interruption. Its focused local tests establish
+only input rejection and resource cleanup, not GitHub, provider or public
+behaviour.
 The mutation jobs Schema-decode the initial plan, equal replan and teardown
 projection, including the operation (`preview-plan`, `preview-equal-replan`,
 `production-plan`, `production-equal-replan` or `preview-destroy`), before
@@ -257,6 +283,23 @@ the exact deployment candidate input separately, and that input must match the
 outer receipt's candidate: a default-branch run may build a reviewed PR head,
 so these two identities are intentionally distinct. The hosted receipt must
 match stage semantics with exactly one desktop and one mobile screenshot.
+The current workflow adapter keeps shared evidence meanings in one closed-mode
+Effect command. It calculates tracked candidate identities, calls the existing
+beta.64 plan projection owner, decodes the existing state/provider inventory
+and bounded Wrangler deployment JSON, and Schema-encodes plan, bootstrap,
+provider and GitHub output files. The command has no Alchemy, Wrangler or
+GitHub execution capability. YAML still owns environment protection,
+permissions, the exact non-cancellable lock, operation choice and provider
+command order.
+The plan parser and its proof move together. Five real sanitised plan captures
+under `tools/docs-deployment/fixtures/alchemy-beta.64/` bind create, update,
+no-op, delete and already-absent destroy to Alchemy `2.0.0-beta.64` and exact
+upstream commit `31edd3c4b2f0f3310fad07f5423aee20cf72be8d`. Their manifest records the
+GitHub run and artefact route, redaction rule and raw/final digests. Tests
+strictly decode the manifest, recompute fixture digests and reject version
+drift, unexpected resources, unsupported actions and malformed lines. These
+retained captures prove parser compatibility only, not current provider or
+hosted state.
 Report-only dispatch is
 forced to the reviewed default branch before installing dependencies or
 materialising the state bearer, while Preview rejects non-numeric PR identity

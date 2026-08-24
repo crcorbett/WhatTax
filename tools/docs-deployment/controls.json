@@ -15,7 +15,7 @@
     "fixture": "tools/docs-deployment/automation.policy.test.ts",
     "id": "docs-workflow-mutation-lock",
     "owner": "taxkit-docs-deployment-automation-owner",
-    "preventedFailure": "A cancellable or weakly keyed mutation bypasses equal replan, environment-scoped credential admission or provider/state readback.",
+    "preventedFailure": "A cancellable plan or mutation, or a weakly keyed operation, bypasses equal replan, environment-scoped credential admission or provider/state readback.",
     "recovery": "Restore the non-cancellable stage lock and equal canonical plan contract.",
     "retirementCondition": "A stronger provider-aware distributed lock replaces the repository orchestration lock.",
     "reviewTrigger": "Concurrency, plan, environment credential admission, Alchemy state or provider readback change.",

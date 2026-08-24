@@ -14,6 +14,14 @@ tombstone: false
 Live implementation plans belong here while work is in progress. Maintainer
 lifecycle is owned by [`../../README.md`](../../README.md).
 
+The accepted
+[Alchemy deployment structure corrections](../../product-specs/alchemy-deployment-structure-corrections.md)
+SPEC is active through its
+[canonical execution plan](./alchemy-deployment-structure-corrections.md).
+It preserves the native one-resource graph while correcting workflow locking,
+credential scope, typed evidence, hosted-proof input, beta.64 parser proof and
+the current deployment procedure.
+
 The implemented [Native Alchemy docs hard cutover](../../product-specs/native-alchemy-hard-cutover.md)
 SPEC and [`native-alchemy-hard-cutover.tasks.json`](../../product-specs/native-alchemy-hard-cutover.tasks.json)
 were implemented and closed as the successor to the completed native Alchemy

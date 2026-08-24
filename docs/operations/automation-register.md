@@ -3,7 +3,7 @@ document_type: automation-register
 lifecycle: current
 authority: canonical
 owner: taxkit-ci-release-maintainer
-last_reviewed: 2026-08-21
+last_reviewed: 2026-08-24
 review_trigger: workflow, signal, authority, proof, stopping, escalation, rollback, or retirement change
 ---
 
@@ -48,17 +48,38 @@ classes: trusted Preview delivery, fixed Production delivery and exact-stage
 Preview teardown. Preview delivery and teardown share the unreviewed
 `taxkit-docs-preview` credential environment; Production retains its separate
 reviewer-protected environment. The records require non-cancellable stage
-locks, accepted/equal replans, narrow credential identities, provider/state
-readback, bounded receipts and fail-closed recovery. Teardown executes
-reviewed default-branch code rather than pull-request-head code.
+locks for plans as well as mutations, accepted/equal replans, narrow credential
+identities, provider/state readback, bounded receipts and fail-closed recovery.
+Teardown executes reviewed default-branch code rather than pull-request-head
+code.
 
 Because GitHub runners are ephemeral, each mutation workflow refreshes the
 account-matched Alchemy `cloudflare-state-store` cache with the installed
 `alchemy cloudflare bootstrap` command before it reads provider/state
 postconditions. The preceding `alchemy login` command persists only the
 environment-method selector; the token remains a GitHub environment secret.
-That preparation is bounded to the named state-store control plane; no local
-OAuth profile is copied into CI.
+That bootstrap is mutation-capable: beta.64 may refresh credentials, read a
+short-lived edge-preview secret, and create or upgrade the state-store Worker.
+The sanitised workflow receipt records those allowed effects and explicitly
+records its before/after provider facts as not observed. No local OAuth
+profile, credential or temporary secret-bearing URL is copied into retained
+evidence.
+
+The workflow contract also checks credential placement. Preview and Production
+have no job-wide Cloudflare token; only their exact bootstrap, plan and
+replan/apply steps receive it. Checkout, dependency and browser setup,
+provider-free builds, validators, hosted proof and artifact actions remain
+token-free. GitHub supplies the stage lock only to workflow runs. It does not
+lock manual CLI mutation, which is unsupported while a matching run is queued
+or active. An interrupted provider step remains uncertain until state/provider
+readback records the result.
+
+One closed-mode Effect command owns candidate/config/lock identities, native
+plan projection, state/provider and Wrangler JSON decoding, and sanitised
+plan/provider/GitHub output encoding for Preview and Production. It cannot
+select or run a provider executable. Workflow YAML still owns the protected
+environment, authority inputs, lock, Alchemy and Wrangler calls and their
+fail-closed order.
 
 The current native `Cloudflare.Website.Vite` graph has one `DocsWebsite`
 resource. Preview, Production and teardown retain accepted observations. Plan
@@ -159,6 +180,13 @@ accepted Preview provider receipt.
 The reconciler is governed by `docs-workflow-receipt-reconciliation` in the
 deployment control register; it adds no provider mutation or credential
 authority and does not create another deployment automation entry.
+
+The central plan parser is pinned to Alchemy `2.0.0-beta.64` and exact upstream
+commit `31edd3c4b2f0f3310fad07f5423aee20cf72be8d`. Its five real sanitised
+fixtures retain source run/artefact identities and raw/final digests for
+create, update, no-op, delete and already-absent destroy. This is local parser
+proof. It neither advances the automation register nor proves current
+Cloudflare state.
 
 The separate `docs-workflow-cache-boundary` control governs acceleration in all
 four workflows. The approved `TURBO_TOKEN` grants access only to the TaxKit

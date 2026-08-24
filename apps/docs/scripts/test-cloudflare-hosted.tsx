@@ -3,95 +3,20 @@ import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 
+import * as BunRuntime from "@effect/platform-bun/BunRuntime";
+import * as BunServices from "@effect/platform-bun/BunServices";
+import { Console, Effect, Match } from "effect";
 import { chromium } from "playwright";
-import type { Page, Request } from "playwright";
+import type { Browser, Page, Request } from "playwright";
 
-const origin = process.env.TAXKIT_DOCS_HOSTED_URL;
-const candidateCommit = process.env.TAXKIT_DOCS_CANDIDATE_COMMIT;
-const deploymentId = process.env.TAXKIT_DOCS_DEPLOYMENT_ID;
-const versionId = process.env.TAXKIT_DOCS_VERSION_ID;
-const workerName = process.env.TAXKIT_DOCS_WORKER_NAME;
-const stage = process.env.TAXKIT_DOCS_STAGE;
-const acceptedPlanSha256 = process.env.TAXKIT_DOCS_PLAN_SHA256;
-const configSha256 = process.env.TAXKIT_DOCS_CONFIG_SHA256;
-const deploymentInputSha256 = process.env.TAXKIT_DOCS_DEPLOYMENT_INPUT_SHA256;
-const lockfileSha256 = process.env.TAXKIT_DOCS_LOCKFILE_SHA256;
-const accountId = process.env.TAXKIT_DOCS_ACCOUNT_ID;
-const stateStoreId = process.env.TAXKIT_DOCS_STATE_STORE_ID;
-const previousVersionId = process.env.TAXKIT_DOCS_PREVIOUS_VERSION_ID ?? null;
-const previewPrNumberValue = process.env.TAXKIT_DOCS_PREVIEW_PR_NUMBER;
-const previewPrNumber =
-  previewPrNumberValue === undefined
-    ? null
-    : Number.parseInt(previewPrNumberValue, 10);
-const rollbackRecoveryIdentity =
-  process.env.TAXKIT_DOCS_ROLLBACK_RECOVERY_IDENTITY;
-const environment = process.env.TAXKIT_DOCS_ENVIRONMENT;
-const evidenceDirectory = process.env.TAXKIT_DOCS_EVIDENCE_DIRECTORY;
-
-assert.ok(
-  origin !== undefined && /^https:\/\/[^/]+\.workers\.dev$/u.test(origin)
-);
-assert.match(candidateCommit ?? "", /^[a-f0-9]{40}$/u);
-assert.match(accountId ?? "", /^[a-f0-9]{32}$/u);
-assert.ok(stateStoreId !== undefined && stateStoreId.length > 0);
-assert.ok(deploymentId !== undefined && deploymentId.length > 0);
-assert.ok(versionId !== undefined && versionId.length > 0);
-assert.ok(workerName !== undefined && workerName.length > 0);
-assert.match(stage ?? "", /^(?:prod|pr-[1-9]\d*)$/u);
-for (const digest of [
-  acceptedPlanSha256,
-  configSha256,
-  deploymentInputSha256,
-  lockfileSha256,
-]) {
-  assert.match(digest ?? "", /^[a-f0-9]{64}$/u);
-}
-assert.ok(
-  rollbackRecoveryIdentity !== undefined && rollbackRecoveryIdentity.length > 0
-);
-assert.match(environment ?? "", /^(?:preview|production|rollback)$/u);
-assert.ok(
-  previewPrNumber === null ||
-    (Number.isInteger(previewPrNumber) && previewPrNumber > 0)
-);
-assert.match(
-  evidenceDirectory ?? "",
-  /^docs\/evidence\/deployments\/[A-Za-z0-9._/-]+$/u
-);
-assert.doesNotMatch(evidenceDirectory ?? "", /(?:^|\/)\.\.(?:\/|$)/u);
+import { runCloudflareHostedProof } from "./cloudflare-hosted-proof.boundary.js";
+import type { CloudflareHostedProofHost } from "./cloudflare-hosted-proof.boundary.js";
 
 const repositoryRoot = new URL("../../../", import.meta.url);
-const candidateAbbreviation = candidateCommit?.slice(0, 7);
-const desktopEvidencePath = `${evidenceDirectory}/${environment}-desktop-${candidateAbbreviation}.png`;
-const mobileEvidencePath = `${evidenceDirectory}/${environment}-mobile-${candidateAbbreviation}.png`;
-const desktopScreenshot = new URL(desktopEvidencePath, repositoryRoot);
-const mobileScreenshot = new URL(mobileEvidencePath, repositoryRoot);
 const knownPath = "/guides/calculate-australian-take-home-pay";
 const missingPath = "/__docs-evidence__/missing";
 const runtimeProofHeaders = {
   "x-taxkit-docs-runtime-proof": "construction-count",
-};
-const hostedPropagationAttempts = 6;
-const hostedPropagationDelayMs = 2000;
-
-const fetchHostedResponse = async (
-  input: string,
-  init: RequestInit | undefined,
-  expectedStatus: number
-) => {
-  let response = await fetch(input, init);
-  for (
-    let attempt = 1;
-    attempt < hostedPropagationAttempts &&
-    (response.status === 404 || response.status >= 500) &&
-    response.status !== expectedStatus;
-    attempt += 1
-  ) {
-    await Bun.sleep(hostedPropagationDelayMs);
-    response = await fetch(input, init);
-  }
-  return response;
 };
 
 const parseRgb = (value: string): readonly [number, number, number] => {
@@ -149,7 +74,12 @@ const waitForHydratedRouter = async (page: Page) => {
   });
 };
 
-const isExpectedServerFunctionAbort = (request: Request) => {
+const digest = async (url: URL) =>
+  createHash("sha256")
+    .update(await readFile(url))
+    .digest("hex");
+
+const isExpectedServerFunctionAbort = (request: Request, origin: string) => {
   const url = new URL(request.url());
 
   return (
@@ -160,235 +90,288 @@ const isExpectedServerFunctionAbort = (request: Request) => {
   );
 };
 
-const initialResponse = await fetchHostedResponse(
-  `${origin}${knownPath}`,
-  { headers: runtimeProofHeaders },
-  200
-);
-const initialHtml = await initialResponse.text();
-assert.equal(initialResponse.status, 200);
-assert.match(initialHtml, /Calculate Australian take-home pay/u);
-assert.equal(
-  initialResponse.headers.get("x-taxkit-docs-runtime-constructions"),
-  "1"
-);
-const firstIsolate = initialResponse.headers.get(
-  "x-taxkit-docs-runtime-isolate"
-);
-assert.ok(firstIsolate !== null && firstIsolate.length > 0);
+const playwrightHostedProofHost = {
+  close: (browser) => browser.close(),
+  launch: () => chromium.launch({ headless: true }),
+  run: async (config, browser) => {
+    const {
+      acceptedPlanSha256,
+      accountId,
+      candidateCommit,
+      configSha256,
+      deploymentId,
+      deploymentInputSha256,
+      environment,
+      evidenceDirectory,
+      hostedPropagationAttempts,
+      hostedPropagationDelayMs,
+      lockfileSha256,
+      origin,
+      previewPrNumber,
+      previousVersionId,
+      rollbackRecoveryIdentity,
+      stage,
+      stateStoreId,
+      versionId,
+      workerName,
+    } = config;
+    const candidateAbbreviation = candidateCommit.slice(0, 7);
+    const desktopEvidencePath = `${evidenceDirectory}/${environment}-desktop-${candidateAbbreviation}.png`;
+    const mobileEvidencePath = `${evidenceDirectory}/${environment}-mobile-${candidateAbbreviation}.png`;
+    const desktopScreenshot = new URL(desktopEvidencePath, repositoryRoot);
+    const mobileScreenshot = new URL(mobileEvidencePath, repositoryRoot);
+    const fetchHostedResponse = async (
+      input: string,
+      init: RequestInit | undefined,
+      expectedStatus: number
+    ) => {
+      let response = await fetch(input, init);
+      for (
+        let attempt = 1;
+        attempt < hostedPropagationAttempts &&
+        (response.status === 404 || response.status >= 500) &&
+        response.status !== expectedStatus;
+        attempt += 1
+      ) {
+        await Bun.sleep(hostedPropagationDelayMs);
+        response = await fetch(input, init);
+      }
+      return response;
+    };
 
-const assetPath = /(?:src|href)="(\/assets\/[^"]+\.(?:css|js))"/u.exec(
-  initialHtml
-)?.[1];
-assert.ok(assetPath !== undefined);
-const assetResponse = await fetchHostedResponse(
-  `${origin}${assetPath}`,
-  undefined,
-  200
-);
-const assetBody = await assetResponse.text();
-assert.equal(assetResponse.status, 200);
-assert.match(
-  assetResponse.headers.get("content-type") ?? "",
-  /css|javascript/u
-);
-assert.match(
-  assetResponse.headers.get("cache-control") ?? "",
-  /max-age=31536000/u
-);
-assert.match(assetResponse.headers.get("cache-control") ?? "", /immutable/u);
-assert.match(
-  assetResponse.headers.get("cache-control") ?? "",
-  /(?:^|,\s*)public(?:,|$)/u
-);
-assert.ok((assetResponse.headers.get("etag") ?? "").length > 0);
-assert.doesNotMatch(assetBody.slice(0, 100), /<!doctype html>/iu);
+    const initialResponse = await fetchHostedResponse(
+      `${origin}${knownPath}`,
+      { headers: runtimeProofHeaders },
+      200
+    );
+    const initialHtml = await initialResponse.text();
+    assert.equal(initialResponse.status, 200);
+    assert.match(initialHtml, /Calculate Australian take-home pay/u);
+    assert.equal(
+      initialResponse.headers.get("x-taxkit-docs-runtime-constructions"),
+      "1"
+    );
+    const firstIsolate = initialResponse.headers.get(
+      "x-taxkit-docs-runtime-isolate"
+    );
+    assert.ok(firstIsolate !== null && firstIsolate.length > 0);
 
-const missingResponse = await fetch(`${origin}${missingPath}`, {
-  headers: runtimeProofHeaders,
-});
-const missingHtml = await missingResponse.text();
-assert.equal(missingResponse.status, 404);
-assert.match(missingHtml, /Documentation page not found/u);
-assert.equal(
-  missingResponse.headers.get("x-taxkit-docs-runtime-constructions"),
-  "1"
-);
-const secondIsolate = missingResponse.headers.get(
-  "x-taxkit-docs-runtime-isolate"
-);
-assert.ok(secondIsolate !== null && secondIsolate.length > 0);
-assert.equal(firstIsolate, secondIsolate);
+    const assetPath = /(?:src|href)="(\/assets\/[^"]+\.(?:css|js))"/u.exec(
+      initialHtml
+    )?.[1];
+    assert.ok(assetPath !== undefined);
+    const assetResponse = await fetchHostedResponse(
+      `${origin}${assetPath}`,
+      undefined,
+      200
+    );
+    const assetBody = await assetResponse.text();
+    assert.equal(assetResponse.status, 200);
+    assert.match(
+      assetResponse.headers.get("content-type") ?? "",
+      /css|javascript/u
+    );
+    assert.match(
+      assetResponse.headers.get("cache-control") ?? "",
+      /max-age=31536000/u
+    );
+    assert.match(
+      assetResponse.headers.get("cache-control") ?? "",
+      /immutable/u
+    );
+    assert.match(
+      assetResponse.headers.get("cache-control") ?? "",
+      /(?:^|,\s*)public(?:,|$)/u
+    );
+    assert.ok((assetResponse.headers.get("etag") ?? "").length > 0);
+    assert.doesNotMatch(assetBody.slice(0, 100), /<!doctype html>/iu);
 
-const browser = await chromium.launch({ headless: true });
-const browserVersion = browser.version();
-const page = await browser.newPage({
-  viewport: { height: 1000, width: 1440 },
-});
-const diagnostics: string[] = [];
-let documentRequests = 0;
-const serverFunctionResponses: {
-  readonly method: string;
-  readonly status: number;
-  readonly url: string;
-}[] = [];
-
-page.on("console", (message) => {
-  if (message.type() === "error" || message.type() === "warning") {
-    diagnostics.push(`${message.type()}: ${message.text()}`);
-  }
-});
-page.on("pageerror", (error) =>
-  diagnostics.push(`pageerror: ${error.message}`)
-);
-page.on("requestfailed", (request) => {
-  if (isExpectedServerFunctionAbort(request)) {
-    return;
-  }
-
-  diagnostics.push(
-    `requestfailed: ${request.url()} ${request.failure()?.errorText ?? ""}`
-  );
-});
-page.on("request", (request) => {
-  if (request.resourceType() === "document") {
-    documentRequests += 1;
-  }
-});
-page.on("response", (response) => {
-  const request = response.request();
-  if (
-    (request.resourceType() === "fetch" || request.resourceType() === "xhr") &&
-    new URL(response.url()).pathname.startsWith("/_serverFn/")
-  ) {
-    serverFunctionResponses.push({
-      method: request.method(),
-      status: response.status(),
-      url: response.url(),
+    const missingResponse = await fetch(`${origin}${missingPath}`, {
+      headers: runtimeProofHeaders,
     });
-  }
-});
+    const missingHtml = await missingResponse.text();
+    assert.equal(missingResponse.status, 404);
+    assert.match(missingHtml, /Documentation page not found/u);
+    assert.equal(
+      missingResponse.headers.get("x-taxkit-docs-runtime-constructions"),
+      "1"
+    );
+    const secondIsolate = missingResponse.headers.get(
+      "x-taxkit-docs-runtime-isolate"
+    );
+    assert.ok(secondIsolate !== null && secondIsolate.length > 0);
+    assert.equal(firstIsolate, secondIsolate);
 
-await page.goto(`${origin}${knownPath}`, { waitUntil: "domcontentloaded" });
-await page
-  .getByRole("heading", { name: "Calculate Australian take-home pay" })
-  .waitFor();
-await waitForHydratedRouter(page);
-assert.equal(await page.getByRole("main").count(), 1);
-assert.equal(await page.getByRole("article").count(), 1);
-assert.equal(
-  await page.getByRole("navigation", { name: "Documentation" }).count(),
-  1
-);
-const contrastRatio = await assertComputedContrast(page);
-const navigationDocumentBaseline = documentRequests;
-const navigationServerFunctionBaseline = serverFunctionResponses.length;
-await page
-  .getByRole("navigation", { name: "Documentation" })
-  .getByRole("link", { exact: true, name: "Reference" })
-  .first()
-  .click();
-await page.getByRole("heading", { exact: true, name: "Reference" }).waitFor();
-assert.equal(documentRequests, navigationDocumentBaseline);
-assert.ok(serverFunctionResponses.length > navigationServerFunctionBaseline);
-assert.ok(
-  serverFunctionResponses
-    .slice(navigationServerFunctionBaseline)
-    .every(({ status }) => status === 200)
-);
+    const browserVersion = browser.version();
+    const page = await browser.newPage({
+      viewport: { height: 1000, width: 1440 },
+    });
+    const diagnostics: string[] = [];
+    let documentRequests = 0;
+    const serverFunctionResponses: {
+      readonly method: string;
+      readonly status: number;
+      readonly url: string;
+    }[] = [];
 
-const observedServerFunction =
-  serverFunctionResponses[navigationServerFunctionBaseline];
-assert.ok(observedServerFunction !== undefined);
-const malformedResponse = await page.request.fetch(observedServerFunction.url, {
-  data: "{",
-  headers: { "content-type": "application/json" },
-  method: "POST",
-});
-assert.ok(malformedResponse.status() >= 400);
-assert.ok(malformedResponse.status() < 500);
+    page.on("console", (message) => {
+      if (message.type() === "error" || message.type() === "warning") {
+        diagnostics.push(`${message.type()}: ${message.text()}`);
+      }
+    });
+    page.on("pageerror", (error) =>
+      diagnostics.push(`pageerror: ${error.message}`)
+    );
+    page.on("requestfailed", (request) => {
+      if (isExpectedServerFunctionAbort(request, origin)) {
+        return;
+      }
 
-await page.evaluate(async (path) => {
-  const router: unknown = Reflect.get(globalThis, "__TSR_ROUTER__");
-  const navigate =
-    typeof router === "object" && router !== null
-      ? Reflect.get(router, "navigate")
-      : undefined;
-  if (typeof navigate !== "function") {
-    throw new TypeError("The hydrated TanStack router was unavailable.");
-  }
-  await Reflect.apply(navigate, router, [{ to: path }]);
-}, missingPath);
-await page.getByTestId("route-not-found").waitFor();
-assert.equal(documentRequests, navigationDocumentBaseline);
+      diagnostics.push(
+        `requestfailed: ${request.url()} ${request.failure()?.errorText ?? ""}`
+      );
+    });
+    page.on("request", (request) => {
+      if (request.resourceType() === "document") {
+        documentRequests += 1;
+      }
+    });
+    page.on("response", (response) => {
+      const request = response.request();
+      if (
+        (request.resourceType() === "fetch" ||
+          request.resourceType() === "xhr") &&
+        new URL(response.url()).pathname.startsWith("/_serverFn/")
+      ) {
+        serverFunctionResponses.push({
+          method: request.method(),
+          status: response.status(),
+          url: response.url(),
+        });
+      }
+    });
 
-await page.goto(`${origin}/start`, { waitUntil: "domcontentloaded" });
-await waitForHydratedRouter(page);
-await page.keyboard.press("Tab");
-const skipLink = page.getByRole("link", { name: "Skip to documentation" });
-assert.equal(
-  await skipLink.evaluate((element) => element === document.activeElement),
-  true
-);
-await page.keyboard.press("Enter");
-assert.equal(
-  await page.evaluate(() => document.activeElement?.id === "docs-main"),
-  true
-);
+    await page.goto(`${origin}${knownPath}`, { waitUntil: "domcontentloaded" });
+    await page
+      .getByRole("heading", { name: "Calculate Australian take-home pay" })
+      .waitFor();
+    await waitForHydratedRouter(page);
+    assert.equal(await page.getByRole("main").count(), 1);
+    assert.equal(await page.getByRole("article").count(), 1);
+    assert.equal(
+      await page.getByRole("navigation", { name: "Documentation" }).count(),
+      1
+    );
+    const contrastRatio = await assertComputedContrast(page);
+    const navigationDocumentBaseline = documentRequests;
+    const navigationServerFunctionBaseline = serverFunctionResponses.length;
+    await page
+      .getByRole("navigation", { name: "Documentation" })
+      .getByRole("link", { exact: true, name: "Reference" })
+      .first()
+      .click();
+    await page
+      .getByRole("heading", { exact: true, name: "Reference" })
+      .waitFor();
+    assert.equal(documentRequests, navigationDocumentBaseline);
+    assert.ok(
+      serverFunctionResponses.length > navigationServerFunctionBaseline
+    );
+    assert.ok(
+      serverFunctionResponses
+        .slice(navigationServerFunctionBaseline)
+        .every(({ status }) => status === 200)
+    );
 
-await page.goto(`${origin}${knownPath}`, { waitUntil: "domcontentloaded" });
-await page
-  .getByRole("heading", { name: "Calculate Australian take-home pay" })
-  .waitFor();
-await waitForHydratedRouter(page);
-await page.screenshot({
-  fullPage: true,
-  path: fileURLToPath(desktopScreenshot),
-});
+    const observedServerFunction =
+      serverFunctionResponses[navigationServerFunctionBaseline];
+    assert.ok(observedServerFunction !== undefined);
+    const malformedResponse = await page.request.fetch(
+      observedServerFunction.url,
+      {
+        data: "{",
+        headers: { "content-type": "application/json" },
+        method: "POST",
+      }
+    );
+    assert.ok(malformedResponse.status() >= 400);
+    assert.ok(malformedResponse.status() < 500);
 
-const mobilePage = await browser.newPage({
-  deviceScaleFactor: 1,
-  viewport: { height: 844, width: 390 },
-});
-mobilePage.on("console", (message) => {
-  if (message.type() === "error" || message.type() === "warning") {
-    diagnostics.push(`mobile ${message.type()}: ${message.text()}`);
-  }
-});
-mobilePage.on("pageerror", (error) =>
-  diagnostics.push(`mobile pageerror: ${error.message}`)
-);
-mobilePage.on("requestfailed", (request) => {
-  if (isExpectedServerFunctionAbort(request)) {
-    return;
-  }
+    await page.evaluate(async (path) => {
+      const router: unknown = Reflect.get(globalThis, "__TSR_ROUTER__");
+      const navigate =
+        typeof router === "object" && router !== null
+          ? Reflect.get(router, "navigate")
+          : undefined;
+      if (typeof navigate !== "function") {
+        throw new TypeError("The hydrated TanStack router was unavailable.");
+      }
+      await Reflect.apply(navigate, router, [{ to: path }]);
+    }, missingPath);
+    await page.getByTestId("route-not-found").waitFor();
+    assert.equal(documentRequests, navigationDocumentBaseline);
 
-  diagnostics.push(
-    `mobile requestfailed: ${request.url()} ${request.failure()?.errorText ?? ""}`
-  );
-});
-await mobilePage.goto(`${origin}${knownPath}`, {
-  waitUntil: "domcontentloaded",
-});
-await waitForHydratedRouter(mobilePage);
-await mobilePage.getByRole("button", { name: "Open navigation" }).click();
-await mobilePage.getByRole("button", { name: "Close navigation" }).waitFor();
-await mobilePage.screenshot({
-  fullPage: true,
-  path: fileURLToPath(mobileScreenshot),
-});
+    await page.goto(`${origin}/start`, { waitUntil: "domcontentloaded" });
+    await waitForHydratedRouter(page);
+    await page.keyboard.press("Tab");
+    const skipLink = page.getByRole("link", { name: "Skip to documentation" });
+    assert.equal(
+      await skipLink.evaluate((element) => element === document.activeElement),
+      true
+    );
+    await page.keyboard.press("Enter");
+    assert.equal(
+      await page.evaluate(() => document.activeElement?.id === "docs-main"),
+      true
+    );
 
-assert.deepEqual(diagnostics, []);
-await browser.close();
+    await page.goto(`${origin}${knownPath}`, { waitUntil: "domcontentloaded" });
+    await page
+      .getByRole("heading", { name: "Calculate Australian take-home pay" })
+      .waitFor();
+    await waitForHydratedRouter(page);
+    await page.screenshot({
+      fullPage: true,
+      path: fileURLToPath(desktopScreenshot),
+    });
 
-const digest = async (url: URL) =>
-  createHash("sha256")
-    .update(await readFile(url))
-    .digest("hex");
+    const mobilePage = await browser.newPage({
+      deviceScaleFactor: 1,
+      viewport: { height: 844, width: 390 },
+    });
+    mobilePage.on("console", (message) => {
+      if (message.type() === "error" || message.type() === "warning") {
+        diagnostics.push(`mobile ${message.type()}: ${message.text()}`);
+      }
+    });
+    mobilePage.on("pageerror", (error) =>
+      diagnostics.push(`mobile pageerror: ${error.message}`)
+    );
+    mobilePage.on("requestfailed", (request) => {
+      if (isExpectedServerFunctionAbort(request, origin)) {
+        return;
+      }
 
-process.stdout.write(
-  `${JSON.stringify(
-    {
+      diagnostics.push(
+        `mobile requestfailed: ${request.url()} ${request.failure()?.errorText ?? ""}`
+      );
+    });
+    await mobilePage.goto(`${origin}${knownPath}`, {
+      waitUntil: "domcontentloaded",
+    });
+    await waitForHydratedRouter(mobilePage);
+    await mobilePage.getByRole("button", { name: "Open navigation" }).click();
+    await mobilePage
+      .getByRole("button", { name: "Close navigation" })
+      .waitFor();
+    await mobilePage.screenshot({
+      fullPage: true,
+      path: fileURLToPath(mobileScreenshot),
+    });
+
+    assert.deepEqual(diagnostics, []);
+
+    return {
       acceptedPlanSha256,
       accessibility: {
         contrastRatio,
@@ -449,8 +432,26 @@ process.stdout.write(
       url: origin,
       versionId,
       workerName,
-    },
-    null,
-    2
-  )}\n`
+    };
+  },
+} satisfies CloudflareHostedProofHost<Browser>;
+
+const program = runCloudflareHostedProof(playwrightHostedProofHost).pipe(
+  Effect.flatMap(Console.log),
+  Effect.tapErrorTag("HostedProofConfigurationError", (error) =>
+    Console.error(`FAIL [hosted-proof] config=${error.requirement}`)
+  ),
+  Effect.tapErrorTag("HostedProofExecutionError", (error) =>
+    Console.error(`FAIL [hosted-proof] execution=${error.operation}`)
+  ),
+  Effect.tapErrorTag("HostedProofEvidenceError", (error) =>
+    Console.error(`FAIL [hosted-proof] evidence=${error.operation}`)
+  ),
+  Effect.scoped,
+  Effect.provide(BunServices.layer)
+);
+
+Match.value(import.meta.main).pipe(
+  Match.when(true, () => BunRuntime.runMain(program)),
+  Match.orElse(() => false)
 );

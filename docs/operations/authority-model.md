@@ -3,7 +3,7 @@ document_type: authority-model
 lifecycle: current
 authority: canonical
 owner: taxkit-authority-model-owner
-last_reviewed: 2026-08-20
+last_reviewed: 2026-08-24
 review_trigger: identity, release, Git, registry, deployment, provider, credential, or recovery change
 ---
 
@@ -163,6 +163,28 @@ reviewed `main`. The unused environment was then removed and a non-creating
 repository environment-list readback proved its absence. Preview retained its
 two secret names and no reviewer; Production retained `crcorbett`. The run did
 not delete a live Worker because `pr-60` was already absent.
+
+### 2026-08-24 — Alchemy structure correction authority
+
+Cooper accepted `ADS-001` through `ADS-004` as one repository implementation
+goal. The repository authority includes coherent commits, hosted Quality, pull
+request delivery and merge after the accepted checks pass. Provider authority
+is narrower: it permits only the existing docs Preview plan/bootstrap/state and
+provider readback needed for real beta.64 evidence. Production deploy or
+rollback, DNS or custom-domain work, credential creation or rotation, broad
+Cloudflare cleanup, publication and unrelated provider mutation remain
+excluded.
+
+The Preview and Production workflow principals may expose
+`CLOUDFLARE_API_TOKEN` only to their exact bootstrap, plan and replan/apply
+steps. The fixed Production plan, deploy and rollback operations share one
+non-cancellable `prod` group; Preview and teardown retain their exact `pr-N`
+group. A GitHub concurrency group does not bind a manual CLI process. Normal
+manual mutation must stop while the matching workflow is queued or running.
+Break-glass work requires a separately authorised sole-writer window, exact
+stage and candidate preflight, retained result, and state/provider readback.
+Interruption during bootstrap or mutation leaves the provider result unknown;
+no retry is authorised until readback classifies that state.
 
 ## Dated TaxKit docs deployment envelope
 

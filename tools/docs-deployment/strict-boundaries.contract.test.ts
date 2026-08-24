@@ -10,6 +10,12 @@ import type {
 const readSource = (path: StrictAppBoundaryPath) => readFile(path, "utf-8");
 
 const readGovernedSources = async (): Promise<StrictAppBoundarySources> => ({
+  "apps/docs/scripts/cloudflare-hosted-proof.boundary.ts": await readSource(
+    "apps/docs/scripts/cloudflare-hosted-proof.boundary.ts"
+  ),
+  "apps/docs/scripts/test-cloudflare-hosted.tsx": await readSource(
+    "apps/docs/scripts/test-cloudflare-hosted.tsx"
+  ),
   "apps/docs/src/lib/runtime-factory.server.ts": await readSource(
     "apps/docs/src/lib/runtime-factory.server.ts"
   ),
@@ -22,6 +28,9 @@ const readGovernedSources = async (): Promise<StrictAppBoundarySources> => ({
   ),
   "tools/docs-deployment/inventory.runtime.ts": await readSource(
     "tools/docs-deployment/inventory.runtime.ts"
+  ),
+  "tools/docs-deployment/workflow-evidence.runtime.ts": await readSource(
+    "tools/docs-deployment/workflow-evidence.runtime.ts"
   ),
   "tools/docs-deployment/workflow-input-check.runtime.ts": await readSource(
     "tools/docs-deployment/workflow-input-check.runtime.ts"
@@ -121,6 +130,39 @@ describe("strict docs app and deployment architecture", () => {
     );
     expect(findingInvariants(withoutWorkflowBoundary)).toContain(
       "workflow-boundary"
+    );
+    const withoutEvidenceBoundary = replaceSource(
+      sources,
+      "tools/docs-deployment/workflow-evidence.runtime.ts",
+      (source) => source.replaceAll("Config.schema(", "readRawConfig(")
+    );
+    expect(findingInvariants(withoutEvidenceBoundary)).toContain(
+      "workflow-boundary"
+    );
+  });
+
+  test("rejects bypassed hosted-proof Config and browser lifetime boundaries", async () => {
+    const sources = await readGovernedSources();
+    const withoutConfig = replaceSource(
+      sources,
+      "apps/docs/scripts/cloudflare-hosted-proof.boundary.ts",
+      (source) => source.replace("Config.schema(", "readRawEnvironment(")
+    );
+    const withoutScope = replaceSource(
+      sources,
+      "apps/docs/scripts/cloudflare-hosted-proof.boundary.ts",
+      (source) => source.replace("Effect.acquireRelease(", "launchBrowser(")
+    );
+    const rawHostEnvironment = replaceSource(
+      sources,
+      "apps/docs/scripts/test-cloudflare-hosted.tsx",
+      (source) => `${source}\nprocess.env["TOKEN"];\n`
+    );
+
+    expect(findingInvariants(withoutConfig)).toContain("hosted-proof-boundary");
+    expect(findingInvariants(withoutScope)).toContain("hosted-proof-boundary");
+    expect(findingInvariants(rawHostEnvironment)).toEqual(
+      expect.arrayContaining(["host-ingress", "hosted-proof-boundary"])
     );
   });
 

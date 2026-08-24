@@ -55,6 +55,8 @@ const inspectMutation = (
 ): readonly DeploymentAutomationFinding[] => {
   const expected = {
     "docs-preview-delivery": {
+      cancellation:
+        "Planning and mutation queue behind the same exact Preview stage lock; no in-flight operation is cancelled.",
       credentials: ["CLOUDFLARE_ACCOUNT_ID", "CLOUDFLARE_API_TOKEN"],
       denied: [
         "automatic-orphan-deletion",
@@ -74,6 +76,8 @@ const inspectMutation = (
         "separately dispatched trusted same-repository pull-request candidate",
     },
     "docs-preview-teardown": {
+      cancellation:
+        "The exact-stage destroy queues and cannot cancel an in-flight deploy or destroy.",
       credentials: ["CLOUDFLARE_ACCOUNT_ID", "CLOUDFLARE_API_TOKEN"],
       denied: [
         "automatic-orphan-deletion",
@@ -93,6 +97,8 @@ const inspectMutation = (
       trigger: "same-repository pull request closed",
     },
     "docs-production-delivery": {
+      cancellation:
+        "Planning, deploy and rollback queue behind the same fixed Production stage lock; no in-flight operation is cancelled.",
       credentials: ["CLOUDFLARE_ACCOUNT_ID", "CLOUDFLARE_API_TOKEN"],
       denied: [
         "automatic-orphan-deletion",
@@ -119,6 +125,7 @@ const inspectMutation = (
     automation.lock.group === expected.group,
     automation.lock.scope === "stage",
     automation.lock.cancelInProgress === false,
+    automation.cancellation === expected.cancellation,
     hasExactStrings(
       automation.authority.operations,
       automation.id === "docs-production-delivery"

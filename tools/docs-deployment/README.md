@@ -3,7 +3,7 @@ document_type: developer-guide
 lifecycle: current
 authority: supporting
 owner: taxkit-deployment-tool-owner
-last_reviewed: 2026-08-13
+last_reviewed: 2026-08-24
 review_trigger: docs deployment command, receipt Schema, workflow adapter, provider inventory, authority, or proof change
 ---
 
@@ -33,6 +33,13 @@ operator procedure and authority live in
   shared boundary and one typed verification program, logs safe fields through
   Effect Console, provides Bun services and executes once through
   `BunRuntime.runMain`.
+- `workflow-evidence.schemas.ts`, `workflow-evidence.ts` and
+  `workflow-evidence.runtime.ts` form one closed command with `bootstrap`,
+  `plan`, `replan` and `provider` modes. It calculates shared tracked-file identities, reuses
+  the beta.64 plan projection and provider inventory Schemas, decodes bounded
+  Wrangler JSON, and encodes sanitised bootstrap, plan, provider and GitHub
+  output files. Its only child process is fixed `git ls-files`; it cannot choose
+  or run Alchemy, Wrangler, GitHub or another executable.
 - `inventory.runtime.ts` is the provider/state readback composition owner. It
   remains read-only unless a separately authorized workflow owns mutation.
 - `strict-boundaries.policy.ts` checks the named application and deployment
@@ -43,7 +50,12 @@ operator procedure and authority live in
   build or spawn the docs app.
 - `workflow-plan-projection.ts` is the single beta.64-bound host adapter for
   Alchemy's text plan output. It admits only the current native Website
-  resource and fails closed on any other resource line.
+  resource and fails closed on any other resource line. The
+  `fixtures/alchemy-beta.64/` manifest binds five real sanitised GitHub
+  artefact captures to Alchemy `2.0.0-beta.64`, upstream commit
+  `31edd3c4b2f0f3310fad07f5423aee20cf72be8d`, their source run/artefact
+  identities and SHA-256 digests. The fixture tests recompute every digest and
+  cover create, update, no-op, delete and already-absent destroy.
 
 The retired orphan classifier has no current workflow, command, Schema,
 service, runtime or child-process boundary. Its immutable JSON receipts remain
@@ -62,9 +74,11 @@ bun run test:docs-deployment
 bun run check:docs-deployment
 ```
 
-The focused tests cover Config and receipt boundaries, credential failures,
-account mismatch, plan/resource admission, workflow identity, deterministic
-historical receipt classification and static adapter contracts. Root
+The focused tests cover Config and receipt boundaries, every workflow-evidence
+mode, credential failures, account mismatch, plan/resource admission,
+workflow identity, deterministic output encoding, secret-negative failures,
+the version-bound real plan fixtures, historical receipt classification and
+static adapter contracts. Root
 `verification` invokes them once. These local commands do not dispatch
 workflows, access providers, deploy, destroy, prove hosted behavior or grant
 operational authority.
