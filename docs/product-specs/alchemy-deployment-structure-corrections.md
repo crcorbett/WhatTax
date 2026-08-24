@@ -1,6 +1,6 @@
 ---
 document_type: product-spec
-lifecycle: proposed
+lifecycle: active
 authority: supporting
 owner: taxkit-product-owner
 last_reviewed: 2026-08-24
@@ -13,14 +13,20 @@ tombstone: false
 
 ## Status and admission
 
-This SPEC is a planning contract. It does not authorise implementation, a Git
-commit, a workflow run, a Cloudflare or GitHub change, a credential change, a
-DNS change, a deployment or a package publication.
+Cooper accepted this whole SPEC, all four tasks and all eight finding
+dispositions on 2026-08-24. The canonical
+[active execution plan](../exec-plans/active/alchemy-deployment-structure-corrections.md)
+now admits repository implementation, checks, commits, hosted Quality, pull
+request delivery and merge after the accepted checks pass.
 
-Implementation may start only after this SPEC is accepted and a separate active
-execution plan is created. Any provider operation still needs the exact
-principal, operation, resource, environment, approval, rollback and readback
-required by the [authority model](../operations/authority-model.md).
+The accepted provider boundary permits only the existing TaxKit docs Preview
+plan/bootstrap/state and provider readback needed for real beta.64 evidence.
+Production deploy or rollback, DNS or custom-domain change, package
+publication, credential creation or rotation, broad Cloudflare cleanup and
+unrelated provider mutation remain outside authority. Every permitted provider
+operation still needs the exact principal, operation, resource, environment,
+rollback and readback required by the
+[authority model](../operations/authority-model.md).
 
 The sibling task ledger is
 [`alchemy-deployment-structure-corrections.tasks.json`](./alchemy-deployment-structure-corrections.tasks.json).
