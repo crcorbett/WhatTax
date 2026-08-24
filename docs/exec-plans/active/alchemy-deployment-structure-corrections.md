@@ -42,10 +42,12 @@ unrelated provider mutation remain outside authority.
 
 ## Ordered slices
 
-1. **ADS-001 — in progress:** make Production locking non-cancellable, scope
-   the Cloudflare token to exact provider steps, enforce the workflow contract
-   and document interruption and manual CLI limits.
-2. **ADS-002 — pending:** add one closed typed Effect workflow-evidence command
+1. **ADS-001 — complete:** Production plan, deploy and rollback now share one
+   non-cancellable group; Preview and Production tokens are limited to exact
+   provider steps; executable controls and current operator truth agree. The
+   bounded proof is
+   [`ADS-001-validation.json`](../../documentation-audit/alchemy-deployment-structure/ADS-001-validation.json).
+2. **ADS-002 — in progress:** add one closed typed Effect workflow-evidence command
    while YAML keeps environments, permissions, authority, provider execution
    and sequencing.
 3. **ADS-003 — pending:** decode hosted-proof input once with Effect Config and

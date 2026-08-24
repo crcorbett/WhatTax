@@ -51,7 +51,7 @@ permissions:
 
 concurrency:
   group: taxkit-docs-production-prod
-  cancel-in-progress: ${{ inputs.operation == 'plan' }}
+  cancel-in-progress: false
 
 jobs:
   production:
@@ -63,7 +63,6 @@ jobs:
     env:
       ALCHEMY_PROFILE: default
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CANDIDATE_SHA: ${{ inputs.candidate_sha }}
       ACCEPTED_PREVIEW_COMMIT: ${{ inputs.accepted_preview_commit }}
       ACCEPTED_PREVIEW_PLAN_SHA256: ${{ inputs.accepted_preview_plan_sha256 }}
@@ -262,6 +261,8 @@ jobs:
         run: bun run docs:build
 
       - name: Materialize ephemeral Alchemy state-store credential cache
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
         run: |
           set -euo pipefail
           ALCHEMY_PLAIN=1 CI=1 bunx alchemy login --profile "$ALCHEMY_PROFILE" > /dev/null
@@ -269,6 +270,8 @@ jobs:
 
       - name: Plan exact fixed Production candidate
         id: plan
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
         run: |
           set -euo pipefail
           mkdir -p "$RUNNER_TEMP/docs-deployment"
@@ -309,6 +312,8 @@ jobs:
 
       - name: Replan and deploy fixed Production candidate
         if: inputs.operation == 'deploy' || inputs.operation == 'rollback'
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
         run: |
           set -euo pipefail
           test -n "$ACCEPTED_PLAN_SHA256"

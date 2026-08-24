@@ -42,7 +42,6 @@ jobs:
     env:
       ALCHEMY_PROFILE: default
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CANDIDATE_SHA: ${{ inputs.candidate_sha }}
       PR_NUMBER: ${{ inputs.pr_number }}
       OPERATION: ${{ inputs.operation }}
@@ -175,6 +174,8 @@ jobs:
         run: bun run docs:build
 
       - name: Materialize ephemeral Alchemy state-store credential cache
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
         run: |
           set -euo pipefail
           ALCHEMY_PLAIN=1 CI=1 bunx alchemy login --profile "$ALCHEMY_PROFILE" > /dev/null
@@ -182,6 +183,8 @@ jobs:
 
       - name: Plan exact Preview candidate
         id: plan
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
         run: |
           set -euo pipefail
           mkdir -p "$RUNNER_TEMP/docs-deployment"
@@ -223,6 +226,8 @@ jobs:
 
       - name: Replan and deploy accepted Preview candidate
         if: inputs.operation == 'deploy'
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
         run: |
           set -euo pipefail
           test -n "$ACCEPTED_PLAN_SHA256"

@@ -3,7 +3,7 @@ document_type: automation-register
 lifecycle: current
 authority: canonical
 owner: taxkit-ci-release-maintainer
-last_reviewed: 2026-08-21
+last_reviewed: 2026-08-24
 review_trigger: workflow, signal, authority, proof, stopping, escalation, rollback, or retirement change
 ---
 
@@ -48,9 +48,10 @@ classes: trusted Preview delivery, fixed Production delivery and exact-stage
 Preview teardown. Preview delivery and teardown share the unreviewed
 `taxkit-docs-preview` credential environment; Production retains its separate
 reviewer-protected environment. The records require non-cancellable stage
-locks, accepted/equal replans, narrow credential identities, provider/state
-readback, bounded receipts and fail-closed recovery. Teardown executes
-reviewed default-branch code rather than pull-request-head code.
+locks for plans as well as mutations, accepted/equal replans, narrow credential
+identities, provider/state readback, bounded receipts and fail-closed recovery.
+Teardown executes reviewed default-branch code rather than pull-request-head
+code.
 
 Because GitHub runners are ephemeral, each mutation workflow refreshes the
 account-matched Alchemy `cloudflare-state-store` cache with the installed
@@ -59,6 +60,15 @@ postconditions. The preceding `alchemy login` command persists only the
 environment-method selector; the token remains a GitHub environment secret.
 That preparation is bounded to the named state-store control plane; no local
 OAuth profile is copied into CI.
+
+The workflow contract also checks credential placement. Preview and Production
+have no job-wide Cloudflare token; only their exact bootstrap, plan and
+replan/apply steps receive it. Checkout, dependency and browser setup,
+provider-free builds, validators, hosted proof and artifact actions remain
+token-free. GitHub supplies the stage lock only to workflow runs. It does not
+lock manual CLI mutation, which is unsupported while a matching run is queued
+or active. An interrupted provider step remains uncertain until state/provider
+readback records the result.
 
 The current native `Cloudflare.Website.Vite` graph has one `DocsWebsite`
 resource. Preview, Production and teardown retain accepted observations. Plan

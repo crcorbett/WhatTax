@@ -21,6 +21,22 @@ const cacheRestoreAction = `actions/cache/restore@${cacheActionSha}`;
 const cacheSaveAction = `actions/cache/save@${cacheActionSha}`;
 const checkoutAction =
   "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1";
+const cloudflareTokenBinding = [
+  "CLOUDFLARE_API_TOKEN: $",
+  "{{ secrets.CLOUDFLARE_API_TOKEN }}",
+].join("");
+
+const stepNamesWithCloudflareToken = (source: string) =>
+  source
+    .split(/^ {6}- name: /mu)
+    .slice(1)
+    .flatMap((block) => {
+      const newline = block.indexOf("\n");
+      if (newline === -1 || !block.includes(cloudflareTokenBinding)) {
+        return [];
+      }
+      return [block.slice(0, newline)];
+    });
 
 describe("docs deployment workflow admission", () => {
   test("keeps every deployment workflow exact-SHA and pinned", async () => {
@@ -215,20 +231,12 @@ describe("docs deployment workflow admission", () => {
     }
   });
 
-  test("keeps mutation locks non-cancellable", async () => {
-    const planCancellation = [
-      "cancel-in-progress: ",
-      "$",
-      "{{ inputs.operation == 'plan' }}",
-    ].join("");
+  test("keeps every stage operation behind its exact non-cancellable lock", async () => {
     for (const path of [workflowPaths.preview, workflowPaths.production]) {
       const source = await readWorkflow(path);
       expect(source).toContain("checks: read");
-      if (path === workflowPaths.preview) {
-        expect(source).toContain("cancel-in-progress: false");
-      } else {
-        expect(source).toContain(planCancellation);
-      }
+      expect(source).toContain("cancel-in-progress: false");
+      expect(source).not.toContain("inputs.operation == 'plan'");
       expect(source).toContain("CLOUDFLARE_ACCOUNT_ID");
       expect(source).toContain("CLOUDFLARE_API_TOKEN");
       expect(source).toContain(
@@ -263,6 +271,10 @@ describe("docs deployment workflow admission", () => {
       expect(source).toContain("replanSha256");
     }
     const production = await readWorkflow(workflowPaths.production);
+    expect(production).toContain("group: taxkit-docs-production-prod");
+    expect(production.split("group: taxkit-docs-production-prod")).toHaveLength(
+      2
+    );
     expect(production).toContain(
       'hosted_rollback_identity="$TAXKIT_DOCS_ROLLBACK_RECOVERY_IDENTITY"'
     );
@@ -324,6 +336,36 @@ describe("docs deployment workflow admission", () => {
     expect(teardown).toContain(
       "TAXKIT_WORKFLOW_PLAN_OPERATION=preview-destroy"
     );
+  });
+
+  test("limits the Cloudflare token to the exact provider steps", async () => {
+    const workflows = [
+      {
+        allowed: [
+          "Materialize ephemeral Alchemy state-store credential cache",
+          "Plan exact Preview candidate",
+          "Replan and deploy accepted Preview candidate",
+        ],
+        path: workflowPaths.preview,
+      },
+      {
+        allowed: [
+          "Materialize ephemeral Alchemy state-store credential cache",
+          "Plan exact fixed Production candidate",
+          "Replan and deploy fixed Production candidate",
+        ],
+        path: workflowPaths.production,
+      },
+    ] as const;
+
+    for (const { allowed, path } of workflows) {
+      const source = await readWorkflow(path);
+      expect(source).not.toContain(`\n      ${cloudflareTokenBinding}`);
+      expect(stepNamesWithCloudflareToken(source)).toEqual([...allowed]);
+      expect(source.split(cloudflareTokenBinding)).toHaveLength(
+        allowed.length + 1
+      );
+    }
   });
 
   test("shares Preview credentials for deploy and exact-stage teardown", async () => {

@@ -3,7 +3,7 @@ document_type: architecture
 lifecycle: current
 authority: canonical
 owner: taxkit-architecture-owner
-last_reviewed: 2026-08-21
+last_reviewed: 2026-08-24
 review_trigger: deployment target, runtime adapter, provider resource, state, domain, or rollback change
 ---
 
@@ -119,11 +119,13 @@ Ephemeral GitHub runners do not retain Alchemy's derived
 `cloudflare-state-store` credential after a plan or apply. The three mutation
 workflows therefore run the supported `alchemy cloudflare bootstrap` operation
 with `CI=0` immediately before planning or teardown. A preceding supported
-`alchemy login` with `CI=1` writes only the `method: "env"` profile selector;
-bootstrap then refreshes only the account-matched state-store cache for that
-runner, and the inventory command reads the cache under `CI=1`. This does not
-grant the report-only workflow mutation authority and does not copy the local
-OAuth profile into CI.
+`alchemy login` with `CI=1` writes only the `method: "env"` profile selector.
+Bootstrap is a mutation-capable control-plane operation: beta.64 may refresh
+credentials, use a short-lived edge-preview Worker to read the secret, and
+create or upgrade the state-store Worker before caching the account-matched
+credential on that runner. The inventory command reads the resulting cache
+under `CI=1`. This authority does not extend to the report-only workflow and no
+local OAuth profile is copied into CI.
 
 The former scheduled GitHub/open-PR orphan classifier and nested subprocess
 boundary are retired. They did not provide a contributor-neutral lifecycle
@@ -138,6 +140,16 @@ source, exact `pr-N` decoding, the non-cancellable stage lock, equal plans and
 provider/state readback enforce the target. Production keeps its separate
 reviewer-protected environment. A GitHub environment controls credential
 custody; Alchemy stage identity controls which infrastructure can change.
+
+Preview and Production place `CLOUDFLARE_API_TOKEN` only on their named
+bootstrap, plan and replan/apply steps. Checkout, installation, provider-free
+builds, repository checks, hosted proof and artifact upload cannot read it.
+Production plan, deploy and rollback use the same fixed `prod` GitHub
+concurrency group with cancellation disabled. Preview and teardown keep their
+shared exact-`pr-N` non-cancellable group. These GitHub locks do not cover a
+manual Alchemy CLI process. Normal manual mutation must stop while the matching
+workflow is queued or running; break-glass recovery needs one separately
+authorised sole writer and state/provider readback before any retry.
 
 The accepted Preview requalification used candidate
 `d9cb8945529fb72158e59ca0daf02a98e1e4de1a` at deterministic stage `pr-1`.

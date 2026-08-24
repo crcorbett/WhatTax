@@ -15,7 +15,7 @@
       "principal": "taxkit-docs-preview-workflow",
       "resources": ["TaxKitDocsCloudflare/pr-N/DocsWebsite"]
     },
-    "cancellation": "Planning may be superseded, but a stage mutation queues and cannot cancel an in-flight apply.",
+    "cancellation": "Planning and mutation queue behind the same exact Preview stage lock; no in-flight operation is cancelled.",
     "convergence": "Reacquire the pr-N lock, recheck the trusted PR head and state/provider identity, then require an equal canonical replan before apply.",
     "durableState": {
       "identity": "exact candidate, pr-N, accepted plan digest, provider deployment/version and hosted proof",
@@ -101,7 +101,7 @@
       "principal": "taxkit-docs-production-workflow",
       "resources": ["TaxKitDocsCloudflare/prod/DocsWebsite"]
     },
-    "cancellation": "Planning may be superseded, but the fixed Production mutation queues and cannot cancel an in-flight apply.",
+    "cancellation": "Planning, deploy and rollback queue behind the same fixed Production stage lock; no in-flight operation is cancelled.",
     "convergence": "Reacquire the prod lock, recheck exact candidate and fixed Worker identity, then require an equal canonical replan before apply.",
     "durableState": {
       "identity": "accepted Preview source, exact Production candidate, plan digest, fixed Worker deployment/version and hosted proof",

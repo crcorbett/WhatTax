@@ -3,7 +3,7 @@ document_type: runbook
 lifecycle: current
 authority: canonical
 owner: taxkit-docs-deployment-operation-owner
-last_reviewed: 2026-08-20
+last_reviewed: 2026-08-24
 review_trigger: docs deployment candidate, Cloudflare or Alchemy identity/state, stage, plan, provider readback, teardown, rollback, credential or authority change
 ---
 
@@ -58,6 +58,19 @@ approval after an operator dispatches Preview and lets a trusted PR-close event
 clean up automatically. Production remains in reviewer-protected
 `taxkit-docs-production`. Restore the Preview reviewer rule and the former
 teardown workflow environment binding if automatic admission is found unsafe.
+
+Preview and Production expose `CLOUDFLARE_API_TOKEN` only to the exact
+bootstrap, plan and replan/apply steps. Do not move it to a job, checkout,
+install, build, validation, hosted-proof or upload environment. Production
+plan, deploy and rollback share the fixed non-cancellable `prod` group;
+Preview and teardown share the exact non-cancellable `pr-N` group.
+
+These GitHub groups do not lock manual CLI work. Do not run a manual Alchemy
+mutation while a matching workflow is queued or running. Break-glass recovery
+needs a separately authorised sole-writer window, exact candidate and stage
+preflight, a retained result, and state/provider readback. If bootstrap,
+deploy, rollback or destroy is interrupted, treat the provider result as
+unknown and do not retry until readback classifies the state.
 
 For integrated local Cloudflare development run `bun run docs:dev:cloudflare`
 (`alchemy dev`). Use `bun run docs:dev:vite` only for the explicitly

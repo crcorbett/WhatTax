@@ -117,7 +117,7 @@
     {
       "id": "ADS-001",
       "invariantIds": ["HC-AUTH-001", "HC-AUTO-001", "HC-DOC-001", "HC-LIFETIME-001", "HC-PROOF-001"],
-      "status": "pending",
+      "status": "completed",
       "title": "Make workflow locks and credential scope safe",
       "type": "deployment-policy",
       "dependsOn": [],

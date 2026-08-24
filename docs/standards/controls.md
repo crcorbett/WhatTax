@@ -3,7 +3,7 @@ document_type: standard
 lifecycle: current
 authority: canonical
 owner: taxkit-ci-release-maintainer
-last_reviewed: 2026-08-20
+last_reviewed: 2026-08-24
 review_trigger: public boundary, workflow, action, release graph, or repeated-review finding change
 ---
 
@@ -71,7 +71,7 @@ Its Schema and negative fixtures admit only these controls:
 | Signal and named failure | Owner, fixture, evidence and recovery | Review trigger | Retirement |
 | --- | --- | --- | --- |
 | Candidate selection; fork, stale SHA, failed Quality result or candidate execution through `pull_request_target` reaches credentials | `docs-workflow-candidate-trust`; `tools/docs-deployment/automation.policy.test.ts`; repair exact trusted source/default-branch binding and issue a new attempt | Trigger, checkout, Quality, principal or candidate change | Stronger accepted workflow identity policy preserves exact-source proof. |
-| Preview, Production or teardown mutation; cancellable or weak stage locking bypasses equal replan or readback | `docs-workflow-mutation-lock`; deployment policy check; restore the non-cancellable stage lock and accepted/equal plan contract | Concurrency, plan, environment credential admission, state or provider change | Stronger provider-aware distributed lock replaces repository orchestration locking. |
+| Preview, Production or teardown plan or mutation; cancellation, weak stage locking or job-wide provider credentials bypass serial operation, least exposure, equal replan or readback | `docs-workflow-mutation-lock`; deployment policy and workflow contract checks; restore the non-cancellable exact-stage lock, provider-step token allowlist and accepted/equal plan contract | Concurrency, plan, credential placement, environment admission, state or provider change | Stronger provider-aware distributed lock replaces repository orchestration locking. |
 | Pull request closes; teardown executes candidate code or derives a target other than exact `pr-N` | `docs-preview-teardown-safety`; stop and return to reviewed default-branch code plus manual exact-stage recovery | Close trigger, checkout, stage derivation or destroy change | Stronger accepted Preview lifecycle preserves reviewed-code and exact-stage proof. |
 | Named deployment workflow completes; a self-authored or detached run/artifact is promoted without completed Actions API readback, exact source/input identity or bounded failure metadata | `docs-workflow-receipt-reconciliation`; `workflow.contract.test.ts`, `workflow-run-check.runtime.ts`, and the read-only `workflow_run` reconciler; retain the source artifact and reconciliation stop, then retry against the exact completed run | Workflow_run trigger, receipt schema/checker, artifact naming, source checkout or external-state promotion change | A stronger provider-independent receipt reconciler preserves completed-run, artifact, source/input and failure-readback coverage. |
 
@@ -81,6 +81,14 @@ automation entries—Preview, Production and exact-stage teardown—and all thre
 have claim-matched established receipts. Historical two-resource and orphan
 receipts recorded below remain evidence for their dated graph, not admission
 for the successor.
+
+Production plan, deploy and rollback share one fixed non-cancellable group.
+Preview delivery and teardown share one exact-`pr-N` non-cancellable group.
+The workflow contract proves that Preview and Production expose the Cloudflare
+token only to exact provider steps. These controls do not lock manual CLI
+mutation; normal manual work stops while a matching workflow is queued or
+running, and break-glass recovery needs separate sole-writer authority and
+state/provider readback.
 
 The dated manual Preview/Production/rollback receipts under
 `docs/evidence/deployments/` prove the same candidate, plan, provider/state and
