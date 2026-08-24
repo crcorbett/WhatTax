@@ -58,8 +58,12 @@ account-matched Alchemy `cloudflare-state-store` cache with the installed
 `alchemy cloudflare bootstrap` command before it reads provider/state
 postconditions. The preceding `alchemy login` command persists only the
 environment-method selector; the token remains a GitHub environment secret.
-That preparation is bounded to the named state-store control plane; no local
-OAuth profile is copied into CI.
+That bootstrap is mutation-capable: beta.64 may refresh credentials, read a
+short-lived edge-preview secret, and create or upgrade the state-store Worker.
+The sanitised workflow receipt records those allowed effects and explicitly
+records its before/after provider facts as not observed. No local OAuth
+profile, credential or temporary secret-bearing URL is copied into retained
+evidence.
 
 The workflow contract also checks credential placement. Preview and Production
 have no job-wide Cloudflare token; only their exact bootstrap, plan and
@@ -69,6 +73,13 @@ token-free. GitHub supplies the stage lock only to workflow runs. It does not
 lock manual CLI mutation, which is unsupported while a matching run is queued
 or active. An interrupted provider step remains uncertain until state/provider
 readback records the result.
+
+One closed-mode Effect command owns candidate/config/lock identities, native
+plan projection, state/provider and Wrangler JSON decoding, and sanitised
+plan/provider/GitHub output encoding for Preview and Production. It cannot
+select or run a provider executable. Workflow YAML still owns the protected
+environment, authority inputs, lock, Alchemy and Wrangler calls and their
+fail-closed order.
 
 The current native `Cloudflare.Website.Vite` graph has one `DocsWebsite`
 resource. Preview, Production and teardown retain accepted observations. Plan

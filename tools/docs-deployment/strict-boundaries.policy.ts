@@ -4,6 +4,7 @@ const strictAppBoundaryPaths = [
   "apps/docs/src/server.ts",
   "tools/docs-deployment/inventory-credentials.boundary.ts",
   "tools/docs-deployment/inventory.runtime.ts",
+  "tools/docs-deployment/workflow-evidence.runtime.ts",
   "tools/docs-deployment/workflow-input-check.runtime.ts",
   "tools/docs-deployment/workflow-plan-check.runtime.ts",
   "tools/docs-deployment/workflow-proof-check.runtime.ts",
@@ -27,8 +28,10 @@ export interface StrictAppBoundaryFinding {
   readonly path: StrictAppBoundaryPath;
 }
 
-const workflowRuntimePaths = strictAppBoundaryPaths.filter((path) =>
-  path.includes("workflow-")
+const workflowEvidenceRuntimePath =
+  "tools/docs-deployment/workflow-evidence.runtime.ts" as const;
+const workflowRuntimePaths = strictAppBoundaryPaths.filter(
+  (path) => path.includes("workflow-") && path !== workflowEvidenceRuntimePath
 );
 
 const finding = (
@@ -91,6 +94,15 @@ const inspectWorkflowBoundaries = (
     if (!includesEvery(sources[path], requiredPatterns)) {
       findings.push(finding("workflow-boundary", path));
     }
+  }
+  if (
+    !includesEvery(sources[workflowEvidenceRuntimePath], [
+      "Config.schema(",
+      "runWorkflowEvidence",
+      "BunRuntime.runMain(program)",
+    ])
+  ) {
+    findings.push(finding("workflow-boundary", workflowEvidenceRuntimePath));
   }
   return findings;
 };

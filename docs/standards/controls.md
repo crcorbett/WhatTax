@@ -90,6 +90,15 @@ mutation; normal manual work stops while a matching workflow is queued or
 running, and break-glass recovery needs separate sole-writer authority and
 state/provider readback.
 
+Preview and Production use the closed `workflow-evidence` Effect command for
+shared identity calculation, native plan projection, bounded provider JSON
+decoding and sanitised receipt/GitHub output encoding. Static workflow checks
+reject the retired repeated `shasum`, plan-receipt `jq`, provider-selection
+`jq` and `printf TAXKIT_DOCS_*` blocks. YAML remains the sole owner of
+environment protection, operation authority, locks and provider execution.
+The bootstrap receipt must describe beta.64 as mutation-capable and must not
+contain a credential or temporary secret-bearing URL.
+
 The dated manual Preview/Production/rollback receipts under
 `docs/evidence/deployments/` prove the same candidate, plan, provider/state and
 hosted contracts for an authorized operator epoch, but they do not change

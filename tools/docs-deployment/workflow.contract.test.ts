@@ -203,7 +203,7 @@ describe("docs deployment workflow admission", () => {
     }
   });
 
-  test("materializes only the ephemeral Alchemy state-store cache before inventory", async () => {
+  test("runs the supported mutation-capable state-store bootstrap before inventory", async () => {
     for (const path of [
       workflowPaths.preview,
       workflowPaths.production,
@@ -220,15 +220,21 @@ describe("docs deployment workflow admission", () => {
   });
 
   test("builds provider-free proof and hashes the native Website inputs before mutation", async () => {
+    const evidenceOwner = await readWorkflow(
+      "tools/docs-deployment/workflow-evidence.ts"
+    );
     for (const path of [workflowPaths.preview, workflowPaths.production]) {
       const source = await readWorkflow(path);
       expect(source).toContain("run: bun run docs:build");
-      expect(source).toContain(
-        "git ls-files -z -- alchemy.run.ts apps/docs packages/docs-content packages/docs-fumadocs"
-      );
-      expect(source).toContain("workflow-plan-projection.runtime.ts");
+      expect(source).toContain("workflow-evidence.runtime.ts");
+      expect(source).not.toContain("shasum -a 256");
+      expect(source).not.toContain("workflow-plan-projection.runtime.ts");
       expect(source).not.toContain("find apps/docs/dist");
     }
+    expect(evidenceOwner).toContain(
+      '["ls-files", "-z", "--", ...deploymentInputRoots]'
+    );
+    expect(evidenceOwner).toContain("stringifyWorkflowPlanProjection");
   });
 
   test("keeps every stage operation behind its exact non-cancellable lock", async () => {
@@ -242,7 +248,7 @@ describe("docs deployment workflow admission", () => {
       expect(source).toContain(
         'test "$ACCEPTED_PLAN_SHA256" = "$replan_sha256"'
       );
-      expect(source).toContain("workflow-plan-projection.runtime.ts");
+      expect(source).toContain("workflow-evidence.runtime.ts");
       expect(source).not.toContain("unexpected_replan_resources");
       expect(source).toContain("wrangler deployments list");
       expect(source).toContain(
@@ -254,11 +260,11 @@ describe("docs deployment workflow admission", () => {
       expect(source).toContain("check:docs-deployment-workflow-proof");
       expect(source).toContain("check:docs-deployment-workflow-plan");
       expect(source).toContain("TAXKIT_WORKFLOW_PLAN_OPERATION");
-      expect(source).toContain("TAXKIT_DOCS_CANDIDATE_COMMIT");
+      expect(source).toContain("TAXKIT_WORKFLOW_EVIDENCE_CANDIDATE_COMMIT");
       expect(source).toContain("hosted-proof.raw.json");
       expect(source).toContain("hosted-proof.json");
       expect(source).toContain("TAXKIT_WORKFLOW_SCREENSHOT_ROOT");
-      expect(source).toContain("sed -E 's:/*$::'");
+      expect(source).not.toContain("sed -E 's:/*$::'");
       expect(source).toContain("check:docs-deployment-workflow-input");
       expect(source).toContain("workflow-input.json");
       expect(source).not.toContain("Materialize successful");
@@ -268,7 +274,9 @@ describe("docs deployment workflow admission", () => {
       expect(source).toContain("configSha256");
       expect(source).toContain("deploymentInputSha256");
       expect(source).toContain("lockfileSha256");
-      expect(source).toContain("replanSha256");
+      expect(source).toContain("TAXKIT_WORKFLOW_EVIDENCE_MODE=replan");
+      expect(source).not.toContain("jq -nS --arg accountId");
+      expect(source).not.toContain("printf 'TAXKIT_DOCS_");
     }
     const production = await readWorkflow(workflowPaths.production);
     expect(production).toContain("group: taxkit-docs-production-prod");
@@ -281,8 +289,8 @@ describe("docs deployment workflow admission", () => {
     expect(production).toContain(
       'hosted_rollback_identity="production-$GITHUB_RUN_ID"'
     );
-    expect(production).toContain(
-      'test "$hosted_rollback_identity" = "$(jq -er \'.rollbackRecoveryIdentity\' "$RUNNER_TEMP/docs-deployment/provider-readback.json")"'
+    expect(production).not.toContain(
+      "jq -er '.rollbackRecoveryIdentity' \"$RUNNER_TEMP/docs-deployment/provider-readback.json\""
     );
     expect(production).toContain(
       'env -u TAXKIT_DOCS_PREVIEW_PR_NUMBER \\\n            TAXKIT_DOCS_ROLLBACK_RECOVERY_IDENTITY="$hosted_rollback_identity" \\\n            bun apps/docs/scripts/test-cloudflare-hosted.tsx'
@@ -342,7 +350,7 @@ describe("docs deployment workflow admission", () => {
     const workflows = [
       {
         allowed: [
-          "Materialize ephemeral Alchemy state-store credential cache",
+          "Run mutation-capable Alchemy state-store bootstrap",
           "Plan exact Preview candidate",
           "Replan and deploy accepted Preview candidate",
         ],
@@ -350,7 +358,7 @@ describe("docs deployment workflow admission", () => {
       },
       {
         allowed: [
-          "Materialize ephemeral Alchemy state-store credential cache",
+          "Run mutation-capable Alchemy state-store bootstrap",
           "Plan exact fixed Production candidate",
           "Replan and deploy fixed Production candidate",
         ],

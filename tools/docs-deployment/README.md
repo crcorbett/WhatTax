@@ -33,6 +33,13 @@ operator procedure and authority live in
   shared boundary and one typed verification program, logs safe fields through
   Effect Console, provides Bun services and executes once through
   `BunRuntime.runMain`.
+- `workflow-evidence.schemas.ts`, `workflow-evidence.ts` and
+  `workflow-evidence.runtime.ts` form one closed command with `bootstrap`,
+  `plan`, `replan` and `provider` modes. It calculates shared tracked-file identities, reuses
+  the beta.64 plan projection and provider inventory Schemas, decodes bounded
+  Wrangler JSON, and encodes sanitised bootstrap, plan, provider and GitHub
+  output files. Its only child process is fixed `git ls-files`; it cannot choose
+  or run Alchemy, Wrangler, GitHub or another executable.
 - `inventory.runtime.ts` is the provider/state readback composition owner. It
   remains read-only unless a separately authorized workflow owns mutation.
 - `strict-boundaries.policy.ts` checks the named application and deployment
@@ -62,8 +69,9 @@ bun run test:docs-deployment
 bun run check:docs-deployment
 ```
 
-The focused tests cover Config and receipt boundaries, credential failures,
-account mismatch, plan/resource admission, workflow identity, deterministic
+The focused tests cover Config and receipt boundaries, every workflow-evidence
+mode, credential failures, account mismatch, plan/resource admission,
+workflow identity, deterministic output encoding, secret-negative failures,
 historical receipt classification and static adapter contracts. Root
 `verification` invokes them once. These local commands do not dispatch
 workflows, access providers, deploy, destroy, prove hosted behavior or grant

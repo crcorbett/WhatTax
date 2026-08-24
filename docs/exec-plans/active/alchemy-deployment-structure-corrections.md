@@ -47,10 +47,13 @@ unrelated provider mutation remain outside authority.
    provider steps; executable controls and current operator truth agree. The
    bounded proof is
    [`ADS-001-validation.json`](../../documentation-audit/alchemy-deployment-structure/ADS-001-validation.json).
-2. **ADS-002 — in progress:** add one closed typed Effect workflow-evidence command
-   while YAML keeps environments, permissions, authority, provider execution
-   and sequencing.
-3. **ADS-003 — pending:** decode hosted-proof input once with Effect Config and
+2. **ADS-002 — complete:** one closed typed Effect command owns bootstrap,
+   shared identity, native plan projection, provider JSON decoding and
+   sanitised receipt/output encoding while YAML keeps environments,
+   permissions, authority, provider execution and sequencing. The bounded
+   proof is
+   [`ADS-002-validation.json`](../../documentation-audit/alchemy-deployment-structure/ADS-002-validation.json).
+3. **ADS-003 — in progress:** decode hosted-proof input once with Effect Config and
    Schema, use closed safe errors and scope the Playwright browser lifetime.
 4. **ADS-004 — pending:** retain provenance-bound real beta.64 plan fixtures,
    restore one current `DocsWebsite` runbook and reconcile the eight findings.

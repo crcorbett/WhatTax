@@ -179,7 +179,7 @@
     {
       "id": "ADS-002",
       "invariantIds": ["HC-BOUNDARY-001", "HC-TOOL-001", "HC-AUTH-001", "HC-PROOF-001", "HC-EVIDENCE-001"],
-      "status": "pending",
+      "status": "completed",
       "title": "Own bootstrap and workflow evidence with typed Effect code",
       "type": "effect-boundary",
       "dependsOn": ["ADS-001"],

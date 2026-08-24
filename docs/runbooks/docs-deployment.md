@@ -95,6 +95,14 @@ again. Alchemy login/bootstrap, plan, deploy and destroy; GitHub API/artifact
 readback; Cloudflare inventory; hosted browser proof; and receipt promotion all
 remain live.
 
+Preview and Production call one closed `workflow-evidence` Effect command
+after provider commands have written named raw files. The command computes
+candidate identities, projects the beta.64 plan through the existing parser,
+decodes inventory and Wrangler JSON, then writes sanitised plan, bootstrap,
+provider and GitHub output files. It never runs Alchemy or Wrangler. Do not
+move provider execution, GitHub authority, environment selection, locks or
+step ordering into that command.
+
 For machine readback, the workflows set
 `TAXKIT_DOCS_DEPLOYMENT_INVENTORY_REPORT` to the exact temporary JSON path.
 The Effect inventory runtime writes that file directly. Turbo status text
@@ -360,8 +368,13 @@ supported `ALCHEMY_PLAIN=1 CI=0 bunx alchemy cloudflare bootstrap --profile
 planning or teardown. It first runs the supported `alchemy login` command with
 `CI=1` to persist only the `method: "env"` profile selector; the token remains
 an environment secret. Bootstrap then materializes the account-matched state
-credential cache only in the runner and keeps the subsequent inventory command
-read-only. The report-only workflow remains separately credentialed and is not
+credential cache in the runner. In beta.64 it may also refresh credentials,
+use a short-lived edge-preview Worker to read the secret, and create or upgrade
+the state-store Worker. The workflow therefore retains a sanitised bootstrap
+receipt that lists those allowed effects and says that before/after provider
+facts were not observed by that step. It never retains credentials or the
+temporary secret-bearing URL. The subsequent inventory command is read-only.
+The report-only workflow remains separately credentialed and is not
 established by this correction.
 
 The deployment workflows install the pinned Chromium binary with
@@ -435,10 +448,12 @@ exact execution belongs in an authorized operation or report-only workflow.
 
 Mutation workflows must first materialize the ephemeral cache with the
 installed Alchemy Cloudflare bootstrap command recorded above. The command is
-account/stage control-plane preparation, not application deployment; it must
-run with the mutation credential, retain no credential file beyond the runner,
-and stop on account, state-store or version disagreement. The report-only
-workflow may not reuse that mutation step or the local OAuth profile.
+mutation-capable account/stage control-plane preparation, not application
+deployment; it must run with the mutation credential, retain no credential
+file beyond the runner, record the allowed beta.64 effects without claiming
+provider readback, and stop on account, state-store or version disagreement.
+The report-only workflow may not reuse that mutation step or the local OAuth
+profile.
 
 ### Alchemy state bootstrap, adoption and recovery
 

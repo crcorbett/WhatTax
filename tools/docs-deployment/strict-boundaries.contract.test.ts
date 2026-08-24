@@ -23,6 +23,9 @@ const readGovernedSources = async (): Promise<StrictAppBoundarySources> => ({
   "tools/docs-deployment/inventory.runtime.ts": await readSource(
     "tools/docs-deployment/inventory.runtime.ts"
   ),
+  "tools/docs-deployment/workflow-evidence.runtime.ts": await readSource(
+    "tools/docs-deployment/workflow-evidence.runtime.ts"
+  ),
   "tools/docs-deployment/workflow-input-check.runtime.ts": await readSource(
     "tools/docs-deployment/workflow-input-check.runtime.ts"
   ),
@@ -120,6 +123,14 @@ describe("strict docs app and deployment architecture", () => {
       "credential-boundary"
     );
     expect(findingInvariants(withoutWorkflowBoundary)).toContain(
+      "workflow-boundary"
+    );
+    const withoutEvidenceBoundary = replaceSource(
+      sources,
+      "tools/docs-deployment/workflow-evidence.runtime.ts",
+      (source) => source.replaceAll("Config.schema(", "readRawConfig(")
+    );
+    expect(findingInvariants(withoutEvidenceBoundary)).toContain(
       "workflow-boundary"
     );
   });

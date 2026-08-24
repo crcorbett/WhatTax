@@ -127,6 +127,13 @@ credential on that runner. The inventory command reads the resulting cache
 under `CI=1`. This authority does not extend to the report-only workflow and no
 local OAuth profile is copied into CI.
 
+After bootstrap and plan complete, the closed `workflow-evidence` Effect
+command writes a sanitised bootstrap receipt. It binds the exact candidate,
+stage, workflow run, Alchemy `2.0.0-beta.64` and matching upstream source
+commit to those three allowed effects. It records state-store facts before and
+after as `not-observed`; successful bootstrap command completion is not a
+claim that no provider mutation occurred or that provider state was read back.
+
 The former scheduled GitHub/open-PR orphan classifier and nested subprocess
 boundary are retired. They did not provide a contributor-neutral lifecycle
 model. PR-close teardown remains the explicit Preview cleanup owner; retained
@@ -269,6 +276,14 @@ the exact deployment candidate input separately, and that input must match the
 outer receipt's candidate: a default-branch run may build a reviewed PR head,
 so these two identities are intentionally distinct. The hosted receipt must
 match stage semantics with exactly one desktop and one mobile screenshot.
+The current workflow adapter keeps shared evidence meanings in one closed-mode
+Effect command. It calculates tracked candidate identities, calls the existing
+beta.64 plan projection owner, decodes the existing state/provider inventory
+and bounded Wrangler deployment JSON, and Schema-encodes plan, bootstrap,
+provider and GitHub output files. The command has no Alchemy, Wrangler or
+GitHub execution capability. YAML still owns environment protection,
+permissions, the exact non-cancellable lock, operation choice and provider
+command order.
 Report-only dispatch is
 forced to the reviewed default branch before installing dependencies or
 materialising the state bearer, while Preview rejects non-numeric PR identity
