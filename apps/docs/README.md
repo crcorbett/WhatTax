@@ -3,8 +3,8 @@ document_type: app-readme
 lifecycle: current
 authority: canonical
 owner: taxkit-docs-app-owner
-last_reviewed: 2026-08-21
-review_trigger: docs route, content boundary, build target, runtime, proof or deployment ownership change
+last_reviewed: 2026-08-28
+review_trigger: docs route, content boundary, build target, runtime, credential source, proof or deployment ownership change
 ---
 
 # Docs app
@@ -95,9 +95,18 @@ bun run --filter=@taxkit/docs-content check-examples
 bun run docs:validate
 ```
 
-`dev` is the authoritative Alchemy-managed Cloudflare development path and
-runs `alchemy dev` from the repository root. `dev:vite` is the fast,
-infrastructure-free portless Vite path at `https://docs.taxkit.localhost`.
+`dev` is the authoritative Alchemy-managed Cloudflare development path. The
+root adapter selects Doppler project/config `taxkit/dev`, strips ambient
+Doppler and Cloudflare values, disables Doppler fallback and both Bun and
+Alchemy `.env` loading, and then runs the source-neutral internal `alchemy dev`
+command. Alchemy's local `dev_<user>` stage is decoded separately; Preview and
+Production inputs and evidence remain limited to `pr-N` or `prod`. Run
+`bun run check:doppler-custody` after the repository-scoped login described in
+the [deployment runbook](../../docs/runbooks/docs-deployment.md). A successful
+local start does not grant provider authority or prove a deployment.
+
+`dev:vite` is the fast, infrastructure-free portless Vite path at
+`https://docs.taxkit.localhost`.
 Alchemy beta.64 injects its Cloudflare Vite plugin for the native resource;
 standalone Vite installs the same official plugin only when the documented
 `ALCHEMY_CLOUDFLARE_VITE_INJECTED` guard is absent.

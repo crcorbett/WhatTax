@@ -5,7 +5,7 @@ import { Stage } from "alchemy/Stage";
 import * as Effect from "effect/Effect";
 
 import {
-  decodeDocsDeploymentStage,
+  decodeDocsCloudflareStackStage,
   docsCloudflareStackName,
   docsWorkerAssetHeaders,
   docsWorkerCompatibilityDate,
@@ -23,7 +23,9 @@ export default Alchemy.Stack(
   },
   Effect.gen(function* () {
     const stack = yield* Stack;
-    const stage = yield* Stage.pipe(Effect.flatMap(decodeDocsDeploymentStage));
+    const stage = yield* Stage.pipe(
+      Effect.flatMap(decodeDocsCloudflareStackStage)
+    );
     const worker = yield* Cloudflare.Website.Vite(docsWorkerResourceId, {
       assets: {
         // Cloudflare Workers Assets does not infer the app-owned `_headers`

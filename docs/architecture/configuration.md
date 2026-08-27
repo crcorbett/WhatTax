@@ -1,6 +1,6 @@
 ---
 status: canonical
-last_reviewed: 2026-07-18
+last_reviewed: 2026-08-28
 source_of_truth: docs
 confidence: medium
 ---
@@ -23,6 +23,41 @@ Apps MUST define runtime-specific config modules that compose package schemas
 with app-local settings. Those modules own config sources such as process env
 or Vite env, app-local defaults and runtime-specific provider selection. They
 must not re-declare package-owned config keys or prefixes.
+
+## Governed operator configuration
+
+Doppler is the owner for TaxKit's operator-set credentials and their related
+environment identities. It is not the owner for host-created values, GitHub
+event data, Alchemy-generated state credentials or TaxKit evidence paths.
+
+The current environment map is:
+
+| Purpose | Config | Values |
+| --- | --- | --- |
+| Credentialed local docs development | `taxkit/dev` | Cloudflare account and development token |
+| Trusted Quality and receipt reconciliation | `taxkit/ci` | Turbo team and token |
+| Preview and exact-stage teardown | `taxkit/stg_preview` | Cloudflare account and Preview token |
+| Production and rollback | `taxkit/prd` | Cloudflare account and Production token |
+
+Ordinary API/web development, portless values, `CI`, GitHub refs and runner
+paths, Playwright paths, `TAXKIT_WORKFLOW_*` inputs, `ALCHEMY_PROFILE` and
+Alchemy's state-store bearer/encryption values remain with their current
+owners. No unused fixed staging config exists.
+
+Local credentialed commands use a fixed repository adapter, not ambient
+selection or a committed `.doppler.yaml`. The adapter strips ambient Doppler
+and governed provider values, passes `--no-read-env`, `--no-fallback`,
+`--no-check-version` and an exact `--only-secrets` list, then starts Bun with
+`--no-env-file`. Alchemy receives an intentionally empty dotenv file. The
+developer login is scoped to this checkout and must be a system-keyring
+reference verified by the pass/fail-only custody command.
+
+GitHub's reviewed target uses read-only, expiring service tokens bound to one
+config. The `ci` bridge is repository-scoped; Preview and Production provider
+bridges live in their different protected environments. Workflows verify safe
+Doppler project/config metadata and pass only named action outputs to exact
+consumer steps. Exact-claim OIDC needs a successor review and is not a second
+current path.
 
 ## Pattern
 
@@ -121,6 +156,9 @@ When composed with `ServiceViteEnvConfigFragment`, this maps `baseUrl` to
   `Config.schema`; use `Schema.Redacted` or `Schema.RedactedFromValue` according
   to the actual ingress representation. Do not expose primitive config values
   through service APIs or unwrap secrets before final adapter construction.
+- Do not use Doppler fallback files, Bun or Alchemy `.env` loading, raw token
+  command arguments, broad GitHub secret injection, or `doppler configure
+  debug` for governed commands.
 
 ## Related Docs
 

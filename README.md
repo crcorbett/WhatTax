@@ -1,6 +1,6 @@
 ---
 status: canonical
-last_reviewed: 2026-08-20
+last_reviewed: 2026-08-28
 source_of_truth: root-docs
 confidence: high
 ---
@@ -81,6 +81,7 @@ bun install
 bun run --filter=api dev
 bun run --filter=web dev
 bun run --filter=docs dev
+bun run check:doppler-custody
 bun run --filter=docs test:cloudflare-built
 bun run check:repository-paths
 bun run check:harness-governance
@@ -97,7 +98,12 @@ bun run version-repo
 `https://api.taxkit.localhost`. `bun run --filter=web dev` injects that
 portless URL into `TAXKIT_API_BASE_URL` and `VITE_TAXKIT_API_BASE_URL` before
 serving the web app at `https://taxkit.localhost`. `bun run --filter=docs dev`
-serves the public docs app at `https://docs.taxkit.localhost`. `bun run
+is the credentialed, Alchemy-managed Cloudflare development path. It requires a
+repository-scoped Doppler login and an authorised `taxkit/dev` config, runs the
+pass/fail-only `bun run check:doppler-custody` check first during onboarding,
+and starts only a local `dev_<user>` Alchemy stage. It does not authorise or
+prove a provider change. Use `bun run --filter=docs dev:vite` for the fast,
+credential-free docs app at `https://docs.taxkit.localhost`. `bun run
 --filter=docs test:cloudflare-built` builds the exact Cloudflare target and
 exercises an isolated copy of its Worker/assets under local workerd; it does
 not access provider credentials or prove a deployment. `bun run

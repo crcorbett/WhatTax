@@ -6,6 +6,10 @@ const strictAppBoundaryPaths = [
   "apps/docs/src/server.ts",
   "tools/docs-deployment/inventory-credentials.boundary.ts",
   "tools/docs-deployment/inventory.runtime.ts",
+  "tools/docs-deployment/doppler-custody.runtime.ts",
+  "tools/docs-deployment/doppler-custody.boundary.ts",
+  "tools/docs-deployment/local-doppler.runtime.ts",
+  "tools/docs-deployment/local-doppler.ts",
   "tools/docs-deployment/workflow-evidence.runtime.ts",
   "tools/docs-deployment/workflow-input-check.runtime.ts",
   "tools/docs-deployment/workflow-plan-check.runtime.ts",
@@ -24,6 +28,7 @@ export interface StrictAppBoundaryFinding {
     | "credential-boundary"
     | "host-ingress"
     | "hosted-proof-boundary"
+    | "local-doppler-boundary"
     | "raw-concurrency"
     | "runtime-owner"
     | "runtime-probe"
@@ -37,6 +42,8 @@ const hostedProofBoundaryPath =
   "apps/docs/scripts/cloudflare-hosted-proof.boundary.ts" as const;
 const hostedProofHostPath =
   "apps/docs/scripts/test-cloudflare-hosted.tsx" as const;
+const localDopplerRuntimePath =
+  "tools/docs-deployment/local-doppler.runtime.ts" as const;
 const workflowRuntimePaths = strictAppBoundaryPaths.filter(
   (path) => path.includes("workflow-") && path !== workflowEvidenceRuntimePath
 );
@@ -74,10 +81,13 @@ const inspectGenericBoundaries = (
 
   for (const path of strictAppBoundaryPaths) {
     const source = sources[path];
-    const applicableHostIngressPatterns =
-      path === hostedProofHostPath
-        ? hostIngressPatterns.filter((pattern) => !pattern.includes("node:fs"))
-        : hostIngressPatterns;
+    const applicableHostIngressPatterns = hostIngressPatterns.filter(
+      (pattern) =>
+        !(
+          (path === hostedProofHostPath && pattern.includes("node:fs")) ||
+          (path === localDopplerRuntimePath && pattern === "process.env")
+        )
+    );
     if (includesAny(source, applicableHostIngressPatterns)) {
       findings.push(finding("host-ingress", path));
     }
@@ -167,6 +177,48 @@ const inspectCredentialBoundary = (
     : [finding("credential-boundary", boundaryPath)];
 };
 
+const inspectLocalDopplerBoundary = (
+  sources: StrictAppBoundarySources
+): readonly StrictAppBoundaryFinding[] => {
+  const custodyPath =
+    "tools/docs-deployment/doppler-custody.boundary.ts" as const;
+  const custodyRuntimePath =
+    "tools/docs-deployment/doppler-custody.runtime.ts" as const;
+  const commandPath = "tools/docs-deployment/local-doppler.ts" as const;
+  const custody = sources[custodyPath];
+  const custodyRuntime = sources[custodyRuntimePath];
+  const command = sources[commandPath];
+  const runtime = sources[localDopplerRuntimePath];
+  const valid =
+    includesEvery(custody, [
+      "FileSystem.FileSystem",
+      "Schema.decodeUnknownEffect(DopplerUserConfig)",
+      "KeyringReference",
+      'reason: "system-keyring-reference"',
+    ]) &&
+    includesEvery(custodyRuntime, [
+      "checkDopplerCustody(",
+      "disableErrorReporting: true",
+    ]) &&
+    includesEvery(command, [
+      '"DOPPLER_TOKEN"',
+      '"CLOUDFLARE_API_TOKEN"',
+      '"--no-read-env"',
+      '"--no-fallback"',
+      '"--only-secrets"',
+      '"--no-env-file"',
+      "extendEnv: false",
+    ]) &&
+    !command.includes("process.env") &&
+    includesEvery(runtime, [
+      "checkDopplerCustody(",
+      'runLocalDocsWithDoppler("doppler", process.env)',
+      "disableErrorReporting: true",
+    ]);
+
+  return valid ? [] : [finding("local-doppler-boundary", commandPath)];
+};
+
 const inspectDocsRuntimeBoundary = (
   sources: StrictAppBoundarySources
 ): readonly StrictAppBoundaryFinding[] => {
@@ -204,5 +256,6 @@ export const inspectStrictAppBoundaries = (
   ...inspectWorkflowBoundaries(sources),
   ...inspectHostedProofBoundary(sources),
   ...inspectCredentialBoundary(sources),
+  ...inspectLocalDopplerBoundary(sources),
   ...inspectDocsRuntimeBoundary(sources),
 ];

@@ -3,7 +3,7 @@ document_type: runbook
 lifecycle: current
 authority: canonical
 owner: taxkit-docs-deployment-operation-owner
-last_reviewed: 2026-08-24
+last_reviewed: 2026-08-28
 review_trigger: docs deployment candidate, Cloudflare or Alchemy identity/state, stage, plan, provider readback, teardown, rollback, credential or authority change
 ---
 
@@ -155,9 +155,43 @@ deploy. A new receipt is not an open prerequisite for this same-environment
 automatic teardown. Require a fresh receipt if the environment, reviewer rule,
 credential scope, teardown source binding or lock control changes.
 
-For integrated local Cloudflare development, use the repository-owned
-`docs:dev:cloudflare` script. This is development only. It does not replace the
-workflow authority or receipt path.
+### Integrated local development
+
+Integrated local Cloudflare development is credentialed provider work. Before
+the first run, the named developer must have authority to create a scoped
+personal Doppler login and to use the development Cloudflare token against the
+TaxKit account. Do not treat repository access as that approval.
+
+From the repository root:
+
+```sh
+doppler login --scope=./
+bun run check:doppler-custody
+bun run docs:dev:cloudflare
+```
+
+The login command may create or replace a local Doppler access token. Run it
+interactively only for the named developer and checkout. Moving the checkout
+requires a new scoped login. Never pass a token on the command line and never
+run `doppler configure debug`; Doppler CLI 3.76.5 can print a raw token after a
+keyring fallback. The custody command reads only the scoped config structure,
+requires mode `0600` and a `secret-...` keyring reference, and prints only
+pass/fail.
+
+The root development adapter removes ambient Doppler and Cloudflare values,
+selects only `taxkit/dev`, fetches only `CLOUDFLARE_ACCOUNT_ID` and
+`CLOUDFLARE_API_TOKEN`, disables fallback and starts the internal command with
+Bun and Alchemy dotenv loading disabled. Missing login, config or either named
+value stops before Alchemy. A Doppler outage also stops; there is no stale
+fallback.
+
+Alchemy uses only a Schema-decoded `dev_<user>` local stack stage. The stricter
+`pr-N | prod` workflow/evidence stage does not admit local stages. The command
+does not replace Preview/Production workflow authority, stage locks or receipt
+paths. Do not run it during an overlapping manual or workflow mutation when
+the shared Alchemy state could be affected.
+
+For fast credential-free work, use `bun run docs:dev:vite` instead.
 
 ## Evidence and postcondition
 

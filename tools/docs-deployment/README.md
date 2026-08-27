@@ -3,7 +3,7 @@ document_type: developer-guide
 lifecycle: current
 authority: supporting
 owner: taxkit-deployment-tool-owner
-last_reviewed: 2026-08-24
+last_reviewed: 2026-08-28
 review_trigger: docs deployment command, receipt Schema, workflow adapter, provider inventory, authority, or proof change
 ---
 
@@ -42,6 +42,19 @@ operator procedure and authority live in
   or run Alchemy, Wrangler, GitHub or another executable.
 - `inventory.runtime.ts` is the provider/state readback composition owner. It
   remains read-only unless a separately authorized workflow owns mutation.
+- `local-doppler.ts` owns the one fixed local credentialed command. It removes
+  ambient Doppler and Cloudflare values, selects only `taxkit/dev`, disables
+  env-config and fallback reads, limits fetched names, and starts Bun with
+  automatic `.env` loading disabled. Its runtime exposes no caller-selected
+  project, config, executable or argument.
+- `doppler-custody.boundary.ts` reads the local Doppler config through Effect
+  FileSystem, YAML and Schema, selects the most specific repository-scoped
+  token reference, and accepts only a mode-`0600` `secret-...` system-keyring
+  reference. Its runtime prints only pass/fail and never resolves or prints the
+  token. Do not replace it with `doppler configure debug`.
+- `no-local-env` is the intentionally empty Alchemy dotenv input. It prevents
+  the native local command from reading a developer `.env` while Doppler
+  supplies the two named Cloudflare values through the process environment.
 - `strict-boundaries.policy.ts` checks the named application and deployment
   adapters for ambient host access, raw concurrency, lost workflow/credential
   boundaries and unmanaged docs runtime state.
@@ -70,13 +83,15 @@ Cloudflare `fetch` callback crosses into the app-owned `ManagedRuntime` through
 ```sh
 bun run check:docs-deployment:types
 bun run check:docs-deployment-tools:types
+bun run check:doppler-custody
 bun run test:docs-deployment
 bun run check:docs-deployment
 ```
 
 The focused tests cover Config and receipt boundaries, every workflow-evidence
 mode, credential failures, account mismatch, plan/resource admission,
-workflow identity, deterministic output encoding, secret-negative failures,
+workflow identity, deterministic output encoding, local Doppler arguments and
+ambient-value stripping, pass/fail-only keyring custody, secret-negative failures,
 the version-bound real plan fixtures, historical receipt classification and
 static adapter contracts. Root
 `verification` invokes them once. These local commands do not dispatch

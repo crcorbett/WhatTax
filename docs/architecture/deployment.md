@@ -3,7 +3,7 @@ document_type: architecture
 lifecycle: current
 authority: canonical
 owner: taxkit-architecture-owner
-last_reviewed: 2026-08-24
+last_reviewed: 2026-08-28
 review_trigger: deployment target, runtime adapter, provider resource, state, domain, or rollback change
 ---
 
@@ -32,8 +32,10 @@ intent and task state belong in the active SPEC and execution plan.
   `@cloudflare/vite-plugin@1.47.0` emits `dist/server/index.js`, its server
   modules and `dist/client` assets. The former docs-app Nitro/Vercel bridge was
   retired after local parity; `apps/web` remains a separate Nitro owner.
-- Root `alchemy.run.ts` owns one `TaxKitDocsCloudflare` stack, branded
-  `pr-<number>` or `prod` stage admission, the mutation composition's
+- Root `alchemy.run.ts` owns one `TaxKitDocsCloudflare` stack. Hosted workflow
+  and evidence admission remains branded `pr-<number>` or `prod`; local
+  `alchemy dev` separately admits only Alchemy's `dev_<user>` default without
+  widening that deployment Schema. The root also owns the mutation composition's
   `Cloudflare.state()`, and one logical
   `Cloudflare.Website.Vite("DocsWebsite")` resource. Alchemy injects its
   Cloudflare Vite integration, builds the app, and owns the SSR Worker/assets
@@ -98,6 +100,22 @@ The local command copies only emitted output to a temporary directory, removes
 checkout paths from the generated Wrangler config, strips provider credential
 variables, runs Wrangler dry-run and then runs the same no-bundle module graph
 under workerd. Local proof does not establish provider state or deployment.
+
+The integrated local development call graph is separate:
+
+```text
+repository-scoped Doppler login and custody check
+  -> fixed taxkit/dev adapter with ambient values and fallbacks disabled
+    -> Bun and Alchemy dotenv loading disabled
+      -> native alchemy dev
+        -> Schema-decoded dev_<user> stack
+          -> the same Website.Vite resource in local development mode
+```
+
+This command can contact Cloudflare and Alchemy state. It therefore still
+needs the named local development operation and account authority in the
+runbook. The adapter does not grant that authority, and deterministic fake
+process tests do not prove provider access.
 
 The repository-owned implementation and command map for deployment tooling is
 [`../../tools/docs-deployment/README.md`](../../tools/docs-deployment/README.md).

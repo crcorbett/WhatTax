@@ -8,7 +8,7 @@
     "packages/api/http/src/client/service.ts": ["duplicates"],
     "packages/api/http/src/groups/health.ts": ["exports", "types"]
   },
-  "ignoreBinaries": ["gh", "jq", "oxfmt", "oxlint"],
+  "ignoreBinaries": ["doppler", "gh", "jq", "oxfmt", "oxlint"],
   "workspaces": {
     ".": {
       "entry": [
@@ -24,7 +24,9 @@
         "tools/quality-workflow/*.test.ts",
         "tools/docs-deployment/check.runtime.ts",
         "tools/docs-deployment/automation.check.runtime.ts",
+        "tools/docs-deployment/doppler-custody.runtime.ts",
         "tools/docs-deployment/inventory.runtime.ts",
+        "tools/docs-deployment/local-doppler.runtime.ts",
         "tools/docs-deployment/*.test.ts"
       ],
       "project": [
