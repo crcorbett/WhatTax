@@ -258,7 +258,7 @@
     },
     {
       "id": "DCG-004",
-      "status": "pending",
+      "status": "completed",
       "title": "Govern Production and recovery",
       "type": "production-vertical-slice",
       "dependsOn": ["DCG-003"],

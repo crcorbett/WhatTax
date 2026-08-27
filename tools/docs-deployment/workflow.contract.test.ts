@@ -23,13 +23,13 @@ const checkoutAction =
   "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1";
 const dopplerAction =
   "dopplerhq/secrets-fetch-action@451892f16195f9ac360e1a5bcbf0b5fd0e957534";
-const cloudflareTokenBinding = [
-  "CLOUDFLARE_API_TOKEN: $",
-  "{{ secrets.CLOUDFLARE_API_TOKEN }}",
-].join("");
 const dopplerCloudflareTokenBinding = [
   "CLOUDFLARE_API_TOKEN: $",
   "{{ steps.doppler-provider.outputs.CLOUDFLARE_API_TOKEN }}",
+].join("");
+const dopplerTurboTokenBinding = [
+  "TURBO_TOKEN: $",
+  "{{ steps.doppler-ci.outputs.TURBO_TOKEN }}",
 ].join("");
 
 const stepNamesWithBinding = (source: string, binding: string) =>
@@ -129,10 +129,7 @@ describe("docs deployment workflow admission", () => {
         "steps.bun-cache-restore.outputs.cache-hit != 'true'"
       );
     }
-    expect(production).toContain("TURBO_CACHE: local:rw,remote:rw");
-    expect(production).toContain(turboTeamBinding);
-    expect(production).toContain(turboTokenBinding);
-    for (const source of [preview, teardown]) {
+    for (const source of [preview, production, teardown]) {
       expect(source).toContain("TURBO_CACHE: local:rw");
       expect(source).not.toContain(turboTeamBinding);
       expect(source).not.toContain(turboTokenBinding);
@@ -144,6 +141,23 @@ describe("docs deployment workflow admission", () => {
     expect(preview).toContain(
       ["TURBO_TOKEN: $", "{{ steps.doppler-ci.outputs.TURBO_TOKEN }}"].join("")
     );
+    expect(production.split("TURBO_CACHE: local:rw,remote:rw")).toHaveLength(5);
+    expect(production).toContain(
+      ["TURBO_TEAM: $", "{{ steps.doppler-ci.outputs.TURBO_TEAM }}"].join("")
+    );
+    expect(production).toContain(
+      ["TURBO_TOKEN: $", "{{ steps.doppler-ci.outputs.TURBO_TOKEN }}"].join("")
+    );
+    expect(stepNamesWithBinding(preview, dopplerTurboTokenBinding)).toEqual([
+      "Validate deployment owners",
+      "Build provider-free docs proof",
+    ]);
+    expect(stepNamesWithBinding(production, dopplerTurboTokenBinding)).toEqual([
+      "Schema-check accepted Preview plan",
+      "Schema-check accepted Preview provider and hosted proof",
+      "Validate deployment owners",
+      "Build provider-free docs proof",
+    ]);
     expect(teardown).not.toContain("TURBO_CACHE: local:rw,remote:rw");
     expect(receipts).toContain("TURBO_CACHE: local:rw,remote:rw");
     expect(receipts).toContain(
@@ -395,7 +409,7 @@ describe("docs deployment workflow admission", () => {
           "Plan exact fixed Production candidate",
           "Replan and deploy fixed Production candidate",
         ],
-        binding: cloudflareTokenBinding,
+        binding: dopplerCloudflareTokenBinding,
         path: workflowPaths.production,
       },
       {
@@ -446,11 +460,34 @@ describe("docs deployment workflow admission", () => {
     expect(preview.match(/secrets\./gu)).toHaveLength(2);
     expect(teardown.match(/secrets\./gu)).toHaveLength(1);
     expect(teardown).not.toContain("doppler-ci");
+    expect(production).toContain(dopplerAction);
+    expect(production).toContain(
+      ["doppler-token: $", "{{ secrets.DOPPLER_CI_TOKEN }}"].join("")
+    );
+    expect(production).toContain(
+      ["doppler-token: $", "{{ secrets.DOPPLER_PROVIDER_TOKEN }}"].join("")
+    );
+    expect(production).toContain(
+      'test "$DOPPLER_PROJECT" = "taxkit" && test "$DOPPLER_CONFIG" = "ci"'
+    );
+    expect(production).toContain(
+      'test "$DOPPLER_PROJECT" = "taxkit" && test "$DOPPLER_CONFIG" = "prd"'
+    );
+    expect(production).toContain("environment: taxkit-docs-production");
+    expect(production).not.toContain("environment: taxkit-docs-preview\n");
+    expect(production).not.toContain('test "$DOPPLER_CONFIG" = "stg_preview"');
+    expect(production).not.toContain("secrets.CLOUDFLARE");
+    expect(production).not.toContain("inject-env-vars");
+    expect(production.match(/secrets\./gu)).toHaveLength(2);
+    expect(production.lastIndexOf(cacheSaveAction)).toBeLessThan(
+      production.indexOf(dopplerAction)
+    );
   });
 
-  test("uploads only prepared Preview and teardown evidence directories", async () => {
-    const [preview, teardown] = await Promise.all([
+  test("uploads only prepared deployment evidence directories", async () => {
+    const [preview, production, teardown] = await Promise.all([
       readWorkflow(workflowPaths.preview),
+      readWorkflow(workflowPaths.production),
       readWorkflow(workflowPaths.teardown),
     ]);
     expect(preview).toContain("Prepare allowlisted Preview plan evidence");
@@ -482,6 +519,32 @@ describe("docs deployment workflow admission", () => {
     );
     expect(teardown).not.toContain(
       ["path: $", "{{ runner.temp }}/docs-deployment\n"].join("")
+    );
+    expect(production).toContain(
+      "Prepare allowlisted Production plan evidence"
+    );
+    expect(production).toContain(
+      "TAXKIT_WORKFLOW_ARTIFACT_MODE: production-plan"
+    );
+    expect(production).toContain(
+      "Prepare allowlisted Production provider evidence"
+    );
+    expect(production).toContain(
+      "TAXKIT_WORKFLOW_ARTIFACT_MODE: production-provider"
+    );
+    expect(production).toContain(
+      ["path: $", "{{ runner.temp }}/docs-production-plan-upload"].join("")
+    );
+    expect(production).toContain(
+      ["path: $", "{{ runner.temp }}/docs-production-provider-upload"].join("")
+    );
+    expect(production).not.toContain(
+      ["path: $", "{{ runner.temp }}/docs-deployment\n"].join("")
+    );
+    expect(production).not.toContain(
+      ["path: |\n", "            $", "{{ runner.temp }}/docs-deployment"].join(
+        ""
+      )
     );
   });
 

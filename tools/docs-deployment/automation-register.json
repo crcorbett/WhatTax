@@ -95,7 +95,7 @@
         "release-or-publication",
         "unrelated-provider-resource"
       ],
-      "durationOrRevocation": "One protected fixed Production operation for the accepted exact candidate; revoke on completion, explicit revocation or identity/safety mismatch.",
+      "durationOrRevocation": "One protected fixed Production operation for the accepted exact candidate through the taxkit/prd bridge; revoke on completion, explicit revocation or identity/safety mismatch.",
       "environment": "taxkit-docs-production",
       "operations": ["production-deploy", "production-rollback"],
       "principal": "taxkit-docs-production-workflow",
@@ -106,7 +106,7 @@
     "durableState": {
       "identity": "accepted Preview source, exact Production candidate, plan digest, fixed Worker deployment/version and hosted proof",
       "kind": "candidate-plan-provider-receipt",
-      "location": "dated workflow artifact and docs/evidence/deployments receipt after acceptance"
+      "location": "allowlisted dated workflow artifact and docs/evidence/deployments receipt after acceptance"
     },
     "environment": {
       "id": "taxkit-docs-production",
@@ -118,13 +118,13 @@
     },
     "failure": {
       "escalationOwner": "taxkit-docs-deployment-operation-owner",
-      "recovery": "Retain the failed receipt and use the normal accepted source-bound rollback path.",
+      "recovery": "Retain the failed receipt; disable the prd bridge and revert to the last reviewed source under separate authority, or use the normal accepted source-bound rollback path.",
       "rollback": "Redeploy the last-known-good exact candidate through the same fixed Production graph.",
       "stopConditions": [
         "accepted Preview identity is absent or differs",
         "quality result is absent or belongs to another commit",
         "plan digest or fixed Worker identity differs",
-        "credential or environment identity differs"
+        "Doppler project/config, credential or environment identity differs"
       ]
     },
     "id": "docs-production-delivery",

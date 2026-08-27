@@ -35,24 +35,24 @@ changing Doppler, GitHub or Cloudflare credentials remains a separate
 provider operation under the
 [authority model](../operations/authority-model.md).
 
-Repository implementation through DCG-003 is accepted: local development,
-Quality, receipt reconciliation, Preview and exact-stage teardown now have one
-reviewed Doppler source path each. Production remains pending DCG-004. No live
-TaxKit config, GitHub bridge, hosted fetch or provider result is claimed before
-the separately approved DCG-005 operation.
+Repository implementation through DCG-004 is accepted: local development,
+Quality, receipt reconciliation, Preview, exact-stage teardown, Production and
+normal rollback now have one reviewed Doppler source path each. No live TaxKit
+config, GitHub bridge, hosted fetch or provider result is claimed before the
+separately approved DCG-005 operation.
 
 ## Problem
 
-TaxKit currently reads Turbo and Cloudflare inputs directly from GitHub
-secrets and variables. The local Alchemy command can also inherit whatever is
-present in the developer's shell, Bun `.env` files or Alchemy's own default
-`.env` loader. Its default `dev_<user>` stage is also rejected by the current
-deployment-only `pr-N`/`prod` decoder, so the documented local command is not a
-complete working path. The values are not
-governed from one environment model, and the current deployment workflows can
-upload broad runner temporary directories containing raw plan or error files.
+At the research baseline, TaxKit read Turbo and Cloudflare inputs directly from
+GitHub secrets and variables. The local Alchemy command could also inherit
+whatever was present in the developer's shell, Bun `.env` files or Alchemy's
+own default `.env` loader. Its default `dev_<user>` stage was rejected by the
+deployment-only `pr-N`/`prod` decoder, so the documented local command was not
+a complete working path. The values were not governed from one environment
+model, and deployment workflows could upload broad runner temporary
+directories containing raw plan or error files.
 
-This creates four practical risks:
+This created four practical risks addressed by this SPEC:
 
 - a developer can unknowingly use the wrong environment or a stale local
   fallback;

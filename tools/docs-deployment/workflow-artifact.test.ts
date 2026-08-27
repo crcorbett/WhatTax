@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 
 import * as BunServices from "@effect/platform-bun/BunServices";
-import { Effect, FileSystem, Path, Record } from "effect";
+import { Array, Effect, FileSystem, Path, Record } from "effect";
 
 import { prepareWorkflowArtifact } from "./workflow-artifact.js";
 
@@ -28,9 +28,21 @@ const runFixture = (
     const result = yield* Effect.exit(
       prepareWorkflowArtifact(mode, source, upload)
     );
-    const uploaded = yield* fileSystem
+    const uploadedMembers = yield* fileSystem
       .readDirectory(upload, { recursive: true })
       .pipe(Effect.orElseSucceed(() => []));
+    const inspected = yield* Effect.all(
+      uploadedMembers.map((member) =>
+        fileSystem
+          .stat(path.join(upload, member))
+          .pipe(Effect.map((info) => (info.type === "File" ? member : null)))
+      ),
+      { concurrency: 1 }
+    );
+    const uploaded = Array.filter(
+      inspected,
+      (member): member is string => member !== null
+    );
     return { result, uploaded: uploaded.toSorted() };
   }).pipe(Effect.scoped, Effect.provide(BunServices.layer));
 
@@ -123,5 +135,27 @@ describe("workflow artifact preparation", () => {
       );
       expect(result._tag).toBe("Failure");
       expect(String(result)).not.toContain("this-must-not-escape");
+    }).pipe(Effect.runPromise));
+
+  test("uses the same strict allowlist for Production provider proof", () =>
+    Effect.gen(function* () {
+      const { result, uploaded } = yield* runFixture(
+        {
+          "docs/evidence/deployments/production/desktop.png": "safe-image",
+          "hosted-proof.json": '{"schemaVersion":1}',
+          "hosted-proof.raw.json": '{"unsafe":"raw"}',
+          "provider-inventory-before.json": '{"schemaVersion":1}',
+          "provider-readback.json": '{"schemaVersion":3}',
+          "workflow-input.json": '{"schemaVersion":1}',
+        },
+        "production-provider"
+      );
+      expect(result._tag).toBe("Success");
+      expect(uploaded).toEqual([
+        "docs/evidence/deployments/production/desktop.png",
+        "hosted-proof.json",
+        "provider-readback.json",
+        "workflow-input.json",
+      ]);
     }).pipe(Effect.runPromise));
 });

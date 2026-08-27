@@ -62,7 +62,6 @@ jobs:
     environment: taxkit-docs-production
     env:
       ALCHEMY_PROFILE: default
-      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
       CANDIDATE_SHA: ${{ inputs.candidate_sha }}
       ACCEPTED_PREVIEW_COMMIT: ${{ inputs.accepted_preview_commit }}
       ACCEPTED_PREVIEW_PLAN_SHA256: ${{ inputs.accepted_preview_plan_sha256 }}
@@ -72,9 +71,7 @@ jobs:
       ROLLBACK_RECOVERY_IDENTITY: ${{ inputs.rollback_recovery_identity }}
       ACCEPTED_PLAN_SHA256: ${{ inputs.accepted_plan_sha256 }}
       OPERATION: ${{ inputs.operation }}
-      TURBO_CACHE: local:rw,remote:rw
-      TURBO_TEAM: ${{ vars.TURBO_TEAM }}
-      TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+      TURBO_CACHE: local:rw
     steps:
       - name: Check exact candidate and Quality result
         env:
@@ -158,7 +155,7 @@ jobs:
           printf 'ACCEPTED_PREVIEW_HOSTED=%s\n' "$accepted_preview_hosted" >> "$GITHUB_ENV"
 
       - name: Set up Bun
-        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.0.2
+        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
         with:
           bun-version-file: .bun-version
 
@@ -231,8 +228,35 @@ jobs:
           path: ${{ env.PLAYWRIGHT_BROWSERS_PATH }}
           key: ${{ steps.playwright-cache-restore.outputs.cache-primary-key }}
 
+      - name: Fetch trusted CI configuration
+        id: doppler-ci
+        uses: dopplerhq/secrets-fetch-action@451892f16195f9ac360e1a5bcbf0b5fd0e957534 # v2.0.0
+        with:
+          doppler-token: ${{ secrets.DOPPLER_CI_TOKEN }}
+
+      - name: Check trusted CI configuration identity
+        env:
+          DOPPLER_CONFIG: ${{ steps.doppler-ci.outputs.DOPPLER_CONFIG }}
+          DOPPLER_PROJECT: ${{ steps.doppler-ci.outputs.DOPPLER_PROJECT }}
+        run: test "$DOPPLER_PROJECT" = "taxkit" && test "$DOPPLER_CONFIG" = "ci"
+
+      - name: Fetch Production provider configuration
+        id: doppler-provider
+        uses: dopplerhq/secrets-fetch-action@451892f16195f9ac360e1a5bcbf0b5fd0e957534 # v2.0.0
+        with:
+          doppler-token: ${{ secrets.DOPPLER_PROVIDER_TOKEN }}
+
+      - name: Check Production provider configuration identity
+        env:
+          DOPPLER_CONFIG: ${{ steps.doppler-provider.outputs.DOPPLER_CONFIG }}
+          DOPPLER_PROJECT: ${{ steps.doppler-provider.outputs.DOPPLER_PROJECT }}
+        run: test "$DOPPLER_PROJECT" = "taxkit" && test "$DOPPLER_CONFIG" = "prd"
+
       - name: Schema-check accepted Preview plan
         env:
+          TURBO_CACHE: local:rw,remote:rw
+          TURBO_TEAM: ${{ steps.doppler-ci.outputs.TURBO_TEAM }}
+          TURBO_TOKEN: ${{ steps.doppler-ci.outputs.TURBO_TOKEN }}
           TAXKIT_WORKFLOW_PLAN_CANDIDATE_COMMIT: ${{ inputs.candidate_sha }}
           TAXKIT_WORKFLOW_PLAN_OPERATION: preview-equal-replan
           TAXKIT_WORKFLOW_PLAN_STAGE: pr-${{ inputs.accepted_preview_pr_number }}
@@ -246,6 +270,9 @@ jobs:
 
       - name: Schema-check accepted Preview provider and hosted proof
         env:
+          TURBO_CACHE: local:rw,remote:rw
+          TURBO_TEAM: ${{ steps.doppler-ci.outputs.TURBO_TEAM }}
+          TURBO_TOKEN: ${{ steps.doppler-ci.outputs.TURBO_TOKEN }}
           TAXKIT_WORKFLOW_PROVIDER_READBACK: ${{ env.ACCEPTED_PREVIEW_READBACK }}
           TAXKIT_WORKFLOW_HOSTED_PROBE: ${{ env.ACCEPTED_PREVIEW_HOSTED }}
           TAXKIT_WORKFLOW_CANDIDATE_COMMIT: ${{ inputs.candidate_sha }}
@@ -255,14 +282,23 @@ jobs:
         run: bun run check:docs-deployment-workflow-proof
 
       - name: Validate deployment owners
+        env:
+          TURBO_CACHE: local:rw,remote:rw
+          TURBO_TEAM: ${{ steps.doppler-ci.outputs.TURBO_TEAM }}
+          TURBO_TOKEN: ${{ steps.doppler-ci.outputs.TURBO_TOKEN }}
         run: bun run check:docs-deployment
 
       - name: Build provider-free docs proof
+        env:
+          TURBO_CACHE: local:rw,remote:rw
+          TURBO_TEAM: ${{ steps.doppler-ci.outputs.TURBO_TEAM }}
+          TURBO_TOKEN: ${{ steps.doppler-ci.outputs.TURBO_TOKEN }}
         run: bun run docs:build
 
       - name: Run mutation-capable Alchemy state-store bootstrap
         env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ steps.doppler-provider.outputs.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ steps.doppler-provider.outputs.CLOUDFLARE_API_TOKEN }}
         run: |
           set -euo pipefail
           mkdir -p "$RUNNER_TEMP/docs-deployment"
@@ -278,7 +314,8 @@ jobs:
       - name: Plan exact fixed Production candidate
         id: plan
         env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ steps.doppler-provider.outputs.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ steps.doppler-provider.outputs.CLOUDFLARE_API_TOKEN }}
         run: |
           set -euo pipefail
           mkdir -p "$RUNNER_TEMP/docs-deployment"
@@ -309,7 +346,8 @@ jobs:
       - name: Replan and deploy fixed Production candidate
         if: inputs.operation == 'deploy' || inputs.operation == 'rollback'
         env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ steps.doppler-provider.outputs.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ steps.doppler-provider.outputs.CLOUDFLARE_API_TOKEN }}
         run: |
           set -euo pipefail
           test -n "$ACCEPTED_PLAN_SHA256"
@@ -420,27 +458,36 @@ jobs:
           TAXKIT_WORKFLOW_SCREENSHOT_ROOT="$RUNNER_TEMP/docs-deployment" \
             bun run check:docs-deployment-workflow-proof
 
+      - name: Prepare allowlisted Production plan evidence
+        if: always()
+        env:
+          TAXKIT_WORKFLOW_ARTIFACT_MODE: production-plan
+          TAXKIT_WORKFLOW_ARTIFACT_SOURCE: ${{ runner.temp }}/docs-deployment
+          TAXKIT_WORKFLOW_ARTIFACT_UPLOAD: ${{ runner.temp }}/docs-production-plan-upload
+        run: bun --conditions=source run tools/docs-deployment/workflow-artifact.runtime.ts
+
       - name: Upload sanitized Production plan and replan evidence
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: taxkit-docs-production-${{ github.run_id }}
-          path: ${{ runner.temp }}/docs-deployment
+          path: ${{ runner.temp }}/docs-production-plan-upload
           retention-days: 30
           if-no-files-found: error
+
+      - name: Prepare allowlisted Production provider evidence
+        if: (inputs.operation == 'deploy' || inputs.operation == 'rollback') && always()
+        env:
+          TAXKIT_WORKFLOW_ARTIFACT_MODE: production-provider
+          TAXKIT_WORKFLOW_ARTIFACT_SOURCE: ${{ runner.temp }}/docs-deployment
+          TAXKIT_WORKFLOW_ARTIFACT_UPLOAD: ${{ runner.temp }}/docs-production-provider-upload
+        run: bun --conditions=source run tools/docs-deployment/workflow-artifact.runtime.ts
 
       - name: Upload Production provider readback
         if: (inputs.operation == 'deploy' || inputs.operation == 'rollback') && always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: taxkit-docs-production-provider-${{ github.run_id }}
-          path: |
-            ${{ runner.temp }}/docs-deployment/provider-inventory.json
-            ${{ runner.temp }}/docs-deployment/provider-inventory-before.json
-            ${{ runner.temp }}/docs-deployment/provider-readback.json
-            ${{ runner.temp }}/docs-deployment/workflow-input.json
-            ${{ runner.temp }}/docs-deployment/docs/evidence/deployments
-            ${{ runner.temp }}/docs-deployment/hosted-proof.raw.json
-            ${{ runner.temp }}/docs-deployment/hosted-proof.json
+          path: ${{ runner.temp }}/docs-production-provider-upload
           retention-days: 30
           if-no-files-found: error

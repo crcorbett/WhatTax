@@ -68,7 +68,7 @@ Not approved without a separate exact operation:
 | DCG-001 | Accepted | Fixed `taxkit/dev` adapter, keyring-only custody check, separate `dev_<user>` stack stage, tests and current docs accepted without provider access. |
 | DCG-002 | Accepted | Trusted Quality and successful receipt validation use pinned `taxkit/ci` named outputs after cache saves; forks and failed/cancelled receipt paths fetch no credential. |
 | DCG-003 | Accepted | Preview and teardown use only `taxkit/stg_preview`; Preview fetches `taxkit/ci` separately, teardown stays local-only, and all three upload classes use the secret-negative allowlist boundary. |
-| DCG-004 | Pending | Depends on DCG-003 acceptance. |
+| DCG-004 | Accepted | Protected Production and rollback use only `taxkit/prd`, fetch `taxkit/ci` separately after cache saves, and upload only prepared secret-negative plan/provider evidence. |
 | DCG-005 | Pending authority | No TaxKit Doppler project, repository `DOPPLER_CI_TOKEN` or protected-environment `DOPPLER_PROVIDER_TOKEN` bridge existed at the research baseline. |
 
 ## Research record
@@ -271,6 +271,45 @@ final merge remain bounded by DCG-005 and the authority model.
   hosted Preview/teardown source remains unproved until DCG-005 bootstrap and
   exact-SHA hosted proof are separately authorised.
 
+### DCG-004 — accepted 28 August 2026
+
+- Production now fetches the minimum `taxkit/ci` and `taxkit/prd` configs
+  through separate v2.0.0 action steps after all cache saves. It checks exact
+  project/config metadata before any named output reaches a consumer.
+- Turbo outputs reach only the accepted Preview plan check, accepted Preview
+  provider/hosted check, deployment-owner validation and provider-free docs
+  build. Cloudflare outputs reach only bootstrap, fixed Production plan and
+  equal-replan/deploy-or-rollback. No direct legacy binding or broad injection
+  remains in Production source.
+- The reviewer-protected `taxkit-docs-production` environment, fixed `prod`
+  non-cancellable lock, accepted Preview chain, initial/equal plan checks,
+  provider readback, hosted proof and normal source-bound rollback/redeploy are
+  unchanged. Static tests reject `stg_preview`, the Preview environment and any
+  direct Cloudflare/Turbo source in Production.
+- Production plan and provider uploads use the same typed allowlist owner as
+  Preview. Raw plan/replan output, provider inventories and raw hosted
+  diagnostics stay runner-local; the provider artifact retains only its final
+  readback, hosted proof, workflow input and approved screenshots.
+- Recovery now names bridge disablement, one reviewed repository revert,
+  Production reviewer/lock readback, replacement-before-revocation rotation
+  and the separate approval needed to remove retained legacy custody. No mixed
+  fallback is admitted.
+- Documentation impact: **Change required** and completed for root/docs app
+  guidance, configuration/deployment architecture, the authority model,
+  automation register, deployment/recovery runbooks, SPEC ledger and active
+  plan. **Preserve** is recorded for native Alchemy, protected Production and
+  rollback meaning. A Changeset is **N/A** because no installed package or
+  public export changed.
+- Pinned Bun `1.3.14` focused proof passed 42 contract/boundary/automation
+  tests. Full deployment proof passed 93 tests and 733 assertions. The final
+  full `bun run verification` passed repository paths, documentation,
+  runbooks, deployment/automation checks, lint, formatting, skills, Quality,
+  Knip, production Knip and all workspace type checks.
+- No Doppler config/token, GitHub secret/variable or Cloudflare/Alchemy
+  resource was created, changed, read by value, rotated or removed. The new
+  Production/rollback source remains unproved until DCG-005 bootstrap and
+  exact-SHA hosted proof are separately authorised.
+
 ## Verification log
 
 The reviewed document set passed JSON parsing and `git diff --check`.
@@ -304,6 +343,11 @@ selection, cache-before-fetch order, named-output placement, Production
 isolation and secret-negative prepared uploads. It preserves the earlier
 hosted receipts as immutable history but does not claim that the new Doppler
 source ran on GitHub or accessed Cloudflare.
+
+DCG-004 deterministic proof establishes protected `prd` selection, separate
+`ci` consumers, fixed-stage and rollback preservation, Preview isolation and
+secret-negative Production artifacts. It does not claim that the new Doppler
+source ran on GitHub, reached Production or completed a rollback.
 
 ## Versioning
 

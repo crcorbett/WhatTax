@@ -185,9 +185,9 @@ Preview and exact-stage teardown repository source selects only
 selects `taxkit/ci` separately for its two Turbo consumers after cache saves;
 teardown does not fetch it. Their upload steps receive only a separately
 prepared allowlist of sanitised proof files, while raw provider output stays on
-the runner. Production retains its direct source until its reviewed slice. No
-hosted Doppler fetch is claimed before the separately approved TaxKit bridge is
-created and read back.
+the runner. Production uses its separate protected `taxkit/prd` bridge, fixed
+`prod` stage and the same allowlisted upload owner. No hosted Doppler fetch is
+claimed before the separately approved TaxKit bridge is created and read back.
 
 Exact Preview, Production, teardown, rollback and Alchemy-state operations
 belong to `docs/runbooks/docs-deployment.md`; dated sanitized observations

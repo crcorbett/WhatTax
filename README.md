@@ -156,11 +156,12 @@ bounded Turbo caching for deterministic work. Receipt validation and Preview
 get their two Turbo values from `taxkit/ci` after cache saves; teardown stays
 local-cache-only. Preview and teardown get Cloudflare values only from
 `taxkit/stg_preview` through the Preview environment bridge and expose them
-only to exact provider steps. Production retains its direct source until its
-reviewed migration. Preview, teardown and receipt uploads use separate
-allowlisted directories so raw runner output is not retained. The TaxKit
-Doppler configs and GitHub bridges are still pending separately approved
-bootstrap, so this is repository behaviour rather than hosted proof.
+only to exact provider steps. Production uses its separate protected
+`taxkit/prd` bridge and keeps its fixed `prod` plan/deploy/rollback controls.
+All deployment and receipt uploads use separate allowlisted directories so raw
+runner output is not retained. The TaxKit Doppler configs and GitHub bridges
+are still pending separately approved bootstrap, so this is repository
+behaviour rather than hosted proof.
 
 Package-facing changes must include a Changeset. Use `bun run changeset` during
 implementation to record the user-facing package impact, and use

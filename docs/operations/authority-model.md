@@ -3,7 +3,7 @@ document_type: authority-model
 lifecycle: current
 authority: canonical
 owner: taxkit-authority-model-owner
-last_reviewed: 2026-08-24
+last_reviewed: 2026-08-28
 review_trigger: identity, release, Git, registry, deployment, provider, credential, or recovery change
 ---
 
@@ -39,6 +39,31 @@ The exact machine-checked records live in
 `tools/documentation/runbook-contract.json`. That sidecar and this table must
 agree; neither grants authority. Provider/registry/deployment claims require
 current target-system readback by the authorized principal.
+
+## 2026-08-28 — Doppler repository authority and provider stop
+
+The active Doppler configuration governance SPEC authorises repository
+research, documentation, workflow/tool implementation, local verification,
+coherent commits and pull-request/merge work after required checks. It does not
+authorise creating, changing, rotating, revoking or deleting a Doppler project,
+config, service token or secret, or a GitHub or Cloudflare credential.
+
+The pending provider operation must name Cooper or another approved TaxKit
+operator as principal; Doppler project `taxkit` and only configs `dev`, `ci`,
+`stg_preview` and `prd`; repository `DOPPLER_CI_TOKEN`; the separate Preview
+and Production environment `DOPPLER_PROVIDER_TOKEN` bridges; read-only,
+expiring, single-config access; masked named values; the exact environment and
+duration; bridge disablement and repository revert; and names-only config,
+scope, expiry, GitHub metadata, workflow and provider readback. Preview and
+Production are separate operations when their authority differs.
+
+Stop before that mutation while any principal, scope, expiry, Cloudflare
+permission measurement, rollback, revocation owner or readback is missing. Do
+not retrieve or record a value. Retained direct GitHub values may stay unused
+during migration recovery, but their removal needs separate approval after
+merged-main replacement proof. A locally green workflow proves repository
+shape only; it does not prove a Doppler config, bridge, hosted run or provider
+result.
 
 ## 2026-08-20 — Vercel Remote Cache qualification
 

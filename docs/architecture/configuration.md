@@ -59,11 +59,11 @@ Doppler project/config metadata and pass only named action outputs to exact
 consumer steps. Exact-claim OIDC needs a successor review and is not a second
 current path.
 
-The local, Quality, receipt, Preview and teardown repository source paths are
-implemented. Preview and teardown select only `taxkit/stg_preview`; Preview
-selects `taxkit/ci` separately for the two provider-free Turbo consumers, while
-teardown stays local-cache-only and cannot fetch `ci`. Production still uses
-its retained direct GitHub environment values until DCG-004 is accepted.
+All repository source paths are implemented. Preview and teardown select only
+`taxkit/stg_preview`; Production and rollback select only `taxkit/prd` through
+the reviewer-protected Production environment. Preview and Production select
+`taxkit/ci` separately for their exact provider-free Turbo consumers after
+cache saves, while teardown stays local-cache-only and cannot fetch `ci`.
 
 The TaxKit Doppler project/configs and GitHub bridges do not yet exist, so no
 hosted fetch is claimed. Creating them remains a separately approved operation.

@@ -78,7 +78,10 @@ fetch only `taxkit/stg_preview` through the Preview environment's
 outputs only to exact provider steps. Preview separately fetches `taxkit/ci`
 through repository `DOPPLER_CI_TOKEN` after cache saves and maps its Turbo
 outputs only to the provider-free deployment check and build. Teardown never
-fetches `ci`. Production retains its direct source until DCG-004. Checkout,
+fetches `ci`. Production fetches `taxkit/prd` only through its reviewer-
+protected environment and separately fetches `taxkit/ci` after cache saves.
+Its Cloudflare outputs reach only bootstrap, plan and equal-replan/apply; its
+Turbo outputs reach only the four post-cache proof/build steps. Checkout,
 dependency and browser setup, hosted proof and artifact actions remain
 provider-token-free. GitHub supplies the stage lock only to workflow runs. It
 does not lock manual CLI mutation, which is unsupported while a matching run
@@ -198,7 +201,7 @@ uploader prepares a separate directory containing exactly one final
 `workflow-run.json` or `workflow-run-failure.json`; downloaded source artifacts
 and raw GitHub API responses remain runner-local.
 
-Preview plan, provider and teardown jobs also prepare separate upload
+Preview, Production and teardown jobs also prepare separate upload
 directories. Their typed allowlist admits only the final sanitised files for
 the relevant mode and checks admitted JSON for deterministic sentinels and
 credential/token shapes. Raw Alchemy output, stderr, intermediate provider
@@ -212,11 +215,10 @@ proof. It neither advances the automation register nor proves current
 Cloudflare state.
 
 The separate `docs-workflow-cache-boundary` control governs acceleration in all
-four workflows. Receipt validation and Preview get the TaxKit Vercel Remote
-Cache values through the same `taxkit/ci` bridge after their cache saves.
-Teardown stays local-cache-only and Production retains its direct values until
-DCG-004. The Turbo token grants no Cloudflare, deployment, release or
-receipt-promotion authority.
+four workflows. Receipt validation, Preview and Production get the TaxKit
+Vercel Remote Cache values through the same `taxkit/ci` bridge after their
+cache saves. Teardown stays local-cache-only. The Turbo token grants no
+Cloudflare, deployment, release or receipt-promotion authority.
 Content-addressed GitHub caches retain Bun package
 downloads in all four workflows and Chromium binaries only where the browser is
 installed. A ref may restore a matching default-branch cache, while GitHub ref

@@ -174,11 +174,13 @@ Preview places its Doppler-sourced `CLOUDFLARE_API_TOKEN` only on its named
 bootstrap, plan and replan/apply steps; teardown exposes it only to bootstrap
 and exact-stage destroy. Preview fetches the separate `taxkit/ci` bridge after
 all cache saves and gives its Turbo outputs only to the provider-free
-deployment check and docs build. Teardown does not fetch `ci`. Production keeps
-its direct provider and Turbo source until DCG-004. Checkout, installation,
-hosted proof and artifact upload cannot read a provider token.
+deployment check and docs build. Teardown does not fetch `ci`. Production uses
+the same two-bridge shape with protected `taxkit/prd`: its Turbo outputs reach
+only the four post-cache provider-free proof/build steps, and its Cloudflare
+outputs reach only bootstrap, plan and equal-replan/apply. Checkout,
+installation, hosted proof and artifact upload cannot read a provider token.
 
-Preview plan, provider and teardown uploads are prepared in separate temporary
+Preview, Production and teardown uploads are prepared in separate temporary
 directories. A typed Effect owner admits only the named sanitised JSON and
 screenshot files for that mode and rejects admitted JSON containing credential
 names, deterministic sentinels or token shapes. Raw Alchemy plan/replan/destroy
