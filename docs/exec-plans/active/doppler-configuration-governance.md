@@ -69,7 +69,7 @@ Not approved without a separate exact operation:
 | DCG-002 | Accepted | Trusted Quality and successful receipt validation use pinned `taxkit/ci` named outputs after cache saves; forks and failed/cancelled receipt paths fetch no credential. |
 | DCG-003 | Accepted | Preview and teardown use only `taxkit/stg_preview`; Preview fetches `taxkit/ci` separately, teardown stays local-only, and all three upload classes use the secret-negative allowlist boundary. |
 | DCG-004 | Accepted | Protected Production and rollback use only `taxkit/prd`, fetch `taxkit/ci` separately after cache saves, and upload only prepared secret-negative plan/provider evidence. |
-| DCG-005 | Pending authority | No TaxKit Doppler project, repository `DOPPLER_CI_TOKEN` or protected-environment `DOPPLER_PROVIDER_TOKEN` bridge existed at the research baseline. |
+| DCG-005 | Pending authority | PR #73 is open. Exact-head Quality run `33090706119` stopped at `Fetch trusted CI configuration`; the separately approved TaxKit Doppler configs and GitHub bridges are still required before hosted proof or merge. |
 
 ## Research record
 
@@ -348,6 +348,17 @@ DCG-004 deterministic proof establishes protected `prd` selection, separate
 `ci` consumers, fixed-stage and rollback preservation, Preview isolation and
 secret-negative Production artifacts. It does not claim that the new Doppler
 source ran on GitHub, reached Production or completed a rollback.
+
+DCG-005 repository delivery started with pull request
+[`#73`](https://github.com/crcorbett/taxkit/pull/73). Hosted Quality run
+[`33090706119`](https://github.com/crcorbett/taxkit/actions/runs/33090706119)
+was bound to exact head `86e7f6a54667033432356babef77600d84e4604d` and completed
+checkout, frozen install, dependency/browser cache handling and the Quality
+workflow policy. It then failed at the pinned `Fetch trusted CI configuration`
+step; the metadata check and release graph did not run. This is names-only
+hosted failure proof of the missing repository bridge, not proof of a Doppler
+config, secret value, cache result, deployment or provider state. No action log
+or credential value was read into the record.
 
 ## Versioning
 
