@@ -48,10 +48,10 @@
     "fixture": "tools/docs-deployment/workflow.contract.test.ts",
     "id": "docs-workflow-cache-boundary",
     "owner": "taxkit-docs-deployment-automation-owner",
-    "preventedFailure": "A cache skips live install, plan, provider mutation, readback, hosted proof or receipt promotion; reuses node_modules; accepts a mutable action; or exposes a deployment credential through a cached task.",
-    "recovery": "Remove only the remote and GitHub cache bindings, retain frozen installation and Chromium setup, then rerun the exact live workflow path.",
+    "preventedFailure": "A cache skips live install, plan, provider mutation, readback, hosted proof or receipt promotion; a Doppler fetch precedes cache save; receipt upload includes downloaded or raw files; node_modules is reused; an action floats; or a credential enters a cached task.",
+    "recovery": "Remove the Doppler, remote and GitHub cache bindings, retain frozen installation and Chromium setup, then rerun the exact local-cache-only workflow path.",
     "retirementCondition": "A stronger deployment acceleration control preserves exact source, live authority checks and cache-free recovery.",
-    "reviewTrigger": "Turbo task, remote binding, cache action, key, path, install order, workflow event, credential or proof-boundary change.",
+    "reviewTrigger": "Doppler action/config, Turbo task, remote binding, cache action, key, path, install order, workflow event, credential, receipt upload or proof-boundary change.",
     "signal": "A deployment or receipt workflow restores, executes or saves accelerated repository work."
   }
 ]

@@ -52,7 +52,7 @@ Not approved without a separate exact operation:
 
 | Item | Identity |
 | --- | --- |
-| Checkout | `/Users/cooper/Projects/taxkit` |
+| Checkout | TaxKit repository root |
 | Branch | `codex/adopt-doppler-for-taxkit-configuration` |
 | Starting HEAD | `d2f7a3b4b90c54d4e930b438c42a29f1a89c60df` |
 | Starting `origin/main` | `d2f7a3b4b90c54d4e930b438c42a29f1a89c60df` |
@@ -66,7 +66,7 @@ Not approved without a separate exact operation:
 | PRD draft | Complete | First SPEC/task-ledger draft written under the PRD writer route and then revised in place. |
 | PRD review | Complete | Ready with bounded external stop; findings and corrections are recorded below. |
 | DCG-001 | Accepted | Fixed `taxkit/dev` adapter, keyring-only custody check, separate `dev_<user>` stack stage, tests and current docs accepted without provider access. |
-| DCG-002 | Pending | Depends on DCG-001 acceptance. |
+| DCG-002 | Accepted | Trusted Quality and successful receipt validation use pinned `taxkit/ci` named outputs after cache saves; forks and failed/cancelled receipt paths fetch no credential. |
 | DCG-003 | Pending | Depends on DCG-002 acceptance. |
 | DCG-004 | Pending | Depends on DCG-003 acceptance. |
 | DCG-005 | Pending authority | No TaxKit Doppler project, repository `DOPPLER_CI_TOKEN` or protected-environment `DOPPLER_PROVIDER_TOKEN` bridge existed at the research baseline. |
@@ -200,6 +200,41 @@ final merge remain bounded by DCG-005 and the authority model.
 - No provider, Doppler or GitHub resource or credential was created, changed,
   read by value, rotated or removed.
 
+### DCG-002 — accepted 28 August 2026
+
+- Trusted same-repository Quality and `main` runs fetch the minimum `taxkit/ci`
+  config with Doppler's v2.0.0 action pinned to
+  `451892f16195f9ac360e1a5bcbf0b5fd0e957534`. Only that action reads
+  repository `DOPPLER_CI_TOKEN`.
+- A separate value-free step checks project `taxkit` and config `ci`. Only the
+  trusted canonical release step receives named Turbo outputs. Fork pull
+  requests do not run the action and execute the same release graph with local
+  cache only.
+- All Bun and Chromium cache saves precede the fetch. The Quality policy rejects
+  broad injection, direct legacy bindings, wrong metadata/outputs, a moved
+  fetch, widened fork access and extra credential-bearing steps.
+- Successful receipt reconciliation follows the same fetch/check rule after
+  its Bun cache save. Failed or cancelled source runs do not fetch Doppler.
+  Turbo outputs exist only on the exact two-check validation step.
+- Receipt upload now uses a new allowlisted folder containing exactly one final
+  reconciled or failure JSON file. Downloaded deployment artifacts and raw
+  GitHub API responses stay in the runner work folder and are not re-uploaded.
+- The touched setup-bun comments now match the pinned v2.2.0 commit. Preview,
+  Production and teardown provider credential paths are deliberately preserved
+  for DCG-003/004.
+- Documentation impact: **Change required** and completed for root Quality
+  guidance, configuration and testing architecture, the automation register,
+  deployment runbook and machine-readable control registers. **Preserve** is
+  recorded for provider workflow authority and the native Alchemy graph. A
+  Changeset remains **N/A** because no installed package changes.
+- Focused proof passed 18 Quality policy tests, 17 workflow contract tests and
+  8 deployment automation tests, plus exact policy checks, types, lint,
+  formatting, docs and runbooks. The full repository result is recorded on the
+  final DCG-002 tree before commit.
+- No Doppler config/token, GitHub secret/variable or provider resource was
+  created, changed, read by value, rotated or removed. Hosted trusted Quality
+  and receipt fetch remain unproved until DCG-005 bootstrap authority.
+
 ## Verification log
 
 The reviewed document set passed JSON parsing and `git diff --check`.
@@ -222,6 +257,11 @@ DCG-001 focused proof passed with pinned Bun `1.3.14`:
 
 This proves the local command and its failure path. It does not prove a live
 TaxKit Doppler config, secret fetch, Cloudflare access or deployment.
+
+DCG-002 deterministic proof establishes the trusted/fork workflow shapes,
+cache-before-fetch order, exact named-output scope and one-file receipt upload.
+It does not prove the action fetched a live TaxKit config or that GitHub ran the
+new workflow.
 
 ## Versioning
 

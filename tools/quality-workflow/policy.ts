@@ -21,15 +21,36 @@ const expectedConcurrencyGroup = [
   `${workflowExpressionPrefix}{{ github.workflow }}-`,
   `${workflowExpressionPrefix}{{ github.ref }}`,
 ].join("");
-const expectedTurboCache = "local:rw,remote:rw";
-const expectedTurboTeam = [
+const trustedEventCondition =
+  "github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository";
+const forkEventCondition =
+  "github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository";
+const trustedTurboCache = "local:rw,remote:rw";
+const forkTurboCache = "local:rw";
+const dopplerActionSha = "451892f16195f9ac360e1a5bcbf0b5fd0e957534";
+const dopplerAction = `dopplerhq/secrets-fetch-action@${dopplerActionSha}`;
+const dopplerToken = [
   workflowExpressionPrefix,
-  "{{ vars.TURBO_TEAM }}",
+  "{{ secrets.DOPPLER_CI_TOKEN }}",
 ].join("");
-const expectedTurboToken = [
+const dopplerProjectOutput = [
   workflowExpressionPrefix,
-  "{{ secrets.TURBO_TOKEN }}",
+  "{{ steps.doppler-ci.outputs.DOPPLER_PROJECT }}",
 ].join("");
+const dopplerConfigOutput = [
+  workflowExpressionPrefix,
+  "{{ steps.doppler-ci.outputs.DOPPLER_CONFIG }}",
+].join("");
+const turboTeamOutput = [
+  workflowExpressionPrefix,
+  "{{ steps.doppler-ci.outputs.TURBO_TEAM }}",
+].join("");
+const turboTokenOutput = [
+  workflowExpressionPrefix,
+  "{{ steps.doppler-ci.outputs.TURBO_TOKEN }}",
+].join("");
+const dopplerIdentityCommand =
+  'test "$DOPPLER_PROJECT" = "taxkit" && test "$DOPPLER_CONFIG" = "ci"';
 const checkoutActionSha = "3d3c42e5aac5ba805825da76410c181273ba90b1";
 const checkoutAction = `actions/checkout@${checkoutActionSha}`;
 const cacheActionSha = "55cc8345863c7cc4c66a329aec7e433d2d1c52a9";
@@ -78,7 +99,7 @@ const expectedPlaywrightSaveKey = [
   workflowExpressionPrefix,
   "{{ steps.playwright-cache-restore.outputs.cache-primary-key }}",
 ].join("");
-const allowedRunSteps = new Set([
+const expectedRunSteps: readonly string[] = [
   "git show-ref --verify --quiet refs/heads/main || git branch --track main origin/main",
   bunCachePathCommand,
   "bun install --frozen-lockfile",
@@ -86,8 +107,10 @@ const allowedRunSteps = new Set([
   playwrightIdentityCommand,
   "apps/docs/node_modules/.bin/playwright install --with-deps chromium",
   "bun run check:quality-workflow",
+  dopplerIdentityCommand,
   "bun run release:check -- --ci",
-]);
+  "bun run release:check -- --ci",
+];
 const expectedActionSteps = [
   checkoutAction,
   "oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6",
@@ -95,6 +118,7 @@ const expectedActionSteps = [
   cacheSaveAction,
   cacheRestoreAction,
   cacheSaveAction,
+  dopplerAction,
 ];
 const UnknownRecord = Schema.Record(Schema.String, Schema.Unknown);
 
@@ -253,8 +277,13 @@ const inspectSteps = (steps: unknown): readonly QualityWorkflowFinding[] => {
         expectedActionSteps.filter((expected) => expected === step).length
     );
   const validRunSteps =
-    runSteps.length === allowedRunSteps.size &&
-    runSteps.every((step) => allowedRunSteps.has(step));
+    runSteps.length === expectedRunSteps.length &&
+    runSteps.every((step) => expectedRunSteps.includes(step)) &&
+    expectedRunSteps.every(
+      (step) =>
+        runSteps.filter((actual) => actual === step).length ===
+        expectedRunSteps.filter((expected) => expected === step).length
+    );
   const checkoutStep = asRecord(steps[0]);
   const checkoutWith = asRecord(checkoutStep?.with);
   const historyStep = asRecord(steps[1]);
@@ -274,9 +303,16 @@ const inspectSteps = (steps: unknown): readonly QualityWorkflowFinding[] => {
   const playwrightCacheSaveStep = asRecord(steps[11]);
   const playwrightCacheSaveWith = asRecord(playwrightCacheSaveStep?.with);
   const policyStep = asRecord(steps[12]);
-  const releaseStep = asRecord(steps[13]);
+  const dopplerStep = asRecord(steps[13]);
+  const dopplerWith = asRecord(dopplerStep?.with);
+  const identityStep = asRecord(steps[14]);
+  const identityEnv = asRecord(identityStep?.env);
+  const trustedReleaseStep = asRecord(steps[15]);
+  const trustedReleaseEnv = asRecord(trustedReleaseStep?.env);
+  const forkReleaseStep = asRecord(steps[16]);
+  const forkReleaseEnv = asRecord(forkReleaseStep?.env);
   const exactSteps =
-    steps.length === 14 &&
+    steps.length === 17 &&
     checkoutStep !== null &&
     hasOnly(checkoutStep, ["uses", "with"]) &&
     checkoutStep.uses === checkoutAction &&
@@ -363,9 +399,42 @@ const inspectSteps = (steps: unknown): readonly QualityWorkflowFinding[] => {
     policyStep !== null &&
     hasOnly(policyStep, ["run"]) &&
     policyStep.run === "bun run check:quality-workflow" &&
-    releaseStep !== null &&
-    hasOnly(releaseStep, ["run"]) &&
-    releaseStep.run === "bun run release:check -- --ci";
+    dopplerStep !== null &&
+    hasOnly(dopplerStep, ["name", "id", "if", "uses", "with"]) &&
+    dopplerStep.name === "Fetch trusted CI configuration" &&
+    dopplerStep.id === "doppler-ci" &&
+    dopplerStep.if === trustedEventCondition &&
+    dopplerStep.uses === dopplerAction &&
+    dopplerWith !== null &&
+    hasOnly(dopplerWith, ["doppler-token"]) &&
+    dopplerWith["doppler-token"] === dopplerToken &&
+    identityStep !== null &&
+    hasOnly(identityStep, ["name", "if", "env", "run"]) &&
+    identityStep.name === "Check trusted CI configuration identity" &&
+    identityStep.if === trustedEventCondition &&
+    identityEnv !== null &&
+    hasOnly(identityEnv, ["DOPPLER_CONFIG", "DOPPLER_PROJECT"]) &&
+    identityEnv.DOPPLER_CONFIG === dopplerConfigOutput &&
+    identityEnv.DOPPLER_PROJECT === dopplerProjectOutput &&
+    identityStep.run === dopplerIdentityCommand &&
+    trustedReleaseStep !== null &&
+    hasOnly(trustedReleaseStep, ["name", "if", "env", "run"]) &&
+    trustedReleaseStep.name === "Run trusted Quality with remote cache" &&
+    trustedReleaseStep.if === trustedEventCondition &&
+    trustedReleaseEnv !== null &&
+    hasOnly(trustedReleaseEnv, ["TURBO_CACHE", "TURBO_TEAM", "TURBO_TOKEN"]) &&
+    trustedReleaseEnv.TURBO_CACHE === trustedTurboCache &&
+    trustedReleaseEnv.TURBO_TEAM === turboTeamOutput &&
+    trustedReleaseEnv.TURBO_TOKEN === turboTokenOutput &&
+    trustedReleaseStep.run === "bun run release:check -- --ci" &&
+    forkReleaseStep !== null &&
+    hasOnly(forkReleaseStep, ["name", "if", "env", "run"]) &&
+    forkReleaseStep.name === "Run fork Quality without credentials" &&
+    forkReleaseStep.if === forkEventCondition &&
+    forkReleaseEnv !== null &&
+    hasOnly(forkReleaseEnv, ["TURBO_CACHE"]) &&
+    forkReleaseEnv.TURBO_CACHE === forkTurboCache &&
+    forkReleaseStep.run === "bun run release:check -- --ci";
   return [
     ...(validActionSteps
       ? []
@@ -410,33 +479,36 @@ export const decodeQualityWorkflow = (text: string) => {
       );
 };
 
-const hasExactWorkflowCachePolicy = (
+const hasExactWorkflowCredentialPolicy = (
   workflow: QualityWorkflowDocument,
   quality: Record<string, unknown> | null
 ) => {
   const steps = Array.isArray(quality?.steps) ? quality.steps : [];
+  const stepEnvironments = steps.flatMap((step) => {
+    const record = asRecord(step);
+    const environment = asRecord(record?.env);
+    return environment === null ? [] : [environment];
+  });
   return (
     workflow.env !== undefined &&
-    hasOnly(workflow.env, [
-      "TAXKIT_ACTION_PIN_UPDATE_OWNER",
-      "TURBO_CACHE",
-      "TURBO_TEAM",
-      "TURBO_TOKEN",
-    ]) &&
-    workflow.env.TURBO_CACHE === expectedTurboCache &&
-    workflow.env.TURBO_TEAM === expectedTurboTeam &&
-    workflow.env.TURBO_TOKEN === expectedTurboToken &&
-    steps.every((step) => {
-      const record = asRecord(step);
-      return record !== null && !Reflect.has(record, "env");
-    })
+    hasOnly(workflow.env, ["TAXKIT_ACTION_PIN_UPDATE_OWNER"]) &&
+    stepEnvironments.length === 3 &&
+    stepEnvironments.every(
+      (environment) =>
+        !Reflect.has(environment, "DOPPLER_CI_TOKEN") &&
+        !Reflect.has(environment, "CLOUDFLARE_API_TOKEN") &&
+        !Reflect.has(environment, "CLOUDFLARE_ACCOUNT_ID")
+    )
   );
 };
 
 export const inspectQualityWorkflow = (workflow: QualityWorkflowDocument) => {
   const { concurrency, jobs, permissions } = workflow;
   const quality = asRecord(jobs.quality);
-  const cachePolicyIsExact = hasExactWorkflowCachePolicy(workflow, quality);
+  const credentialPolicyIsExact = hasExactWorkflowCredentialPolicy(
+    workflow,
+    quality
+  );
   const findings = [
     ...inspectTrigger(workflow.on),
     ...(hasOnly(permissions, ["contents"]) && permissions.contents === "read"
@@ -498,13 +570,13 @@ export const inspectQualityWorkflow = (workflow: QualityWorkflowDocument) => {
             "Name taxkit-ci-release-maintainer as the action-pin update owner."
           ),
         ]),
-    ...(cachePolicyIsExact
+    ...(credentialPolicyIsExact
       ? []
       : [
           finding(
             "workflow-cache-policy",
             ".github/workflows/quality.yml:env",
-            "Bind the approved Vercel cache identity once, use read/write for token-bearing events, keep fork pull requests secret-free through the pull_request trigger, and reject step-level cache overrides."
+            "Keep the bridge token on the fixed fetch action, bind named Turbo outputs only to the trusted release step, and keep the fork release step local-cache-only."
           ),
         ]),
     ...inspectSteps(quality?.steps),
@@ -671,13 +743,13 @@ const expectedControls = {
     fixture: "tools/quality-workflow/policy.test.ts",
     owner: "taxkit-ci-release-maintainer",
     preventedFailure:
-      "A fork or pull_request_target run receives the remote-cache credential, a missing cache blocks the full graph, or a cache hit is treated as release proof.",
+      "A fork or pull_request_target run receives the Doppler bridge or remote-cache credential, the wrong config is accepted, a secret fetch precedes a cache save, a missing cache blocks the full graph, or a cache hit is treated as release proof.",
     recovery:
-      "Remove the remote-cache bindings while preserving every uncached Quality command and true exit status.",
+      "Remove the Doppler and remote-cache bindings while preserving every local-cache-only Quality command and true exit status.",
     retirementCondition:
       "A stronger token-bearing cache authority and fallback control replaces this contract.",
     reviewTrigger:
-      "Turbo config, root task, credential, event, cache mode, task input/output or fallback change.",
+      "Doppler project/config/action, Turbo config, root task, credential, event, cache mode, task input/output or fallback change.",
     signal:
       "A Turbo task, cache credential binding, cache mode or Quality event changes.",
   },
@@ -892,6 +964,7 @@ const inspectQualityAutomation = (
       "contents:read",
       "dependency-cache:read",
       "dependency-cache:write-ref-scoped",
+      "doppler-config:read-ci-trusted-events",
       "remote-cache:read",
       "remote-cache:write-on-token-bearing-events",
     ]) ||
@@ -899,6 +972,7 @@ const inspectQualityAutomation = (
     !hasExactMembers(quality.resource.scope, [
       "immutable repository revision",
       "configured Actions runner",
+      "read-only taxkit/ci Doppler config through the repository bridge on trusted events",
       "Vercel team remote-cache task artifacts and logs",
       "content-addressed ref-scoped GitHub Bun package cache",
       "content-addressed ref-scoped GitHub Playwright Chromium cache",
@@ -913,16 +987,18 @@ const inspectQualityAutomation = (
     !hasExactMembers(quality.stopAndEscalation.stopConditions, [
       "first tagged check failure",
       "unknown workflow shape",
-      "fork pull request receives remote-cache credential",
+      "missing or wrong taxkit/ci metadata or named Turbo output",
+      "Doppler fetch occurs before the final cache save",
+      "fork pull request receives Doppler bridge or remote-cache credential",
       "dependency cache key or path contains secret or mutable installed state",
       "dependency cache skips frozen install or Chromium system dependencies",
       "cache-only success or missing uncached fallback",
     ]) ||
     quality.rollback.action !==
-      "remove Turbo and dependency-cache bindings while preserving frozen installs and the complete uncached Quality graph" ||
+      "remove the Doppler bridge plus Turbo and dependency-cache bindings while preserving frozen installs and the complete local-cache-only Quality graph" ||
     quality.rollback.authorityRequired !== "taxkit-ci-release-maintainer" ||
     quality.recovery.action !==
-      "repair the named source or cache boundary, remove dependency-cache restore/save when needed, and run frozen installs plus the canonical graph on a new revision" ||
+      "repair the named Doppler source or cache boundary, remove the bridge and dependency-cache restore/save when needed, and run frozen installs plus the local-cache-only canonical graph on a new revision" ||
     quality.recovery.verificationCommand !== "bun run release:check -- --ci" ||
     quality.retirementCondition.condition !==
       "a stronger canonical CI owner replaces the quality workflow" ||

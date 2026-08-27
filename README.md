@@ -130,13 +130,16 @@ browser proof and Changeset status.
 
 Deterministic repository commands run through Turbo, including the root
 validators used by `verification` and the app/package checks used by
-`release:check`. Token-bearing GitHub Quality runs may read and write Vercel
-Remote Cache on same-repository pull requests and `main`; fork pull requests
-receive no token and run the same full command graph locally. A missing token
-or cache service also falls back locally. Local remote-cache use is an explicit
-developer choice through `TURBO_TOKEN` and `TURBO_TEAM`. Never commit either
-credential or treat a cache hit as test, release, deployment or public
-availability proof.
+`release:check`. Trusted GitHub Quality runs fetch the minimum `taxkit/ci`
+config through the pinned Doppler action after every cache save, check the safe
+project/config identity, and pass only the named Turbo outputs to the canonical
+release step. Same-repository pull requests and `main` may read and write
+Vercel Remote Cache. Fork pull requests do not fetch Doppler and run the same
+full command graph with local cache only. Local remote-cache use remains an
+explicit developer choice through `TURBO_TOKEN` and `TURBO_TEAM`. Never commit
+either credential or treat a cache hit as test, release, deployment or public
+availability proof. The hosted trusted path remains unproved until the
+repository `DOPPLER_CI_TOKEN` bridge is separately created and read back.
 
 Quality also keeps separate GitHub caches for Bun package downloads and the
 Playwright Chromium binary. It does not cache `node_modules`: current warm
@@ -149,7 +152,9 @@ pull-request merge ref, away from `main` and sibling pull requests. A miss or
 cache outage only changes download time.
 
 The trusted docs Preview, Production, teardown and receipt workflows use the
-same remote task cache for deterministic Turbo work. They use the same
+same remote task cache for deterministic Turbo work. Receipt validation now
+gets its two Turbo values from `taxkit/ci` after its cache save and uploads only
+one final reconciled or failure receipt. They use the same
 content-addressed Bun download keys, and browser workflows use the same
 content-addressed Chromium keys. GitHub ref scope controls writes. Exact
 candidate checks, provider plans or mutations, hosted readback and receipt

@@ -136,6 +136,17 @@ There is intentionally no external lease.
    Reconcile the completed GitHub run before accepting the receipt. A
    successful source check is not provider proof; provider readback is not
    public-host proof.
+
+   For a successful source run, the reconciler restores and saves its Bun
+   package cache first, then fetches only `taxkit/ci` through repository
+   `DOPPLER_CI_TOKEN`. It checks the safe project/config outputs and supplies
+   only the named Turbo team/token outputs to the exact input/run validation
+   step. Failed or cancelled source runs do not fetch Doppler. The final upload
+   contains exactly one reconciled or failure JSON file; downloaded source
+   artifacts and raw GitHub API responses remain in the runner work directory.
+   A missing bridge, wrong metadata or missing named output stops the positive
+   receipt. Do not restore the retained direct Turbo values as a silent
+   fallback in the same workflow.
 7. When a same-repository Preview pull request closes, `Docs Preview Teardown`
    runs from reviewed default-branch code in the same
    `taxkit-docs-preview` environment. It rechecks the closed pull request,

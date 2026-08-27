@@ -22,9 +22,6 @@ permissions:
   contents: read
 env:
   TAXKIT_ACTION_PIN_UPDATE_OWNER: taxkit-ci-release-maintainer
-  TURBO_CACHE: local:rw,remote:rw
-  TURBO_TEAM: ${"${{"} vars.TURBO_TEAM }}
-  TURBO_TOKEN: ${"${{"} secrets.TURBO_TOKEN }}
 concurrency:
   group: quality-${"${{"} github.workflow }}-${"${{"} github.ref }}
   cancel-in-progress: true
@@ -72,7 +69,30 @@ jobs:
           path: ${"${{"} env.PLAYWRIGHT_BROWSERS_PATH }}
           key: ${"${{"} steps.playwright-cache-restore.outputs.cache-primary-key }}
       - run: bun run check:quality-workflow
-      - run: bun run release:check -- --ci
+      - name: Fetch trusted CI configuration
+        id: doppler-ci
+        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+        uses: dopplerhq/secrets-fetch-action@451892f16195f9ac360e1a5bcbf0b5fd0e957534
+        with:
+          doppler-token: ${"${{"} secrets.DOPPLER_CI_TOKEN }}
+      - name: Check trusted CI configuration identity
+        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+        env:
+          DOPPLER_CONFIG: ${"${{"} steps.doppler-ci.outputs.DOPPLER_CONFIG }}
+          DOPPLER_PROJECT: ${"${{"} steps.doppler-ci.outputs.DOPPLER_PROJECT }}
+        run: test "$DOPPLER_PROJECT" = "taxkit" && test "$DOPPLER_CONFIG" = "ci"
+      - name: Run trusted Quality with remote cache
+        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+        env:
+          TURBO_CACHE: local:rw,remote:rw
+          TURBO_TEAM: ${"${{"} steps.doppler-ci.outputs.TURBO_TEAM }}
+          TURBO_TOKEN: ${"${{"} steps.doppler-ci.outputs.TURBO_TOKEN }}
+        run: bun run release:check -- --ci
+      - name: Run fork Quality without credentials
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository
+        env:
+          TURBO_CACHE: local:rw
+        run: bun run release:check -- --ci
 `;
 
 const findingsFor = (text: string) =>
@@ -187,7 +207,7 @@ describe("quality workflow policy", () => {
         acceptedWorkflow
           .replace("contents: read", "contents: write")
           .replace("@3d3c42e5aac5ba805825da76410c181273ba90b1", "@v7")
-          .replace("bun run release:check -- --ci", "bun run verification")
+          .replaceAll("bun run release:check -- --ci", "bun run verification")
       ).map((item) => item.invariant)
     ).toEqual([
       "canonical-release-graph",
@@ -201,9 +221,9 @@ describe("quality workflow policy", () => {
     expect(
       findingsFor(
         acceptedWorkflow
-          .replace(
-            "      - run: bun run release:check -- --ci",
-            "      - run: bun run verification # bun run release:check -- --ci"
+          .replaceAll(
+            "        run: bun run release:check -- --ci",
+            "        run: bun run verification # bun run release:check -- --ci"
           )
           .replace(
             "jobs:\n  quality:",
@@ -267,24 +287,47 @@ describe("quality workflow policy", () => {
     ]);
   });
 
-  test("rejects missing cache identity, remote read-only regression and step overrides", () => {
+  test("rejects a widened Doppler fetch, wrong outputs and fork credentials", () => {
     for (const workflow of [
       acceptedWorkflow.replace(
-        ["  TURBO_TEAM: $", "{{ vars.TURBO_TEAM }}\n"].join(""),
-        ""
+        ["doppler-token: $", "{{ secrets.DOPPLER_CI_TOKEN }}"].join(""),
+        ["doppler-token: $", "{{ secrets.TURBO_TOKEN }}"].join("")
       ),
       acceptedWorkflow.replace(
-        ["  TURBO_TOKEN: $", "{{ secrets.TURBO_TOKEN }}\n"].join(""),
-        ""
+        ["steps.doppler-ci.outputs.TURBO_TEAM", " }}"].join(""),
+        ["vars.TURBO_TEAM", " }}"].join("")
       ),
       acceptedWorkflow.replace("local:rw,remote:rw", "local:rw,remote:r"),
       acceptedWorkflow.replace(
-        "      - run: bun run release:check -- --ci",
-        "      - run: bun run release:check -- --ci\n        env:\n          TURBO_CACHE: local:rw,remote:rw"
+        "        with:\n          doppler-token:",
+        "        with:\n          inject-env-vars: true\n          doppler-token:"
+      ),
+      acceptedWorkflow.replace(
+        "          TURBO_CACHE: local:rw\n        run: bun run release:check -- --ci",
+        "          TURBO_CACHE: local:rw,remote:rw\n          TURBO_TOKEN: inherited\n        run: bun run release:check -- --ci"
+      ),
+    ]) {
+      expect(findingsFor(workflow).length).toBeGreaterThan(0);
+    }
+  });
+
+  test("rejects secret fetch before the last cache save or a changed config identity", () => {
+    for (const workflow of [
+      acceptedWorkflow.replace(
+        "      - name: Fetch trusted CI configuration",
+        "      - name: Fetch trusted CI configuration\n        inject-before-cache: true"
+      ),
+      acceptedWorkflow.replace(
+        'test "$DOPPLER_PROJECT" = "taxkit"',
+        'test "$DOPPLER_PROJECT" = "another-project"'
+      ),
+      acceptedWorkflow.replace(
+        'test "$DOPPLER_CONFIG" = "ci"',
+        'test "$DOPPLER_CONFIG" = "prd"'
       ),
     ]) {
       expect(findingsFor(workflow).map((item) => item.invariant)).toContain(
-        "workflow-cache-policy"
+        "workflow-mutation-step"
       );
     }
   });
@@ -314,12 +357,12 @@ describe("quality workflow policy", () => {
         "    runs-on: ubuntu-latest\n    continue-on-error: true\n"
       ),
       acceptedWorkflow.replace(
-        "      - run: bun run release:check -- --ci",
-        "      - run: bun run release:check -- --ci\n        if: false"
+        "        run: bun run release:check -- --ci",
+        "        run: bun run release:check -- --ci\n        continue-on-error: true"
       ),
-      acceptedWorkflow.replace(
-        "      - run: bun run release:check -- --ci",
-        "      - run: bun run release:check -- --ci\n        continue-on-error: true"
+      acceptedWorkflow.replaceAll(
+        "if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository",
+        "if: false"
       ),
     ]) {
       expect(findingsFor(contaminated).length).toBeGreaterThan(0);

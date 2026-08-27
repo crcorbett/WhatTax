@@ -25,11 +25,11 @@
     "id": "turbo-remote-cache-boundary",
     "owner": "taxkit-ci-release-maintainer",
     "signal": "A Turbo task, cache credential binding, cache mode or Quality event changes.",
-    "preventedFailure": "A fork or pull_request_target run receives the remote-cache credential, a missing cache blocks the full graph, or a cache hit is treated as release proof.",
+    "preventedFailure": "A fork or pull_request_target run receives the Doppler bridge or remote-cache credential, the wrong config is accepted, a secret fetch precedes a cache save, a missing cache blocks the full graph, or a cache hit is treated as release proof.",
     "fixture": "tools/quality-workflow/policy.test.ts",
     "evidence": "bun run check:quality-workflow",
-    "recovery": "Remove the remote-cache bindings while preserving every uncached Quality command and true exit status.",
-    "reviewTrigger": "Turbo config, root task, credential, event, cache mode, task input/output or fallback change.",
+    "recovery": "Remove the Doppler and remote-cache bindings while preserving every local-cache-only Quality command and true exit status.",
+    "reviewTrigger": "Doppler project/config/action, Turbo config, root task, credential, event, cache mode, task input/output or fallback change.",
     "retirementCondition": "A stronger token-bearing cache authority and fallback control replaces this contract."
   },
   {

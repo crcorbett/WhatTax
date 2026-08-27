@@ -59,6 +59,13 @@ Doppler project/config metadata and pass only named action outputs to exact
 consumer steps. Exact-claim OIDC needs a successor review and is not a second
 current path.
 
+The local, Quality and receipt source paths are implemented. The TaxKit Doppler
+project/configs and GitHub bridge do not yet exist, so trusted hosted fetch is
+an explicit pending bootstrap and not a current proof claim. Preview,
+Production and teardown still use their retained direct GitHub environment
+values until their later reviewed slices are accepted; there is no mixed
+fallback inside one workflow.
+
 ## Pattern
 
 Package exports schema, type and a config fragment:

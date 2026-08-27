@@ -3,7 +3,7 @@ document_type: automation-register
 lifecycle: current
 authority: canonical
 owner: taxkit-ci-release-maintainer
-last_reviewed: 2026-08-24
+last_reviewed: 2026-08-28
 review_trigger: workflow, signal, authority, proof, stopping, escalation, rollback, or retirement change
 ---
 
@@ -20,12 +20,14 @@ length or keywords. `externalState.status` remains `not-established` and its
 nonclaims must match the proof envelope.
 
 Quality CI is convergent validation of one immutable revision with `contents:
-read` and Vercel Remote Cache read/write access on token-bearing events.
-Same-repository pull requests and `main` use the workflow-enforced
-`local:rw,remote:rw` mode. Fork pull requests receive no repository secret and
-fall back to the complete local graph. Same-repository pull-request code can
-access the team-scoped remote-cache token under Cooper's accepted
-contributor-trust boundary.
+read` and Vercel Remote Cache read/write access on trusted token-bearing events.
+After dependency-cache saves, same-repository pull requests and `main` fetch
+the read-only single-config `taxkit/ci` values through repository
+`DOPPLER_CI_TOKEN`, verify safe metadata and bind named Turbo outputs only to
+the canonical release step with `local:rw,remote:rw`. Fork pull requests do not
+fetch Doppler and run the complete graph with `local:rw`. Same-repository
+pull-request code can access the resulting team-scoped remote-cache token under
+Cooper's accepted contributor-trust boundary.
 The remote cache resource contains Turbo task artifacts and logs only. Its CI
 report has no candidate identity or attempt-receipt claim, and a cache hit does
 not establish provider state.
@@ -39,6 +41,11 @@ Neither entry grants release, publication, deployment, provider, credential, or
 external-state authority. A green local or hosted result does not establish
 that GitHub ran, nor any tag, registry, deployment, provider or public
 availability consequence.
+
+The register describes repository desired state. The TaxKit Doppler config and
+GitHub bridge are not yet established, so no hosted trusted-run claim is made.
+Creating that bridge, proving it and later removing retained direct Turbo
+values are separate operations under the authority model.
 
 The distinct docs deployment owner is
 [`tools/docs-deployment/automation-register.json`](../../tools/docs-deployment/automation-register.json).
@@ -180,6 +187,12 @@ accepted Preview provider receipt.
 The reconciler is governed by `docs-workflow-receipt-reconciliation` in the
 deployment control register; it adds no provider mutation or credential
 authority and does not create another deployment automation entry.
+Its successful validation path fetches only `taxkit/ci` after the Bun cache
+save, verifies project/config metadata and binds the two named Turbo outputs to
+the exact two-check step. Failure and cancelled paths do not fetch it. The
+uploader prepares a separate directory containing exactly one final
+`workflow-run.json` or `workflow-run-failure.json`; downloaded source artifacts
+and raw GitHub API responses remain runner-local.
 
 The central plan parser is pinned to Alchemy `2.0.0-beta.64` and exact upstream
 commit `31edd3c4b2f0f3310fad07f5423aee20cf72be8d`. Its five real sanitised
@@ -189,9 +202,11 @@ proof. It neither advances the automation register nor proves current
 Cloudflare state.
 
 The separate `docs-workflow-cache-boundary` control governs acceleration in all
-four workflows. The approved `TURBO_TOKEN` grants access only to the TaxKit
-Vercel Remote Cache; it does not extend Cloudflare, deployment, release or
-receipt-promotion authority. Content-addressed GitHub caches retain Bun package
+four workflows. Receipt validation gets the TaxKit Vercel Remote Cache values
+through the same `taxkit/ci` bridge after its cache save; the provider workflows
+retain their direct values until their reviewed migration slices. The Turbo
+token grants no Cloudflare, deployment, release or receipt-promotion authority.
+Content-addressed GitHub caches retain Bun package
 downloads in all four workflows and Chromium binaries only where the browser is
 installed. A ref may restore a matching default-branch cache, while GitHub ref
 scope isolates its writes. Frozen install, browser install, exact candidate

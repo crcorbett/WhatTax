@@ -256,19 +256,30 @@ Chromium `--with-deps` through the app-local Playwright executable before the
 canonical graph. This keeps Changesets and docs build/browser proof bound to
 the checked-out graph; floating `bunx` resolution is rejected.
 
-Quality binds Vercel Remote Cache through `TURBO_TEAM` and `TURBO_TOKEN` for
-each Turbo invocation and configures `local:rw,remote:rw` on every event.
-Same-repository pull requests and pushes to `main` receive the existing
-team-scoped remote-cache token, so both can populate and reuse matching task
-hashes. Fork pull requests receive no repository secret and run the complete
-local fallback. The policy rejects missing bindings, remote read-only
-regression, `pull_request_target` and step-level overrides. A cache miss,
-missing token or unavailable service therefore changes speed only: the full
-command still runs and its real exit status remains authoritative.
+After every dependency-cache save, trusted Quality fetches the minimum
+`taxkit/ci` config with the full-SHA Doppler secrets-fetch action. Only the
+fetch step receives repository `DOPPLER_CI_TOKEN`. A following value-free check
+requires project `taxkit` and config `ci`, and only the canonical release step
+receives the named `TURBO_TEAM` and `TURBO_TOKEN` outputs with
+`local:rw,remote:rw`. Same-repository pull requests and pushes to `main` can
+therefore populate and reuse matching task hashes after the separately
+authorised bridge exists. Fork pull requests do not run the fetch action and
+run the same release graph with `local:rw` only. The policy rejects broad
+injection, wrong metadata, direct legacy bindings, a fetch before cache saves,
+remote read-only regression, `pull_request_target` and extra step-level
+bindings. A cache miss or unavailable service changes speed only; a missing or
+bad Doppler config fails the trusted path closed instead of silently changing
+source.
 Same-repository pull-request
 code can access the cache token; this accepted trust boundary must be reviewed
 if contributor trust or token scope changes. Cache logs and artifacts are not
 candidate, release, provider, deployment or public-site proof.
+
+This is repository desired-state proof. The hosted trusted path remains
+unproved until the read-only, single-config repository bridge is created under
+separate authority and an exact-SHA run is read back. The direct legacy Turbo
+secret and variable remain external rollback material but are no longer read by
+the Quality or receipt workflow source.
 
 The GitHub dependency caches are separate from Turbo. The Bun cache resolves
 its user-level path with `bun pm cache` and never contains `node_modules`.
@@ -300,7 +311,9 @@ release-relevant boundaries. This is local workflow-configuration proof only;
 it does not prove a hosted run, publication, deployment, registry state, or
 external consumer behaviour.
 
-All five workflows pin `actions/checkout` v7.0.1 by exact commit. Checkout
+All five workflows pin `actions/checkout` v7.0.1 by exact commit. Quality and
+the receipt reconciler also pin Doppler's v2.0.0 fetch action to its exact
+commit and leave broad environment injection disabled. Checkout
 places the selected Git revision in GitHub's workspace; it does not install or
 run TaxKit. The following pinned setup action installs the repository's Bun
 version, and Bun owns frozen dependency installation and repository commands.

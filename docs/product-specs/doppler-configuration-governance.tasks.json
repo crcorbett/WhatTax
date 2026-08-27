@@ -142,7 +142,7 @@
     },
     {
       "id": "DCG-002",
-      "status": "pending",
+      "status": "completed",
       "title": "Move Quality and receipt inputs to named Doppler outputs",
       "type": "ci-vertical-slice",
       "dependsOn": ["DCG-001"],
