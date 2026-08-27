@@ -77,6 +77,18 @@ The Cloudflare token is available only to the named bootstrap, plan,
 replan/apply and destroy steps that need it. It must not be moved to a job,
 checkout, install, repository check, hosted proof or artefact upload.
 
+The approved bootstrap creates service tokens only for `ci`, `stg_preview` and
+`prd`; `dev` uses the named developer's checkout-scoped personal login. Doppler
+CLI 3.76.5 supports the required `--access read` and `--max-age` controls. After
+the operation record fixes the exact duration, send each newly created token
+straight from `doppler configs tokens create --plain` to the matching
+`gh secret set` standard input. The token must not appear on screen, in a shell
+argument, variable, file, clipboard, log, cache or receipt. If the GitHub write
+fails, stop, identify the orphan by token metadata, and revoke it under the
+same approved rollback before retrying. Do not create a temporary workflow to
+move the existing write-only GitHub values. Their approved secure source, or a
+separately authorised replacement, must be named before bootstrap.
+
 Production plan, deploy and rollback share the fixed non-cancellable
 `taxkit-docs-production-prod` group. Preview deploy and teardown share the
 exact non-cancellable `taxkit-docs-preview-pr-N` group. These GitHub locks do

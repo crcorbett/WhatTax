@@ -209,12 +209,14 @@ plain while preserving the existing `pr-<number>` Alchemy stage rule.
 
 ### Credential lifecycle
 
-The reviewed implementation uses one read-only, expiring service token per
-Doppler config. `ci` is stored at repository scope as `DOPPLER_CI_TOKEN`.
-`stg_preview` and `prd` are each stored as `DOPPLER_PROVIDER_TOKEN` in their
-different protected GitHub environments. Preview and Production therefore
-never share a token. Each config contains only the named values in the table,
-and every required TaxKit value uses masked visibility in Doppler.
+The reviewed implementation uses one read-only, expiring service token for
+each automation config: `ci`, `stg_preview` and `prd`. `ci` is stored at
+repository scope as `DOPPLER_CI_TOKEN`. `stg_preview` and `prd` are each stored
+as `DOPPLER_PROVIDER_TOKEN` in their different protected GitHub environments.
+Preview and Production therefore never share a token. Local `dev` deliberately
+has no service token or GitHub bridge; the named developer's checkout-scoped
+Doppler login reads that config. Each config contains only the named values in
+the table, and every required TaxKit value uses masked visibility in Doppler.
 
 Exact-claim GitHub OIDC is a preferred future successor if the live Doppler
 plan and current repository subject support it. That successor needs a new
@@ -363,9 +365,11 @@ containing:
 - resources: Doppler project `taxkit`; configs `dev`, `ci`, `stg_preview` and
   `prd`; exact existing GitHub repository/environments; and no other project;
 - change: create missing project/configs, enter only the approved named values
-  with masked visibility, create one read-only expiring service token per
-  config, set repository `DOPPLER_CI_TOKEN`, and set separate environment
-  `DOPPLER_PROVIDER_TOKEN` bridges for Preview and Production;
+  with masked visibility, create one read-only expiring service token for each
+  of `ci`, `stg_preview` and `prd`, set repository `DOPPLER_CI_TOKEN`, and set
+  separate environment `DOPPLER_PROVIDER_TOKEN` bridges for Preview and
+  Production; `dev` keeps the separately approved personal-login path and gets
+  no service token;
 - environment: development, CI, Preview or Production named separately;
 - least privilege: read-only single-config access, expiry where supported and
   current measured Cloudflare permissions;
@@ -379,6 +383,10 @@ containing:
 The operation stops if a token cannot be read-only and config-scoped, required
 values cannot use masked visibility, the Cloudflare permission set is
 unmeasured, or any value would need to pass through a log or evidence file.
+GitHub cannot return the existing Turbo or Cloudflare secret values, so the
+approved operation must name their separate secure source or separately
+authorise replacement credentials. It must not add a migration workflow merely
+to move those values between providers.
 
 ## Tests and verification
 

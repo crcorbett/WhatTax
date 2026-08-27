@@ -108,8 +108,9 @@ Not approved without a separate exact operation:
 - Use the immutable Doppler secrets-fetch action and named outputs only; do not
   install the moving Doppler CLI action in CI.
 - Use separate read-only, expiring, single-config service tokens for the
-  reviewed implementation. Exact-claim OIDC is a future reviewed successor,
-  not a second live path.
+  three automation configs. Local `dev` uses only the named developer's scoped
+  personal login and receives no service token. Exact-claim OIDC is a future
+  reviewed successor, not a second live path.
 - Keep `ci` limited to Turbo. Preview and Production use separate protected
   provider bridges, so teardown cannot fetch unused Turbo values.
 - Strip ambient Doppler and governed provider values before local fetch, and
@@ -310,6 +311,28 @@ final merge remain bounded by DCG-005 and the authority model.
   Production/rollback source remains unproved until DCG-005 bootstrap and
   exact-SHA hosted proof are separately authorised.
 
+### DCG-005 — authority-stop clarification on 28 August 2026
+
+- A fresh read-only check found no TaxKit Doppler project, no repository
+  `DOPPLER_CI_TOKEN`, and no Preview or Production
+  `DOPPLER_PROVIDER_TOKEN`. The retained direct Turbo and Cloudflare entries
+  remain present by name only.
+- Doppler CLI 3.76.5 confirms that config service-token creation accepts both
+  `--access read` and `--max-age`, while GitHub CLI 2.83.1 accepts secret values
+  through standard input and encrypts them locally. The approved operation can
+  therefore transfer each new bridge directly without a file, environment
+  variable, clipboard or printed value.
+- The SPEC's earlier phrase “one service token per config” contradicted its
+  local personal-login design. It now requires exactly three automation tokens
+  for `ci`, `stg_preview` and `prd`; `dev` has no service token or GitHub bridge.
+- GitHub cannot return the retained direct secret values. Bootstrap therefore
+  remains stopped until the operation record names an approved separate secure
+  source for those values or separately authorises replacement credentials.
+- Documentation impact: **Change required** for the credential lifecycle in
+  the SPEC/task ledger, this plan and the deployment runbook. Architecture,
+  workflow code, package/app READMEs, repository skills and installed package
+  behaviour are **Preserve**. A Changeset remains **N/A**.
+
 ## Verification log
 
 The reviewed document set passed JSON parsing and `git diff --check`.
@@ -359,6 +382,13 @@ step; the metadata check and release graph did not run. This is names-only
 hosted failure proof of the missing repository bridge, not proof of a Doppler
 config, secret value, cache result, deployment or provider state. No action log
 or credential value was read into the record.
+
+The current exact head `4acf98f00ad4ad33b80582b61772ce460cf97244`
+produced the same bounded failure in hosted Quality run
+[`33090875255`](https://github.com/crcorbett/taxkit/actions/runs/33090875255):
+steps through the repository-owned Quality policy passed, and the first Doppler
+fetch failed before any metadata check or release command. The pull request
+therefore remains open and unmerged.
 
 ## Versioning
 

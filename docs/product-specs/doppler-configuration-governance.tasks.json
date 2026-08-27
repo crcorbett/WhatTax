@@ -323,7 +323,7 @@
       "goal": "Perform only the separately approved provider operation, prove the merged path at exact identity, remove legacy custody under separate approval, and close the plan without overstating proof.",
       "scope": [
         "Present and obtain approval for the exact principal/resource/environment/change/rollback/readback envelope before provider mutation.",
-        "Create only approved missing Doppler resources and read-only expiring single-config service tokens, then set only repository DOPPLER_CI_TOKEN and the separate Preview/Production environment DOPPLER_PROVIDER_TOKEN bridges.",
+        "Create only approved missing Doppler resources and three read-only expiring single-config service tokens for ci, stg_preview and prd, then set only repository DOPPLER_CI_TOKEN and the separate Preview/Production environment DOPPLER_PROVIDER_TOKEN bridges; dev remains personal-login-only.",
         "Run exact-SHA trusted Quality, fork fallback, Preview/deploy/hosted/teardown, Production/rollback/redeploy and receipt proof as authorised.",
         "Inspect uploaded artifacts and cache ordering for secret-negative proof without reading values.",
         "After merged-main proof and separate approval, remove direct Turbo/Cloudflare GitHub values and retired report-only credential entries, then read back metadata absence.",
