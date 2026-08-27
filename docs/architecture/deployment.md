@@ -158,7 +158,11 @@ model. PR-close teardown remains the explicit Preview cleanup owner; retained
 orphan reports are immutable historical observations only.
 
 Preview deployment and exact-stage PR-close teardown share the
-`taxkit-docs-preview` GitHub environment and its narrow mutation credential.
+`taxkit-docs-preview` GitHub environment and its narrow
+`DOPPLER_PROVIDER_TOKEN` bridge. Repository source requires that bridge to be a
+read-only, expiring, single-config token for `taxkit/stg_preview`, verifies the
+safe project/config outputs, and gives only the two named Cloudflare outputs to
+the exact provider steps.
 That environment has no required reviewer: the Preview dispatch or trusted
 same-repository PR-close event supplies operation authority, while reviewed
 source, exact `pr-N` decoding, the non-cancellable stage lock, equal plans and
@@ -166,9 +170,20 @@ provider/state readback enforce the target. Production keeps its separate
 reviewer-protected environment. A GitHub environment controls credential
 custody; Alchemy stage identity controls which infrastructure can change.
 
-Preview and Production place `CLOUDFLARE_API_TOKEN` only on their named
-bootstrap, plan and replan/apply steps. Checkout, installation, provider-free
-builds, repository checks, hosted proof and artifact upload cannot read it.
+Preview places its Doppler-sourced `CLOUDFLARE_API_TOKEN` only on its named
+bootstrap, plan and replan/apply steps; teardown exposes it only to bootstrap
+and exact-stage destroy. Preview fetches the separate `taxkit/ci` bridge after
+all cache saves and gives its Turbo outputs only to the provider-free
+deployment check and docs build. Teardown does not fetch `ci`. Production keeps
+its direct provider and Turbo source until DCG-004. Checkout, installation,
+hosted proof and artifact upload cannot read a provider token.
+
+Preview plan, provider and teardown uploads are prepared in separate temporary
+directories. A typed Effect owner admits only the named sanitised JSON and
+screenshot files for that mode and rejects admitted JSON containing credential
+names, deterministic sentinels or token shapes. Raw Alchemy plan/replan/destroy
+output, provider stderr, intermediate inventories and raw hosted diagnostics
+remain runner-local.
 Production plan, deploy and rollback use the same fixed `prod` GitHub
 concurrency group with cancellation disabled. Preview and teardown keep their
 shared exact-`pr-N` non-cancellable group. These GitHub locks do not cover a

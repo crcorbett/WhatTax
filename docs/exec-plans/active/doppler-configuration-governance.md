@@ -67,7 +67,7 @@ Not approved without a separate exact operation:
 | PRD review | Complete | Ready with bounded external stop; findings and corrections are recorded below. |
 | DCG-001 | Accepted | Fixed `taxkit/dev` adapter, keyring-only custody check, separate `dev_<user>` stack stage, tests and current docs accepted without provider access. |
 | DCG-002 | Accepted | Trusted Quality and successful receipt validation use pinned `taxkit/ci` named outputs after cache saves; forks and failed/cancelled receipt paths fetch no credential. |
-| DCG-003 | Pending | Depends on DCG-002 acceptance. |
+| DCG-003 | Accepted | Preview and teardown use only `taxkit/stg_preview`; Preview fetches `taxkit/ci` separately, teardown stays local-only, and all three upload classes use the secret-negative allowlist boundary. |
 | DCG-004 | Pending | Depends on DCG-003 acceptance. |
 | DCG-005 | Pending authority | No TaxKit Doppler project, repository `DOPPLER_CI_TOKEN` or protected-environment `DOPPLER_PROVIDER_TOKEN` bridge existed at the research baseline. |
 
@@ -235,6 +235,42 @@ final merge remain bounded by DCG-005 and the authority model.
   created, changed, read by value, rotated or removed. Hosted trusted Quality
   and receipt fetch remain unproved until DCG-005 bootstrap authority.
 
+### DCG-003 — accepted 28 August 2026
+
+- Preview fetches `taxkit/ci` and `taxkit/stg_preview` through two separately
+  pinned v2.0.0 action steps after all Bun and Chromium cache saves. Safe
+  metadata checks require exact project `taxkit` and configs `ci` or
+  `stg_preview` before any consumer runs.
+- Only the provider-free deployment check and docs build receive the two Turbo
+  outputs. Only bootstrap, plan and equal-replan/apply receive the two
+  Cloudflare outputs. No direct legacy binding or broad action injection
+  remains in Preview source.
+- Exact-stage teardown uses only the Preview environment's `stg_preview`
+  provider bridge. It has no `ci` fetch, remote Turbo cache or Production
+  config path. The existing exact `pr-N` lock, two-plan comparison, destroy and
+  provider/state absence proof are unchanged.
+- One typed Effect artifact owner decodes a fixed mode and copies only its
+  named sanitised JSON and screenshot files into a separate upload directory.
+  Raw Alchemy output, stderr, intermediate inventories and raw hosted
+  diagnostics stay runner-local. Secret sentinels, token shapes, missing
+  required files, unsafe paths and a widened allowlist fail with value-free
+  errors.
+- Documentation impact: **Change required** and completed for root/docs app
+  guidance, configuration/deployment architecture, automation register,
+  deployment/recovery runbooks, tool owner, SPEC ledger and active plan.
+  **Preserve** is recorded for the native Alchemy resource, state, stage, lock,
+  plan, provider/hosted readback and teardown contracts. A Changeset is **N/A**
+  because no installed package or public export changed.
+- Pinned Bun `1.3.14` focused proof passed 41 contract/boundary/automation
+  tests. Full deployment proof passed 92 tests and 706 assertions. The final
+  full `bun run verification` passed repository paths, documentation,
+  runbooks, deployment/automation checks, lint, formatting, skills, Quality,
+  Knip, production Knip and all workspace type checks.
+- No Doppler config/token, GitHub secret/variable or Cloudflare/Alchemy
+  resource was created, changed, read by value, rotated or removed. The new
+  hosted Preview/teardown source remains unproved until DCG-005 bootstrap and
+  exact-SHA hosted proof are separately authorised.
+
 ## Verification log
 
 The reviewed document set passed JSON parsing and `git diff --check`.
@@ -262,6 +298,12 @@ DCG-002 deterministic proof establishes the trusted/fork workflow shapes,
 cache-before-fetch order, exact named-output scope and one-file receipt upload.
 It does not prove the action fetched a live TaxKit config or that GitHub ran the
 new workflow.
+
+DCG-003 deterministic proof establishes exact Preview/teardown config
+selection, cache-before-fetch order, named-output placement, Production
+isolation and secret-negative prepared uploads. It preserves the earlier
+hosted receipts as immutable history but does not claim that the new Doppler
+source ran on GitHub or accessed Cloudflare.
 
 ## Versioning
 

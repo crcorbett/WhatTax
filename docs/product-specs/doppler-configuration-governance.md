@@ -22,9 +22,10 @@ Alchemy and Cloudflare. Doppler will not own values created by the host,
 GitHub, Alchemy or TaxKit's evidence tools.
 
 The first working slice is deliberately small: one local credentialed docs
-command. The Quality workflow's two Turbo values follow as the first hosted
-source slice. Preview, teardown,
-Production and receipt reconciliation follow only after that slice is proven.
+command. The Quality workflow's two Turbo values and receipt reconciliation
+follow as the first hosted-source repository slice. Preview and teardown then
+use their separate provider config and secret-negative artifact boundary.
+Production follows only after that slice is accepted.
 The existing native Alchemy resource graph, stage names, locks, equal replan,
 provider readback, hosted proof and recovery rules remain unchanged.
 
@@ -33,6 +34,12 @@ research baseline. Repository implementation may proceed, but creating or
 changing Doppler, GitHub or Cloudflare credentials remains a separate
 provider operation under the
 [authority model](../operations/authority-model.md).
+
+Repository implementation through DCG-003 is accepted: local development,
+Quality, receipt reconciliation, Preview and exact-stage teardown now have one
+reviewed Doppler source path each. Production remains pending DCG-004. No live
+TaxKit config, GitHub bridge, hosted fetch or provider result is claimed before
+the separately approved DCG-005 operation.
 
 ## Problem
 

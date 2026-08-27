@@ -72,14 +72,18 @@ records its before/after provider facts as not observed. No local OAuth
 profile, credential or temporary secret-bearing URL is copied into retained
 evidence.
 
-The workflow contract also checks credential placement. Preview and Production
-have no job-wide Cloudflare token; only their exact bootstrap, plan and
-replan/apply steps receive it. Checkout, dependency and browser setup,
-provider-free builds, validators, hosted proof and artifact actions remain
-token-free. GitHub supplies the stage lock only to workflow runs. It does not
-lock manual CLI mutation, which is unsupported while a matching run is queued
-or active. An interrupted provider step remains uncertain until state/provider
-readback records the result.
+The workflow contract also checks credential placement. Preview and teardown
+fetch only `taxkit/stg_preview` through the Preview environment's
+`DOPPLER_PROVIDER_TOKEN`, check the safe metadata, and map the two Cloudflare
+outputs only to exact provider steps. Preview separately fetches `taxkit/ci`
+through repository `DOPPLER_CI_TOKEN` after cache saves and maps its Turbo
+outputs only to the provider-free deployment check and build. Teardown never
+fetches `ci`. Production retains its direct source until DCG-004. Checkout,
+dependency and browser setup, hosted proof and artifact actions remain
+provider-token-free. GitHub supplies the stage lock only to workflow runs. It
+does not lock manual CLI mutation, which is unsupported while a matching run
+is queued or active. An interrupted provider step remains uncertain until
+state/provider readback records the result.
 
 One closed-mode Effect command owns candidate/config/lock identities, native
 plan projection, state/provider and Wrangler JSON decoding, and sanitised
@@ -194,6 +198,12 @@ uploader prepares a separate directory containing exactly one final
 `workflow-run.json` or `workflow-run-failure.json`; downloaded source artifacts
 and raw GitHub API responses remain runner-local.
 
+Preview plan, provider and teardown jobs also prepare separate upload
+directories. Their typed allowlist admits only the final sanitised files for
+the relevant mode and checks admitted JSON for deterministic sentinels and
+credential/token shapes. Raw Alchemy output, stderr, intermediate provider
+inventories and raw hosted diagnostics remain in the runner work directory.
+
 The central plan parser is pinned to Alchemy `2.0.0-beta.64` and exact upstream
 commit `31edd3c4b2f0f3310fad07f5423aee20cf72be8d`. Its five real sanitised
 fixtures retain source run/artefact identities and raw/final digests for
@@ -202,10 +212,11 @@ proof. It neither advances the automation register nor proves current
 Cloudflare state.
 
 The separate `docs-workflow-cache-boundary` control governs acceleration in all
-four workflows. Receipt validation gets the TaxKit Vercel Remote Cache values
-through the same `taxkit/ci` bridge after its cache save; the provider workflows
-retain their direct values until their reviewed migration slices. The Turbo
-token grants no Cloudflare, deployment, release or receipt-promotion authority.
+four workflows. Receipt validation and Preview get the TaxKit Vercel Remote
+Cache values through the same `taxkit/ci` bridge after their cache saves.
+Teardown stays local-cache-only and Production retains its direct values until
+DCG-004. The Turbo token grants no Cloudflare, deployment, release or
+receipt-promotion authority.
 Content-addressed GitHub caches retain Bun package
 downloads in all four workflows and Chromium binaries only where the browser is
 installed. A ref may restore a matching default-branch cache, while GitHub ref

@@ -40,6 +40,13 @@ operator procedure and authority live in
   Wrangler JSON, and encodes sanitised bootstrap, plan, provider and GitHub
   output files. Its only child process is fixed `git ls-files`; it cannot choose
   or run Alchemy, Wrangler, GitHub or another executable.
+- `workflow-artifact.schemas.ts`, `workflow-artifact.ts` and its runtime own
+  the final upload boundary. The runtime decodes one fixed mode and separate
+  source/upload directories. The Effect program copies only the named safe
+  JSON and screenshot files for that mode, follows no file outside the source
+  directory, scans admitted JSON for secret sentinels and token shapes, and
+  reports only a safe file name and reason. Raw Alchemy output, stderr,
+  inventories and hosted diagnostics remain in the runner work directory.
 - `inventory.runtime.ts` is the provider/state readback composition owner. It
   remains read-only unless a separately authorized workflow owns mutation.
 - `local-doppler.ts` owns the one fixed local credentialed command. It removes

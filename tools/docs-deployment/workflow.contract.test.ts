@@ -27,14 +27,18 @@ const cloudflareTokenBinding = [
   "CLOUDFLARE_API_TOKEN: $",
   "{{ secrets.CLOUDFLARE_API_TOKEN }}",
 ].join("");
+const dopplerCloudflareTokenBinding = [
+  "CLOUDFLARE_API_TOKEN: $",
+  "{{ steps.doppler-provider.outputs.CLOUDFLARE_API_TOKEN }}",
+].join("");
 
-const stepNamesWithCloudflareToken = (source: string) =>
+const stepNamesWithBinding = (source: string, binding: string) =>
   source
     .split(/^ {6}- name: /mu)
     .slice(1)
     .flatMap((block) => {
       const newline = block.indexOf("\n");
-      if (newline === -1 || !block.includes(cloudflareTokenBinding)) {
+      if (newline === -1 || !block.includes(binding)) {
         return [];
       }
       return [block.slice(0, newline)];
@@ -125,11 +129,22 @@ describe("docs deployment workflow admission", () => {
         "steps.bun-cache-restore.outputs.cache-hit != 'true'"
       );
     }
-    for (const source of [preview, production, teardown]) {
-      expect(source).toContain("TURBO_CACHE: local:rw,remote:rw");
-      expect(source).toContain(turboTeamBinding);
-      expect(source).toContain(turboTokenBinding);
+    expect(production).toContain("TURBO_CACHE: local:rw,remote:rw");
+    expect(production).toContain(turboTeamBinding);
+    expect(production).toContain(turboTokenBinding);
+    for (const source of [preview, teardown]) {
+      expect(source).toContain("TURBO_CACHE: local:rw");
+      expect(source).not.toContain(turboTeamBinding);
+      expect(source).not.toContain(turboTokenBinding);
     }
+    expect(preview.split("TURBO_CACHE: local:rw,remote:rw")).toHaveLength(3);
+    expect(preview).toContain(
+      ["TURBO_TEAM: $", "{{ steps.doppler-ci.outputs.TURBO_TEAM }}"].join("")
+    );
+    expect(preview).toContain(
+      ["TURBO_TOKEN: $", "{{ steps.doppler-ci.outputs.TURBO_TOKEN }}"].join("")
+    );
+    expect(teardown).not.toContain("TURBO_CACHE: local:rw,remote:rw");
     expect(receipts).toContain("TURBO_CACHE: local:rw,remote:rw");
     expect(receipts).toContain(
       ["TURBO_TEAM: $", "{{ steps.doppler-ci.outputs.TURBO_TEAM }}"].join("")
@@ -371,6 +386,7 @@ describe("docs deployment workflow admission", () => {
           "Plan exact Preview candidate",
           "Replan and deploy accepted Preview candidate",
         ],
+        binding: dopplerCloudflareTokenBinding,
         path: workflowPaths.preview,
       },
       {
@@ -379,17 +395,24 @@ describe("docs deployment workflow admission", () => {
           "Plan exact fixed Production candidate",
           "Replan and deploy fixed Production candidate",
         ],
+        binding: cloudflareTokenBinding,
         path: workflowPaths.production,
+      },
+      {
+        allowed: [
+          "Run mutation-capable Alchemy state-store bootstrap",
+          "Equal dry-run and destroy exact Preview stage",
+        ],
+        binding: dopplerCloudflareTokenBinding,
+        path: workflowPaths.teardown,
       },
     ] as const;
 
-    for (const { allowed, path } of workflows) {
+    for (const { allowed, binding, path } of workflows) {
       const source = await readWorkflow(path);
-      expect(source).not.toContain(`\n      ${cloudflareTokenBinding}`);
-      expect(stepNamesWithCloudflareToken(source)).toEqual([...allowed]);
-      expect(source.split(cloudflareTokenBinding)).toHaveLength(
-        allowed.length + 1
-      );
+      expect(source).not.toContain(`\n      ${binding}`);
+      expect(stepNamesWithBinding(source, binding)).toEqual([...allowed]);
+      expect(source.split(binding)).toHaveLength(allowed.length + 1);
     }
   });
 
@@ -403,6 +426,63 @@ describe("docs deployment workflow admission", () => {
     expect(production).toContain("environment: taxkit-docs-production");
     expect(teardown).toContain("environment: taxkit-docs-preview");
     expect(teardown).not.toContain("environment: taxkit-docs-preview-teardown");
+    for (const source of [preview, teardown]) {
+      expect(source).toContain(dopplerAction);
+      expect(source).toContain(
+        ["doppler-token: $", "{{ secrets.DOPPLER_PROVIDER_TOKEN }}"].join("")
+      );
+      expect(source).toContain(
+        'test "$DOPPLER_PROJECT" = "taxkit" && test "$DOPPLER_CONFIG" = "stg_preview"'
+      );
+      expect(source).not.toContain("secrets.CLOUDFLARE");
+      expect(source).not.toContain("inject-env-vars");
+      expect(source.lastIndexOf(cacheSaveAction)).toBeLessThan(
+        source.indexOf(dopplerAction)
+      );
+    }
+    expect(preview).toContain(
+      ["doppler-token: $", "{{ secrets.DOPPLER_CI_TOKEN }}"].join("")
+    );
+    expect(preview.match(/secrets\./gu)).toHaveLength(2);
+    expect(teardown.match(/secrets\./gu)).toHaveLength(1);
+    expect(teardown).not.toContain("doppler-ci");
+  });
+
+  test("uploads only prepared Preview and teardown evidence directories", async () => {
+    const [preview, teardown] = await Promise.all([
+      readWorkflow(workflowPaths.preview),
+      readWorkflow(workflowPaths.teardown),
+    ]);
+    expect(preview).toContain("Prepare allowlisted Preview plan evidence");
+    expect(preview).toContain("TAXKIT_WORKFLOW_ARTIFACT_MODE: preview-plan");
+    expect(preview).toContain("Prepare allowlisted Preview provider evidence");
+    expect(preview).toContain(
+      "TAXKIT_WORKFLOW_ARTIFACT_MODE: preview-provider"
+    );
+    expect(preview).toContain(
+      ["path: $", "{{ runner.temp }}/docs-preview-plan-upload"].join("")
+    );
+    expect(preview).toContain(
+      ["path: $", "{{ runner.temp }}/docs-preview-provider-upload"].join("")
+    );
+    expect(preview).not.toContain(
+      ["path: $", "{{ runner.temp }}/docs-deployment\n"].join("")
+    );
+    expect(preview).not.toContain(
+      ["path: |\n", "            $", "{{ runner.temp }}/docs-deployment"].join(
+        ""
+      )
+    );
+    expect(teardown).toContain("Prepare allowlisted Preview teardown evidence");
+    expect(teardown).toContain(
+      "TAXKIT_WORKFLOW_ARTIFACT_MODE: preview-teardown"
+    );
+    expect(teardown).toContain(
+      ["path: $", "{{ runner.temp }}/docs-preview-teardown-upload"].join("")
+    );
+    expect(teardown).not.toContain(
+      ["path: $", "{{ runner.temp }}/docs-deployment\n"].join("")
+    );
   });
 
   test("uses one non-cancellable Preview deploy and teardown group", async () => {
@@ -454,13 +534,7 @@ describe("docs deployment workflow admission", () => {
     expect(teardown).toContain(`REVIEWED_WORKFLOW_SHA: ${githubExpression}`);
     expect(teardown).not.toContain("github.event.pull_request.base.sha");
     expect(teardown).toContain('test "$GITHUB_REF" = "refs/heads/main"');
-    const cloudflareTokenExpression = [
-      "$",
-      "{{ secrets.CLOUDFLARE_API_TOKEN }}",
-    ].join("");
-    expect(teardown).not.toContain(
-      `CLOUDFLARE_API_TOKEN: ${cloudflareTokenExpression}\n      PR_NUMBER:`
-    );
+    expect(teardown).not.toContain("secrets.CLOUDFLARE_API_TOKEN");
   });
 
   test("binds Production mutation to a Schema-checked Preview workflow receipt", async () => {

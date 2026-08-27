@@ -180,6 +180,15 @@ preflight proof; their `dist/**` output is not asserted to be the exact artifact
 produced inside an Alchemy plan/apply. `.wrangler/**` and `dist/**` remain
 ignored generated output and are never deployment receipts.
 
+Preview and exact-stage teardown repository source selects only
+`taxkit/stg_preview` through the shared Preview GitHub environment. Preview
+selects `taxkit/ci` separately for its two Turbo consumers after cache saves;
+teardown does not fetch it. Their upload steps receive only a separately
+prepared allowlist of sanitised proof files, while raw provider output stays on
+the runner. Production retains its direct source until its reviewed slice. No
+hosted Doppler fetch is claimed before the separately approved TaxKit bridge is
+created and read back.
+
 Exact Preview, Production, teardown, rollback and Alchemy-state operations
 belong to `docs/runbooks/docs-deployment.md`; dated sanitized observations
 belong below `docs/evidence/deployments/`. The hosted harness requires the

@@ -10,6 +10,8 @@ const strictAppBoundaryPaths = [
   "tools/docs-deployment/doppler-custody.boundary.ts",
   "tools/docs-deployment/local-doppler.runtime.ts",
   "tools/docs-deployment/local-doppler.ts",
+  "tools/docs-deployment/workflow-artifact.runtime.ts",
+  "tools/docs-deployment/workflow-artifact.ts",
   "tools/docs-deployment/workflow-evidence.runtime.ts",
   "tools/docs-deployment/workflow-input-check.runtime.ts",
   "tools/docs-deployment/workflow-plan-check.runtime.ts",
@@ -32,6 +34,7 @@ export interface StrictAppBoundaryFinding {
     | "raw-concurrency"
     | "runtime-owner"
     | "runtime-probe"
+    | "workflow-artifact-boundary"
     | "workflow-boundary";
   readonly path: StrictAppBoundaryPath;
 }
@@ -45,7 +48,11 @@ const hostedProofHostPath =
 const localDopplerRuntimePath =
   "tools/docs-deployment/local-doppler.runtime.ts" as const;
 const workflowRuntimePaths = strictAppBoundaryPaths.filter(
-  (path) => path.includes("workflow-") && path !== workflowEvidenceRuntimePath
+  (path) =>
+    path.includes("workflow-") &&
+    path !== workflowEvidenceRuntimePath &&
+    path !== "tools/docs-deployment/workflow-artifact.runtime.ts" &&
+    path !== "tools/docs-deployment/workflow-artifact.ts"
 );
 
 const finding = (
@@ -153,6 +160,32 @@ const inspectWorkflowBoundaries = (
   return findings;
 };
 
+const inspectWorkflowArtifactBoundary = (
+  sources: StrictAppBoundarySources
+): readonly StrictAppBoundaryFinding[] => {
+  const runtimePath =
+    "tools/docs-deployment/workflow-artifact.runtime.ts" as const;
+  const servicePath = "tools/docs-deployment/workflow-artifact.ts" as const;
+  const runtime = sources[runtimePath];
+  const service = sources[servicePath];
+  const valid =
+    includesEvery(runtime, [
+      "Config.schema(WorkflowArtifactConfig)",
+      "prepareWorkflowArtifact(",
+      "disableErrorReporting: true",
+    ]) &&
+    includesEvery(service, [
+      "FileSystem.FileSystem",
+      "allowedFiles",
+      "forbiddenText",
+      "realPath(",
+      "concurrency: 1",
+    ]) &&
+    !includesAny(service, ["process.env", "Bun.file", "Object.entries"]);
+
+  return valid ? [] : [finding("workflow-artifact-boundary", servicePath)];
+};
+
 const inspectCredentialBoundary = (
   sources: StrictAppBoundarySources
 ): readonly StrictAppBoundaryFinding[] => {
@@ -254,6 +287,7 @@ export const inspectStrictAppBoundaries = (
 ): readonly StrictAppBoundaryFinding[] => [
   ...inspectGenericBoundaries(sources),
   ...inspectWorkflowBoundaries(sources),
+  ...inspectWorkflowArtifactBoundary(sources),
   ...inspectHostedProofBoundary(sources),
   ...inspectCredentialBoundary(sources),
   ...inspectLocalDopplerBoundary(sources),

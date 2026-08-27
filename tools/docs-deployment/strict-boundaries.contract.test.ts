@@ -41,6 +41,12 @@ const readGovernedSources = async (): Promise<StrictAppBoundarySources> => ({
   "tools/docs-deployment/local-doppler.ts": await readSource(
     "tools/docs-deployment/local-doppler.ts"
   ),
+  "tools/docs-deployment/workflow-artifact.runtime.ts": await readSource(
+    "tools/docs-deployment/workflow-artifact.runtime.ts"
+  ),
+  "tools/docs-deployment/workflow-artifact.ts": await readSource(
+    "tools/docs-deployment/workflow-artifact.ts"
+  ),
   "tools/docs-deployment/workflow-evidence.runtime.ts": await readSource(
     "tools/docs-deployment/workflow-evidence.runtime.ts"
   ),
@@ -174,6 +180,16 @@ describe("strict docs app and deployment architecture", () => {
     expect(findingInvariants(bypassedCustody)).toContain(
       "local-doppler-boundary"
     );
+  });
+
+  test("rejects a widened workflow artifact boundary", async () => {
+    const sources = await readGovernedSources();
+    const widened = replaceSource(
+      sources,
+      "tools/docs-deployment/workflow-artifact.ts",
+      (source) => source.replaceAll("allowedFiles", "unboundedFiles")
+    );
+    expect(findingInvariants(widened)).toContain("workflow-artifact-boundary");
   });
 
   test("rejects bypassed hosted-proof Config and browser lifetime boundaries", async () => {

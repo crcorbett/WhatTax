@@ -151,14 +151,16 @@ matching cache saved by `main`. GitHub keeps pull-request writes on the
 pull-request merge ref, away from `main` and sibling pull requests. A miss or
 cache outage only changes download time.
 
-The trusted docs Preview, Production, teardown and receipt workflows use the
-same remote task cache for deterministic Turbo work. Receipt validation now
-gets its two Turbo values from `taxkit/ci` after its cache save and uploads only
-one final reconciled or failure receipt. They use the same
-content-addressed Bun download keys, and browser workflows use the same
-content-addressed Chromium keys. GitHub ref scope controls writes. Exact
-candidate checks, provider plans or mutations, hosted readback and receipt
-promotion are always live and cannot be satisfied by a cache hit.
+The trusted docs Preview, Production, teardown and receipt workflows use
+bounded Turbo caching for deterministic work. Receipt validation and Preview
+get their two Turbo values from `taxkit/ci` after cache saves; teardown stays
+local-cache-only. Preview and teardown get Cloudflare values only from
+`taxkit/stg_preview` through the Preview environment bridge and expose them
+only to exact provider steps. Production retains its direct source until its
+reviewed migration. Preview, teardown and receipt uploads use separate
+allowlisted directories so raw runner output is not retained. The TaxKit
+Doppler configs and GitHub bridges are still pending separately approved
+bootstrap, so this is repository behaviour rather than hosted proof.
 
 Package-facing changes must include a Changeset. Use `bun run changeset` during
 implementation to record the user-facing package impact, and use

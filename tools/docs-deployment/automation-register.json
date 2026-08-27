@@ -9,7 +9,7 @@
         "release-or-publication",
         "unrelated-provider-resource"
       ],
-      "durationOrRevocation": "One protected Preview operation for the accepted exact candidate and pr-N stage; revoke on completion, explicit revocation or identity/safety mismatch.",
+      "durationOrRevocation": "One protected Preview operation for the accepted exact candidate and pr-N stage through the taxkit/stg_preview bridge; revoke on completion, explicit revocation or identity/safety mismatch.",
       "environment": "taxkit-docs-preview",
       "operations": ["preview-deploy"],
       "principal": "taxkit-docs-preview-workflow",
@@ -20,7 +20,7 @@
     "durableState": {
       "identity": "exact candidate, pr-N, accepted plan digest, provider deployment/version and hosted proof",
       "kind": "candidate-plan-provider-receipt",
-      "location": "dated workflow artifact and docs/evidence/deployments receipt after acceptance"
+      "location": "allowlisted dated workflow artifact and docs/evidence/deployments receipt after acceptance"
     },
     "environment": {
       "id": "taxkit-docs-preview",
@@ -32,13 +32,13 @@
     },
     "failure": {
       "escalationOwner": "taxkit-docs-deployment-operation-owner",
-      "recovery": "Retain the failed receipt, repair the named owner and retry only as a new exact authorized attempt.",
+      "recovery": "Retain the failed receipt; disable the stg_preview bridge and revert to the last reviewed source under separate authority, or repair the named owner and retry only as a new exact authorized attempt.",
       "rollback": "Use the accepted exact-stage teardown path; never broaden destroy scope.",
       "stopConditions": [
         "candidate is a fork or no longer the trusted PR head",
         "quality result is absent or belongs to another commit",
         "plan digest or provider/state identity differs",
-        "credential or environment identity differs"
+        "Doppler project/config, credential or environment identity differs"
       ]
     },
     "id": "docs-preview-delivery",
@@ -181,7 +181,7 @@
         "release-or-publication",
         "unrelated-provider-resource"
       ],
-      "durationOrRevocation": "One exact PR-close teardown attempt for pr-N; revoke on absence readback, explicit revocation or identity/safety mismatch.",
+      "durationOrRevocation": "One exact PR-close teardown attempt for pr-N through the taxkit/stg_preview bridge; revoke on absence readback, explicit revocation or identity/safety mismatch.",
       "environment": "taxkit-docs-preview",
       "operations": ["preview-destroy"],
       "principal": "taxkit-docs-preview-teardown-workflow",
@@ -192,7 +192,7 @@
     "durableState": {
       "identity": "closed PR number, reviewed workflow SHA, pr-N, destroy digest and provider/state absence",
       "kind": "exact-stage-absence-receipt",
-      "location": "dated workflow artifact and docs/evidence/deployments receipt after acceptance"
+      "location": "allowlisted dated workflow artifact and docs/evidence/deployments receipt after acceptance"
     },
     "environment": {
       "id": "taxkit-docs-preview",
@@ -204,13 +204,13 @@
     },
     "failure": {
       "escalationOwner": "taxkit-docs-deployment-operation-owner",
-      "recovery": "Retain the stop receipt and use the manual runbook under exact destroy authority.",
+      "recovery": "Retain the stop receipt; disable the stg_preview bridge and revert to the last reviewed source under separate authority, or use the manual runbook under exact destroy authority.",
       "rollback": "No destructive retry occurs until the exact retained Preview identity is re-read.",
       "stopConditions": [
         "workflow checks out or executes pull-request head code",
         "default-branch workflow SHA is not reviewed",
         "stage is not exactly derived as pr-N",
-        "destroy plan or provider/state identity differs"
+        "destroy plan, Doppler project/config or provider/state identity differs"
       ]
     },
     "id": "docs-preview-teardown",

@@ -43,9 +43,15 @@ Record these exact values before dispatch:
 - the expected postcondition, evidence route and recovery owner.
 
 The candidate must have a successful Quality result. Preview candidates must
-come from the same repository. Use the environment-scoped credential already
-attached to `taxkit-docs-preview` or `taxkit-docs-production`; do not copy it
-into a local file, command, log or receipt.
+come from the same repository. Preview and teardown require the
+`taxkit-docs-preview` environment's `DOPPLER_PROVIDER_TOKEN` to be a read-only,
+expiring, single-config bridge for `taxkit/stg_preview`. Preview also requires
+repository `DOPPLER_CI_TOKEN` for `taxkit/ci`; teardown must not use it.
+Production retains its existing environment-scoped direct values until its
+reviewed migration. Do not copy any credential into a local file, command, log
+or receipt. The repository source is implemented, but these TaxKit Doppler
+configs and bridges were not established at the research baseline, so hosted
+use needs the separately approved bootstrap in the SPEC.
 
 ## Authority
 
@@ -119,9 +125,14 @@ There is intentionally no external lease.
    configuration. A placeholder, shortened commit or caller-supplied value
    without its named receipt is not an accepted input.
 3. The workflow checks candidate and Quality identity, installs frozen
-   dependencies, and runs provider-free docs checks. It then performs the
-   authorised bootstrap and runs `alchemy plan`. Alchemy owns the Vite build;
-   do not add a second build process.
+   dependencies, and saves Bun and browser caches before any Doppler fetch.
+   Preview fetches and checks `taxkit/ci` and `taxkit/stg_preview` separately;
+   teardown fetches and checks only `taxkit/stg_preview`. A missing bridge,
+   wrong config identity or named output stops the job with no direct fallback.
+   Preview gives Turbo outputs only to the provider-free deployment check and
+   docs build, then gives Cloudflare outputs only to the provider steps. It
+   performs the authorised bootstrap and runs `alchemy plan`. Alchemy owns the
+   Vite build; do not add a second build process.
 4. The typed evidence command decodes the raw plan with the single beta.64
    parser. Accept only one `DocsWebsite` `create`, `update` or `noop` action for
    deploy. The plan receipt must bind the exact candidate, lockfile,
@@ -147,6 +158,13 @@ There is intentionally no external lease.
    A missing bridge, wrong metadata or missing named output stops the positive
    receipt. Do not restore the retained direct Turbo values as a silent
    fallback in the same workflow.
+
+   Preview and teardown upload only the separate directories prepared by the
+   typed artifact command. Inspect the named final files, not the runner work
+   directory. Raw plan/replan/destroy output, provider stderr, intermediate
+   inventories and raw hosted diagnostics stay runner-local. A required file,
+   unsafe path or admitted JSON containing a credential name, sentinel or
+   token shape makes the upload preparation fail without printing the value.
 7. When a same-repository Preview pull request closes, `Docs Preview Teardown`
    runs from reviewed default-branch code in the same
    `taxkit-docs-preview` environment. It rechecks the closed pull request,
@@ -165,6 +183,11 @@ pull-request-close cleanup can use the same narrow credential as Preview
 deploy. A new receipt is not an open prerequisite for this same-environment
 automatic teardown. Require a fresh receipt if the environment, reviewer rule,
 credential scope, teardown source binding or lock control changes.
+
+If the Preview bridge fails during the approved migration overlap, disable the
+new bridge and revert to the last reviewed direct-source workflow commit. Read
+back the exact environment and workflow commit before retrying. Do not add a
+second source or a direct-secret fallback to the Doppler workflow.
 
 ### Integrated local development
 

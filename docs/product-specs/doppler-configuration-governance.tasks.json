@@ -199,7 +199,7 @@
     },
     {
       "id": "DCG-003",
-      "status": "pending",
+      "status": "completed",
       "title": "Govern Preview and teardown with secret-negative evidence",
       "type": "preview-vertical-slice",
       "dependsOn": ["DCG-002"],
