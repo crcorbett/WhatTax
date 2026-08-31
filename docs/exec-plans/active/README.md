@@ -14,11 +14,11 @@ tombstone: false
 Live implementation plans belong here while work is in progress. Maintainer
 lifecycle is owned by [`../../README.md`](../../README.md).
 
-The [Oxlint policy refresh](./oxlint-policy-refresh.md) is active. OLP-001 is
-installing the current generic and Effect anti-slop rules, preserving TaxKit's
-stricter local policy, fixing genuine owned findings and proving the result
-through the root verification graph and hosted pull-request Quality before
-merge.
+The implemented [Oxlint policy refresh](../../product-specs/oxlint-policy-refresh.md)
+and its [completed plan](../completed/oxlint-policy-refresh.md) record the
+current generic and Effect anti-slop policy, structural finding fixes, local
+verification, hosted Quality and merged-main proof. Package publication and
+deployment remain explicit non-claims.
 
 The implemented
 [Doppler configuration governance](../../product-specs/doppler-configuration-governance.md)

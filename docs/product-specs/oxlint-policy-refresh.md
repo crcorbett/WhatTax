@@ -1,6 +1,6 @@
 ---
 document_type: product-spec
-lifecycle: current
+lifecycle: implemented
 authority: supporting
 owner: taxkit-tooling-owner
 last_reviewed: 2026-08-31
@@ -13,7 +13,7 @@ tombstone: false
 
 ## Outcome
 
-TaxKit will run the current compatible Oxlint plugin runtime with the full
+TaxKit runs the current compatible Oxlint plugin runtime with the full
 generic anti-slop ruleset, the opt-in Effect service-constructor rule, and the
 applicable shared repository safeguards. Existing TaxKit rules, exact boundary
 allowlists and narrow generated-file ignores remain in force.
@@ -89,11 +89,15 @@ plugins and root configuration.
 
 ## Verification and limits
 
-Focused proof is `bun run test:oxlint`, `bun run lint`, `bun run check-types`,
+Focused proof was `bun run test:oxlint`, `bun run lint`, `bun run check-types`,
 `bun run check:docs`, `bun run check:runbooks`, `bun run test:skills`,
 `bun run check:repository-paths`, `git diff --check` and
-`bun run verification`. Hosted Quality must pass on the pull request before
-merge. These checks prove this repository revision only; they do not prove a
-package publication, deployment, provider state or external consumer result.
+`bun run verification`. Candidate `48384d5da44c25894612c7253003adc677f601dd`
+passed hosted Quality run `33375644482`; [pull request
+#76](https://github.com/crcorbett/taxkit/pull/76) merged it as
+`1a0b180326bb93eecee373c57503880b44754506`, which was read back as the exact
+`origin/main` commit. Main Quality run `33376169245` passed on that exact merge.
+These checks prove this repository revision only; they do not prove a package
+publication, deployment, provider state or external consumer result.
 
 Rollback is a revert of the merged repository commit.
