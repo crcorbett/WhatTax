@@ -23,11 +23,29 @@ const readGovernedSources = async (): Promise<StrictAppBoundarySources> => ({
     "apps/docs/src/lib/runtime.server.ts"
   ),
   "apps/docs/src/server.ts": await readSource("apps/docs/src/server.ts"),
+  "tools/docs-deployment/doppler-custody.boundary.ts": await readSource(
+    "tools/docs-deployment/doppler-custody.boundary.ts"
+  ),
+  "tools/docs-deployment/doppler-custody.runtime.ts": await readSource(
+    "tools/docs-deployment/doppler-custody.runtime.ts"
+  ),
   "tools/docs-deployment/inventory-credentials.boundary.ts": await readSource(
     "tools/docs-deployment/inventory-credentials.boundary.ts"
   ),
   "tools/docs-deployment/inventory.runtime.ts": await readSource(
     "tools/docs-deployment/inventory.runtime.ts"
+  ),
+  "tools/docs-deployment/local-doppler.runtime.ts": await readSource(
+    "tools/docs-deployment/local-doppler.runtime.ts"
+  ),
+  "tools/docs-deployment/local-doppler.ts": await readSource(
+    "tools/docs-deployment/local-doppler.ts"
+  ),
+  "tools/docs-deployment/workflow-artifact.runtime.ts": await readSource(
+    "tools/docs-deployment/workflow-artifact.runtime.ts"
+  ),
+  "tools/docs-deployment/workflow-artifact.ts": await readSource(
+    "tools/docs-deployment/workflow-artifact.ts"
   ),
   "tools/docs-deployment/workflow-evidence.runtime.ts": await readSource(
     "tools/docs-deployment/workflow-evidence.runtime.ts"
@@ -139,6 +157,39 @@ describe("strict docs app and deployment architecture", () => {
     expect(findingInvariants(withoutEvidenceBoundary)).toContain(
       "workflow-boundary"
     );
+  });
+
+  test("rejects a widened or ambient local Doppler boundary", async () => {
+    const sources = await readGovernedSources();
+    const ambientCommand = replaceSource(
+      sources,
+      "tools/docs-deployment/local-doppler.ts",
+      (source) =>
+        source
+          .replace('"--no-read-env",', "")
+          .replace("extendEnv: false", "extendEnv: true")
+    );
+    const bypassedCustody = replaceSource(
+      sources,
+      "tools/docs-deployment/local-doppler.runtime.ts",
+      (source) => source.replace("checkDopplerCustody(", "skipCustody(")
+    );
+    expect(findingInvariants(ambientCommand)).toContain(
+      "local-doppler-boundary"
+    );
+    expect(findingInvariants(bypassedCustody)).toContain(
+      "local-doppler-boundary"
+    );
+  });
+
+  test("rejects a widened workflow artifact boundary", async () => {
+    const sources = await readGovernedSources();
+    const widened = replaceSource(
+      sources,
+      "tools/docs-deployment/workflow-artifact.ts",
+      (source) => source.replaceAll("allowedFiles", "unboundedFiles")
+    );
+    expect(findingInvariants(widened)).toContain("workflow-artifact-boundary");
   });
 
   test("rejects bypassed hosted-proof Config and browser lifetime boundaries", async () => {

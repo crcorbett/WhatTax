@@ -2,7 +2,15 @@ import * as Config from "effect/Config";
 import * as Effect from "effect/Effect";
 import * as Schema from "effect/Schema";
 
-import { DocsDeploymentStage } from "./docs-deployment-stage.js";
+import {
+  DocsDeploymentStage,
+  DocsLocalDevelopmentStage,
+} from "./docs-deployment-stage.js";
+
+const DocsCloudflareStackStage = Schema.Union([
+  DocsDeploymentStage,
+  DocsLocalDevelopmentStage,
+]);
 
 export const docsCloudflareStackName = "TaxKitDocsCloudflare";
 export const docsWorkerResourceId = "DocsWebsite";
@@ -27,8 +35,8 @@ export const docsWorkerMemo = {
   ],
 };
 
-export const decodeDocsDeploymentStage = (value: unknown) =>
-  Schema.decodeUnknownEffect(DocsDeploymentStage)(value).pipe(
+export const decodeDocsCloudflareStackStage = (value: unknown) =>
+  Schema.decodeUnknownEffect(DocsCloudflareStackStage)(value).pipe(
     Effect.mapError((error) => new Config.ConfigError(error)),
   );
 

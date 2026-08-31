@@ -11,9 +11,6 @@ permissions:
 
 env:
   TAXKIT_ACTION_PIN_UPDATE_OWNER: taxkit-ci-release-maintainer
-  TURBO_CACHE: local:rw,remote:rw
-  TURBO_TEAM: ${{ vars.TURBO_TEAM }}
-  TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
 
 concurrency:
   group: quality-${{ github.workflow }}-${{ github.ref }}
@@ -28,7 +25,7 @@ jobs:
         with:
           fetch-depth: 0
       - run: git show-ref --verify --quiet refs/heads/main || git branch --track main origin/main
-      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.0.2
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
         with:
           bun-version-file: .bun-version
       - id: bun-cache-path
@@ -63,4 +60,27 @@ jobs:
           path: ${{ env.PLAYWRIGHT_BROWSERS_PATH }}
           key: ${{ steps.playwright-cache-restore.outputs.cache-primary-key }}
       - run: bun run check:quality-workflow
-      - run: bun run release:check -- --ci
+      - name: Fetch trusted CI configuration
+        id: doppler-ci
+        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+        uses: dopplerhq/secrets-fetch-action@451892f16195f9ac360e1a5bcbf0b5fd0e957534 # v2.0.0
+        with:
+          doppler-token: ${{ secrets.DOPPLER_CI_TOKEN }}
+      - name: Check trusted CI configuration identity
+        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+        env:
+          DOPPLER_CONFIG: ${{ steps.doppler-ci.outputs.DOPPLER_CONFIG }}
+          DOPPLER_PROJECT: ${{ steps.doppler-ci.outputs.DOPPLER_PROJECT }}
+        run: test "$DOPPLER_PROJECT" = "taxkit" && test "$DOPPLER_CONFIG" = "ci"
+      - name: Run trusted Quality with remote cache
+        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+        env:
+          TURBO_CACHE: local:rw,remote:rw
+          TURBO_TEAM: ${{ steps.doppler-ci.outputs.TURBO_TEAM }}
+          TURBO_TOKEN: ${{ steps.doppler-ci.outputs.TURBO_TOKEN }}
+        run: bun run release:check -- --ci
+      - name: Run fork Quality without credentials
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository
+        env:
+          TURBO_CACHE: local:rw
+        run: bun run release:check -- --ci

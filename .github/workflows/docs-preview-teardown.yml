@@ -34,9 +34,7 @@ jobs:
       ALCHEMY_PROFILE: default
       PR_NUMBER: ${{ github.event.pull_request.number || inputs.pr_number }}
       REVIEWED_WORKFLOW_SHA: ${{ inputs.reviewed_workflow_sha || github.sha }}
-      TURBO_CACHE: local:rw,remote:rw
-      TURBO_TEAM: ${{ vars.TURBO_TEAM }}
-      TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+      TURBO_CACHE: local:rw
     steps:
       - name: Check exact closed PR and reviewed default-branch source
         env:
@@ -76,7 +74,7 @@ jobs:
         run: test "$(git rev-parse HEAD)" = "$REVIEWED_WORKFLOW_SHA"
 
       - name: Set up Bun
-        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.0.2
+        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
         with:
           bun-version-file: .bun-version
 
@@ -139,6 +137,18 @@ jobs:
           path: ${{ env.PLAYWRIGHT_BROWSERS_PATH }}
           key: ${{ steps.playwright-cache-restore.outputs.cache-primary-key }}
 
+      - name: Fetch Preview provider configuration
+        id: doppler-provider
+        uses: dopplerhq/secrets-fetch-action@451892f16195f9ac360e1a5bcbf0b5fd0e957534 # v2.0.0
+        with:
+          doppler-token: ${{ secrets.DOPPLER_PROVIDER_TOKEN }}
+
+      - name: Check Preview provider configuration identity
+        env:
+          DOPPLER_CONFIG: ${{ steps.doppler-provider.outputs.DOPPLER_CONFIG }}
+          DOPPLER_PROJECT: ${{ steps.doppler-provider.outputs.DOPPLER_PROJECT }}
+        run: test "$DOPPLER_PROJECT" = "taxkit" && test "$DOPPLER_CONFIG" = "stg_preview"
+
       - name: Validate deployment owners
         run: bun run check:docs-deployment
 
@@ -147,8 +157,8 @@ jobs:
 
       - name: Run mutation-capable Alchemy state-store bootstrap
         env:
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ steps.doppler-provider.outputs.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ steps.doppler-provider.outputs.CLOUDFLARE_API_TOKEN }}
         run: |
           set -euo pipefail
           mkdir -p "$RUNNER_TEMP/docs-deployment"
@@ -163,8 +173,8 @@ jobs:
 
       - name: Equal dry-run and destroy exact Preview stage
         env:
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ steps.doppler-provider.outputs.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ steps.doppler-provider.outputs.CLOUDFLARE_API_TOKEN }}
         run: |
           set -euo pipefail
           mkdir -p "$RUNNER_TEMP/docs-deployment"
@@ -303,11 +313,19 @@ jobs:
           TAXKIT_WORKFLOW_STAGE="$stage" \
             bun run check:docs-deployment-workflow-teardown-proof
 
+      - name: Prepare allowlisted Preview teardown evidence
+        if: always()
+        env:
+          TAXKIT_WORKFLOW_ARTIFACT_MODE: preview-teardown
+          TAXKIT_WORKFLOW_ARTIFACT_SOURCE: ${{ runner.temp }}/docs-deployment
+          TAXKIT_WORKFLOW_ARTIFACT_UPLOAD: ${{ runner.temp }}/docs-preview-teardown-upload
+        run: bun --conditions=source run tools/docs-deployment/workflow-artifact.runtime.ts
+
       - name: Upload sanitized Preview teardown evidence
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: taxkit-docs-preview-teardown-${{ github.run_id }}
-          path: ${{ runner.temp }}/docs-deployment
+          path: ${{ runner.temp }}/docs-preview-teardown-upload
           retention-days: 30
           if-no-files-found: error

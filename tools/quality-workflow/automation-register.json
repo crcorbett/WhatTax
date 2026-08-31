@@ -19,6 +19,7 @@
         "contents:read",
         "dependency-cache:read",
         "dependency-cache:write-ref-scoped",
+        "doppler-config:read-ci-trusted-events",
         "remote-cache:read",
         "remote-cache:write-on-token-bearing-events"
       ],
@@ -37,6 +38,7 @@
       "scope": [
         "immutable repository revision",
         "configured Actions runner",
+        "read-only taxkit/ci Doppler config through the repository bridge on trusted events",
         "Vercel team remote-cache task artifacts and logs",
         "content-addressed ref-scoped GitHub Bun package cache",
         "content-addressed ref-scoped GitHub Playwright Chromium cache"
@@ -63,7 +65,9 @@
       "stopConditions": [
         "first tagged check failure",
         "unknown workflow shape",
-        "fork pull request receives remote-cache credential",
+        "missing or wrong taxkit/ci metadata or named Turbo output",
+        "Doppler fetch occurs before the final cache save",
+        "fork pull request receives Doppler bridge or remote-cache credential",
         "dependency cache key or path contains secret or mutable installed state",
         "dependency cache skips frozen install or Chromium system dependencies",
         "cache-only success or missing uncached fallback"
@@ -71,11 +75,11 @@
       "escalationOwner": "taxkit-ci-release-maintainer"
     },
     "rollback": {
-      "action": "remove Turbo and dependency-cache bindings while preserving frozen installs and the complete uncached Quality graph",
+      "action": "remove the Doppler bridge plus Turbo and dependency-cache bindings while preserving frozen installs and the complete local-cache-only Quality graph",
       "authorityRequired": "taxkit-ci-release-maintainer"
     },
     "recovery": {
-      "action": "repair the named source or cache boundary, remove dependency-cache restore/save when needed, and run frozen installs plus the canonical graph on a new revision",
+      "action": "repair the named Doppler source or cache boundary, remove the bridge and dependency-cache restore/save when needed, and run frozen installs plus the local-cache-only canonical graph on a new revision",
       "owner": "taxkit-ci-release-maintainer",
       "verificationCommand": "bun run release:check -- --ci"
     },

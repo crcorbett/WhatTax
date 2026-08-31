@@ -1,12 +1,17 @@
-import { Effect } from "effect";
+import { Effect, Schema } from "effect";
 import { readFile } from "node:fs/promises";
 import { describe, expect, it } from "vitest";
 
 import {
-  decodeDocsDeploymentStage,
+  decodeDocsCloudflareStackStage,
   docsWorkerAssetHeaders,
   docsWorkerObservability,
 } from "./cloudflare-stack";
+import { DocsDeploymentStage } from "./docs-deployment-stage";
+
+const decodeDocsDeploymentStage = Schema.decodeUnknownEffect(
+  DocsDeploymentStage
+);
 
 describe("docs Cloudflare stack policy", () => {
   it.each(["prod", "pr-1", "pr-214"])(
@@ -21,6 +26,25 @@ describe("docs Cloudflare stack policy", () => {
     (stage) => {
       expect(
         Effect.runSyncExit(decodeDocsDeploymentStage(stage))._tag
+      ).toBe("Failure");
+    }
+  );
+
+  it.each(["dev_cooper", "dev_taxkit-maintainer", "dev_ci_user"])(
+    "accepts the local-only stack stage %s",
+    (stage) => {
+      expect(Effect.runSync(decodeDocsCloudflareStackStage(stage))).toBe(stage);
+      expect(
+        Effect.runSyncExit(decodeDocsDeploymentStage(stage))._tag
+      ).toBe("Failure");
+    }
+  );
+
+  it.each(["dev", "dev_", "dev user", "development_cooper"])(
+    "rejects the invalid local stack stage %s",
+    (stage) => {
+      expect(
+        Effect.runSyncExit(decodeDocsCloudflareStackStage(stage))._tag
       ).toBe("Failure");
     }
   );

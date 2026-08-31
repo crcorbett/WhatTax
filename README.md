@@ -1,6 +1,6 @@
 ---
 status: canonical
-last_reviewed: 2026-08-20
+last_reviewed: 2026-08-28
 source_of_truth: root-docs
 confidence: high
 ---
@@ -81,6 +81,7 @@ bun install
 bun run --filter=api dev
 bun run --filter=web dev
 bun run --filter=docs dev
+bun run check:doppler-custody
 bun run --filter=docs test:cloudflare-built
 bun run check:repository-paths
 bun run check:harness-governance
@@ -97,7 +98,12 @@ bun run version-repo
 `https://api.taxkit.localhost`. `bun run --filter=web dev` injects that
 portless URL into `TAXKIT_API_BASE_URL` and `VITE_TAXKIT_API_BASE_URL` before
 serving the web app at `https://taxkit.localhost`. `bun run --filter=docs dev`
-serves the public docs app at `https://docs.taxkit.localhost`. `bun run
+is the credentialed, Alchemy-managed Cloudflare development path. It requires a
+repository-scoped Doppler login and an authorised `taxkit/dev` config, runs the
+pass/fail-only `bun run check:doppler-custody` check first during onboarding,
+and starts only a local `dev_<user>` Alchemy stage. It does not authorise or
+prove a provider change. Use `bun run --filter=docs dev:vite` for the fast,
+credential-free docs app at `https://docs.taxkit.localhost`. `bun run
 --filter=docs test:cloudflare-built` builds the exact Cloudflare target and
 exercises an isolated copy of its Worker/assets under local workerd; it does
 not access provider credentials or prove a deployment. `bun run
@@ -124,13 +130,16 @@ browser proof and Changeset status.
 
 Deterministic repository commands run through Turbo, including the root
 validators used by `verification` and the app/package checks used by
-`release:check`. Token-bearing GitHub Quality runs may read and write Vercel
-Remote Cache on same-repository pull requests and `main`; fork pull requests
-receive no token and run the same full command graph locally. A missing token
-or cache service also falls back locally. Local remote-cache use is an explicit
-developer choice through `TURBO_TOKEN` and `TURBO_TEAM`. Never commit either
-credential or treat a cache hit as test, release, deployment or public
-availability proof.
+`release:check`. Trusted GitHub Quality runs fetch the minimum `taxkit/ci`
+config through the pinned Doppler action after every cache save, check the safe
+project/config identity, and pass only the named Turbo outputs to the canonical
+release step. Same-repository pull requests and `main` may read and write
+Vercel Remote Cache. Fork pull requests do not fetch Doppler and run the same
+full command graph with local cache only. Local remote-cache use remains an
+explicit developer choice through `TURBO_TOKEN` and `TURBO_TEAM`. Never commit
+either credential or treat a cache hit as test, release, deployment or public
+availability proof. The hosted trusted path remains unproved until the
+repository `DOPPLER_CI_TOKEN` bridge is separately created and read back.
 
 Quality also keeps separate GitHub caches for Bun package downloads and the
 Playwright Chromium binary. It does not cache `node_modules`: current warm
@@ -142,12 +151,17 @@ matching cache saved by `main`. GitHub keeps pull-request writes on the
 pull-request merge ref, away from `main` and sibling pull requests. A miss or
 cache outage only changes download time.
 
-The trusted docs Preview, Production, teardown and receipt workflows use the
-same remote task cache for deterministic Turbo work. They use the same
-content-addressed Bun download keys, and browser workflows use the same
-content-addressed Chromium keys. GitHub ref scope controls writes. Exact
-candidate checks, provider plans or mutations, hosted readback and receipt
-promotion are always live and cannot be satisfied by a cache hit.
+The trusted docs Preview, Production, teardown and receipt workflows use
+bounded Turbo caching for deterministic work. Receipt validation and Preview
+get their two Turbo values from `taxkit/ci` after cache saves; teardown stays
+local-cache-only. Preview and teardown get Cloudflare values only from
+`taxkit/stg_preview` through the Preview environment bridge and expose them
+only to exact provider steps. Production uses its separate protected
+`taxkit/prd` bridge and keeps its fixed `prod` plan/deploy/rollback controls.
+All deployment and receipt uploads use separate allowlisted directories so raw
+runner output is not retained. The TaxKit Doppler configs and GitHub bridges
+are still pending separately approved bootstrap, so this is repository
+behaviour rather than hosted proof.
 
 Package-facing changes must include a Changeset. Use `bun run changeset` during
 implementation to record the user-facing package impact, and use

@@ -3,7 +3,7 @@ document_type: architecture
 lifecycle: current
 authority: canonical
 owner: taxkit-architecture-owner
-last_reviewed: 2026-08-24
+last_reviewed: 2026-08-28
 review_trigger: deployment target, runtime adapter, provider resource, state, domain, or rollback change
 ---
 
@@ -32,8 +32,10 @@ intent and task state belong in the active SPEC and execution plan.
   `@cloudflare/vite-plugin@1.47.0` emits `dist/server/index.js`, its server
   modules and `dist/client` assets. The former docs-app Nitro/Vercel bridge was
   retired after local parity; `apps/web` remains a separate Nitro owner.
-- Root `alchemy.run.ts` owns one `TaxKitDocsCloudflare` stack, branded
-  `pr-<number>` or `prod` stage admission, the mutation composition's
+- Root `alchemy.run.ts` owns one `TaxKitDocsCloudflare` stack. Hosted workflow
+  and evidence admission remains branded `pr-<number>` or `prod`; local
+  `alchemy dev` separately admits only Alchemy's `dev_<user>` default without
+  widening that deployment Schema. The root also owns the mutation composition's
   `Cloudflare.state()`, and one logical
   `Cloudflare.Website.Vite("DocsWebsite")` resource. Alchemy injects its
   Cloudflare Vite integration, builds the app, and owns the SSR Worker/assets
@@ -99,6 +101,22 @@ checkout paths from the generated Wrangler config, strips provider credential
 variables, runs Wrangler dry-run and then runs the same no-bundle module graph
 under workerd. Local proof does not establish provider state or deployment.
 
+The integrated local development call graph is separate:
+
+```text
+repository-scoped Doppler login and custody check
+  -> fixed taxkit/dev adapter with ambient values and fallbacks disabled
+    -> Bun and Alchemy dotenv loading disabled
+      -> native alchemy dev
+        -> Schema-decoded dev_<user> stack
+          -> the same Website.Vite resource in local development mode
+```
+
+This command can contact Cloudflare and Alchemy state. It therefore still
+needs the named local development operation and account authority in the
+runbook. The adapter does not grant that authority, and deterministic fake
+process tests do not prove provider access.
+
 The repository-owned implementation and command map for deployment tooling is
 [`../../tools/docs-deployment/README.md`](../../tools/docs-deployment/README.md).
 
@@ -140,7 +158,11 @@ model. PR-close teardown remains the explicit Preview cleanup owner; retained
 orphan reports are immutable historical observations only.
 
 Preview deployment and exact-stage PR-close teardown share the
-`taxkit-docs-preview` GitHub environment and its narrow mutation credential.
+`taxkit-docs-preview` GitHub environment and its narrow
+`DOPPLER_PROVIDER_TOKEN` bridge. Repository source requires that bridge to be a
+read-only, expiring, single-config token for `taxkit/stg_preview`, verifies the
+safe project/config outputs, and gives only the two named Cloudflare outputs to
+the exact provider steps.
 That environment has no required reviewer: the Preview dispatch or trusted
 same-repository PR-close event supplies operation authority, while reviewed
 source, exact `pr-N` decoding, the non-cancellable stage lock, equal plans and
@@ -148,9 +170,22 @@ provider/state readback enforce the target. Production keeps its separate
 reviewer-protected environment. A GitHub environment controls credential
 custody; Alchemy stage identity controls which infrastructure can change.
 
-Preview and Production place `CLOUDFLARE_API_TOKEN` only on their named
-bootstrap, plan and replan/apply steps. Checkout, installation, provider-free
-builds, repository checks, hosted proof and artifact upload cannot read it.
+Preview places its Doppler-sourced `CLOUDFLARE_API_TOKEN` only on its named
+bootstrap, plan and replan/apply steps; teardown exposes it only to bootstrap
+and exact-stage destroy. Preview fetches the separate `taxkit/ci` bridge after
+all cache saves and gives its Turbo outputs only to the provider-free
+deployment check and docs build. Teardown does not fetch `ci`. Production uses
+the same two-bridge shape with protected `taxkit/prd`: its Turbo outputs reach
+only the four post-cache provider-free proof/build steps, and its Cloudflare
+outputs reach only bootstrap, plan and equal-replan/apply. Checkout,
+installation, hosted proof and artifact upload cannot read a provider token.
+
+Preview, Production and teardown uploads are prepared in separate temporary
+directories. A typed Effect owner admits only the named sanitised JSON and
+screenshot files for that mode and rejects admitted JSON containing credential
+names, deterministic sentinels or token shapes. Raw Alchemy plan/replan/destroy
+output, provider stderr, intermediate inventories and raw hosted diagnostics
+remain runner-local.
 Production plan, deploy and rollback use the same fixed `prod` GitHub
 concurrency group with cancellation disabled. Preview and teardown keep their
 shared exact-`pr-N` non-cancellable group. These GitHub locks do not cover a

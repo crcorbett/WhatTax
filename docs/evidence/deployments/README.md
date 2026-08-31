@@ -3,7 +3,7 @@ document_type: deployment-evidence-index
 lifecycle: current
 authority: canonical
 owner: taxkit-docs-deployment-proof-owner
-last_reviewed: 2026-08-21
+last_reviewed: 2026-08-31
 review_trigger: docs deployment candidate, provider, stage, URL, proof, screenshot, teardown or rollback receipt change
 ---
 
@@ -57,6 +57,39 @@ This is a capability receipt only. It does not establish that a workflow has
 run from the default branch, that Preview or Production is currently serving,
 or that teardown, rollback, custom-domain/DNS, publication or release proof
 exists. The earlier failed capability and re-auth receipts remain unchanged.
+
+## 2026-08-31 Doppler bootstrap precondition
+
+The sanitized
+`2026-08-31-doppler-bootstrap-precondition/receipt.json` records the exact PR
+head, missing TaxKit Doppler project and GitHub bridges, retained direct secret
+names, measured account-owned Cloudflare permission groups and the failed
+trusted Quality boundary. The retained Cloudflare mutation token was active at
+the observation time, but its bearer value had no approved recoverable source.
+The previously approved Doppler bootstrap therefore stopped before mutation
+and now needs separate authority to create three TaxKit-only account-owned
+replacement tokens. The receipt contains no secret value, token identifier,
+hash, preview, cache or export. It proves neither a replacement credential nor
+a Doppler, hosted deployment or provider result.
+
+## 2026-08-31 Doppler bootstrap
+
+The sanitized
+[`2026-08-31-doppler-bootstrap/receipt.json`](./2026-08-31-doppler-bootstrap/receipt.json)
+records the separately approved TaxKit-only bootstrap. It binds the exact
+Doppler project/configs, masked key names, three read-only automation-token
+identities, three GitHub bridge names, three active account-owned Cloudflare
+token identities and the revoked interrupted token. It also records the
+repository-scoped personal login, safe local checks, bounded failed attempts,
+rollback and exact non-claims. No secret value, hash, preview, personal account
+name, email, local machine path, export or fallback cache is retained.
+
+The receipt proves creation and metadata readback only for those exact
+credentials and stores. It also binds successful trusted Quality run
+`33351826840`, attempt 2, to exact head `7a12205…`; the same-repository run did
+not exercise the fork-only step. It does not prove Preview, teardown,
+Production, rollback, deployment, DNS, publication or legacy-credential
+removal.
 
 ## Local workerd
 

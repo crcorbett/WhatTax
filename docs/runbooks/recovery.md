@@ -47,6 +47,22 @@ rollback precondition and escalation owner.
    provider's own runbook; TaxKit docs Cloudflare recovery is routed through
    `docs/runbooks/docs-deployment.md`, and this local runbook is insufficient.
 
+### Doppler or GitHub bridge recovery
+
+For a failed TaxKit Doppler source change, first identify the exact workflow
+commit, GitHub scope, Doppler project/config metadata and the last reviewed
+direct-source workflow commit. Do not read or record secret values.
+
+During the approved migration overlap, the smallest recovery is to disable the
+new bridge and revert repository source to that reviewed commit, then read back
+the exact GitHub repository/environment metadata and workflow identity. For
+Production, also prove the reviewer rule and fixed `prod` lock remain intact;
+never substitute `stg_preview` or a Preview bridge. Never mix Doppler outputs
+and direct legacy secrets in one workflow. Rotation must prove the replacement
+bridge at the intended config before separately asking to revoke the old token.
+Removing retained direct credentials also needs its own approval and metadata
+readback after merged-main replacement proof.
+
 ## Evidence and postcondition
 
 Read-only diagnosis produces a bounded incident record with artifact identity,

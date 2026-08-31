@@ -161,6 +161,7 @@ const AutomationAuthority = Schema.Struct({
       "contents:read",
       "dependency-cache:read",
       "dependency-cache:write-ref-scoped",
+      "doppler-config:read-ci-trusted-events",
       "remote-cache:read",
       "remote-cache:write-on-token-bearing-events",
     ])

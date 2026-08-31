@@ -3,7 +3,7 @@ document_type: runbook
 lifecycle: current
 authority: canonical
 owner: taxkit-docs-deployment-operation-owner
-last_reviewed: 2026-08-24
+last_reviewed: 2026-08-28
 review_trigger: docs deployment candidate, Cloudflare or Alchemy identity/state, stage, plan, provider readback, teardown, rollback, credential or authority change
 ---
 
@@ -43,9 +43,16 @@ Record these exact values before dispatch:
 - the expected postcondition, evidence route and recovery owner.
 
 The candidate must have a successful Quality result. Preview candidates must
-come from the same repository. Use the environment-scoped credential already
-attached to `taxkit-docs-preview` or `taxkit-docs-production`; do not copy it
-into a local file, command, log or receipt.
+come from the same repository. Preview and teardown require the
+`taxkit-docs-preview` environment's `DOPPLER_PROVIDER_TOKEN` to be a read-only,
+expiring, single-config bridge for `taxkit/stg_preview`. Preview also requires
+repository `DOPPLER_CI_TOKEN` for `taxkit/ci`; teardown must not use it.
+Production requires the `taxkit-docs-production` environment's separate
+`DOPPLER_PROVIDER_TOKEN` for `taxkit/prd` and the same repository `ci` bridge.
+Do not copy any credential into a local file, command, log or receipt. The
+repository source is implemented, but these TaxKit Doppler
+configs and bridges were not established at the research baseline, so hosted
+use needs the separately approved bootstrap in the SPEC.
 
 ## Authority
 
@@ -69,6 +76,18 @@ not prove that no provider state changed.
 The Cloudflare token is available only to the named bootstrap, plan,
 replan/apply and destroy steps that need it. It must not be moved to a job,
 checkout, install, repository check, hosted proof or artefact upload.
+
+The approved bootstrap creates service tokens only for `ci`, `stg_preview` and
+`prd`; `dev` uses the named developer's checkout-scoped personal login. Doppler
+CLI 3.76.5 supports the required `--access read` and `--max-age` controls. After
+the operation record fixes the exact duration, send each newly created token
+straight from `doppler configs tokens create --plain` to the matching
+`gh secret set` standard input. The token must not appear on screen, in a shell
+argument, variable, file, clipboard, log, cache or receipt. If the GitHub write
+fails, stop, identify the orphan by token metadata, and revoke it under the
+same approved rollback before retrying. Do not create a temporary workflow to
+move the existing write-only GitHub values. Their approved secure source, or a
+separately authorised replacement, must be named before bootstrap.
 
 Production plan, deploy and rollback share the fixed non-cancellable
 `taxkit-docs-production-prod` group. Preview deploy and teardown share the
@@ -119,7 +138,13 @@ There is intentionally no external lease.
    configuration. A placeholder, shortened commit or caller-supplied value
    without its named receipt is not an accepted input.
 3. The workflow checks candidate and Quality identity, installs frozen
-   dependencies, and runs provider-free docs checks. It then performs the
+   dependencies, and saves Bun and browser caches before any Doppler fetch.
+   Preview fetches and checks `taxkit/ci` and `taxkit/stg_preview` separately;
+   Production fetches and checks `taxkit/ci` and `taxkit/prd` separately;
+   teardown fetches and checks only `taxkit/stg_preview`. A missing bridge,
+   wrong config identity or named output stops the job with no direct fallback.
+   Turbo outputs reach only the named provider-free proof/build steps, while
+   Cloudflare outputs reach only provider steps. The workflow performs the
    authorised bootstrap and runs `alchemy plan`. Alchemy owns the Vite build;
    do not add a second build process.
 4. The typed evidence command decodes the raw plan with the single beta.64
@@ -136,6 +161,25 @@ There is intentionally no external lease.
    Reconcile the completed GitHub run before accepting the receipt. A
    successful source check is not provider proof; provider readback is not
    public-host proof.
+
+   For a successful source run, the reconciler restores and saves its Bun
+   package cache first, then fetches only `taxkit/ci` through repository
+   `DOPPLER_CI_TOKEN`. It checks the safe project/config outputs and supplies
+   only the named Turbo team/token outputs to the exact input/run validation
+   step. Failed or cancelled source runs do not fetch Doppler. The final upload
+   contains exactly one reconciled or failure JSON file; downloaded source
+   artifacts and raw GitHub API responses remain in the runner work directory.
+   A missing bridge, wrong metadata or missing named output stops the positive
+   receipt. Do not restore the retained direct Turbo values as a silent
+   fallback in the same workflow.
+
+   Preview, Production and teardown upload only the separate directories
+   prepared by the typed artifact command. Inspect the named final files, not
+   the runner work directory. Raw plan/replan/destroy output, provider stderr,
+   intermediate inventories and raw hosted diagnostics stay runner-local. A
+   required file, unsafe path or admitted JSON containing a credential name,
+   sentinel or token shape makes the upload preparation fail without printing
+   the value.
 7. When a same-repository Preview pull request closes, `Docs Preview Teardown`
    runs from reviewed default-branch code in the same
    `taxkit-docs-preview` environment. It rechecks the closed pull request,
@@ -155,9 +199,62 @@ deploy. A new receipt is not an open prerequisite for this same-environment
 automatic teardown. Require a fresh receipt if the environment, reviewer rule,
 credential scope, teardown source binding or lock control changes.
 
-For integrated local Cloudflare development, use the repository-owned
-`docs:dev:cloudflare` script. This is development only. It does not replace the
-workflow authority or receipt path.
+If the Preview bridge fails during the approved migration overlap, disable the
+new bridge and revert to the last reviewed direct-source workflow commit. Read
+back the exact environment and workflow commit before retrying. Do not add a
+second source or a direct-secret fallback to the Doppler workflow.
+
+Production recovery follows the same source rule but retains its reviewer
+protection and fixed `prod` lock. Disable only the failing `prd` bridge, revert
+to the last reviewed direct-source Production workflow commit, and read back
+the exact Production environment, reviewer rule and workflow commit before any
+new plan. Do not use `stg_preview`, a Preview bridge or a direct-secret fallback
+inside the Doppler workflow.
+
+For rotation, create and prove a replacement read-only, expiring,
+single-config bridge at the intended config, update only its matching GitHub
+scope, and read back metadata before separately requesting old-token
+revocation. Retained direct Turbo/Cloudflare values are rollback custody only;
+their later removal requires merged-main replacement proof, separate approval
+and names-only metadata readback.
+
+### Integrated local development
+
+Integrated local Cloudflare development is credentialed provider work. Before
+the first run, the named developer must have authority to create a scoped
+personal Doppler login and to use the development Cloudflare token against the
+TaxKit account. Do not treat repository access as that approval.
+
+From the repository root:
+
+```sh
+doppler login --scope=./
+bun run check:doppler-custody
+bun run docs:dev:cloudflare
+```
+
+The login command may create or replace a local Doppler access token. Run it
+interactively only for the named developer and checkout. Moving the checkout
+requires a new scoped login. Never pass a token on the command line and never
+run `doppler configure debug`; Doppler CLI 3.76.5 can print a raw token after a
+keyring fallback. The custody command reads only the scoped config structure,
+requires mode `0600` and a `secret-...` keyring reference, and prints only
+pass/fail.
+
+The root development adapter removes ambient Doppler and Cloudflare values,
+selects only `taxkit/dev`, fetches only `CLOUDFLARE_ACCOUNT_ID` and
+`CLOUDFLARE_API_TOKEN`, disables fallback and starts the internal command with
+Bun and Alchemy dotenv loading disabled. Missing login, config or either named
+value stops before Alchemy. A Doppler outage also stops; there is no stale
+fallback.
+
+Alchemy uses only a Schema-decoded `dev_<user>` local stack stage. The stricter
+`pr-N | prod` workflow/evidence stage does not admit local stages. The command
+does not replace Preview/Production workflow authority, stage locks or receipt
+paths. Do not run it during an overlapping manual or workflow mutation when
+the shared Alchemy state could be affected.
+
+For fast credential-free work, use `bun run docs:dev:vite` instead.
 
 ## Evidence and postcondition
 
