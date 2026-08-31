@@ -383,8 +383,9 @@ hosted failure proof of the missing repository bridge, not proof of a Doppler
 config, secret value, cache result, deployment or provider state. No action log
 or credential value was read into the record.
 
-The current exact head `46a51adbf150f62fbe2abf289194fd62abeb60a9`
-produced the same bounded failure in hosted Quality run
+The implementation head observed during the bootstrap precondition readback,
+`46a51adbf150f62fbe2abf289194fd62abeb60a9`, produced the same bounded failure
+in hosted Quality run
 [`33091612475`](https://github.com/crcorbett/taxkit/actions/runs/33091612475):
 steps through the repository-owned Quality policy passed, and the first Doppler
 fetch failed before any metadata check or release command. Read-only
@@ -398,7 +399,11 @@ before mutation because its precondition requires all values to have a secure
 source. Separate authority for three TaxKit-only account-owned replacement
 tokens is the smallest resume action. The sanitized dated receipt is
 [`DCG-005-bootstrap-precondition-2026-08-31`](../../evidence/deployments/2026-08-31-doppler-bootstrap-precondition/receipt.json).
-The pull request remains open and unmerged.
+The follow-up evidence commit `29a2a651b2d8f67d9c7c4a90f200d9cf6a9c108d`
+then produced the same bounded result in hosted Quality run
+[`33351760442`](https://github.com/crcorbett/taxkit/actions/runs/33351760442):
+workflow policy passed and the missing bridge stopped the trusted fetch. The
+pull request remained open and unmerged at that observation.
 
 Documentation impact for this read-only reconciliation is **Change required**
 for the dated evidence receipt/index and this active plan. The reviewed SPEC,
