@@ -320,6 +320,24 @@
       "title": "Bootstrap, prove, clean up and close out",
       "type": "external-proof-and-closeout",
       "dependsOn": ["DCG-004"],
+      "progress": {
+        "completed": [
+          "TaxKit Doppler project, four locked configs, three read-only automation tokens, three GitHub bridges and repository-scoped local login created and read back without values",
+          "PR 73 merged as aec5e22009ad9fb8af506ae52b1871e91dbcdeb4 with exact approved base and head parents",
+          "Merged-main Quality run 33365915627 passed trusted taxkit/ci fetch, identity and remote-cache Quality",
+          "Approved automatic teardown run 33365915649 used taxkit/stg_preview for only pr-73, accepted equal no-op plans and read back state and provider Worker absence",
+          "Receipt-reconciliation run 33366004914 and a later independent Cloudflare read confirmed the bounded teardown postcondition",
+          "Sanitized merged-main receipt recorded without secret values, hashes, previews, raw logs, raw provider output or local paths"
+        ],
+        "remainingAuthority": [
+          "hosted fork Quality proof if an authorised safe fork run is required",
+          "Preview plan, deployment, hosted journey and teardown proof for this Doppler epoch",
+          "Production plan, deployment, rollback and redeploy proof for this Doppler epoch",
+          "legacy direct GitHub credential removal and metadata readback after replacement proof",
+          "merge of the documentation-only closeout record and its own automatic absent-stage teardown"
+        ],
+        "receipt": "docs/evidence/deployments/2026-08-31-doppler-merged-main/receipt.json"
+      },
       "goal": "Perform only the separately approved provider operation, prove the merged path at exact identity, remove legacy custody under separate approval, and close the plan without overstating proof.",
       "scope": [
         "Present and obtain approval for the exact principal/resource/environment/change/rollback/readback envelope before provider mutation.",

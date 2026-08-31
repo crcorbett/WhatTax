@@ -78,7 +78,7 @@ Still not approved without a separate exact operation:
 | DCG-002 | Accepted | Trusted Quality and successful receipt validation use pinned `taxkit/ci` named outputs after cache saves; forks and failed/cancelled receipt paths fetch no credential. |
 | DCG-003 | Accepted | Preview and teardown use only `taxkit/stg_preview`; Preview fetches `taxkit/ci` separately, teardown stays local-only, and all three upload classes use the secret-negative allowlist boundary. |
 | DCG-004 | Accepted | Protected Production and rollback use only `taxkit/prd`, fetch `taxkit/ci` separately after cache saves, and upload only prepared secret-negative plan/provider evidence. |
-| DCG-005 | In progress; deployment authority pending | PR #73 is open. The exact TaxKit Doppler configs, Cloudflare credentials, service tokens, GitHub bridges and local scoped login are created and read back without values. Quality run `33351826840`, attempt 2, passed trusted `taxkit/ci` fetch, identity and the full remote-cache Quality graph at exact head `7a12205…`. Preview/Production deployment proof and legacy removal remain separately bounded. |
+| DCG-005 | In progress; further authority pending | PR #73 merged as `aec5e220…`. Exact merged-main Quality run `33365915627` passed. The separately approved automatic `pr-73` teardown run `33365915649` fetched only `taxkit/stg_preview`, accepted equal no-op plans and read back the exact stage and matching Worker absent; receipt reconciliation run `33366004914` passed. Hosted fork, Preview deployment, Production/rollback and legacy removal remain separately bounded. |
 
 ## Research record
 
@@ -389,6 +389,52 @@ final merge remain bounded by DCG-005 and the authority model.
   package/app READMEs and the native Alchemy graph are **Preserve** because the
   performed operation matched their reviewed contract. Public docs,
   packages/exports, generated output, skills and a Changeset are **N/A**.
+
+### DCG-005 — approved PR 73 merge and automatic teardown on 31 August 2026
+
+- Cooper approved merge of exact PR 73 head `078dcc8…` into exact main
+  `d2f7a3…` using a merge commit, plus only the automatic `pr-73` teardown
+  against Cloudflare account `f9f94270a4a5af8af7010d891020922d` through
+  `taxkit/stg_preview`. Production, other stages, DNS, legacy removal,
+  publication and unrelated resources were excluded.
+- GitHub created merge commit `aec5e22009ad9fb8af506ae52b1871e91dbcdeb4`
+  with the exact approved base and head as its two parents. GitHub and
+  `origin/main` both read back that commit.
+- Main Quality run
+  [`33365915627`](https://github.com/crcorbett/taxkit/actions/runs/33365915627)
+  passed at that exact commit, including trusted Doppler fetch, metadata
+  identity and the remote-cache Quality graph. The fork-only step was not
+  eligible and remains unproved.
+- Automatic teardown run
+  [`33365915649`](https://github.com/crcorbett/taxkit/actions/runs/33365915649)
+  checked out the reviewed merged-main workflow, fetched only the Preview
+  provider config, accepted matching dry-run and replan digests, and selected
+  only a no-op for logical resource `DocsWebsite` in stage `pr-73`. Its
+  sanitized postcondition found no pre-existing Alchemy stage and no matching
+  Cloudflare Worker before or after the operation.
+- Receipt-reconciliation run
+  [`33366004914`](https://github.com/crcorbett/taxkit/actions/runs/33366004914)
+  independently validated the workflow input and promoted the bounded receipt.
+  A later read-only Cloudflare list found 39 account Workers and zero carrying
+  both the TaxKit docs stack tag and `pr-73` stage tag. No Worker identifiers,
+  token values or raw provider output were retained.
+- The immutable repository record is
+  [`DCG-005-merged-main-and-pr-73-teardown-2026-08-31`](../../evidence/deployments/2026-08-31-doppler-merged-main/receipt.json).
+  The receipt contains only approved identities, hashes of sanitized workflow
+  artifacts and plan projections, outcomes, recovery and explicit non-claims.
+- Documentation impact: **Change required** for the SPEC/task ledger,
+  product/active-plan indexes, this plan and the deployment evidence
+  index/receipt. Architecture, workflow source, operations rules, runbooks,
+  package/app READMEs and the native Alchemy graph are **Preserve** because the
+  operation followed their reviewed contract. Public docs, package exports,
+  generated output, skills and a Changeset are **N/A**.
+- The documentation-only closeout candidate passed JSON parsing,
+  `git diff --check`, the secret-shaped-value scan, focused docs/runbook/path
+  and deployment-evidence checks, and the full repository verification with
+  pinned Bun `1.3.14`. The deployment suite passed 93 tests and 733 assertions.
+  Changeset status reported only the repository's existing entries; no new
+  Changeset is required because this slice changes no package or public export.
+  These checks prove the local repository state only.
 
 ## Verification log
 

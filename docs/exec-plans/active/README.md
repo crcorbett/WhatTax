@@ -19,9 +19,11 @@ The active
 plan owns the current research, required PRD review, ordered repository slices
 and closeout. Repository implementation through DCG-004 is accepted and the
 separately approved TaxKit-only Doppler, Cloudflare-token and GitHub-bridge
-bootstrap is complete. Hosted deployment proof, merged-main reconciliation and
-legacy-credential cleanup remain bounded by their own proof or authority
-requirements.
+bootstrap is complete. PR 73 is merged, merged-main Quality passed, and the
+separately approved automatic `pr-73` absent-stage teardown passed with
+independent receipt and provider readback. Hosted fork proof, Preview
+deployment, Production/rollback and legacy-credential cleanup remain bounded
+by their own proof or authority requirements.
 
 The implemented
 [Alchemy deployment structure corrections](../../product-specs/alchemy-deployment-structure-corrections.md)
