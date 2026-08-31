@@ -6,8 +6,8 @@ import { Effect, Layer } from "effect";
 import { describe, expect, test } from "vitest";
 
 import {
-  makeDocsRuntime,
-  makeDocsRuntimeProbeLayer,
+  createDocsRuntime,
+  createDocsRuntimeProbeLayer,
   readDocsRuntimeProbe,
 } from "./runtime-factory.server";
 
@@ -19,9 +19,9 @@ describe("docs server runtime ownership", () => {
       listPages: () => Effect.die("not used"),
       validateContent: () => Effect.die("not used"),
     });
-    const runtime = makeDocsRuntime(
+    const runtime = createDocsRuntime(
       Layer.succeed(DocsContentService, service),
-      makeDocsRuntimeProbeLayer(Effect.succeed("deterministic-test-isolate"))
+      createDocsRuntimeProbeLayer(Effect.succeed("deterministic-test-isolate"))
     );
 
     const [firstService, firstProbe, secondService, secondProbe] =
@@ -54,10 +54,10 @@ describe("docs server runtime ownership", () => {
     );
 
     expect(runtimeSource).toMatch(
-      /export const docsRuntime = makeDocsRuntime\(/u
+      /export const docsRuntime = createDocsRuntime\(/u
     );
-    expect(runtimeSource.match(/makeDocsRuntime\(/gu)).toHaveLength(1);
-    expect(runtimeSource.match(/makeDocsRuntimeProbeLayer\(/gu)).toHaveLength(
+    expect(runtimeSource.match(/createDocsRuntime\(/gu)).toHaveLength(1);
+    expect(runtimeSource.match(/createDocsRuntimeProbeLayer\(/gu)).toHaveLength(
       1
     );
     expect(runtimeSource).toContain("Random.nextIntBetween");

@@ -5,7 +5,7 @@ import { Array, Option } from "effect";
 import {
   decodeReadableRepositoryText,
   inspectRepositoryText,
-  makeRepositoryPathReport,
+  createRepositoryPathReport,
   renderRepositoryPathReport,
 } from "./policy.js";
 import { RepositoryRelativeFile } from "./schemas.js";
@@ -133,7 +133,7 @@ describe("repository path policy", () => {
         privatePath
       ),
     ];
-    const report = makeRepositoryPathReport({
+    const report = createRepositoryPathReport({
       binaryFiles: 1,
       findings,
       textFiles: 2,

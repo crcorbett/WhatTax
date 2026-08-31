@@ -38,7 +38,7 @@ const readDopplerConfig = (configPath: string) =>
       );
     const unknownConfig = yield* Effect.try({
       catch: () => new DopplerCustodyError({ reason: "config-shape" }),
-      try: (): unknown => parse(contents),
+      try: (): typeof Schema.Unknown.Type => parse(contents),
     });
     return yield* Schema.decodeUnknownEffect(DopplerUserConfig)(
       unknownConfig

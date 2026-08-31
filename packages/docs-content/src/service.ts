@@ -9,7 +9,7 @@ import type {
   DocsValidationResult,
 } from "./schemas.js";
 
-export interface DocsContentServiceShape {
+export interface DocsContentServiceContract {
   readonly getNavigation: () => Effect.Effect<DocsNavigation, DocsSourceError>;
   readonly getPage: (
     path: DocsPagePath
@@ -26,5 +26,5 @@ export interface DocsContentServiceShape {
 
 export class DocsContentService extends Context.Service<
   DocsContentService,
-  DocsContentServiceShape
+  DocsContentServiceContract
 >()("@taxkit/docs-content/DocsContentService") {}

@@ -9,14 +9,18 @@ export interface TaxKitApiClientOptions {
   readonly transformClient?: (client: HttpClient) => HttpClient;
 }
 
-export const makeTaxKitApiClient = (options: TaxKitApiClientOptions = {}) =>
+export const createTaxKitApiClient = (options: TaxKitApiClientOptions = {}) =>
   HttpApiClient.make(TaxKitApi, {
     baseUrl: options.baseUrl,
     transformClient: options.transformClient,
   });
 
+/** @deprecated Use `createTaxKitApiClient`. */
+export const makeTaxKitApiClient = (options: TaxKitApiClientOptions = {}) =>
+  createTaxKitApiClient(options);
+
 export type TaxKitApiClient = EffectTypes.Success<
-  ReturnType<typeof makeTaxKitApiClient>
+  ReturnType<typeof createTaxKitApiClient>
 >;
 
 export {

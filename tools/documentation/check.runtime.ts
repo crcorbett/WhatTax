@@ -177,16 +177,19 @@ export const checkDocumentation = (repositoryRoot: string) =>
               Schema.fromJsonString(WorkspacePackageManifest)
             )
           ),
-          Effect.map(
-            (manifest) =>
-              [
-                manifestPath.replace(/\/package\.json$/u, ""),
-                {
-                  ...(manifest.name ? { name: manifest.name } : {}),
-                  scripts: new Set(Record.keys(manifest.scripts ?? {})),
-                },
-              ] as const
-          ),
+          Effect.map((manifest) => {
+            const packageSummary = {
+              scripts: new Set(Record.keys(manifest.scripts ?? {})),
+            };
+            const ownedPackageSummary = manifest.name
+              ? { ...packageSummary, name: manifest.name }
+              : packageSummary;
+
+            return [
+              manifestPath.replace(/\/package\.json$/u, ""),
+              ownedPackageSummary,
+            ] as const;
+          }),
           Effect.mapError(
             () =>
               new DocumentationCheckError({

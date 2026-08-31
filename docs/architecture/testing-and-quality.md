@@ -3,7 +3,7 @@ document_type: architecture
 lifecycle: current
 authority: canonical
 owner: taxkit-quality-owner
-last_reviewed: 2026-08-20
+last_reviewed: 2026-08-31
 review_trigger: verification graph, proof boundary, CI, deployment, or test-owner change
 ---
 
@@ -419,6 +419,11 @@ supporting gate and cannot replace semantic ownership or call-graph review.
   domain-neutral contracts. `taxkit-rules.js` owns tax/calculator policy plus
   decoder and route-transport rules. Do not put package names or tax defaults
   into a portable rule message.
+- `tools/oxlint/anti-slop/**` is a separately installed generic rule owner.
+  `oxlint.config.ts` registers its generic and Effect plugins, enables every
+  admitted rule at error severity and keeps the vendored source under an exact
+  ignore. Do not copy its rules into TaxKit plugins or add broad source
+  exemptions to pass them.
 - Portable Effect rules ban manual `_tag` literals and `switch`, keep live/test
   Layers out of service contracts, restrict encoder execution, reject throwing
   Schema sync codecs, preserve typed service errors and tagged-error causes,
@@ -487,6 +492,11 @@ supporting gate and cannot replace semantic ownership or call-graph review.
   `--disable-nested-config`. Direct visitor-unit tests alone are not acceptance
   evidence. Fixture-only rejected source stays non-executable and is copied to
   an exact generated path for the binary run.
+- The anti-slop configuration contract enumerates all 15 generic rules and the
+  Effect constructor-import rule. Accepted and rejected Effect fixtures run
+  through the installed Oxlint binary. The portable Effect fixture also proves
+  that module-level mutable test state is rejected while local mutable state is
+  allowed.
 - Portable binding rules require rejected real-binary cases for renamed or
   destructured canonical bindings and accepted unallowlisted cases for
   unrelated same-named locals. Dynamic property values, aliases returned from

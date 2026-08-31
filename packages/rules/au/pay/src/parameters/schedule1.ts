@@ -102,8 +102,8 @@ export const Schedule1Artifact2025_26 = new SourceArtifact({
   ),
   documentVersion: "2025-26",
   extract: new SourceExtract({
+    rowContract: "Schedule1Row[]",
     rowCount: 15,
-    shape: "Schedule1Row[]",
   }),
   retrievedOn: isoDate("2026-05-12"),
   source: Schedule1Source2025_26,

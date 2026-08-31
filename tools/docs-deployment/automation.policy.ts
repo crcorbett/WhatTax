@@ -466,7 +466,7 @@ export const inspectDeploymentAutomationRegisters = (
           automation.id === "docs-preview-delivery" ||
           automation.id === "docs-preview-teardown"
         ) {
-          expectedPrNumber = Number.parseInt(receipt.stage.slice(3), 10);
+          expectedPrNumber = Math.trunc(Number(receipt.stage.slice(3)));
         }
         workflowInputMismatch =
           workflowInput.candidateCommit !== receipt.candidateCommit ||

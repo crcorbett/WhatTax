@@ -19,7 +19,7 @@ import type {
   TaxYearsResponse,
 } from "./schemas.js";
 
-export interface PublicCalculatorServiceShape {
+export interface PublicCalculatorServiceContract {
   readonly calculate: (
     request: CalculatorRunServiceRequest
   ) => Effect.Effect<CalculatorRunResponse, CalculatorServiceError>;
@@ -49,5 +49,5 @@ export interface PublicCalculatorServiceShape {
 
 export class PublicCalculatorService extends Context.Service<
   PublicCalculatorService,
-  PublicCalculatorServiceShape
+  PublicCalculatorServiceContract
 >()("@taxkit/calculators/PublicCalculatorService") {}

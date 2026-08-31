@@ -94,8 +94,10 @@ describe("beta.64 Alchemy plan projection", () => {
       Schema.fromJsonString(RootPackageManifest)
     )(packageSource);
     const resolvedAlchemyVersions = [
-      ...lockfileSource.matchAll(/"alchemy": \["alchemy@([^"]+)"/gu),
-    ].flatMap((match) => (match[1] === undefined ? [] : [match[1]]));
+      ...lockfileSource.matchAll(/"alchemy": \["alchemy@(?<version>[^"]+)"/gu),
+    ].flatMap((match) =>
+      match.groups?.["version"] === undefined ? [] : [match.groups["version"]]
+    );
 
     expect(alchemyPlanTextVersion).toBe("2.0.0-beta.64");
     expect(alchemyPlanSourceCommit).toBe(
@@ -111,14 +113,19 @@ describe("beta.64 Alchemy plan projection", () => {
     const manifest = await readManifest();
     const seen = new Set<string>();
 
-    for (const capture of manifest.captures) {
-      const source = await readFile(
-        `${fixtureRoot}/${capture.fixture}`,
-        "utf-8"
-      );
-      const digest = createHash("sha256").update(source).digest("hex");
-      const [resource] = await project(source, capture.kind);
+    const captures = await Promise.all(
+      manifest.captures.map(async (capture) => {
+        const source = await readFile(
+          `${fixtureRoot}/${capture.fixture}`,
+          "utf-8"
+        );
+        const digest = createHash("sha256").update(source).digest("hex");
+        const [resource] = await project(source, capture.kind);
+        return { capture, digest, resource, source };
+      })
+    );
 
+    for (const { capture, digest, resource, source } of captures) {
       seen.add(capture.scenario);
       expect(Buffer.byteLength(source)).toBe(capture.finalBytes);
       expect(digest).toBe(capture.finalSha256);
@@ -341,6 +348,13 @@ describe("beta.64 Alchemy plan projection", () => {
     expect(new Set(accepted.entries.map((entry) => entry.findingId)).size).toBe(
       8
     );
+    await Promise.all(
+      accepted.entries.flatMap((entry) =>
+        entry.proof.map((proofPath) =>
+          expect(readFile(proofPath, "utf-8")).resolves.not.toHaveLength(0)
+        )
+      )
+    );
     for (const entry of accepted.entries) {
       const mapping = expected.get(entry.findingId);
       expect(mapping).toBeDefined();
@@ -353,9 +367,6 @@ describe("beta.64 Alchemy plan projection", () => {
       expect(entry.verification).toEqual(mapping.verification);
       expect(entry.proof).toEqual(mapping.proof);
       expect(taskIds.has(mapping.taskId)).toBe(true);
-      for (const proofPath of entry.proof) {
-        await expect(readFile(proofPath, "utf-8")).resolves.not.toHaveLength(0);
-      }
     }
   });
 
@@ -415,48 +426,56 @@ describe("beta.64 Alchemy plan projection", () => {
   });
 
   test("rejects unknown actions, resources and replacement-like output", async () => {
-    for (const source of [
-      "Plan: 1 to replace\n[DocsWebsite] replace\n",
-      "Plan: 1 to create\n[Unexpected] create\n",
-      "Plan: 2 changes\n[DocsWebsite] delete\n[DocsWebsite] create\n",
-    ]) {
-      await expect(project(source, "deploy")).rejects.toHaveProperty(
-        "_tag",
-        "WorkflowPlanProjectionError"
-      );
-    }
+    await Promise.all(
+      [
+        "Plan: 1 to replace\n[DocsWebsite] replace\n",
+        "Plan: 1 to create\n[Unexpected] create\n",
+        "Plan: 2 changes\n[DocsWebsite] delete\n[DocsWebsite] create\n",
+      ].map((source) =>
+        expect(project(source, "deploy")).rejects.toHaveProperty(
+          "_tag",
+          "WorkflowPlanProjectionError"
+        )
+      )
+    );
   });
 
   test("rejects malformed resource lines and wrong operation actions", async () => {
-    for (const [source, kind] of [
-      ["Plan: 1 to update\n[DocsWebsite] update extra\n", "deploy"],
-      ["Plan: 1 to create\n[DocsWebsite create\n", "deploy"],
-      ["Plan: 1 to delete\n[DocsWebsite] delete\n", "deploy"],
-      ["Plan: 1 to update\n[DocsWebsite] update\n", "destroy"],
-    ] as const) {
-      await expect(project(source, kind)).rejects.toHaveProperty(
-        "_tag",
-        "WorkflowPlanProjectionError"
-      );
-    }
+    await Promise.all(
+      (
+        [
+          ["Plan: 1 to update\n[DocsWebsite] update extra\n", "deploy"],
+          ["Plan: 1 to create\n[DocsWebsite create\n", "deploy"],
+          ["Plan: 1 to delete\n[DocsWebsite] delete\n", "deploy"],
+          ["Plan: 1 to update\n[DocsWebsite] update\n", "destroy"],
+        ] as const
+      ).map(([source, kind]) =>
+        expect(project(source, kind)).rejects.toHaveProperty(
+          "_tag",
+          "WorkflowPlanProjectionError"
+        )
+      )
+    );
   });
 
   test("rejects missing, malformed and inconsistent destroy summaries", async () => {
-    for (const source of [
-      "",
-      "completely changed provider output\n",
-      "[DocsWebsite create\n",
-      "Plan: no changes\n[Unexpected create\n",
-      "Plan: no changes\nchanged trailing output\n",
-      "Plan: no changes\n[DocsWebsite] delete\n",
-      "Plan: 1 to delete\n",
-      "Plan: no changes\nPlan: no changes\n",
-    ]) {
-      await expect(project(source, "destroy")).rejects.toHaveProperty(
-        "_tag",
-        "WorkflowPlanProjectionError"
-      );
-    }
+    await Promise.all(
+      [
+        "",
+        "completely changed provider output\n",
+        "[DocsWebsite create\n",
+        "Plan: no changes\n[Unexpected create\n",
+        "Plan: no changes\nchanged trailing output\n",
+        "Plan: no changes\n[DocsWebsite] delete\n",
+        "Plan: 1 to delete\n",
+        "Plan: no changes\nPlan: no changes\n",
+      ].map((source) =>
+        expect(project(source, "destroy")).rejects.toHaveProperty(
+          "_tag",
+          "WorkflowPlanProjectionError"
+        )
+      )
+    );
   });
 
   test("normalises beta.64 ANSI and timestamp log variation without admitting it", async () => {

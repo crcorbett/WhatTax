@@ -9,14 +9,16 @@ import { FumadocsSourcePage, FumadocsSourcePages } from "./schemas.js";
 import type { FumadocsSourcePage as FumadocsSourcePageValue } from "./schemas.js";
 import { FumadocsSource } from "./service.js";
 
+type UntrustedFumadocsPage = typeof Schema.Unknown.Type;
+
 export interface FumadocsGeneratedCollectionAdapter {
   readonly getPage: (
     slugs: NonNullable<Parameters<LoaderOutput["getPage"]>[0]>,
     locale?: Parameters<LoaderOutput["getPage"]>[1]
-  ) => unknown | Promise<unknown>;
+  ) => UntrustedFumadocsPage | Promise<UntrustedFumadocsPage>;
   readonly listPages: (
     locale?: Parameters<LoaderOutput["getPages"]>[0]
-  ) => unknown | Promise<unknown>;
+  ) => UntrustedFumadocsPage | Promise<UntrustedFumadocsPage>;
 }
 
 export const makeFumadocsSourceLive = (

@@ -1,4 +1,4 @@
-import { makeTaxKitApiClientLayer } from "@taxkit/api-http/client/live";
+import { createTaxKitApiClientLayer } from "@taxkit/api-http/client/live";
 import { Effect, Layer, ManagedRuntime } from "effect";
 import * as FetchHttpClient from "effect/unstable/http/FetchHttpClient";
 
@@ -11,7 +11,7 @@ import {
 const TaxKitApiClientLive = Layer.unwrap(
   Effect.gen(function* makeTaxKitApiClientLive() {
     const config = yield* TaxKitWebClientConfig;
-    return makeTaxKitApiClientLayer({ baseUrl: config.httpApi.baseUrl });
+    return createTaxKitApiClientLayer({ baseUrl: config.httpApi.baseUrl });
   }).pipe(
     Effect.mapError(
       (cause) =>

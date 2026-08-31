@@ -3,7 +3,7 @@ document_type: standard
 lifecycle: current
 authority: canonical
 owner: taxkit-tooling-owner
-last_reviewed: 2026-07-24
+last_reviewed: 2026-08-31
 review_trigger: formatter, lint, dependency, typecheck, governance gate, Changeset, or root command change
 ---
 
@@ -18,9 +18,13 @@ library with stable package boundaries and predictable bundle behavior.
 - `bun` is the package manager and workspace runner.
 - Root `package.json` owns workspace globs and catalog dependency versions.
 - `ultracite` wraps the configured provider commands.
-- `oxlint.config.ts` extends `ultracite/oxlint/core` and
-  `ultracite/oxlint/react`.
-- `oxfmt.config.ts` spreads `ultracite/oxfmt`.
+- `oxlint.config.ts` extends `ultracite/oxlint/core`, the reviewed React
+  profile and the Remix profile. Oxlint and `@oxlint/plugins` use the same
+  1.80.0 plugin runtime.
+- `oxfmt.config.ts` spreads `ultracite/oxfmt` and preserves authored Markdown
+  wrapping. Agent instructions, documentation, generated routes and the
+  vendored anti-slop source have exact formatter ignores; application and
+  package source remains formatted.
 - The root `check` and `fix` scripts request Ultracite's type-aware mode. The
   optional `oxlint-tsgolint` adapter is not currently installed or qualified,
   so those commands stop before linting rather than silently weakening the
@@ -142,6 +146,25 @@ Important enabled rules:
   of `export *`, improving API review, bundling, and code splitting.
 - `jsdoc/check-tag-names`: docstrings use only linter-recognized tags.
 
+The vendored `tools/oxlint/anti-slop` plugin owns 15 generic rules. All run at
+error severity and reject chained or unexplained assertions, widening followed
+by assertion, unknown parameters, returns and aliases, unsafe dictionary and
+object parameter types, runtime `typeof`, `Reflect.get`/`Reflect.apply`, module
+mocking, conditional empty-object spreads, widened known values and vague
+`Shape` symbol names. The separate opt-in Effect plugin rejects imported
+service or Layer constructors named `make*`; exported compatibility aliases may
+remain at their owner, but repository consumers import the clearer `create*`
+name.
+
+The generic plugin is deliberately separate from TaxKit policy. It does not
+own TaxKit content, SEO, TanStack route naming, package naming or reference-site
+rules. Those concerns are excluded unless a TaxKit semantic owner and focused
+proof are added. The plugin source is ignored by the root lint and formatter
+because it is installed verbatim; its behaviour is proved through fixtures and
+the normal source tree still receives every configured rule. TypeScript files
+disable the JavaScript-only `no-redeclare` rule so a value and its derived type
+may share one name. JavaScript files keep that rule.
+
 Current TaxKit-specific overrides are narrow:
 
 - `func-names`: `Effect.gen(function* () { ... })` is idiomatic and should not
@@ -187,6 +210,10 @@ Important portable rules include:
   `vitest`. Shared globals must have one owner. Vitest-only utilities such as
   `vi` and hooks may still come from `vitest`; an explicitly aliased secondary
   shared API is also valid.
+- `effect/no-module-level-mutable-test-state`: rejects module-level `let` and
+  `var` in test files so one test cannot leak changed state into another.
+  Immutable declarations, function-local variables and ambient declarations
+  remain valid.
 - `effect/no-switch`: bans `switch`. Use Effect `Match` with
   exhaustive handling.
 - `bun/no-host-api-outside-adapters` and

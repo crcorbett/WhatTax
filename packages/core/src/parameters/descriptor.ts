@@ -45,13 +45,13 @@ export type ParameterEffectivePeriod = typeof ParameterEffectivePeriod.Type;
  *
  * @since 0.1.0
  */
-export interface ParameterDescriptor<Self, Shape> {
+export interface ParameterDescriptor<Self, Value> {
   readonly effectivePeriod: ParameterEffectivePeriod;
   readonly id: ParameterId;
-  readonly schema: Schema.Schema<Shape>;
+  readonly schema: Schema.Schema<Value>;
   readonly source: SourceRef;
   readonly sourceArtifact?: SourceArtifact;
-  readonly tag: Context.Key<Self, Shape>;
+  readonly tag: Context.Key<Self, Value>;
   readonly title: string;
 }
 
@@ -67,22 +67,27 @@ export type AnyParameterDescriptor = ParameterDescriptor<unknown, unknown>;
  *
  * @since 0.1.0
  */
-export const makeParameterDescriptor = <Self, Shape>(args: {
+export const makeParameterDescriptor = <Self, Value>(args: {
   readonly effectivePeriod: ParameterEffectivePeriod;
   readonly id: string;
-  readonly schema: Schema.Schema<Shape>;
+  readonly schema: Schema.Schema<Value>;
   readonly source: SourceRef;
   readonly sourceArtifact?: SourceArtifact;
-  readonly tag: Context.Key<Self, Shape>;
+  readonly tag: Context.Key<Self, Value>;
   readonly title: string;
-}): ParameterDescriptor<Self, Shape> => ({
-  effectivePeriod: ParameterEffectivePeriod.make(args.effectivePeriod),
-  id: ParameterId.make(args.id),
-  schema: args.schema,
-  source: args.source,
-  ...(args.sourceArtifact === undefined
-    ? {}
-    : { sourceArtifact: args.sourceArtifact }),
-  tag: args.tag,
-  title: args.title,
-});
+}): ParameterDescriptor<Self, Value> => {
+  const descriptor: ParameterDescriptor<Self, Value> = {
+    effectivePeriod: ParameterEffectivePeriod.make(args.effectivePeriod),
+    id: ParameterId.make(args.id),
+    schema: args.schema,
+    source: args.source,
+    tag: args.tag,
+    title: args.title,
+  };
+
+  if (args.sourceArtifact !== undefined) {
+    return { ...descriptor, sourceArtifact: args.sourceArtifact };
+  }
+
+  return descriptor;
+};

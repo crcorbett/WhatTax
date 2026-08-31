@@ -17,7 +17,7 @@ import {
   DeploymentWorkflowProviderReadback,
 } from "./workflow-receipts.schemas.js";
 
-const decodeAutomations = (input: unknown) =>
+const decodeAutomations = (input: typeof Schema.Unknown.Type) =>
   Effect.runPromise(
     Schema.decodeUnknownEffect(DeploymentAutomationRegister)(input)
   );

@@ -24,7 +24,7 @@ export default defineConfig(async () => {
     outDir: docsContentSourceDirectory,
   });
   const originalDocsMdxBuildStart = docsMdx.buildStart;
-  if (typeof originalDocsMdxBuildStart !== "function") {
+  if (originalDocsMdxBuildStart === undefined) {
     throw new TypeError("Fumadocs Vite plugin must expose a buildStart hook.");
   }
   let docsMdxBuildStartResult: Promise<unknown> | undefined;

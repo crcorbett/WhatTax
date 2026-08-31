@@ -10,7 +10,7 @@ import type {
   CalculatorRunServiceRequest,
 } from "@taxkit/calculators/schemas";
 import { PublicCalculatorService } from "@taxkit/calculators/service";
-import type { PublicCalculatorServiceShape } from "@taxkit/calculators/service";
+import type { PublicCalculatorServiceContract } from "@taxkit/calculators/service";
 import { Effect } from "effect";
 import type { Context, Schema } from "effect";
 
@@ -38,7 +38,7 @@ export type TaxKitEffectRequirements = Context.Service.Identifier<
 >;
 
 const publicCalculatorService: Effect.Effect<
-  PublicCalculatorServiceShape,
+  PublicCalculatorServiceContract,
   never,
   TaxKitEffectRequirements
 > = Effect.service(PublicCalculatorService);

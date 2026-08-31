@@ -209,18 +209,20 @@ describe("TaxKit public calculation HTTP API", () => {
         const httpCause = yield* Exit.match(exit, {
           onFailure: Effect.succeed,
           onSuccess: () =>
-            Effect.dieMessage("Expected the HTTP calculate fixture to fail"),
+            Effect.die(
+              new Error("Expected the HTTP calculate fixture to fail")
+            ),
         });
         const sdkCause = yield* Exit.match(sdkExit, {
           onFailure: Effect.succeed,
           onSuccess: () =>
-            Effect.dieMessage("Expected the SDK calculate fixture to fail"),
+            Effect.die(new Error("Expected the SDK calculate fixture to fail")),
         });
         const serviceCause = yield* Exit.match(serviceExit, {
           onFailure: Effect.succeed,
           onSuccess: () =>
-            Effect.dieMessage(
-              "Expected the calculator service fixture to fail"
+            Effect.die(
+              new Error("Expected the calculator service fixture to fail")
             ),
         });
         const failure = expectAt(

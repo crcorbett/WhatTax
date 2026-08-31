@@ -12,6 +12,14 @@ import type { Browser, Page, Request } from "playwright";
 import { runCloudflareHostedProof } from "./cloudflare-hosted-proof.boundary.js";
 import type { CloudflareHostedProofHost } from "./cloudflare-hosted-proof.boundary.js";
 
+interface BrowserRouterHarness {
+  readonly navigate: (options: { readonly to: string }) => Promise<void>;
+}
+
+declare global {
+  var __TSR_ROUTER__: BrowserRouterHarness | undefined;
+}
+
 const repositoryRoot = new URL("../../../", import.meta.url);
 const knownPath = "/guides/calculate-australian-take-home-pay";
 const missingPath = "/__docs-evidence__/missing";
@@ -29,7 +37,7 @@ const relativeLuminance = (color: readonly [number, number, number]) =>
   color
     .map((channel) => channel / 255)
     .map((channel) =>
-      channel <= 0.040_45 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4
+      channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4
     )
     .reduce(
       (luminance, channel, index) =>
@@ -62,16 +70,12 @@ const assertComputedContrast = async (page: Page) => {
 };
 
 const waitForHydratedRouter = async (page: Page) => {
-  await page.waitForFunction(() => {
-    const router: unknown = Reflect.get(globalThis, "__TSR_ROUTER__");
-    return (
-      typeof router === "object" &&
-      router !== null &&
-      typeof Reflect.get(router, "navigate") === "function" &&
+  await page.waitForFunction(
+    () =>
+      globalThis.__TSR_ROUTER__ !== undefined &&
       document.querySelector('[data-tk-hydrated="true"]') !== null &&
       document.querySelector('[data-tk-navigation-interactive="true"]') !== null
-    );
-  });
+  );
 };
 
 const digest = async (url: URL) =>
@@ -125,18 +129,22 @@ const playwrightHostedProofHost = {
       init: RequestInit | undefined,
       expectedStatus: number
     ) => {
-      let response = await fetch(input, init);
-      for (
-        let attempt = 1;
-        attempt < hostedPropagationAttempts &&
-        (response.status === 404 || response.status >= 500) &&
-        response.status !== expectedStatus;
-        attempt += 1
-      ) {
+      const fetchAttempt = async (
+        attempt: number,
+        response: Response
+      ): Promise<Response> => {
+        if (
+          attempt >= hostedPropagationAttempts ||
+          (response.status !== 404 && response.status < 500) ||
+          response.status === expectedStatus
+        ) {
+          return response;
+        }
         await Bun.sleep(hostedPropagationDelayMs);
-        response = await fetch(input, init);
-      }
-      return response;
+        return fetchAttempt(attempt + 1, await fetch(input, init));
+      };
+
+      return fetchAttempt(1, await fetch(input, init));
     };
 
     const initialResponse = await fetchHostedResponse(
@@ -156,9 +164,9 @@ const playwrightHostedProofHost = {
     );
     assert.ok(firstIsolate !== null && firstIsolate.length > 0);
 
-    const assetPath = /(?:src|href)="(\/assets\/[^"]+\.(?:css|js))"/u.exec(
-      initialHtml
-    )?.[1];
+    const assetPath =
+      /(?:src|href)="(?<asset>\/assets\/[^"]+\.(?:css|js))"/u.exec(initialHtml)
+        ?.groups?.["asset"];
     assert.ok(assetPath !== undefined);
     const assetResponse = await fetchHostedResponse(
       `${origin}${assetPath}`,
@@ -298,15 +306,11 @@ const playwrightHostedProofHost = {
     assert.ok(malformedResponse.status() < 500);
 
     await page.evaluate(async (path) => {
-      const router: unknown = Reflect.get(globalThis, "__TSR_ROUTER__");
-      const navigate =
-        typeof router === "object" && router !== null
-          ? Reflect.get(router, "navigate")
-          : undefined;
-      if (typeof navigate !== "function") {
+      const router = globalThis.__TSR_ROUTER__;
+      if (router === undefined) {
         throw new TypeError("The hydrated TanStack router was unavailable.");
       }
-      await Reflect.apply(navigate, router, [{ to: path }]);
+      await router.navigate({ to: path });
     }, missingPath);
     await page.getByTestId("route-not-found").waitFor();
     assert.equal(documentRequests, navigationDocumentBaseline);

@@ -361,7 +361,7 @@ export const ReleaseProofPacket = Schema.Struct({
 });
 export type ReleaseProofPacket = typeof ReleaseProofPacket.Type;
 
-export const makeReleaseReadinessPlan = (
+export const createReleaseReadinessPlan = (
   workspaceRoot: string
 ): readonly ReleaseCheck[] => [
   new ReleaseCheck({
@@ -428,6 +428,10 @@ export const makeReleaseReadinessPlan = (
     label: "Pending release train status",
   }),
 ];
+
+/** @deprecated Use `createReleaseReadinessPlan`. */
+export const makeReleaseReadinessPlan = (workspaceRoot: string) =>
+  createReleaseReadinessPlan(workspaceRoot);
 
 export const renderReleaseReadinessReport = (
   report: ReleaseReadinessReport

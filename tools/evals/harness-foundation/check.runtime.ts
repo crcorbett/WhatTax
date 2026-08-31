@@ -88,7 +88,7 @@ const requiredSourceArtifacts = [
   "tools/evals/harness-foundation/input.boundary.ts",
   "tools/evals/harness-foundation/schemas.ts",
 ];
-const expectedJourneyCommands: Readonly<Record<JourneyId, string>> = {
+const expectedJourneyCommands = {
   "taxkit-calculator-direct": "bun run test",
   "taxkit-docs-runtime":
     "bun run docs:validate && bun run --filter=docs test:browser",
@@ -96,7 +96,7 @@ const expectedJourneyCommands: Readonly<Record<JourneyId, string>> = {
   "taxkit-release-closure": "bun run release:check -- --ci",
   "taxkit-sdk-packed":
     "bun run --filter=@taxkit/sdk check-packed-artifact && bun run --filter=@taxkit/sdk validate:downstream",
-};
+} satisfies Readonly<Record<JourneyId, string>>;
 const externalBoundaries = [
   "push",
   "hosted CI",

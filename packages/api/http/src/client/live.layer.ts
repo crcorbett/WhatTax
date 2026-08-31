@@ -1,7 +1,7 @@
 import { Layer } from "effect";
 import type { HttpClient } from "effect/unstable/http/HttpClient";
 
-import { makeTaxKitApiClient } from "./index.js";
+import { createTaxKitApiClient } from "./index.js";
 import { TaxKitHttpApiService } from "./service.js";
 
 export interface MakeTaxKitApiClientLayerOptions {
@@ -9,6 +9,11 @@ export interface MakeTaxKitApiClientLayerOptions {
   readonly transformClient?: (client: HttpClient) => HttpClient;
 }
 
+export const createTaxKitApiClientLayer = (
+  options: MakeTaxKitApiClientLayerOptions = {}
+) => Layer.effect(TaxKitHttpApiService, createTaxKitApiClient(options));
+
+/** @deprecated Use `createTaxKitApiClientLayer`. */
 export const makeTaxKitApiClientLayer = (
   options: MakeTaxKitApiClientLayerOptions = {}
-) => Layer.effect(TaxKitHttpApiService, makeTaxKitApiClient(options));
+) => createTaxKitApiClientLayer(options);

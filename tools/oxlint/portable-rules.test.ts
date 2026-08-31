@@ -1,7 +1,10 @@
 import { afterEach, describe, expect, test } from "bun:test";
 import { rm } from "node:fs/promises";
-import { join } from "node:path";
+import nodePath from "node:path";
 
+import oxlintConfig from "../../oxlint.config.ts";
+
+const { join } = nodePath;
 const repositoryRoot = join(import.meta.dir, "../..");
 const oxlint = join(repositoryRoot, "node_modules/.bin/oxlint");
 
@@ -9,6 +12,25 @@ const generatedFixtures = [
   "tools/oxlint/fixtures/.generated-effect-rejected.ts",
   "tools/oxlint/fixtures/.generated-bun-rejected.ts",
   "tools/oxlint/fixtures/.generated-mdx-rejected.tsx",
+  "tools/oxlint/fixtures/.generated-anti-slop-effect-rejected.ts",
+] as const;
+
+const antiSlopRules = [
+  "no-chained-type-assertions",
+  "no-conditional-empty-object-spread",
+  "no-known-value-widening",
+  "no-module-mocking",
+  "no-object-parameters",
+  "no-reflect-apply",
+  "no-reflect-get",
+  "no-runtime-typeof",
+  "no-shape-in-symbol-names",
+  "no-unknown-parameters",
+  "no-unknown-returns",
+  "no-unknown-type-aliases",
+  "no-unsafe-dictionary-type",
+  "no-widen-then-assert",
+  "require-safety-comment-for-type-assertion",
 ] as const;
 
 const fixtureCases = [
@@ -27,6 +49,7 @@ const fixtureCases = [
       "no-host-imports-in-contracts",
       "no-layer-exports-in-service-files",
       "no-manual-tag",
+      "no-module-level-mutable-test-state",
       "no-process-outside-boundaries",
       "no-runtime-execution-outside-boundaries",
       "no-schema-encoder-outside-egress",
@@ -54,9 +77,16 @@ const fixtureCases = [
     rejected: "tools/oxlint/fixtures/mdx-rejected.tsx.txt",
     rules: ["no-route-local-component-registry"],
   },
+  {
+    accepted: ["tools/oxlint/fixtures/anti-slop-effect-accepted.test.ts"],
+    generated: generatedFixtures[3],
+    namespace: "anti-slop-effect",
+    rejected: "tools/oxlint/fixtures/anti-slop-effect-rejected.ts.txt",
+    rules: ["no-service-constructor-imports"],
+  },
 ] as const;
 
-const runOxlint = (path: string) => {
+const runOxlintCommand = (args: readonly string[]) => {
   const result = Bun.spawnSync({
     cmd: [
       oxlint,
@@ -64,7 +94,7 @@ const runOxlint = (path: string) => {
       "oxlint.config.ts",
       "--disable-nested-config",
       "--no-error-on-unmatched-pattern",
-      path,
+      ...args,
     ],
     cwd: repositoryRoot,
     stderr: "pipe",
@@ -77,6 +107,8 @@ const runOxlint = (path: string) => {
   };
 };
 
+const runOxlint = (path: string) => runOxlintCommand([path]);
+
 afterEach(async () => {
   await Promise.all(
     generatedFixtures.map((path) =>
@@ -86,6 +118,15 @@ afterEach(async () => {
 });
 
 describe("portable Oxlint plugins", () => {
+  test("enables every anti-slop rule at error severity", () => {
+    for (const rule of antiSlopRules) {
+      expect(oxlintConfig.rules?.[`anti-slop/${rule}`]).toBe("error");
+    }
+    expect(
+      oxlintConfig.rules?.["anti-slop-effect/no-service-constructor-imports"]
+    ).toBe("error");
+  });
+
   for (const fixture of fixtureCases) {
     test(`${fixture.namespace} rules accept boundary and unrelated-local fixtures`, () => {
       for (const path of fixture.accepted) {

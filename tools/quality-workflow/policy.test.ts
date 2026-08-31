@@ -452,11 +452,11 @@ describe("quality workflow policy", () => {
   test("rejects aliased and parenthesized candidate reads in the CI branch", () => {
     const accepted = `import { Console } from "effect";
     import { runCiReleaseReadiness } from "./program.js";
-    import { makeReleaseReadinessPlan } from "./schemas.js";
+    import { createReleaseReadinessPlan } from "./schemas.js";
     const program = Effect.gen(function* main() {
       const cli = yield* decodeReleaseReadinessCli(args);
       if (cli.mode === "ci") {
-        const report = yield* runCiReleaseReadiness(makeReleaseReadinessPlan(root));
+        const report = yield* runCiReleaseReadiness(createReleaseReadinessPlan(root));
         yield* Console.info("CI release graph passed");
         return report;
       }

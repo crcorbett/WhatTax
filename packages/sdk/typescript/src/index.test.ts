@@ -76,7 +76,7 @@ describe("plain SDK facade", () => {
       rejectedFacts
     );
 
-    const rejectedError = await rejection.catch((error: unknown) => error);
+    const rejectedError = await rejection.catch((error) => error);
 
     expect(rejectedError).toBeInstanceOf(TaxKitCalculationError);
     if (Schema.is(TaxKitCalculationError)(rejectedError)) {

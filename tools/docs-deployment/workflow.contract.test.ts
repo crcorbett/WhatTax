@@ -46,12 +46,14 @@ const stepNamesWithBinding = (source: string, binding: string) =>
 
 describe("docs deployment workflow admission", () => {
   test("keeps every deployment workflow exact-SHA and pinned", async () => {
-    for (const path of [
-      workflowPaths.preview,
-      workflowPaths.production,
-      workflowPaths.teardown,
-    ]) {
-      const source = await readWorkflow(path);
+    const sources = await Promise.all(
+      [
+        workflowPaths.preview,
+        workflowPaths.production,
+        workflowPaths.teardown,
+      ].map(readWorkflow)
+    );
+    for (const source of sources) {
       expect(source).not.toContain("pull_request_target");
       expect(source).toContain(checkoutAction);
       expect(source).toContain(
@@ -66,12 +68,14 @@ describe("docs deployment workflow admission", () => {
   });
 
   test("installs the browser needed by the docs build before provider mutation", async () => {
-    for (const path of [
-      workflowPaths.preview,
-      workflowPaths.production,
-      workflowPaths.teardown,
-    ]) {
-      const source = await readWorkflow(path);
+    const sources = await Promise.all(
+      [
+        workflowPaths.preview,
+        workflowPaths.production,
+        workflowPaths.teardown,
+      ].map(readWorkflow)
+    );
+    for (const source of sources) {
       expect(source).toContain(
         "apps/docs/node_modules/.bin/playwright install chromium"
       );
@@ -246,12 +250,14 @@ describe("docs deployment workflow admission", () => {
   });
 
   test("runs the supported mutation-capable state-store bootstrap before inventory", async () => {
-    for (const path of [
-      workflowPaths.preview,
-      workflowPaths.production,
-      workflowPaths.teardown,
-    ]) {
-      const source = await readWorkflow(path);
+    const sources = await Promise.all(
+      [
+        workflowPaths.preview,
+        workflowPaths.production,
+        workflowPaths.teardown,
+      ].map(readWorkflow)
+    );
+    for (const source of sources) {
       expect(source).toContain(
         'ALCHEMY_PLAIN=1 CI=1 bunx alchemy login --profile "$ALCHEMY_PROFILE" > /dev/null'
       );
@@ -265,8 +271,10 @@ describe("docs deployment workflow admission", () => {
     const evidenceOwner = await readWorkflow(
       "tools/docs-deployment/workflow-evidence.ts"
     );
-    for (const path of [workflowPaths.preview, workflowPaths.production]) {
-      const source = await readWorkflow(path);
+    const sources = await Promise.all(
+      [workflowPaths.preview, workflowPaths.production].map(readWorkflow)
+    );
+    for (const source of sources) {
       expect(source).toContain("run: bun run docs:build");
       expect(source).toContain("workflow-evidence.runtime.ts");
       expect(source).not.toContain("shasum -a 256");
@@ -280,8 +288,10 @@ describe("docs deployment workflow admission", () => {
   });
 
   test("keeps every stage operation behind its exact non-cancellable lock", async () => {
-    for (const path of [workflowPaths.preview, workflowPaths.production]) {
-      const source = await readWorkflow(path);
+    const sources = await Promise.all(
+      [workflowPaths.preview, workflowPaths.production].map(readWorkflow)
+    );
+    for (const source of sources) {
       expect(source).toContain("checks: read");
       expect(source).toContain("cancel-in-progress: false");
       expect(source).not.toContain("inputs.operation == 'plan'");
@@ -422,8 +432,13 @@ describe("docs deployment workflow admission", () => {
       },
     ] as const;
 
-    for (const { allowed, binding, path } of workflows) {
-      const source = await readWorkflow(path);
+    const workflowSources = await Promise.all(
+      workflows.map(async (workflow) => ({
+        ...workflow,
+        source: await readWorkflow(workflow.path),
+      }))
+    );
+    for (const { allowed, binding, source } of workflowSources) {
       expect(source).not.toContain(`\n      ${binding}`);
       expect(stepNamesWithBinding(source, binding)).toEqual([...allowed]);
       expect(source.split(binding)).toHaveLength(allowed.length + 1);

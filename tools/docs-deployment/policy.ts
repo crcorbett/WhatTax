@@ -1,4 +1,4 @@
-import { Array, HashSet } from "effect";
+import { Array, HashSet, Record, Schema } from "effect";
 
 import type {
   DeploymentAuthorityPreflightReceipt,
@@ -206,30 +206,29 @@ const expectedHostedOracleIds = [
   "cache-headers",
 ] as const;
 
-const canonicalJson = (value: unknown): string => {
-  if (Array.isArray(value)) {
+const JsonObject = Schema.Record(Schema.String, Schema.Json);
+const JsonArray = Schema.Array(Schema.Json);
+
+const canonicalJson = (value: Schema.Json): string => {
+  if (Schema.is(JsonArray)(value)) {
     return `[${value.map(canonicalJson).join(",")}]`;
   }
-  if (value !== null && typeof value === "object") {
-    return `{${Reflect.ownKeys(value)
-      .filter((key): key is string => typeof key === "string")
-      .toSorted((left, right) => left.localeCompare(right))
-      .map(
-        (key) =>
-          `${JSON.stringify(key)}:${canonicalJson(Reflect.get(value, key))}`
-      )
+  if (Schema.is(JsonObject)(value)) {
+    return `{${Record.toEntries<string, Schema.Json>(value)
+      .toSorted(([left], [right]) => left.localeCompare(right))
+      .map(([key, child]) => `${JSON.stringify(key)}:${canonicalJson(child)}`)
       .join(",")}}`;
   }
   return JSON.stringify(value);
 };
 
-export const deploymentRecordDigest = (value: unknown): string =>
+export const deploymentRecordDigest = (value: Schema.Json): string =>
   new Bun.CryptoHasher("sha256").update(canonicalJson(value)).digest("hex");
 
 const inspectPlanReceipt = (receipt: {
   readonly acceptedPlanSha256: string;
   readonly operation: string;
-  readonly projection: unknown;
+  readonly projection: Schema.Json;
   readonly replanSha256: string | null;
 }): readonly string[] => {
   const findings: string[] = [];

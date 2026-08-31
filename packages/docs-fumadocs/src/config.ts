@@ -13,7 +13,7 @@ import type {
 } from "fumadocs-mdx/config";
 import remarkMermaid from "remark-mermaidjs";
 
-import { FumadocsCodeBlockMeta } from "./schemas.ts";
+import { applyCodeBlockMeta } from "./code-block-meta.ts";
 
 export const effectSchemaToStandardSchema = <
   const SourceSchema extends Schema.Decoder<unknown, never>,
@@ -24,20 +24,7 @@ export const effectSchemaToStandardSchema = <
 export const transformerCodeBlockMeta = (): ShikiTransformer => ({
   name: "taxkit:docs-code-block-meta",
   pre(node) {
-    Schema.decodeUnknownOption(FumadocsCodeBlockMeta)(this.options.meta).pipe(
-      Option.flatMap((meta) => Option.fromUndefinedOr(meta.title)),
-      Option.map((title) => {
-        node.properties["data-title"] = title;
-        return title;
-      })
-    );
-
-    Option.fromUndefinedOr(this.options.lang).pipe(
-      Option.map((language) => {
-        node.properties["data-language"] = language;
-        return language;
-      })
-    );
+    applyCodeBlockMeta(node, this.options);
   },
 });
 

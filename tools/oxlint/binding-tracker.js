@@ -10,8 +10,10 @@ export const propertyName = (node) => {
   return null;
 };
 
-export const importSourceValue = (node) =>
-  typeof node?.source?.value === "string" ? node.source.value : "";
+export const importSourceValue = (node) => {
+  const value = node?.source?.value;
+  return String(value) === value ? value : "";
+};
 
 const declaredVariable = (sourceCode, node, name) =>
   sourceCode

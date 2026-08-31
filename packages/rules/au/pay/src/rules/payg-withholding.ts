@@ -71,7 +71,7 @@ const findRow = (
  * aggregator can combine it with other withholding components (e.g. STSL)
  * without the PAYG rule needing to know about them.
  *
- * @throws CalculationError when no Schedule 1 row covers the weekly-equivalent amount.
+ * @throws {CalculationError} When no Schedule 1 row covers the weekly-equivalent amount.
  * @since 0.1.0
  */
 export const PaygWithholdingLive = Layer.effect(PaygWithholdingComponentFact)(

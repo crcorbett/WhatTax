@@ -1,5 +1,5 @@
 import "@tanstack/react-start/server-only";
-import { makeTaxKitApiClientLayer } from "@taxkit/api-http/client/live";
+import { createTaxKitApiClientLayer } from "@taxkit/api-http/client/live";
 import { Effect, Layer, ManagedRuntime } from "effect";
 import * as FetchHttpClient from "effect/unstable/http/FetchHttpClient";
 
@@ -12,7 +12,7 @@ import {
 const TaxKitApiClientLive = Layer.unwrap(
   Effect.gen(function* makeTaxKitApiClientLive() {
     const config = yield* TaxKitWebServerConfig;
-    return makeTaxKitApiClientLayer({ baseUrl: config.httpApi.baseUrl });
+    return createTaxKitApiClientLayer({ baseUrl: config.httpApi.baseUrl });
   }).pipe(
     Effect.mapError(
       (cause) =>

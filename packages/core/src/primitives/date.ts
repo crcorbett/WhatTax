@@ -81,7 +81,8 @@ export const isoDate = (value: string): IsoDate => {
 
 const optionalIsoDate = (
   value: string | IsoDate | undefined
-): IsoDate | undefined => (typeof value === "string" ? isoDate(value) : value);
+): IsoDate | undefined =>
+  value === undefined ? undefined : isoDate(String(value));
 
 /**
  * Builds a validated half-open date interval.
@@ -92,7 +93,7 @@ export const dateInterval = (args: {
   readonly from: string | IsoDate;
   readonly toExclusive?: string | IsoDate;
 }): DateInterval => {
-  const from = typeof args.from === "string" ? isoDate(args.from) : args.from;
+  const from = isoDate(String(args.from));
   const toExclusive = optionalIsoDate(args.toExclusive);
 
   if (toExclusive !== undefined && String(from) >= String(toExclusive)) {
@@ -125,7 +126,7 @@ export const dateIntervalsOverlap = (
  * @since 0.1.0
  */
 export const australianTaxYearInterval = (year: string): DateInterval => {
-  const startYear = Number.parseInt(year.slice(0, 4), 10);
+  const startYear = Math.trunc(Number(year.slice(0, 4)));
   if (!Number.isInteger(startYear)) {
     throw new TypeError(`taxkit/core: invalid Australian tax year ${year}`);
   }

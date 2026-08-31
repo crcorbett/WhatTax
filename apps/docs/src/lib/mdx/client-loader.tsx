@@ -8,8 +8,8 @@ import { DocsContentPreloadError } from "#/lib/docs/errors";
 import { mdxComponents } from "./components";
 
 const docsContentLoader = docsCollection.createClientLoader({
-  component({ default: MDX }) {
-    return <MDX components={mdxComponents} />;
+  component({ default: Mdx }) {
+    return <Mdx components={mdxComponents} />;
   },
 });
 

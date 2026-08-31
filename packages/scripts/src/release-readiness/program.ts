@@ -78,7 +78,7 @@ const lastSuccessfulCheck = (
 ): ReleaseAttemptReceipt["lastSuccessfulCheck"] =>
   Option.getOrNull(EffectArray.last(outcomes))?.check.id ?? null;
 
-export const makeSuccessfulAttemptReceipt = (
+export const createSuccessfulAttemptReceipt = (
   report: ReleaseReadinessReport,
   candidate: ReleaseCandidateIdentity
 ): ReleaseAttemptReceipt => {

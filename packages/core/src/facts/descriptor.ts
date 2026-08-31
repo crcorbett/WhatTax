@@ -87,12 +87,12 @@ export class FactQuestion extends Schema.TaggedClass<FactQuestion>()(
  *
  * @since 0.1.0
  */
-export interface FactDescriptor<Self, Shape> {
+export interface FactDescriptor<Self, Value> {
   readonly id: FactId;
   readonly title: string;
   readonly authority: FactAuthority;
-  readonly schema: Schema.Schema<Shape>;
-  readonly tag: Context.Key<Self, Shape>;
+  readonly schema: Schema.Schema<Value>;
+  readonly tag: Context.Key<Self, Value>;
   readonly question?: FactQuestion;
 }
 
@@ -100,18 +100,25 @@ export interface FactDescriptor<Self, Shape> {
  * Builds a schema-backed fact descriptor with a branded stable ID.
  * @since 0.1.0
  */
-export const makeFactDescriptor = <Self, Shape>(args: {
+export const makeFactDescriptor = <Self, Value>(args: {
   readonly id: string;
   readonly title: string;
   readonly authority: FactAuthority;
-  readonly schema: Schema.Schema<Shape>;
-  readonly tag: Context.Key<Self, Shape>;
+  readonly schema: Schema.Schema<Value>;
+  readonly tag: Context.Key<Self, Value>;
   readonly question?: FactQuestion;
-}): FactDescriptor<Self, Shape> => ({
-  authority: args.authority,
-  id: FactId.make(args.id),
-  schema: args.schema,
-  tag: args.tag,
-  title: args.title,
-  ...(args.question === undefined ? {} : { question: args.question }),
-});
+}): FactDescriptor<Self, Value> => {
+  const descriptor: FactDescriptor<Self, Value> = {
+    authority: args.authority,
+    id: FactId.make(args.id),
+    schema: args.schema,
+    tag: args.tag,
+    title: args.title,
+  };
+
+  if (args.question !== undefined) {
+    return { ...descriptor, question: args.question };
+  }
+
+  return descriptor;
+};

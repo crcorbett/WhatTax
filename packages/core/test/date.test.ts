@@ -17,7 +17,7 @@ import {
 const sourceArtifact = new SourceArtifact({
   checksum: SourceChecksum.make("sha256:test"),
   documentVersion: "test",
-  extract: new SourceExtract({ rowCount: 1, shape: "TestRow[]" }),
+  extract: new SourceExtract({ rowContract: "TestRow[]", rowCount: 1 }),
   retrievedOn: isoDate("2024-02-29"),
   source: SourceRef.make({
     kind: "internal-validation",

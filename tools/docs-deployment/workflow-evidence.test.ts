@@ -14,8 +14,9 @@ import { DeploymentWorkflowProviderReadback } from "./workflow-receipts.schemas.
 const candidateCommit = "a".repeat(40);
 const accountId = "b".repeat(32);
 const digest = "c".repeat(64);
+type TestConfig = Readonly<Record<string, string | undefined>>;
 
-const runWithConfig = (config: object) =>
+const runWithConfig = (config: TestConfig) =>
   runWorkflowEvidence.pipe(
     Effect.provideService(
       ConfigProvider.ConfigProvider,
@@ -37,7 +38,7 @@ const readJson = <A>(path: string, schema: Schema.ConstraintDecoder<A>) =>
 const makePlanConfig = (
   repositoryRoot: string,
   directory: string,
-  overrides: object = {}
+  overrides: TestConfig = {}
 ) => ({
   TAXKIT_WORKFLOW_EVIDENCE_ACCEPTED_BY: "taxkit-test",
   TAXKIT_WORKFLOW_EVIDENCE_CANDIDATE_COMMIT: candidateCommit,
@@ -85,7 +86,7 @@ const inventory = {
 };
 
 const withFixture = <A, E>(
-  use: (
+  runFixture: (
     directory: string,
     repositoryRoot: string
   ) => Effect.Effect<A, E, BunServices.BunServices | Scope.Scope>
@@ -103,7 +104,7 @@ const withFixture = <A, E>(
       `${directory}/alchemy-plan.txt`,
       "Plan: 1 to create\n[DocsWebsite] create\n"
     );
-    return yield* use(directory, repositoryRoot);
+    return yield* runFixture(directory, repositoryRoot);
   }).pipe(Effect.scoped, Effect.provide(BunServices.layer), Effect.runPromise);
 
 describe("workflow evidence command", () => {

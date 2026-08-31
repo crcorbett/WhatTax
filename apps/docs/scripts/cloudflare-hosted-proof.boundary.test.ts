@@ -5,6 +5,8 @@ import { ConfigProvider, Effect, Fiber, Match, Result } from "effect";
 import { runCloudflareHostedProof } from "./cloudflare-hosted-proof.boundary.js";
 import type { CloudflareHostedProofHost } from "./cloudflare-hosted-proof.boundary.js";
 
+type TestConfig = Readonly<Record<string, string | undefined>>;
+
 const validConfig = {
   TAXKIT_DOCS_ACCOUNT_ID: "b".repeat(32),
   TAXKIT_DOCS_CANDIDATE_COMMIT: "a".repeat(40),
@@ -25,17 +27,18 @@ const validConfig = {
   TAXKIT_DOCS_STATE_STORE_ID: "alchemy-state-store",
   TAXKIT_DOCS_VERSION_ID: "version-pr-24",
   TAXKIT_DOCS_WORKER_NAME: "taxkit-docs-pr-24",
-};
+} satisfies TestConfig;
 
 const browser = { fixture: "browser" };
 type TestBrowser = typeof browser;
+interface TestHostFixture {
+  readonly counts: { closed: number; launched: number; ran: number };
+  readonly host: CloudflareHostedProofHost<TestBrowser>;
+}
 
 const makeHost = (
   overrides: Partial<CloudflareHostedProofHost<TestBrowser>> = {}
-): {
-  readonly host: CloudflareHostedProofHost<TestBrowser>;
-  readonly counts: { closed: number; launched: number; ran: number };
-} => {
+): TestHostFixture => {
   const counts = { closed: 0, launched: 0, ran: 0 };
   return {
     counts,
@@ -59,7 +62,7 @@ const makeHost = (
 
 const configured = (
   host: CloudflareHostedProofHost<TestBrowser>,
-  config: object = validConfig
+  config: TestConfig = validConfig
 ) =>
   runCloudflareHostedProof(host).pipe(
     Effect.provideService(
@@ -70,7 +73,7 @@ const configured = (
 
 const runResult = (
   host: CloudflareHostedProofHost<TestBrowser>,
-  config: object = validConfig
+  config: TestConfig = validConfig
 ) =>
   configured(host, config).pipe(
     Effect.scoped,

@@ -8,7 +8,7 @@ import {
 import { makeReleaseOutputRedactor } from "./live.layer.js";
 import { runCiReleaseReadiness, runReleaseReadiness } from "./program.js";
 import {
-  makeReleaseReadinessPlan,
+  createReleaseReadinessPlan,
   ReleaseAttemptId,
   renderReleaseReadinessReport,
 } from "./schemas.js";
@@ -21,7 +21,7 @@ import {
 import type { TestCommandResult } from "./test.layer.js";
 
 const workspaceRoot = "/workspace/taxkit";
-const checks = makeReleaseReadinessPlan(workspaceRoot);
+const checks = createReleaseReadinessPlan(workspaceRoot);
 const candidate = {
   baseCommit: "e63a7b60c369ca880a49dce5d1ffddcf49a6365e",
   contentManifest: "docs/evidence/releases/HGI-203-content-manifest.txt",

@@ -2,6 +2,7 @@ import { describe, expect, test } from "bun:test";
 
 import * as BunServices from "@effect/platform-bun/BunServices";
 import { ConfigProvider, Effect, Match, Result } from "effect";
+import type { Schema } from "effect";
 import * as FileSystem from "effect/FileSystem";
 
 import { readWorkflowSha256 } from "./workflow-check.boundary.js";
@@ -11,8 +12,12 @@ const candidateCommit = "a".repeat(40);
 const workflowCommit = "b".repeat(40);
 const workflowRunId = "42";
 const workflowPath = ".github/workflows/docs-preview.yml";
+type TestConfig = Readonly<Record<string, string | undefined>>;
 
-const runInputCheck = (receipt: unknown, configOverrides: object = {}) =>
+const runInputCheck = (
+  receipt: typeof Schema.Unknown.Type,
+  configOverrides: TestConfig = {}
+) =>
   Effect.gen(function* runInputCheckFixture() {
     const fileSystem = yield* FileSystem.FileSystem;
     const directory = yield* fileSystem.makeTempDirectoryScoped({

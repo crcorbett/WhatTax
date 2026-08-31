@@ -111,6 +111,8 @@ export class HostedProofEvidenceError extends Data.TaggedError(
   readonly operation: "encode-observation";
 }> {}
 
+type HostedProofObservation = typeof Schema.Unknown.Type;
+
 export interface CloudflareHostedProofHost<BrowserHandle> {
   readonly close: (browser: BrowserHandle) => Promise<void>;
   readonly launch: (signal: AbortSignal) => Promise<BrowserHandle>;
@@ -118,7 +120,7 @@ export interface CloudflareHostedProofHost<BrowserHandle> {
     config: CloudflareHostedProofConfig,
     browser: BrowserHandle,
     signal: AbortSignal
-  ) => Promise<unknown>;
+  ) => Promise<HostedProofObservation>;
 }
 
 const loadHostedProofConfig = Effect.gen(function* loadHostedProofConfig() {

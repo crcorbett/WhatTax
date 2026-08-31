@@ -30,14 +30,14 @@ const sectionNames = [
   "Non-claims",
 ] as const;
 
-const decodeContract = (value: unknown) =>
+const decodeContract = (value: typeof Schema.Unknown.Type) =>
   Effect.runPromise(
     Schema.decodeUnknownEffect(RunbookContract, {
       onExcessProperty: "error",
     })(value)
   );
 
-const decodeValidation = (value: unknown) =>
+const decodeValidation = (value: typeof Schema.Unknown.Type) =>
   Effect.runPromise(
     Schema.decodeUnknownEffect(Hgi203ValidationProjection)(value)
   );

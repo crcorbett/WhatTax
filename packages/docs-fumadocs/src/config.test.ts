@@ -1,10 +1,8 @@
-import { Option, Schema } from "effect";
+import { Schema } from "effect";
 import { describe, expect, it } from "vitest";
 
-import {
-  effectSchemaToStandardSchema,
-  transformerCodeBlockMeta,
-} from "./config.js";
+import { applyCodeBlockMeta } from "./code-block-meta.js";
+import { effectSchemaToStandardSchema } from "./config.js";
 
 describe("effectSchemaToStandardSchema", () => {
   it("keeps Effect Schema authoritative for Standard Schema validation", () => {
@@ -33,30 +31,16 @@ describe("effectSchemaToStandardSchema", () => {
   });
 });
 
-describe("transformerCodeBlockMeta", () => {
+describe("code block metadata", () => {
   it("copies code block title and language to data attributes", () => {
-    const transformer = transformerCodeBlockMeta();
     const node = { properties: {} };
 
-    Option.fromUndefinedOr(transformer.pre).pipe(
-      Option.match({
-        onNone: () => null,
-        onSome: (pre) =>
-          Reflect.apply(
-            pre,
-            {
-              options: {
-                lang: "ts",
-                meta: {
-                  title: "example.ts",
-                },
-                themes: { dark: "github-dark", light: "github-light" },
-              },
-            },
-            [node]
-          ),
-      })
-    );
+    applyCodeBlockMeta(node, {
+      lang: "ts",
+      meta: {
+        title: "example.ts",
+      },
+    });
 
     expect(node.properties).toEqual({
       "data-language": "ts",

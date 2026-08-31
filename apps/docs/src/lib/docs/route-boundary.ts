@@ -14,6 +14,8 @@ import {
 
 import { DocsContentPreloadError, DocsRouteTransportError } from "./errors";
 
+type UntrustedRouteTransport = typeof Schema.Unknown.Type;
+
 type SyncSchema = Schema.Top & {
   readonly DecodingServices: never;
   readonly EncodingServices: never;
@@ -104,7 +106,7 @@ const createRouteBoundary = <
           )
         )
       ),
-    restore: (encoded: unknown) =>
+    restore: (encoded: UntrustedRouteTransport) =>
       Schema.decodeUnknownResult(codec)(encoded).pipe(
         Result.mapError(
           (error) =>

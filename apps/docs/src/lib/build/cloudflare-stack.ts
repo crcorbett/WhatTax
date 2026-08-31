@@ -35,7 +35,9 @@ export const docsWorkerMemo = {
   ],
 };
 
-export const decodeDocsCloudflareStackStage = (value: unknown) =>
+export const decodeDocsCloudflareStackStage = (
+  value: typeof Schema.Unknown.Type
+) =>
   Schema.decodeUnknownEffect(DocsCloudflareStackStage)(value).pipe(
     Effect.mapError((error) => new Config.ConfigError(error)),
   );
