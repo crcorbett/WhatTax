@@ -64,9 +64,9 @@ everything else. An accepted packet proves an observation, not authority.
 5. To validate only the checked-out CI revision, run `bun run release:check --
    --ci`. Its nine-check report may be repeated after a material revision or
    environment change, but cannot be promoted into candidate or release proof.
-   For an explicit developer-managed remote-cache run, provide `TURBO_TEAM` and
-   `TURBO_TOKEN`; do not commit or print them. Run without those values to prove
-   the uncached fallback.
+   Local runs use local Turbo caching. Do not provide direct `TURBO_TEAM` or
+   `TURBO_TOKEN` values. Trusted GitHub runs get those values only from the
+   fixed `taxkit/ci` Doppler bridge.
 6. Only for an explicitly prepared new candidate, run `bun run release:check`
    once. Do not rerun merely to improve presentation or conceal a failure.
 7. Preserve the immutable attempt, bounded summary, candidate identity,

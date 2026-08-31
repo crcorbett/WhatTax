@@ -275,11 +275,10 @@ code can access the cache token; this accepted trust boundary must be reviewed
 if contributor trust or token scope changes. Cache logs and artifacts are not
 candidate, release, provider, deployment or public-site proof.
 
-This is repository desired-state proof. The hosted trusted path remains
-unproved until the read-only, single-config repository bridge is created under
-separate authority and an exact-SHA run is read back. The direct legacy Turbo
-secret and variable remain external rollback material but are no longer read by
-the Quality or receipt workflow source.
+The read-only, single-config repository bridge is established and merged-main
+Quality has read it successfully at an exact revision. The direct Turbo secret
+and variable have been removed. Fork behaviour remains repository-policy proof
+until an authorised hosted fork run is recorded.
 
 The GitHub dependency caches are separate from Turbo. The Bun cache resolves
 its user-level path with `bun pm cache` and never contains `node_modules`.

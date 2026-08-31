@@ -50,9 +50,9 @@ repository `DOPPLER_CI_TOKEN` for `taxkit/ci`; teardown must not use it.
 Production requires the `taxkit-docs-production` environment's separate
 `DOPPLER_PROVIDER_TOKEN` for `taxkit/prd` and the same repository `ci` bridge.
 Do not copy any credential into a local file, command, log or receipt. The
-repository source is implemented, but these TaxKit Doppler
-configs and bridges were not established at the research baseline, so hosted
-use needs the separately approved bootstrap in the SPEC.
+TaxKit Doppler configs and bridges are established. Every deployment still
+needs its own exact operation approval; credential bootstrap does not grant
+deployment authority.
 
 ## Authority
 
@@ -170,8 +170,8 @@ There is intentionally no external lease.
    contains exactly one reconciled or failure JSON file; downloaded source
    artifacts and raw GitHub API responses remain in the runner work directory.
    A missing bridge, wrong metadata or missing named output stops the positive
-   receipt. Do not restore the retained direct Turbo values as a silent
-   fallback in the same workflow.
+   receipt. Direct Turbo values do not exist in GitHub and must not be
+   recreated as a fallback.
 
    Preview, Production and teardown upload only the separate directories
    prepared by the typed artifact command. Inspect the named final files, not
@@ -199,24 +199,22 @@ deploy. A new receipt is not an open prerequisite for this same-environment
 automatic teardown. Require a fresh receipt if the environment, reviewer rule,
 credential scope, teardown source binding or lock control changes.
 
-If the Preview bridge fails during the approved migration overlap, disable the
-new bridge and revert to the last reviewed direct-source workflow commit. Read
-back the exact environment and workflow commit before retrying. Do not add a
-second source or a direct-secret fallback to the Doppler workflow.
+If the Preview bridge fails, stop before provider work. Create and prove a new
+read-only, expiring token for only `taxkit/stg_preview`, update only the Preview
+environment bridge, read back its metadata, and then revoke the failed token.
+A reviewed source revert must keep Doppler as the sole credential source.
 
 Production recovery follows the same source rule but retains its reviewer
-protection and fixed `prod` lock. Disable only the failing `prd` bridge, revert
-to the last reviewed direct-source Production workflow commit, and read back
-the exact Production environment, reviewer rule and workflow commit before any
-new plan. Do not use `stg_preview`, a Preview bridge or a direct-secret fallback
-inside the Doppler workflow.
+protection and fixed `prod` lock. Replace only the `taxkit/prd` token and
+Production bridge, then read back the Production environment, reviewer rule
+and workflow commit before any new plan. Do not use `stg_preview`, a Preview
+bridge or a direct GitHub value.
 
 For rotation, create and prove a replacement read-only, expiring,
 single-config bridge at the intended config, update only its matching GitHub
 scope, and read back metadata before separately requesting old-token
-revocation. Retained direct Turbo/Cloudflare values are rollback custody only;
-their later removal requires merged-main replacement proof, separate approval
-and names-only metadata readback.
+revocation. Direct Turbo and Cloudflare GitHub entries no longer exist and must
+not be recreated as recovery.
 
 ### Integrated local development
 

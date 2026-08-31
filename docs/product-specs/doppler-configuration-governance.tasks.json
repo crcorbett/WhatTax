@@ -2,7 +2,7 @@
   "$schema": "https://taxkit.local/schemas/product-spec-task-plan.v1.json",
   "spec": "docs/product-specs/doppler-configuration-governance.md",
   "title": "Doppler configuration governance implementation tasks",
-  "status": "active",
+  "status": "implemented",
   "last_reviewed": "2026-08-31",
   "principles": [
     "Doppler governs operator-set credentials and related environment identities, not host, GitHub, Alchemy-internal or evidence-derived values.",
@@ -316,7 +316,7 @@
     },
     {
       "id": "DCG-005",
-      "status": "pending-authority",
+      "status": "completed",
       "title": "Bootstrap, prove, clean up and close out",
       "type": "external-proof-and-closeout",
       "dependsOn": ["DCG-004"],
@@ -327,16 +327,20 @@
           "Merged-main Quality run 33365915627 passed trusted taxkit/ci fetch, identity and remote-cache Quality",
           "Approved automatic teardown run 33365915649 used taxkit/stg_preview for only pr-73, accepted equal no-op plans and read back state and provider Worker absence",
           "Receipt-reconciliation run 33366004914 and a later independent Cloudflare read confirmed the bounded teardown postcondition",
-          "Sanitized merged-main receipt recorded without secret values, hashes, previews, raw logs, raw provider output or local paths"
+          "Sanitised merged-main receipt recorded without secret values, hashes, previews, raw logs, raw provider output or local paths",
+          "Repository TURBO_TOKEN and TURBO_TEAM plus the direct Preview and Production Cloudflare entries removed under Cooper's hard-cutover approval",
+          "Eight old TaxKit CI inventory/mutation Cloudflare tokens revoked; names-only readback retained the three intended current tokens and no other TaxKit token",
+          "Doppler-only recovery, hard-cutover receipt and current architecture, operations and runbook owners recorded"
         ],
-        "remainingAuthority": [
+        "boundedNonClaims": [
           "hosted fork Quality proof if an authorised safe fork run is required",
           "Preview plan, deployment, hosted journey and teardown proof for this Doppler epoch",
-          "Production plan, deployment, rollback and redeploy proof for this Doppler epoch",
-          "legacy direct GitHub credential removal and metadata readback after replacement proof",
-          "merge of the documentation-only closeout record and its own automatic absent-stage teardown"
+          "Production plan, deployment, rollback and redeploy proof for this Doppler epoch"
         ],
-        "receipt": "docs/evidence/deployments/2026-08-31-doppler-merged-main/receipt.json"
+        "receipts": [
+          "docs/evidence/deployments/2026-08-31-doppler-merged-main/receipt.json",
+          "docs/evidence/deployments/2026-08-31-doppler-hard-cutover/receipt.json"
+        ]
       },
       "goal": "Perform only the separately approved provider operation, prove the merged path at exact identity, remove legacy custody under separate approval, and close the plan without overstating proof.",
       "scope": [
@@ -357,7 +361,7 @@
         "docs/exec-plans/active/README.md",
         "final merged origin/main identity or an explicit blocked non-claim"
       ],
-      "implementationPrompt": "Execute only DCG-005 after DCG-004 acceptance and explicit operation-specific authority. Never expose or retrieve values. Bind every claim to exact principal, config, GitHub environment, commit, run and provider readback. Treat bootstrap, hosted proof, legacy removal and provider mutation as separate approved operations when their authority differs. Stop and report the exact missing authority rather than weakening proof.",
+      "implementationPrompt": "Completed. Preserve Doppler as the only current source, keep the hard-cutover receipt secret-negative, and do not convert bounded hosted fork, Preview or Production non-claims into proof without their own exact operation authority.",
       "mandatoryVerification": [
         "exact approved provider/GitHub metadata readback without values",
         "exact-SHA hosted Quality, Preview, teardown, Production, rollback and receipt results where authorised",
@@ -382,7 +386,7 @@
       "parentAudit": {
         "required": true,
         "basis": "Review operation authority, exact identities, hosted/provider receipts, secret-negative proof, final docs and origin/main reconciliation.",
-        "recovery": "Disable the new bridge or revert workflow source under the approved rollback; keep the task pending when operation authority is absent."
+        "recovery": "Replace and prove only the narrow Doppler token for the same config and matching GitHub bridge. A source revert must remain Doppler-only."
       },
       "completionCriteria": [
         "Every performed external change has approval, least privilege, rollback and metadata readback.",

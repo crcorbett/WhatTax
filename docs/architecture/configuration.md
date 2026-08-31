@@ -65,10 +65,10 @@ the reviewer-protected Production environment. Preview and Production select
 `taxkit/ci` separately for their exact provider-free Turbo consumers after
 cache saves, while teardown stays local-cache-only and cannot fetch `ci`.
 
-The TaxKit Doppler project/configs and GitHub bridges do not yet exist, so no
-hosted fetch is claimed. Creating them remains a separately approved operation.
-No implemented workflow silently falls back between Doppler and a direct
-legacy value.
+The TaxKit Doppler project/configs and three GitHub bridges are established.
+Direct Turbo and Cloudflare GitHub entries have been removed after merged-main
+replacement proof. No implemented workflow or supported recovery path falls
+back to a direct value.
 
 ## Pattern
 

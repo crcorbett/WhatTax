@@ -1,13 +1,13 @@
 ---
 document_type: product-spec
-lifecycle: active
+lifecycle: implemented
 authority: canonical
 owner: taxkit-platform-owner
 last_reviewed: 2026-08-31
 review_trigger: Doppler project or config change, credential lifecycle change, deployment input change, GitHub workflow change, Alchemy or Cloudflare configuration change, or secret-evidence incident
 successor: null
 tombstone: false
-status: canonical
+status: implemented
 source_of_truth: docs
 confidence: high
 ---
@@ -45,11 +45,10 @@ The separately approved DCG-005 bootstrap completed on 31 August 2026. The
 `taxkit` project now has exactly `dev`, `ci`, `stg_preview` and `prd`; the three
 automation configs have separate read-only expiring service tokens; GitHub has
 the three named bridge secrets; and local TaxKit development has a
-repository-scoped personal login. The retained direct GitHub values remain for
-rollback and are not read by the new workflow source. The dated
+repository-scoped personal login. The dated
 [bootstrap receipt](../evidence/deployments/2026-08-31-doppler-bootstrap/receipt.json)
 owns the exact identities and secret-negative readback. Provider deployment,
-hosted deployment proof and legacy cleanup remain separate proof or authority
+hosted deployment proof and Production remain separate proof or authority
 boundaries.
 
 PR 73 then merged as `aec5e220…`. Exact merged-main Quality run `33365915627`
@@ -60,7 +59,16 @@ Alchemy stage and matching Cloudflare Worker absent. The dated
 [merged-main receipt](../evidence/deployments/2026-08-31-doppler-merged-main/receipt.json)
 binds the merge parents, workflow runs, sanitized artifacts and independent
 provider readback. It does not promote that no-op into Preview deployment,
-hosted fork, Production, rollback or legacy-removal proof.
+hosted fork, Production or rollback proof.
+
+Cooper then approved a hard cutover. Repository `TURBO_TOKEN` and `TURBO_TEAM`,
+the direct Cloudflare pair in both deployment environments, and eight old
+TaxKit CI inventory/mutation Cloudflare tokens were removed. Names-only
+readback found only the three Doppler bridges and the three intended current
+Cloudflare tokens. The dated
+[hard-cutover receipt](../evidence/deployments/2026-08-31-doppler-hard-cutover/receipt.json)
+owns the exact deletion and readback. Recovery is now Doppler-only; a direct
+GitHub credential path must not be recreated.
 
 ## Problem
 
@@ -198,8 +206,8 @@ trusted pull request or main
 - Do not add a general secret-management framework or a provider wrapper.
 - Do not claim hosted execution, provider state, rotation or revocation from
   local tests.
-- Do not remove legacy GitHub credentials until the merged-main Doppler path is
-  independently proven and a separate removal operation is approved.
+- Do not erase or rewrite historical receipts and test fixtures that prove the
+  retired direct path and its rejection.
 
 ## Ownership and trust boundaries
 
@@ -355,9 +363,9 @@ forbidden cache inputs. Fork-restored caches remain untrusted inputs.
 - A failed fetch does not fall back to direct legacy GitHub secrets.
 - Rotation proves the replacement at the intended environment, changes the
   bridge, reads back access and only then requests old-token revocation.
-- Recovery may temporarily restore the retained direct GitHub path only through
-  a reviewed repository rollback and exact environment readback. It must not
-  silently mix sources in one workflow.
+- Recovery replaces the narrow Doppler token for the same config and updates
+  only its matching bridge. A reviewed source revert must remain Doppler-only.
+- Direct Turbo or Cloudflare GitHub values must not be recreated.
 - Existing Alchemy state recovery remains unchanged.
 
 ### `DCG-RQ-010` — Migration and proof ceiling
@@ -369,11 +377,11 @@ Repository slices land in this order:
 2. Quality/receipt named-output path and fork fallback;
 3. Preview/teardown named-output path and secret-negative artifact boundary;
 4. Production/rollback path and recovery documentation; and
-5. separately approved provider bootstrap, hosted proof, legacy cleanup and
+5. separately approved provider bootstrap, merged-main proof, hard cleanup and
    final closeout.
 
-Legacy GitHub values remain during rollback overlap, but new workflow source
-must have exactly one active source path. Local and deterministic tests prove
+The migration overlap is closed. Workflow source and external credential
+custody now have one active source path. Local and deterministic tests prove
 repository behaviour only. Hosted runs prove workflow behaviour for their
 exact commit. Provider readback proves only the named environment and resource.
 
@@ -451,9 +459,9 @@ SHA and show:
 - Named action outputs still exist in the job process boundary. Step-local
   mapping and no broad injection reduce exposure but do not make careless
   logging safe.
-- Keeping legacy GitHub values during rollback overlap temporarily duplicates
-  custody. They are not referenced by new source and are removed only after
-  exact merged-main proof and separate approval.
+- A hard cutover removes the quick direct-source rollback. Recovery now needs a
+  narrow Doppler token replacement and metadata readback, which is slower but
+  avoids duplicate credential custody.
 - A stricter evidence allowlist may initially omit a useful diagnostic. Raw
   files stay runner-local; a reviewed sanitized projection can be added later.
 
@@ -495,6 +503,9 @@ SHA and show:
 - Full repository verification passes using the pinned Bun version.
 - Hosted/provider claims are made only after separately authorised exact-SHA
   runs and readback. Any unperformed operation remains named and bounded.
+- Direct GitHub credential entries and old TaxKit CI Cloudflare tokens are
+  absent by metadata readback; only the intended Doppler bridges and current
+  environment tokens remain.
 - The implementation is not package-facing, so no Changeset is added.
 
 ## References
