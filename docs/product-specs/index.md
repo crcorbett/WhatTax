@@ -3,7 +3,7 @@ document_type: product-spec-index
 lifecycle: current
 authority: canonical
 owner: taxkit-product-owner
-last_reviewed: 2026-08-28
+last_reviewed: 2026-08-31
 review_trigger: product-spec admission, lifecycle, evidence, or successor change
 successor: null
 tombstone: false
@@ -21,7 +21,7 @@ Specs:
 
 | Spec | Status | Notes |
 | --- | --- | --- |
-| [Doppler configuration governance](./doppler-configuration-governance.md) | Active | The edit-first PRD review accepted the ordered repository slices with a bounded external stop. Provider bootstrap, credential changes, hosted proof and legacy removal remain separately authorised operations. |
+| [Doppler configuration governance](./doppler-configuration-governance.md) | Active | The edit-first PRD review accepted the ordered repository slices. The separately approved TaxKit-only Doppler, Cloudflare-token and GitHub-bridge bootstrap is complete; hosted deployment proof, merged-main reconciliation and legacy removal remain bounded. |
 | [Alchemy deployment structure corrections](./alchemy-deployment-structure-corrections.md) | Implemented | Findings `ALC-AUD-001` through `ALC-AUD-005` and decisions `ALC-AUD-R001` through `ALC-AUD-R003` are closed. [PR #71](https://github.com/crcorbett/taxkit/pull/71) merged the verified candidate as `28ed00f`; the [completed plan](../exec-plans/completed/alchemy-deployment-structure-corrections.md) retains ordered delivery and claim-matched proof. |
 | [Native Alchemy docs hard cutover](./native-alchemy-hard-cutover.md) | Implemented | Native-only source/workflow admission, beta.64 sibling memo coverage and the exact Preview/teardown lock are implemented. The separately authorised five-stage Preview state reconciliation and zero-legacy final inventory are recorded in [`legacy-state-cutover.json`](../evidence/deployments/2026-08-21-native-alchemy-hard-cutover/legacy-state-cutover.json); Production was not deployed or cut over by that operation. |
 | [Automatic Preview Teardown Admission](./automatic-preview-teardown-admission.md) | Implemented | PR-close teardown now shares the unreviewed Preview credential environment. Corrected run `32367035323` and reconciliation `32367125582` proved the automatic exact-stage no-op path; the old approval environment is removed and Production remains protected. |

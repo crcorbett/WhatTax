@@ -3,7 +3,7 @@ document_type: product-spec
 lifecycle: active
 authority: canonical
 owner: taxkit-platform-owner
-last_reviewed: 2026-08-28
+last_reviewed: 2026-08-31
 review_trigger: Doppler project or config change, credential lifecycle change, deployment input change, GitHub workflow change, Alchemy or Cloudflare configuration change, or secret-evidence incident
 successor: null
 tombstone: false
@@ -40,6 +40,17 @@ Quality, receipt reconciliation, Preview, exact-stage teardown, Production and
 normal rollback now have one reviewed Doppler source path each. No live TaxKit
 config, GitHub bridge, hosted fetch or provider result is claimed before the
 separately approved DCG-005 operation.
+
+The separately approved DCG-005 bootstrap completed on 31 August 2026. The
+`taxkit` project now has exactly `dev`, `ci`, `stg_preview` and `prd`; the three
+automation configs have separate read-only expiring service tokens; GitHub has
+the three named bridge secrets; and local TaxKit development has a
+repository-scoped personal login. The retained direct GitHub values remain for
+rollback and are not read by the new workflow source. The dated
+[bootstrap receipt](../evidence/deployments/2026-08-31-doppler-bootstrap/receipt.json)
+owns the exact identities and secret-negative readback. Provider deployment,
+merged-main proof and legacy cleanup remain separate proof or authority
+boundaries.
 
 ## Problem
 

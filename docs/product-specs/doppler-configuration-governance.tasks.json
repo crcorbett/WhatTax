@@ -3,7 +3,7 @@
   "spec": "docs/product-specs/doppler-configuration-governance.md",
   "title": "Doppler configuration governance implementation tasks",
   "status": "active",
-  "last_reviewed": "2026-08-28",
+  "last_reviewed": "2026-08-31",
   "principles": [
     "Doppler governs operator-set credentials and related environment identities, not host, GitHub, Alchemy-internal or evidence-derived values.",
     "Start with one small local and Quality vertical slice, then extend the same narrow boundary to Preview and Production.",

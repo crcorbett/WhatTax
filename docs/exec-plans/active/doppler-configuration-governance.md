@@ -30,19 +30,28 @@ evidence only; its conclusions are not accepted without repository review.
 
 ## Authority
 
-Approved now:
+Approved repository work:
 
 - read-only repository, sibling and official-guidance research;
 - SPEC, task-ledger, plan, source, test, workflow, docs and runbook changes;
 - local deterministic checks;
 - coherent commits, pull-request creation and merge after required checks pass.
 
-Not approved without a separate exact operation:
+Separately approved and completed on 31 August 2026:
 
-- creating or changing a Doppler project, config, identity, service token or
-  secret;
+- exact `taxkit` project/config creation and masked value transfer;
+- three account-owned, TaxKit-only Cloudflare credentials for development,
+  Preview and Production with the recorded account, permission groups and
+  expiry;
+- three read-only expiring Doppler automation tokens and the exact repository,
+  Preview and Production GitHub bridges; and
+- one repository-scoped personal Doppler login plus value-free metadata and
+  non-deploying credential checks.
+
+Still not approved without a separate exact operation:
+
 - creating, changing, rotating, revoking or deleting a GitHub or Cloudflare
-  credential;
+  credential beyond the completed bootstrap envelope;
 - provider deployment or mutation beyond the separately authorised existing
   deployment runbook operation;
 - legacy credential removal; or
@@ -69,7 +78,7 @@ Not approved without a separate exact operation:
 | DCG-002 | Accepted | Trusted Quality and successful receipt validation use pinned `taxkit/ci` named outputs after cache saves; forks and failed/cancelled receipt paths fetch no credential. |
 | DCG-003 | Accepted | Preview and teardown use only `taxkit/stg_preview`; Preview fetches `taxkit/ci` separately, teardown stays local-only, and all three upload classes use the secret-negative allowlist boundary. |
 | DCG-004 | Accepted | Protected Production and rollback use only `taxkit/prd`, fetch `taxkit/ci` separately after cache saves, and upload only prepared secret-negative plan/provider evidence. |
-| DCG-005 | Pending authority | PR #73 is open. Exact-head Quality run `33090706119` stopped at `Fetch trusted CI configuration`; the separately approved TaxKit Doppler configs and GitHub bridges are still required before hosted proof or merge. |
+| DCG-005 | In progress; deployment authority pending | PR #73 is open. The exact TaxKit Doppler configs, Cloudflare credentials, service tokens, GitHub bridges and local scoped login are created and read back without values. Quality run `33351826840`, attempt 2, passed trusted `taxkit/ci` fetch, identity and the full remote-cache Quality graph at exact head `7a12205…`. Preview/Production deployment proof and legacy removal remain separately bounded. |
 
 ## Research record
 
@@ -333,6 +342,54 @@ final merge remain bounded by DCG-005 and the authority model.
   workflow code, package/app READMEs, repository skills and installed package
   behaviour are **Preserve**. A Changeset remains **N/A**.
 
+### DCG-005 — approved credential bootstrap on 31 August 2026
+
+- Cooper approved the exact replacement envelope: three TaxKit-only,
+  account-owned Cloudflare tokens for development, Preview and Production,
+  fixed to account `f9f94270a4a5af8af7010d891020922d`, the three measured
+  Workers Scripts Write, Workers Observability Write and Secrets Store Write
+  groups, expiry on 18 November 2026, direct one-time Doppler transfer and
+  Cooper as revocation owner. DNS, deployment, old-token removal and legacy
+  GitHub-secret removal were excluded.
+- Doppler project `taxkit` now has exactly four locked root configs: `dev`,
+  `ci`, `stg_preview` and `prd`. The required names are present as masked
+  strings. Development and the two provider configs contain only the matching
+  Cloudflare account/token pair; `ci` contains only the Turbo team/token pair.
+- Three separate read-only service tokens expire on 18 November 2026 and are
+  bound one-to-one to `ci`, `stg_preview` and `prd`. They were transferred
+  directly into repository `DOPPLER_CI_TOKEN` and the Preview/Production
+  environment `DOPPLER_PROVIDER_TOKEN` bridges. Development has no service
+  token.
+- Three separate active Cloudflare tokens have the approved account scope,
+  permissions and expiry. A first unused development token was revoked after
+  its direct-transfer process lost standard input; readback found no active
+  remainder for that identifier. All three replacement tokens passed
+  Wrangler `4.114.0` account checks through only their matching Doppler config.
+  No deploy command ran.
+- The existing approved Turbo value moved directly from its secure source to
+  `taxkit/ci`. No secret passed through a checkout file, shell argument,
+  clipboard, log, cache or receipt.
+- A repository-scoped personal CLI login named `TaxKit checkout 2026-08-31`
+  is held by a mode-`0600` Doppler config through a system-keyring reference.
+  The pass/fail custody check passed. A first browser paste used unrelated
+  stale clipboard text, was rejected, and was replaced by a fresh hidden
+  short-lived code; no partial login remained.
+- One invalid `79d` service-token duration was rejected before Doppler created
+  a token. GitHub briefly received an empty CI bridge, which was immediately
+  overwritten by the valid `1896h` read-only token. Names-only readback shows
+  one active CI token and the corrected bridge timestamp.
+- The immutable, secret-negative operation record is
+  [`DCG-005-doppler-bootstrap-2026-08-31`](../../evidence/deployments/2026-08-31-doppler-bootstrap/receipt.json).
+  It retains exact non-secret token identities, scope, expiry, failures,
+  rollback and non-claims, but no value, hash, preview, private account name,
+  email or local machine path.
+- Documentation impact: **Change required** and completed for the SPEC/task
+  review date, product/active-plan indexes, this plan and the deployment
+  evidence index/receipt. Canonical architecture, runbooks, workflow source,
+  package/app READMEs and the native Alchemy graph are **Preserve** because the
+  performed operation matched their reviewed contract. Public docs,
+  packages/exports, generated output, skills and a Changeset are **N/A**.
+
 ## Verification log
 
 The reviewed document set passed JSON parsing and `git diff --check`.
@@ -415,6 +472,20 @@ changes no command, package, export, runtime or public behaviour. Pinned Bun
 `1.3.14` full verification and a forced 93-test deployment run passed; these
 checks prove the repository state only and do not prove external bootstrap.
 
+The approved bootstrap then established the exact TaxKit stores and bridges at
+implementation head `7a12205bf635c8243cf600461f2130924b5c1c7a`.
+`bun run check:doppler-custody` passed for the repository-only personal login.
+A local `taxkit/ci` run of the Quality policy used Turbo remote caching and
+passed. Wrangler `4.114.0` account checks passed through each of `dev`,
+`stg_preview` and `prd` without deployment. Trusted Quality run
+[`33351826840`](https://github.com/crcorbett/taxkit/actions/runs/33351826840),
+attempt 2, then passed the pinned Doppler fetch and exact `taxkit/ci` metadata
+check at that head. Its trusted remote-cache Quality step and whole job
+completed successfully. The fork-only step was correctly skipped for this
+same-repository pull request, so hosted fork behaviour is not claimed. Preview,
+Production, rollback, merged-main and legacy-removal proof remain separate
+boundaries.
+
 ## Versioning
 
 This work changes repository workflows, internal tools and maintainer docs. It
@@ -423,7 +494,10 @@ Changeset is expected. Each slice must recheck that conclusion.
 
 ## Recovery
 
-Before external bootstrap, recovery is a normal repository revert.
+Before any separately approved deployment, repository-source recovery remains
+a normal reviewed revert. The completed credential bootstrap is recovered by
+the exact bridge and token procedures below rather than by deleting provider
+state blindly.
 
 During approved migration overlap, legacy GitHub values are retained but not
 referenced by new source. If the new bridge fails, the operator disables it and

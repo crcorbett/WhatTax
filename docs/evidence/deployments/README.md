@@ -72,6 +72,25 @@ replacement tokens. The receipt contains no secret value, token identifier,
 hash, preview, cache or export. It proves neither a replacement credential nor
 a Doppler, hosted deployment or provider result.
 
+## 2026-08-31 Doppler bootstrap
+
+The sanitized
+[`2026-08-31-doppler-bootstrap/receipt.json`](./2026-08-31-doppler-bootstrap/receipt.json)
+records the separately approved TaxKit-only bootstrap. It binds the exact
+Doppler project/configs, masked key names, three read-only automation-token
+identities, three GitHub bridge names, three active account-owned Cloudflare
+token identities and the revoked interrupted token. It also records the
+repository-scoped personal login, safe local checks, bounded failed attempts,
+rollback and exact non-claims. No secret value, hash, preview, personal account
+name, email, local machine path, export or fallback cache is retained.
+
+The receipt proves creation and metadata readback only for those exact
+credentials and stores. It also binds successful trusted Quality run
+`33351826840`, attempt 2, to exact head `7a12205…`; the same-repository run did
+not exercise the fork-only step. It does not prove Preview, teardown,
+Production, rollback, deployment, DNS, publication or legacy-credential
+removal.
+
 ## Local workerd
 
 The DCD-001 command-owned ignored receipt is local-only and is bound to its

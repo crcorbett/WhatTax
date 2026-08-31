@@ -3,7 +3,7 @@ document_type: execution-plan-index
 lifecycle: current
 authority: canonical
 owner: taxkit-documentation-owner
-last_reviewed: 2026-08-28
+last_reviewed: 2026-08-31
 review_trigger: active execution-plan admission, lifecycle, dependency, or successor change
 successor: null
 tombstone: false
@@ -17,8 +17,11 @@ lifecycle is owned by [`../../README.md`](../../README.md).
 The active
 [Doppler configuration governance](./doppler-configuration-governance.md)
 plan owns the current research, required PRD review, ordered repository slices
-and bounded external bootstrap stop. Implementation has not started and no
-provider or credential mutation is claimed.
+and closeout. Repository implementation through DCG-004 is accepted and the
+separately approved TaxKit-only Doppler, Cloudflare-token and GitHub-bridge
+bootstrap is complete. Hosted deployment proof, merged-main reconciliation and
+legacy-credential cleanup remain bounded by their own proof or authority
+requirements.
 
 The implemented
 [Alchemy deployment structure corrections](../../product-specs/alchemy-deployment-structure-corrections.md)
