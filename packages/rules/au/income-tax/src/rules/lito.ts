@@ -58,7 +58,7 @@ const findBracket = (
  *
  * Formula: offset = max(0, fullOffsetCents - phaseOutRate * (income - threshold))
  *
- * @throws CalculationError when no LITO bracket is available.
+ * @throws {CalculationError} When no LITO bracket is available.
  * @since 0.1.0
  */
 export const LitoLive = Layer.effect(LitoComponentFact)(

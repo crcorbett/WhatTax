@@ -76,36 +76,38 @@ describe("documentation checker path classes", () => {
         targetPath: "packages/docs-content/content/guide.mdx",
       })
     );
-    for (const invalid of [
-      '{"state":"accepted"}',
-      JSON.stringify({
-        observedAt: "not-a-timestamp",
-        owner: "product-owner",
-        schemaVersion: 1,
-        state: "accepted",
-        targetPath: "packages/docs-content/content/guide.mdx",
-      }),
-      JSON.stringify({
-        observedAt: "2026-07-21T22:30:00Z",
-        owner: "product-owner",
-        schemaVersion: 1,
-        state: "draft",
-        targetPath: "packages/docs-content/content/guide.mdx",
-      }),
-      JSON.stringify({
-        extra: true,
-        observedAt: "2026-07-21T22:30:00Z",
-        owner: "product-owner",
-        schemaVersion: 1,
-        state: "accepted",
-        targetPath: "packages/docs-content/content/guide.mdx",
-      }),
-    ]) {
-      const exit = await Effect.runPromiseExit(
-        decodePublicPageAcceptanceRecord(invalid)
-      );
-      expect(exit._tag).toBe("Failure");
-    }
+    await Promise.all(
+      [
+        '{"state":"accepted"}',
+        JSON.stringify({
+          observedAt: "not-a-timestamp",
+          owner: "product-owner",
+          schemaVersion: 1,
+          state: "accepted",
+          targetPath: "packages/docs-content/content/guide.mdx",
+        }),
+        JSON.stringify({
+          observedAt: "2026-07-21T22:30:00Z",
+          owner: "product-owner",
+          schemaVersion: 1,
+          state: "draft",
+          targetPath: "packages/docs-content/content/guide.mdx",
+        }),
+        JSON.stringify({
+          extra: true,
+          observedAt: "2026-07-21T22:30:00Z",
+          owner: "product-owner",
+          schemaVersion: 1,
+          state: "accepted",
+          targetPath: "packages/docs-content/content/guide.mdx",
+        }),
+      ].map(async (invalid) => {
+        const exit = await Effect.runPromiseExit(
+          decodePublicPageAcceptanceRecord(invalid)
+        );
+        expect(exit._tag).toBe("Failure");
+      })
+    );
   });
 
   test("keeps public content, maintainer docs, generated OpenAPI, and workspace manifests separate", () => {

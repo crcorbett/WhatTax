@@ -72,3 +72,4 @@ export { forwardedConsoleError };
 export const rejectedTestApis = { describe, expect };
 
 writeLog("portable Effect rule fixture rejected");
+let sharedObservation = 0;

@@ -6,7 +6,7 @@ const loadDocsHomeData = createServerFn({ method: "GET" }).handler(async () => {
   return await loadDocsHomeServer();
 });
 const loadDocsPageData = createServerFn({ method: "GET" })
-  .inputValidator((input: unknown) => input)
+  .inputValidator((input) => input)
   .handler(async ({ data }) => {
     const { loadDocsPageServer } = await import("./loaders.server");
 

@@ -105,7 +105,7 @@ const noSwitch = {
   },
 };
 
-const layerExportNamePattern = /(Live|Mock|Test|TestLive)$/u;
+const layerExportNamePattern = /(?:Live|Mock|Test|TestLive)$/u;
 
 const noLayerExportsInServiceFiles = {
   create(context) {
@@ -693,6 +693,55 @@ const noEffectTestGlobalMix = {
   },
 };
 
+const runtimeFunctionNodeTypes = new Set([
+  "ArrowFunctionExpression",
+  "FunctionDeclaration",
+  "FunctionExpression",
+]);
+
+const noModuleLevelMutableTestState = {
+  create(context) {
+    const isModuleLevel = (node) => {
+      let current = node.parent;
+      while (current && current.type !== "Program") {
+        if (runtimeFunctionNodeTypes.has(current.type)) {
+          return false;
+        }
+        if (
+          current.type === "TSModuleDeclaration" &&
+          (current.declare || current.global || current.id?.name === "global")
+        ) {
+          return false;
+        }
+        current = current.parent;
+      }
+      return current?.type === "Program";
+    };
+
+    return {
+      VariableDeclaration(node) {
+        if (node.kind !== "const" && isModuleLevel(node)) {
+          context.report({
+            messageId: "noModuleLevelMutableTestState",
+            node,
+          });
+        }
+      },
+    };
+  },
+  meta: {
+    docs: {
+      description:
+        "Disallow module-level mutable bindings in tests that can leak state between cases.",
+    },
+    messages: {
+      noModuleLevelMutableTestState:
+        "Do not keep mutable test state in a module-level let or var binding. Build isolated state inside each test or test Layer; use Effect Ref, Deferred, Queue, or a scoped service for observations and coordination. Keep unavoidable synchronous host-adapter mutation inside that per-test boundary.",
+    },
+    type: "problem",
+  },
+};
+
 export default {
   meta: { name: "effect" },
   rules: {
@@ -702,6 +751,7 @@ export default {
     "no-host-imports-in-contracts": noHostImportsInContracts,
     "no-layer-exports-in-service-files": noLayerExportsInServiceFiles,
     "no-manual-tag": noManualTag,
+    "no-module-level-mutable-test-state": noModuleLevelMutableTestState,
     "no-process-outside-boundaries": noProcessOutsideBoundaries,
     "no-runtime-execution-outside-boundaries":
       noRuntimeExecutionOutsideBoundaries,

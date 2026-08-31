@@ -76,8 +76,8 @@ export const StslArtifact2025_26 = new SourceArtifact({
   ),
   documentVersion: "2025-09-24 to 2026-06-30",
   extract: new SourceExtract({
+    rowContract: "StslRow[]",
     rowCount: 4,
-    shape: "StslRow[]",
   }),
   retrievedOn: isoDate("2026-05-12"),
   source: StslSource2025_26,

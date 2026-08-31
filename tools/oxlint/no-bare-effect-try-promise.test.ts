@@ -1,8 +1,9 @@
 import { afterEach, describe, expect, test } from "bun:test";
 import { Buffer } from "node:buffer";
 import { rm } from "node:fs/promises";
-import { join } from "node:path";
+import nodePath from "node:path";
 
+const { join } = nodePath;
 const repositoryRoot = join(import.meta.dir, "../..");
 const oxlint = join(repositoryRoot, "node_modules/.bin/oxlint");
 const temporaryFiles: string[] = [];

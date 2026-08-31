@@ -24,9 +24,9 @@ export type DocumentationInspection = Readonly<{
   workspaceScripts: ReadonlyMap<string, WorkspaceScripts>;
 }>;
 
-const markdownLink = /\[[^\]]*\]\(([^\s)]+)(?:\s+[^)]*)?\)/gu;
+const markdownLink = /\[[^\]]*\]\((?<target>[^\s)]+)(?:\s+[^)]*)?\)/gu;
 const bunRun =
-  /\bbun\s+run\s+(?:(?:--filter(?:=|\s+)([^\s`]+))\s+)?([A-Za-z0-9:_-]+)/gu;
+  /\bbun\s+run\s+(?:(?:--filter(?:=|\s+)(?<filter>[^\s`]+))\s+)?(?<command>[A-Za-z0-9:_-]+)/gu;
 const lifecycleMetadata = [
   "document_type",
   "lifecycle",
@@ -52,14 +52,23 @@ const isUnder = (path: string, root: string): boolean =>
   path === root || path.startsWith(`${root}/`);
 
 const metadata = (text: string): ReadonlyMap<string, string> => {
-  const block = /^---\r?\n([\s\S]*?)\r?\n---(?:\r?\n|$)/u.exec(text)?.[1];
+  const block = /^---\r?\n(?<body>[\s\S]*?)\r?\n---(?:\r?\n|$)/u.exec(text)
+    ?.groups?.["body"];
   return new Map(
     globalThis.Array.from(
-      (block ?? "").matchAll(/^([a-z_]+):\s*(\S.*)$/gmu),
+      (block ?? "").matchAll(/^(?<key>[a-z_]+):\s*(?<value>\S.*)$/gmu),
       (entry) => {
-        const value = entry[2] ?? "";
-        const quoted = /^(?:"([\s\S]*)"|'([\s\S]*)')$/u.exec(value);
-        return [entry[1] ?? "", quoted?.[1] ?? quoted?.[2] ?? value];
+        const value = entry.groups?.["value"] ?? "";
+        const quoted =
+          /^(?:"(?<doubleQuoted>[\s\S]*)"|'(?<singleQuoted>[\s\S]*)')$/u.exec(
+            value
+          );
+        return [
+          entry.groups?.["key"] ?? "",
+          quoted?.groups?.["doubleQuoted"] ??
+            quoted?.groups?.["singleQuoted"] ??
+            value,
+        ];
       }
     )
   );
@@ -116,6 +125,18 @@ const filteredScriptsFor = (
   return selected?.[1].scripts ?? new Set<string>();
 };
 
+const isMissingRelativeTarget = (
+  target: string | undefined,
+  sourcePath: string,
+  paths: ReadonlySet<string>
+): target is string =>
+  target !== undefined &&
+  target.length > 0 &&
+  !target.startsWith("/") &&
+  !target.startsWith("#") &&
+  !/^[a-z][a-z0-9+.-]*:/iu.test(target) &&
+  !paths.has(relativeTarget(sourcePath, target));
+
 const inspectCurrentOwnerReferences = (
   inspection: DocumentationInspection,
   file: DocumentationFile,
@@ -126,15 +147,9 @@ const inspectCurrentOwnerReferences = (
     .replaceAll(/```[\s\S]*?```/gu, "")
     .replaceAll(/`[^`]*`/gu, "");
   for (const match of prose.matchAll(markdownLink)) {
-    const [, matchedTarget] = match;
+    const matchedTarget = match.groups?.["target"];
     const target = matchedTarget?.split("#")[0];
-    if (
-      target &&
-      !target.startsWith("/") &&
-      !target.startsWith("#") &&
-      !/^[a-z][a-z0-9+.-]*:/iu.test(target) &&
-      !paths.has(relativeTarget(file.path, target))
-    ) {
+    if (isMissingRelativeTarget(target, file.path, paths)) {
       result.push(
         diagnostic(
           "relative-link",
@@ -147,7 +162,8 @@ const inspectCurrentOwnerReferences = (
   }
   const localScripts = localScriptsFor(inspection.workspaceScripts, file.path);
   for (const match of file.text.matchAll(bunRun)) {
-    const [, filter, command] = match;
+    const filter = match.groups?.["filter"];
+    const command = match.groups?.["command"];
     const commandScripts = filter
       ? filteredScriptsFor(inspection.workspaceScripts, filter)
       : localScripts;
@@ -357,7 +373,8 @@ const inspectPublicStatus = (
   const statusFor = (file: DocumentationFile): string | null =>
     file.path === policy.public.navigation.path
       ? (() => {
-          const [, status] = /"status"\s*:\s*"([^"]+)"/u.exec(file.text) ?? [];
+          const status = /"status"\s*:\s*"(?<status>[^"]+)"/u.exec(file.text)
+            ?.groups?.["status"];
           return status ?? null;
         })()
       : (metadata(file.text).get("status") ?? null);

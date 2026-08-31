@@ -1,4 +1,4 @@
-import { join, resolve } from "node:path";
+import nodePath from "node:path";
 
 import * as NodeFileSystem from "@effect/platform-node/NodeFileSystem";
 import {
@@ -28,6 +28,7 @@ import type {
 } from "../schemas.js";
 import { validateMdxComponentPolicy } from "./mdx-component-policy.js";
 
+const { join, resolve } = nodePath;
 const docsRoot = "packages/docs-content";
 const contentRoot = "packages/docs-content/content";
 const examplesRoot = "packages/docs-content/examples";
@@ -39,13 +40,13 @@ const absoluteContentRoot = join(repoRoot, contentRoot);
 const absoluteExamplesRoot = join(repoRoot, examplesRoot);
 
 const bannedPattern =
-  /\b(easy|simple|simply|just|seamless|seamlessly|powerful|effortless|beautiful|magical|unlock|leverage|utilise|streamline)\b/iu;
+  /\b(?:easy|simple|simply|just|seamless|seamlessly|powerful|effortless|beautiful|magical|unlock|leverage|utilise|streamline)\b/iu;
 const staleNamePattern =
-  /\b(calculateRequest|createEffectClient|PublicCalculationMetadata|PublicErrorEnvelope|PublicCalculationMetadataGroup|PublicCalculationMetadataHandlerLive)\b/u;
+  /\b(?:calculateRequest|createEffectClient|PublicCalculationMetadata|PublicErrorEnvelope|PublicCalculationMetadataGroup|PublicCalculationMetadataHandlerLive)\b/u;
 const privateNamePattern =
-  /\b(adad|SaaS|paid|simulation|private downstream product|private product strategy)\b/iu;
-const relativeLinkPattern = /\[[^\]]+\]\(([^)]+)\)/gu;
-const frontmatterPattern = /^---\n([\s\S]*?)\n---/u;
+  /\b(?:adad|SaaS|paid|simulation|private downstream product|private product strategy)\b/iu;
+const relativeLinkPattern = /\[[^\]]+\]\((?<target>[^)]+)\)/gu;
+const frontmatterPattern = /^---\n(?<body>[\s\S]*?)\n---/u;
 const exampleFileNames = [
   "browser-http.ts",
   "effect.ts",
@@ -150,7 +151,7 @@ const decodeFrontmatter = (
           )
         ),
       onSome: (match) =>
-        Option.fromNullishOr(match[1]).pipe(
+        Option.fromNullishOr(match.groups?.["body"]).pipe(
           Option.match({
             onNone: () =>
               Effect.fail(
@@ -301,7 +302,7 @@ const validateLocalLinks = (source: DocsSourcePath, absolutePath: string) =>
       Effect.forEach(
         EffectArray.fromIterable(markdown.matchAll(relativeLinkPattern)),
         (match) =>
-          Option.fromNullishOr(match[1]).pipe(
+          Option.fromNullishOr(match.groups?.["target"]).pipe(
             Option.match({
               onNone: () =>
                 Effect.succeed(EffectArray.empty<DocsValidationIssue>()),

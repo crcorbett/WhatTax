@@ -1,7 +1,8 @@
 import { describe, expect, test } from "bun:test";
 import { lstatSync, readFileSync, readlinkSync } from "node:fs";
-import { resolve } from "node:path";
+import nodePath from "node:path";
 
+const { resolve } = nodePath;
 const root = resolve(import.meta.dir, "../..");
 
 const readSkill = (name: string) =>
@@ -192,8 +193,8 @@ const classifyCoordinationPolicy = (
 
 const typescriptFences = (source: string) =>
   Array.from(
-    source.matchAll(/```(?:ts|typescript)\n([\s\S]*?)```/gu),
-    (match) => match[1] ?? ""
+    source.matchAll(/```(?:ts|typescript)\n(?<code>[\s\S]*?)```/gu),
+    (match) => match.groups?.["code"] ?? ""
   ).join("\n");
 
 interface Hgi208Fixture {

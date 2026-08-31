@@ -9,7 +9,7 @@ import { ChildProcess, ChildProcessSpawner } from "effect/unstable/process";
 import {
   decodeReadableRepositoryText,
   inspectRepositoryText,
-  makeRepositoryPathReport,
+  createRepositoryPathReport,
   renderRepositoryPathReport,
 } from "./policy.js";
 import {
@@ -118,7 +118,7 @@ export const checkRepositoryPaths = (repositoryRoot: string) =>
     );
     const binaryFiles = Array.filter(inspected, (file) => file.binary).length;
 
-    return makeRepositoryPathReport({
+    return createRepositoryPathReport({
       binaryFiles,
       findings: Array.flatMap(inspected, (file) => file.findings),
       textFiles: inspected.length - binaryFiles,

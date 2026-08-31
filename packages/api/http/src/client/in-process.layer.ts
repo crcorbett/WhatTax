@@ -19,7 +19,7 @@ const makeInProcessFetch = (handler: InProcessTaxKitApiHandler) => {
 const makeInProcessFetchLayer = (handler: InProcessTaxKitApiHandler) =>
   Layer.succeed(FetchHttpClient.Fetch, makeInProcessFetch(handler));
 
-export const makeTaxKitApiInProcessClientLayer = (
+export const createTaxKitApiInProcessClientLayer = (
   handler: InProcessTaxKitApiHandler
 ) => {
   const InProcessHttpClientLive = FetchHttpClient.layer.pipe(

@@ -7,7 +7,7 @@ import type {
 } from "./errors.js";
 import type { FumadocsSourcePage } from "./schemas.js";
 
-export interface FumadocsSourceShape {
+export interface FumadocsSourceContract {
   readonly getPage: (
     slugs: readonly string[],
     locale?: string
@@ -22,5 +22,5 @@ export interface FumadocsSourceShape {
 
 export class FumadocsSource extends Context.Service<
   FumadocsSource,
-  FumadocsSourceShape
+  FumadocsSourceContract
 >()("@taxkit/docs-fumadocs/FumadocsSource") {}

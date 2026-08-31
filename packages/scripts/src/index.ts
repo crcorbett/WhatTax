@@ -9,6 +9,7 @@ export {
 export { ReleaseCommandRunnerLive } from "./release-readiness/live.layer.js";
 export { runReleaseReadiness } from "./release-readiness/program.js";
 export {
+  createReleaseReadinessPlan,
   makeReleaseReadinessPlan,
   ReleaseAttemptReceipt,
   ReleaseAttemptId,

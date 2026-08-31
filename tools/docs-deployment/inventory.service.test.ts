@@ -38,7 +38,7 @@ const rawReport = {
   },
 };
 
-const decodeReport = (input: unknown) =>
+const decodeReport = (input: typeof Schema.Unknown.Type) =>
   Effect.runPromise(
     Schema.decodeUnknownEffect(DocsDeploymentInventoryReport)(input)
   );

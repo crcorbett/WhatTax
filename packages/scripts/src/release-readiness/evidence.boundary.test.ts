@@ -149,7 +149,7 @@ describe("release evidence boundary", () => {
   );
 
   it.effect("rejects malformed and reordered accepted-attempt summaries", () =>
-    Effect.gen(function* testAcceptedAttemptSummaryShape() {
+    Effect.gen(function* testAcceptedAttemptSummaryContract() {
       const fileSystem = yield* FileSystem.FileSystem;
       const path = yield* Path.Path;
       const { workspaceRoot } = yield* readEvidenceTexts;
@@ -262,7 +262,7 @@ describe("release evidence boundary", () => {
   );
 
   it.effect("rejects malformed, escaping and reordered content manifests", () =>
-    Effect.gen(function* testContentManifestShape() {
+    Effect.gen(function* testContentManifestContract() {
       const workspaceRoot = yield* makeTempWorkspace;
       const fileSystem = yield* FileSystem.FileSystem;
       const path = yield* Path.Path;

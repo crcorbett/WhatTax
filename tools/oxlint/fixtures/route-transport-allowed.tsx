@@ -9,7 +9,7 @@ import {
 export type PageRouteResult = ReturnType<typeof docsPageRouteBoundary.restore>;
 
 export const DirectRoute = createFileRoute("/lint-direct")({
-  component() {
+  component: function DirectRouteComponent() {
     return Result.match(
       docsHomeRouteBoundary.restore(DirectRoute.useLoaderData()),
       {
@@ -21,7 +21,7 @@ export const DirectRoute = createFileRoute("/lint-direct")({
 });
 
 export const ImmutableBindingRoute = createFileRoute("/lint-binding")({
-  component() {
+  component: function ImmutableBindingRouteComponent() {
     const loaderData = ImmutableBindingRoute.useLoaderData();
     const routeResult = docsPageRouteBoundary.restore(loaderData);
 

@@ -13,7 +13,7 @@ import type { DocsSourcePath } from "../schemas.js";
 const fencedCodeBlockPattern = /```[\s\S]*?```/gu;
 const inlineCodePattern = /`[^`]*`/gu;
 const mdxComponentPattern =
-  /<\/?([A-Z][A-Za-z0-9]*(?:\.[A-Z][A-Za-z0-9]*)*)\b/gu;
+  /<\/?(?<component>[A-Z][A-Za-z0-9]*(?:\.[A-Z][A-Za-z0-9]*)*)\b/gu;
 
 const allowedMdxComponentNames = HashSet.empty<DocsMdxComponentName>();
 
@@ -31,7 +31,7 @@ export const validateMdxComponentPolicy = (
       markdownWithoutFencedCode(markdown).matchAll(mdxComponentPattern)
     ),
     (match) =>
-      Option.fromNullishOr(match[1]).pipe(
+      Option.fromNullishOr(match.groups?.["component"]).pipe(
         Option.match({
           onNone: () =>
             Effect.succeed(EffectArray.empty<DocsValidationIssue>()),

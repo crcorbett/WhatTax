@@ -17,12 +17,12 @@ import {
 } from "./evidence.boundary.js";
 import { ReleaseCommandRunnerLive } from "./live.layer.js";
 import {
-  makeSuccessfulAttemptReceipt,
+  createSuccessfulAttemptReceipt,
   runCiReleaseReadiness,
   runReleaseReadiness,
 } from "./program.js";
 import {
-  makeReleaseReadinessPlan,
+  createReleaseReadinessPlan,
   ReleaseAttemptId,
   renderReleaseReadinessReport,
 } from "./schemas.js";
@@ -45,7 +45,7 @@ const program = Effect.gen(function* releaseReadinessMain() {
   const cli = yield* decodeReleaseReadinessCli(Bun.argv.slice(2));
   if (cli.mode === "ci") {
     const report = yield* runCiReleaseReadiness(
-      makeReleaseReadinessPlan(workspaceRoot)
+      createReleaseReadinessPlan(workspaceRoot)
     );
     yield* Console.info(
       `CI release graph passed ${report.outcomes.length} ordered checks; postcondition=repository checks passed for this CI revision; nonclaim=no candidate, attempt receipt, publication, tag, release, deployment or provider mutation.`
@@ -74,7 +74,7 @@ const program = Effect.gen(function* releaseReadinessMain() {
     `release-${yield* Clock.currentTimeMillis}`
   );
   const report = yield* runReleaseReadiness(
-    makeReleaseReadinessPlan(workspaceRoot),
+    createReleaseReadinessPlan(workspaceRoot),
     attemptId,
     candidate
   ).pipe(
@@ -91,7 +91,7 @@ const program = Effect.gen(function* releaseReadinessMain() {
   );
   const artifact = yield* persistReleaseAttemptReceipt(
     workspaceRoot,
-    makeSuccessfulAttemptReceipt(report, candidate)
+    createSuccessfulAttemptReceipt(report, candidate)
   );
   yield* Console.info(renderReleaseReadinessReport(report));
   yield* Console.info(`RECEIPT ${artifact.path} (${artifact.sha256})`);

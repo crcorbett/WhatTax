@@ -4,7 +4,7 @@ import {
   Outlet,
   Scripts,
 } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 import {
   DocsRouteError,
@@ -12,6 +12,7 @@ import {
   DocsRoutePending,
 } from "#/components/docs-route-states";
 import { requestDocsNavigationFocus } from "#/lib/navigation-focus";
+import { useHydrated } from "#/lib/use-hydrated";
 
 import "../styles.css";
 
@@ -31,10 +32,9 @@ const RootShell = ({ children }: { readonly children: React.ReactNode }) => (
 );
 
 const RootComponent = () => {
-  const [interactive, setInteractive] = useState(false);
+  const interactive = useHydrated();
 
   useEffect(() => {
-    setInteractive(true);
     addEventListener("popstate", requestDocsNavigationFocus);
 
     return () => removeEventListener("popstate", requestDocsNavigationFocus);

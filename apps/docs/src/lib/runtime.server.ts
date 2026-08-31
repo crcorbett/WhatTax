@@ -4,11 +4,11 @@ import { DocsContentServiceLive } from "@taxkit/docs-content/live";
 import { Effect, Layer, Random } from "effect";
 
 import {
-  makeDocsRuntime,
-  makeDocsRuntimeProbeLayer,
+  createDocsRuntime,
+  createDocsRuntimeProbeLayer,
 } from "./runtime-factory.server";
 
-const docsRuntimeProbeLive = makeDocsRuntimeProbeLayer(
+const docsRuntimeProbeLive = createDocsRuntimeProbeLayer(
   Effect.all(
     [
       Random.nextIntBetween(0, Number.MAX_SAFE_INTEGER),
@@ -22,7 +22,7 @@ const docsRuntimeProbeLive = makeDocsRuntimeProbeLayer(
   )
 );
 
-export const docsRuntime = makeDocsRuntime(
+export const docsRuntime = createDocsRuntime(
   DocsContentServiceLive.pipe(Layer.provide(DocsGeneratedFumadocsSourceLive)),
   docsRuntimeProbeLive
 );

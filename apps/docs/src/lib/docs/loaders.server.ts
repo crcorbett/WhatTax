@@ -28,7 +28,7 @@ export const loadDocsHomeServer = () =>
     }).pipe(docsHomeRouteBoundary.encodeExit)
   );
 
-export const loadDocsPageServer = (data: unknown) =>
+export const loadDocsPageServer = (data: typeof Schema.Unknown.Type) =>
   docsRuntime.runPromise(
     Schema.decodeUnknownEffect(DocsPageLoaderInput)(data).pipe(
       Effect.mapError(

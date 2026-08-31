@@ -53,9 +53,10 @@ import type {
 } from "./schemas.js";
 
 type CalculatorProgram = Effect.Effect<unknown, unknown, unknown>;
+type UntrustedCalculatorFacts = typeof Schema.Unknown.Type;
 
 type CalculatorExecution = (
-  facts: unknown,
+  facts: UntrustedCalculatorFacts,
   validationIssues: readonly GraphValidationIssue[]
 ) => Effect.Effect<
   CalculationResult<CalculatorRunReport>,

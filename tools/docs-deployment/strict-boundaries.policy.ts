@@ -275,8 +275,8 @@ const inspectDocsRuntimeBoundary = (
     !includesAny(runtimeFactory, forbiddenFactoryPatterns) &&
     includesEvery(runtimeFactory, factoryRequirements) &&
     runtimeComposition.includes("Random.nextIntBetween(") &&
-    runtimeComposition.match(/makeDocsRuntime\(/gu)?.length === 1 &&
-    runtimeComposition.match(/makeDocsRuntimeProbeLayer\(/gu)?.length === 1 &&
+    runtimeComposition.match(/createDocsRuntime\(/gu)?.length === 1 &&
+    runtimeComposition.match(/createDocsRuntimeProbeLayer\(/gu)?.length === 1 &&
     includesEvery(serverAdapter, adapterRequirements);
 
   return valid ? [] : [finding("runtime-probe", factoryPath)];

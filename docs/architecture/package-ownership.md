@@ -3,7 +3,7 @@ document_type: architecture
 lifecycle: current
 authority: canonical
 owner: taxkit-architecture-owner
-last_reviewed: 2026-07-30
+last_reviewed: 2026-08-31
 review_trigger: package, app, root composition, or semantic ownership change
 ---
 
@@ -49,7 +49,9 @@ and source exports exist.
 `packages/core`
 : Implemented shared primitives, fact descriptors, rule descriptors, graph
 metadata, trace and ledger contracts, common tagged errors and calculation
-engine service.
+engine service. Public trace inputs and results are JSON values, and
+`SourceExtract.rowContract` names the extracted row contract without using the
+vague former `shape` field.
 
 `packages/domain/au/*`
 : Planned Australian date dimensions and domain facts that are not owned by a
@@ -70,6 +72,8 @@ for production-only runtime helpers.
   release-readiness command, its command-runner service, live process layer,
   deterministic test layer and runtime entrypoint. It invokes canonical root
   and package commands without moving or duplicating their validator logic.
+  Constructor functions use `create*`; deprecated `make*` aliases remain only
+  for package compatibility.
 
 `tools/repository-paths`
 : Root-owned repository portability gate. It owns the closed machine-local path
@@ -81,7 +85,8 @@ for production-only runtime helpers.
 `packages/api/http`
 : Implemented HTTP API package. It owns Effect HTTP API definitions, boundary
 schemas, thin server handlers, OpenAPI, typed HTTP clients and HTTP
-status/transport annotations.
+status/transport annotations. Client and Layer constructors use `create*`;
+deprecated `make*` aliases remain at the export owner for compatibility.
 
 `packages/calculators`
 : Implemented reusable calculator orchestration package. It owns calculator
@@ -92,8 +97,10 @@ It also owns the canonical reusable calculator run schemas named
 `CalculatorRun*` and the `CalculatorServiceError` union. HTTP-only public
 envelopes and status annotations stay in `packages/api/http`; SDK schema
 exports may re-export calculator-owned run contracts but must not duplicate
-them. It depends on `packages/core` and rule packages, but it must not depend
-on HTTP handlers, SDK clients, CLI commands or app runtime modules.
+them. Service interfaces use the precise `Contract` suffix rather than the
+vague `Shape` suffix. It depends on `packages/core` and rule packages, but it
+must not depend on HTTP handlers, SDK clients, CLI commands or app runtime
+modules.
 
 `packages/sdk/typescript`
 : Implemented private TypeScript SDK package for a future public SDK
@@ -147,7 +154,7 @@ shutdown and platform serving for the implemented API app.
   of the Node-only validation module. Validation and generated raw-text access
   may read MDX files only through their explicit non-runtime operations; app
   routes use processed generated content through the service and client
-  exports.
+  exports. Service interfaces use the precise `Contract` suffix.
 
 `packages/docs-fumadocs`
 : Implemented private reusable package for generic Fumadocs integration. It
@@ -156,6 +163,7 @@ shutdown and platform serving for the implemented API app.
   generated-loader live and deterministic test Layers, and generic
   browser-safe MDX render primitives. It must not own TaxKit-specific
   frontmatter, navigation, validation policy, routes or generated content.
+  Service interfaces use the precise `Contract` suffix.
 
 ## Runtime shape
 

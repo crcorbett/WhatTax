@@ -121,6 +121,8 @@ const expectedActionSteps = [
   dopplerAction,
 ];
 const UnknownRecord = Schema.Record(Schema.String, Schema.Unknown);
+type UntrustedWorkflowValue = typeof Schema.Unknown.Type;
+type WorkflowRecord = typeof UnknownRecord.Type;
 
 const finding = (
   invariant: (typeof QualityWorkflowFinding.Type)["invariant"],
@@ -128,10 +130,10 @@ const finding = (
   recovery: string
 ) => new QualityWorkflowFinding({ invariant, recovery, target });
 
-const asRecord = (value: unknown): Record<string, unknown> | null =>
+const asRecord = (value: UntrustedWorkflowValue): WorkflowRecord | null =>
   Schema.is(UnknownRecord)(value) ? value : null;
 
-const hasOnly = (record: Record<string, unknown>, expected: string[]) =>
+const hasOnly = (record: WorkflowRecord, expected: string[]) =>
   Reflect.ownKeys(record).length === expected.length &&
   expected.every((key) => key in record);
 
@@ -190,7 +192,7 @@ const hasNamedImport = (
 const hasShadowedReservedCallBinding = (file: ts.SourceFile) => {
   const reserved = new Set([
     "Console",
-    "makeReleaseReadinessPlan",
+    "createReleaseReadinessPlan",
     "runCiReleaseReadiness",
   ]);
   let shadowed = false;
@@ -216,7 +218,7 @@ const hasShadowedReservedCallBinding = (file: ts.SourceFile) => {
 
 // oxlint-disable-next-line complexity -- every trigger key and path-filter variant is checked independently so CI cannot skip a boundary.
 const inspectTrigger = (
-  triggers: Record<string, unknown>
+  triggers: WorkflowRecord
 ): readonly QualityWorkflowFinding[] => {
   const pullRequest = triggers.pull_request;
   const pullRequestRecord = asRecord(pullRequest);
@@ -248,7 +250,9 @@ const inspectTrigger = (
 };
 
 // oxlint-disable-next-line complexity -- each allowed step key and value is checked independently so execution cannot be skipped or tolerated.
-const inspectSteps = (steps: unknown): readonly QualityWorkflowFinding[] => {
+const inspectSteps = (
+  steps: UntrustedWorkflowValue
+): readonly QualityWorkflowFinding[] => {
   if (!Array.isArray(steps)) {
     return [
       finding(
@@ -260,12 +264,14 @@ const inspectSteps = (steps: unknown): readonly QualityWorkflowFinding[] => {
   }
   const actionSteps = steps
     .map(asRecord)
-    .filter((step): step is Record<string, unknown> => step !== null)
-    .flatMap((step) => (typeof step.uses === "string" ? [step.uses] : []));
+    .filter((step): step is WorkflowRecord => step !== null)
+    .flatMap((step) =>
+      Schema.is(Schema.String)(step.uses) ? [step.uses] : []
+    );
   const runSteps = steps
     .map(asRecord)
-    .filter((step): step is Record<string, unknown> => step !== null)
-    .flatMap((step) => (typeof step.run === "string" ? [step.run] : []));
+    .filter((step): step is WorkflowRecord => step !== null)
+    .flatMap((step) => (Schema.is(Schema.String)(step.run) ? [step.run] : []));
   const validActionSteps =
     actionSteps.length === expectedActionSteps.length &&
     actionSteps.every(
@@ -481,7 +487,7 @@ export const decodeQualityWorkflow = (text: string) => {
 
 const hasExactWorkflowCredentialPolicy = (
   workflow: QualityWorkflowDocument,
-  quality: Record<string, unknown> | null
+  quality: WorkflowRecord | null
 ) => {
   const steps = Array.isArray(quality?.steps) ? quality.steps : [];
   const stepEnvironments = steps.flatMap((step) => {
@@ -629,17 +635,17 @@ export const inspectReleaseRuntime = (source: string) => {
     unwrappedReleasePlanArgument !== undefined &&
     ts.isCallExpression(unwrappedReleasePlanArgument) &&
     callIdentity(unwrappedReleasePlanArgument.expression) ===
-      "makeReleaseReadinessPlan";
+      "createReleaseReadinessPlan";
   const exactBindings =
     hasNamedImport(file, "effect", "Console") &&
     hasNamedImport(file, "./program.js", "runCiReleaseReadiness") &&
-    hasNamedImport(file, "./schemas.js", "makeReleaseReadinessPlan") &&
+    hasNamedImport(file, "./schemas.js", "createReleaseReadinessPlan") &&
     !hasShadowedReservedCallBinding(file);
   return ciBranch !== undefined &&
     identities.length === 3 &&
     identities.filter((identity) => identity === "runCiReleaseReadiness")
       .length === 1 &&
-    identities.filter((identity) => identity === "makeReleaseReadinessPlan")
+    identities.filter((identity) => identity === "createReleaseReadinessPlan")
       .length === 1 &&
     identities.filter((identity) => identity === "Console.info").length === 1 &&
     exactReleasePlan &&

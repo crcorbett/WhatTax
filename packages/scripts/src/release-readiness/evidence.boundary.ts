@@ -177,10 +177,13 @@ export const verifyCandidateContentManifest = (
       .split("\n")
       .filter((line) => line.length > 0 && !line.startsWith("#"))
       .map((line) => {
-        const match = /^([a-f0-9]{64}) {2}(.+)$/u.exec(line);
+        const match = /^(?<sha256>[a-f0-9]{64}) {2}(?<path>.+)$/u.exec(line);
         return match === null
           ? null
-          : { path: match[2] ?? "", sha256: `sha256:${match[1]}` };
+          : {
+              path: match.groups?.["path"] ?? "",
+              sha256: `sha256:${match.groups?.["sha256"] ?? ""}`,
+            };
       });
     const malformed = entries.some((entry) => entry === null);
     const parsedArtifacts = entries.filter(

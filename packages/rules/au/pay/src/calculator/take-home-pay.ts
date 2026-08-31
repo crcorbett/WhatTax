@@ -16,6 +16,8 @@ import {
   PayWithholdingsLedgerFact,
 } from "../facts/withholdings.js";
 
+export { PayWithholdingsLedgerFact as CalculatePayWithholdings } from "../facts/withholdings.js";
+
 /**
  * Independent version of the Australian pay ruleset represented by this
  * report.
@@ -80,7 +82,6 @@ export const CalculateTakeHomePay = Effect.gen(function* () {
  *
  * @since 0.1.0
  */
-export const CalculatePayWithholdings = PayWithholdingsLedgerFact;
 
 /**
  * Input schema for the standard take-home-pay scenario helper.

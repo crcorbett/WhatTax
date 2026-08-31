@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { cp, mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import nodePath from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 import { Effect, Record as EffectRecord, Schema } from "effect";
@@ -15,6 +15,16 @@ import {
   docsWorkerCompatibilityDate,
   docsWorkerCompatibilityFlags,
 } from "../src/lib/build/cloudflare-stack";
+
+const { join } = nodePath;
+
+interface BrowserRouterHarness {
+  readonly navigate: (options: { readonly to: string }) => Promise<void>;
+}
+
+declare global {
+  var __TSR_ROUTER__: BrowserRouterHarness | undefined;
+}
 
 const appRoot = new URL("../", import.meta.url);
 const repositoryRoot = new URL("../../", appRoot);
@@ -80,13 +90,22 @@ const sha256Directory = async (
     })
   );
   const hash = createHash("sha256");
+  const entries = await Promise.all(
+    files
+      .filter(include)
+      .toSorted()
+      .map(async (path) => ({
+        bytes: new Uint8Array(
+          await Bun.file(new URL(path, directory)).arrayBuffer()
+        ),
+        path,
+      }))
+  );
 
-  for (const path of files.filter(include).toSorted()) {
+  for (const { bytes, path } of entries) {
     hash.update(path);
     hash.update("\0");
-    hash.update(
-      new Uint8Array(await Bun.file(new URL(path, directory)).arrayBuffer())
-    );
+    hash.update(bytes);
     hash.update("\0");
   }
 
@@ -105,7 +124,7 @@ const relativeLuminance = (color: readonly [number, number, number]) =>
   color
     .map((channel) => channel / 255)
     .map((channel) =>
-      channel <= 0.040_45 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4
+      channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4
     )
     .reduce(
       (luminance, channel, index) =>
@@ -150,17 +169,12 @@ const assertComputedContrast = async (
 };
 
 const waitForInteractiveDocs = async (page: Page) => {
-  await page.waitForFunction(() => {
-    const router: unknown = Reflect.get(globalThis, "__TSR_ROUTER__");
-
-    return (
-      typeof router === "object" &&
-      router !== null &&
-      typeof Reflect.get(router, "navigate") === "function" &&
+  await page.waitForFunction(
+    () =>
+      globalThis.__TSR_ROUTER__ !== undefined &&
       document.querySelector('[data-tk-hydrated="true"]') !== null &&
       document.querySelector('[data-tk-navigation-interactive="true"]') !== null
-    );
-  });
+  );
 };
 
 const isExpectedServerFunctionAbort = (request: Request, origin: string) => {
@@ -217,15 +231,17 @@ const readProcessTable = async (): Promise<readonly ProcessEntry[]> => {
   ]);
 
   return output.split("\n").flatMap((line) => {
-    const match = /^\s*(\d+)\s+(\d+)\s+(.+)$/u.exec(line);
+    const match = /^\s*(?<pid>\d+)\s+(?<parentPid>\d+)\s+(?<command>.+)$/u.exec(
+      line
+    );
 
     return match === null
       ? []
       : [
           {
-            command: match[3] ?? "",
-            parentPid: Number(match[2]),
-            pid: Number(match[1]),
+            command: match.groups?.["command"] ?? "",
+            parentPid: Number(match.groups?.["parentPid"]),
+            pid: Number(match.groups?.["pid"]),
           },
         ];
   });
@@ -374,7 +390,7 @@ assert.equal(
   "The emitted Worker must contain one app-owned live probe Layer."
 );
 assert.equal(
-  emittedServerSource.match(/var docsRuntime = makeDocsRuntime\(/gu)?.length,
+  emittedServerSource.match(/var docsRuntime = createDocsRuntime\(/gu)?.length,
   1,
   "The emitted Worker must construct its docs runtime exactly once at module scope."
 );
@@ -386,22 +402,22 @@ const builtFiles = await Array.fromAsync(
   })
 );
 
+const builtSources = await Promise.all(
+  builtFiles.map(async (path) => ({
+    path,
+    source: await Bun.file(new URL(path, builtRoot)).text(),
+  }))
+);
+
 for (const forbiddenName of [
   "ALCHEMY_PASSWORD",
   "CLOUDFLARE_API_TOKEN",
   "CLOUDFLARE_ACCOUNT_ID",
   "GITHUB_TOKEN",
 ]) {
-  let containsForbiddenName = false;
-
-  for (const path of builtFiles) {
-    const source = await Bun.file(new URL(path, builtRoot)).text();
-
-    if (source.includes(forbiddenName)) {
-      containsForbiddenName = true;
-      break;
-    }
-  }
+  const containsForbiddenName = builtSources.some(({ source }) =>
+    source.includes(forbiddenName)
+  );
 
   assert.equal(
     containsForbiddenName,
@@ -445,14 +461,14 @@ const deploymentInputSha256 = createHash("sha256")
   .update(`assets\0${assetsSha256}\0`)
   .digest("hex");
 const uploadMatch =
-  /Total Upload:\s*([\d.]+)\s*KiB\s*\/\s*gzip:\s*([\d.]+)\s*KiB/u.exec(
+  /Total Upload:\s*(?<upload>[\d.]+)\s*KiB\s*\/\s*gzip:\s*(?<gzip>[\d.]+)\s*KiB/u.exec(
     dryRunOutput
   );
 
 assert.ok(uploadMatch !== null, "Wrangler did not report upload sizes.");
 assert.match(dryRunOutput, /No bindings found\./u);
-const uploadBytes = Number(uploadMatch[1]) * 1024;
-const gzipUploadBytes = Number(uploadMatch[2]) * 1024;
+const uploadBytes = Number(uploadMatch.groups?.["upload"]) * 1024;
+const gzipUploadBytes = Number(uploadMatch.groups?.["gzip"]) * 1024;
 
 assert.ok(gzipUploadBytes < workerSizeLimitBytes);
 
@@ -486,33 +502,33 @@ let browser: Browser | undefined;
 let observedDescendants: readonly ProcessEntry[] = [];
 
 try {
-  let initialResponse: Response | undefined;
-  let initialRequestMs = 0;
-
-  for (
-    let attempt = 0;
-    attempt < 300 &&
-    initialResponse === undefined &&
-    workerProcess.exitCode === null;
-    attempt += 1
-  ) {
+  const waitForInitialResponse = async (
+    attempt: number
+  ): Promise<{
+    readonly initialRequestMs: number;
+    readonly initialResponse: Response | undefined;
+  }> => {
+    if (attempt >= 300 || workerProcess.exitCode !== null) {
+      return { initialRequestMs: 0, initialResponse: undefined };
+    }
     const requestStartedAt = performance.now();
 
     try {
       const response = await fetch(`${origin}${knownPath}`, {
         headers: runtimeProofHeaders,
       });
-
-      initialResponse = response;
-      initialRequestMs = performance.now() - requestStartedAt;
+      return {
+        initialRequestMs: performance.now() - requestStartedAt,
+        initialResponse: response,
+      };
     } catch {
       // workerd has not bound the reserved port yet
     }
 
-    if (initialResponse === undefined) {
-      await Bun.sleep(50);
-    }
-  }
+    await Bun.sleep(50);
+    return waitForInitialResponse(attempt + 1);
+  };
+  const { initialRequestMs, initialResponse } = await waitForInitialResponse(0);
 
   const earlyExitOutput =
     workerProcess.exitCode === null
@@ -552,9 +568,9 @@ try {
     "The observed Wrangler descendants did not include the pinned workerd executable."
   );
 
-  const assetPath = /(?:src|href)="(\/assets\/[^"]+\.(?:css|js))"/u.exec(
-    initialHtml
-  )?.[1];
+  const assetPath =
+    /(?:src|href)="(?<asset>\/assets\/[^"]+\.(?:css|js))"/u.exec(initialHtml)
+      ?.groups?.["asset"];
   assert.ok(assetPath !== undefined);
   const assetResponse = await fetch(`${origin}${assetPath}`);
   const assetBody = await assetResponse.text();
@@ -756,17 +772,12 @@ try {
   assert.ok(malformedServerFunctionResponse.status() < 500);
 
   await page.evaluate(async (path) => {
-    const router: unknown = Reflect.get(globalThis, "__TSR_ROUTER__");
-    const navigate =
-      typeof router === "object" && router !== null
-        ? Reflect.get(router, "navigate")
-        : undefined;
-
-    if (typeof navigate !== "function") {
+    const router = globalThis.__TSR_ROUTER__;
+    if (router === undefined) {
       throw new TypeError("The hydrated TanStack router was unavailable.");
     }
 
-    await Reflect.apply(navigate, router, [{ to: path }]);
+    await router.navigate({ to: path });
   }, missingPath);
   await page.getByTestId("route-not-found").waitFor();
   assert.equal(documentRequests, navigationDocumentBaseline);
@@ -847,21 +858,12 @@ try {
     await route.continue();
   });
   const pendingNavigation = page.evaluate(async (path) => {
-    const router: unknown = Reflect.get(globalThis, "__TSR_ROUTER__");
-
-    if (typeof router !== "object" || router === null) {
+    const router = globalThis.__TSR_ROUTER__;
+    if (router === undefined) {
       throw new Error("The hydrated TanStack router was unavailable.");
     }
 
-    const navigate: unknown = Reflect.get(router, "navigate");
-
-    if (typeof navigate !== "function") {
-      throw new TypeError(
-        "The hydrated TanStack navigate operation was unavailable."
-      );
-    }
-
-    await Reflect.apply(navigate, router, [{ to: path }]);
+    await router.navigate({ to: path });
   }, delayedPageLoad.path);
   await page.getByTestId("route-pending").waitFor();
   await page

@@ -59,18 +59,19 @@ if (
   );
 }
 
-for (const packageName of blockedHttpApiPackageNames) {
-  const httpApiImports =
-    await Bun.$`rg -n --fixed-strings ${packageName} ${sourceRoot}`
-      .quiet()
-      .nothrow();
+const blockedImportFailures = await Promise.all(
+  blockedHttpApiPackageNames.map(async (packageName) => {
+    const httpApiImports =
+      await Bun.$`rg -n --fixed-strings ${packageName} ${sourceRoot}`
+        .quiet()
+        .nothrow();
 
-  if (httpApiImports.exitCode === 0) {
-    failures.push(
-      `SDK source must not import ${packageName}:\n${httpApiImports.stdout.toString()}`
-    );
-  }
-}
+    return httpApiImports.exitCode === 0
+      ? `SDK source must not import ${packageName}:\n${httpApiImports.stdout.toString()}`
+      : null;
+  })
+);
+failures.push(...blockedImportFailures.filter((failure) => failure !== null));
 
 const rootSource = await Bun.file(rootEntrypoint).text();
 
@@ -78,20 +79,18 @@ if (rootSource.includes("@taxkit/rules-au-") || rootSource.includes("./au")) {
   failures.push("Root SDK entrypoint must not import AU packages or subpaths.");
 }
 
-for (const entrypoint of browserEntrypoints) {
-  const source = await Bun.file(entrypoint).text();
-
-  if (
-    source.includes("node:") ||
-    source.includes("bun:") ||
-    source.includes('from "bun"') ||
-    source.includes("from 'bun'")
-  ) {
-    failures.push(
-      `Browser-safe SDK entrypoint imports a server-only module: ${entrypoint.pathname}`
-    );
-  }
-}
+const browserImportFailures = await Promise.all(
+  browserEntrypoints.map(async (entrypoint) => {
+    const source = await Bun.file(entrypoint).text();
+    return source.includes("node:") ||
+      source.includes("bun:") ||
+      source.includes('from "bun"') ||
+      source.includes("from 'bun'")
+      ? `Browser-safe SDK entrypoint imports a server-only module: ${entrypoint.pathname}`
+      : null;
+  })
+);
+failures.push(...browserImportFailures.filter((failure) => failure !== null));
 
 if (failures.length > 0) {
   for (const failure of failures) {

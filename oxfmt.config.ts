@@ -5,10 +5,15 @@ export default defineConfig({
   ...ultracite,
   ignorePatterns: [
     ...ultracite.ignorePatterns,
-    ".agents/skills/**",
+    ".agents/**",
+    ".claude/**",
     "AGENTS.md",
     "README.md",
     "docs/**",
     "apps/web/src/routeTree.gen.ts",
+    "tools/oxlint/anti-slop/**",
   ],
+  // Preserve authored Markdown wrapping. Ultracite 7.10 otherwise rewrites
+  // current and historical documentation wholesale.
+  proseWrap: "preserve",
 });

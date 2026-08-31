@@ -131,7 +131,7 @@ export class WorkflowPlanProjectionError extends Schema.TaggedErrorClass<Workflo
 const ansiEscape = /\u001B\[[0-?]*[ -/]*[@-~]/gu;
 const timestampLog = /^\[\d{2}:\d{2}:\d{2}(?:\.\d+)?\] [A-Z]+ /u;
 const resourceLine = /^\[[^\]]+\] /u;
-const nativeResourceLine = /^\[DocsWebsite\] (create|update|noop|delete)$/u;
+const nativeResourceLine = /^\[DocsWebsite\] (?:create|update|noop|delete)$/u;
 const planSummaryLine = /^Plan: /u;
 
 const fail = (reason: string) =>

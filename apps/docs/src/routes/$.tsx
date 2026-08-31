@@ -4,7 +4,7 @@ import type {
   DocsNavigation as DocsNavigationValue,
 } from "@taxkit/docs-content/schemas";
 import { Array, Match, Option, Result, pipe } from "effect";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import {
   DocsRecoverableError,
@@ -16,6 +16,7 @@ import { loadDocsPage } from "#/lib/docs/loaders";
 import { docsPageRouteBoundary } from "#/lib/docs/route-boundary";
 import { MdxDocument } from "#/lib/mdx/client-loader";
 import { requestDocsNavigationFocus } from "#/lib/navigation-focus";
+import { useHydrated } from "#/lib/use-hydrated";
 
 type DocsPageRouteError = Result.Result.Failure<
   ReturnType<typeof docsPageRouteBoundary.restore>
@@ -188,12 +189,8 @@ const DocsPageContainer = ({
   navigation: DocsNavigationValue;
   page: DocsContentPage;
 }>) => {
-  const [interactive, setInteractive] = useState(false);
+  const interactive = useHydrated();
   const [navigationOpen, setNavigationOpen] = useState(false);
-
-  useEffect(() => {
-    setInteractive(true);
-  }, []);
 
   const toggleNavigation = () => {
     const opening = !navigationOpen;
@@ -235,7 +232,7 @@ const DocsPageContainer = ({
 };
 
 export const Route = createFileRoute("/$")({
-  component() {
+  component: function DocsPageRoute() {
     const loaderData = Route.useLoaderData();
     const router = useRouter();
     const routeResult = docsPageRouteBoundary.restore(loaderData);

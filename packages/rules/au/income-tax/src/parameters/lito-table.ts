@@ -75,8 +75,8 @@ export const LitoArtifact2025_26 = new SourceArtifact({
   ),
   documentVersion: "2025-26",
   extract: new SourceExtract({
+    rowContract: "LitoBracket[]",
     rowCount: 4,
-    shape: "LitoBracket[]",
   }),
   retrievedOn: isoDate("2026-05-12"),
   source: LitoSource2025_26,

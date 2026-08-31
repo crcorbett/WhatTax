@@ -19,7 +19,7 @@ export {
 } from "./metadata.js";
 export {
   PublicCalculatorService,
-  type PublicCalculatorServiceShape,
+  type PublicCalculatorServiceContract,
 } from "./service.js";
 export { PublicCalculatorServiceLive } from "./live.layer.js";
 export {

@@ -20,7 +20,7 @@ const logicalIdTagPrefix = "alchemy:id:";
 
 const decode = <A>(
   schema: Schema.ConstraintDecoder<A>,
-  value: unknown,
+  value: typeof Schema.Unknown.Type,
   target: string
 ) =>
   Schema.decodeUnknownEffect(schema, { onExcessProperty: "ignore" })(
@@ -228,13 +228,13 @@ const readInventory = Effect.fn("DocsDeploymentInventory.read")(function* () {
   } satisfies DocsDeploymentInventoryReport;
 });
 
-export interface DocsDeploymentInventoryShape {
+export interface DocsDeploymentInventoryContract {
   readonly read: () => ReturnType<typeof readInventory>;
 }
 
 export class DocsDeploymentInventory extends Context.Service<
   DocsDeploymentInventory,
-  DocsDeploymentInventoryShape
+  DocsDeploymentInventoryContract
 >()("taxkit/DocsDeploymentInventory") {}
 
 export const DocsDeploymentInventoryLive = Layer.succeed(

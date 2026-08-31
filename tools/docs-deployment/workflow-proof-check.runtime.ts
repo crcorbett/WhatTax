@@ -60,7 +60,7 @@ export const checkWorkflowProof = Effect.gen(function* workflowProofCheck() {
   const expectedPreviewPrNumber =
     config.TAXKIT_WORKFLOW_STAGE === "prod"
       ? null
-      : Number.parseInt(config.TAXKIT_WORKFLOW_STAGE.slice("pr-".length), 10);
+      : Math.trunc(Number(config.TAXKIT_WORKFLOW_STAGE.slice("pr-".length)));
   const mismatch = [
     provider.accountId !== hosted.accountId,
     provider.stateStoreId !== hosted.stateStoreId,

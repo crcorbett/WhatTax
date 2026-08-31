@@ -69,8 +69,8 @@ export const MedicareLevyArtifact2025_26 = new SourceArtifact({
   ),
   documentVersion: "2025-26",
   extract: new SourceExtract({
+    rowContract: "MedicareLevyTable",
     rowCount: 1,
-    shape: "MedicareLevyTable",
   }),
   retrievedOn: isoDate("2026-05-12"),
   source: MedicareLevySource2025_26,

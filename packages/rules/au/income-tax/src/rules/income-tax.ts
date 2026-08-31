@@ -53,7 +53,7 @@ const findBracket = (
  * Formula: tax = baseTaxCents + rate * (incomeCents - thresholdCents)
  * Rounding: nearest cent (ATO truncates; validation uses nearest for simplicity).
  *
- * @throws CalculationError when no income tax bracket covers the input income.
+ * @throws {CalculationError} When no income tax bracket covers the input income.
  * @since 0.1.0
  */
 export const IncomeTaxLive = Layer.effect(IncomeTaxComponentFact)(

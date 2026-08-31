@@ -30,7 +30,7 @@ type RedactionMode =
   | "normal";
 
 const sensitiveMarker =
-  /(^|[\s"'=(]|file:\/\/|[A-Za-z][A-Za-z0-9_.-]*:)(?:\/(?:Users|home)\/|\/[A-Za-z]:\/(?:Users|home)\/|[A-Za-z]:[\\/](?:Users|home)[\\/]|\\\\[^\\/\s]+[\\/](?:Users|home)[\\/])|ghp_|github_pat_|sk-|\b(?:authorization|token|api[_-]?key|secret|password|bearer)\b/iu;
+  /(?<homeBoundary>^|[\s"'=(]|file:\/\/|[A-Za-z][A-Za-z0-9_.-]*:)(?:\/(?:Users|home)\/|\/[A-Za-z]:\/(?:Users|home)\/|[A-Za-z]:[\\/](?:Users|home)[\\/]|\\\\[^\\/\s]+[\\/](?:Users|home)[\\/])|ghp_|github_pat_|sk-|\b(?:authorization|token|api[_-]?key|secret|password|bearer)\b/iu;
 
 export const makeReleaseOutputRedactor = () => {
   let mode: RedactionMode = "normal";
@@ -96,7 +96,7 @@ export const makeReleaseOutputRedactor = () => {
         output += pending.slice(0, marker.index);
         pending = pending.slice(marker.index + marker[0].length);
         const normalizedMarker = marker[0].toLowerCase();
-        const [, homeBoundary] = marker;
+        const homeBoundary = marker.groups?.["homeBoundary"];
         if (homeBoundary !== undefined) {
           output += `${homeBoundary}<home>`;
           mode = "home-user";

@@ -10,7 +10,7 @@ import type { RepositoryRelativeFile } from "./schemas.js";
 
 const homeDirectoryName = ["Us", "ers"].join("");
 const checkoutDirectoryName = ["Pro", "jects"].join("");
-const httpsReference = new RegExp("https://[^\\s)\\]}>]+", "gu");
+const httpsReference = /https:\/\/[^\s)\]}>]+/gu;
 const homeFileUrl = new RegExp(
   `file:///(?:${homeDirectoryName}|home)/[^/\\s]+(?:/|$)`,
   "u"
@@ -126,7 +126,7 @@ export const renderRepositoryPathReport = (
     )
   );
 
-export const makeRepositoryPathReport = (options: {
+export const createRepositoryPathReport = (options: {
   readonly binaryFiles: number;
   readonly findings: Iterable<RepositoryPathFinding>;
   readonly textFiles: number;

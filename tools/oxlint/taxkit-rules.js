@@ -1,5 +1,6 @@
-import { resolve } from "node:path";
+import nodePath from "node:path";
 
+const { resolve } = nodePath;
 const noTypeof = {
   create(context) {
     return {
@@ -140,7 +141,7 @@ const noNullishComparison = {
   },
 };
 
-const isConditionalShape = (node) =>
+const isConditionalObjectSpread = (node) =>
   node?.type === "ConditionalExpression" || node?.type === "LogicalExpression";
 
 const noConditionalObjectSpread = {
@@ -149,7 +150,7 @@ const noConditionalObjectSpread = {
       SpreadElement(node) {
         if (
           node.parent?.type === "ObjectExpression" &&
-          isConditionalShape(node.argument)
+          isConditionalObjectSpread(node.argument)
         ) {
           context.report({
             messageId: "noConditionalObjectSpread",

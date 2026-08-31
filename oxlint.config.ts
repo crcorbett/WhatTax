@@ -3,6 +3,16 @@ import core from "ultracite/oxlint/core";
 import react from "ultracite/oxlint/react";
 import remix from "ultracite/oxlint/remix";
 
+const taxkitReact = {
+  ...react,
+  rules: {
+    ...react.rules,
+    // Effect Match and Result callbacks return JSX inline but do not define
+    // stateful React components. Keep the rule for actual nested components.
+    "react/no-unstable-nested-components": ["error", { allowAsProps: true }],
+  },
+};
+
 const decodingBoundaryFiles = [
   // Application configuration, executable smoke checks and checked examples.
   "apps/api/src/config.ts",
@@ -26,6 +36,7 @@ const decodingBoundaryFiles = [
   "packages/docs-content/src/validation/mdx-component-policy.ts",
   "packages/docs-content/src/validation/policy.runtime.test.ts",
   "packages/docs-content/src/validation/policy.ts",
+  "packages/docs-fumadocs/src/code-block-meta.ts",
   "packages/docs-fumadocs/src/live.layer.ts",
   "packages/docs-fumadocs/src/test.layer.ts",
   "packages/docs-fumadocs/src/config.ts",
@@ -356,22 +367,39 @@ const bunRuntimeEntrypointFiles = [
 ];
 
 export default defineConfig({
-  extends: [core, react, remix],
+  extends: [core, taxkitReact, remix],
   ignorePatterns: [
+    ".agents/**",
+    ".claude/**",
     "apps/web/src/routeTree.gen.ts",
     "dist/**",
     ".output/**",
     ".tanstack/**",
     ".turbo/**",
     ".vercel/**",
+    "tools/oxlint/anti-slop/**",
   ],
   jsPlugins: [
     "./tools/oxlint/bun-rules.js",
     "./tools/oxlint/effect-rules.js",
     "./tools/oxlint/mdx-rules.js",
     "./tools/oxlint/taxkit-rules.js",
+    {
+      name: "anti-slop",
+      specifier: "./tools/oxlint/anti-slop/index.ts",
+    },
+    {
+      name: "anti-slop-effect",
+      specifier: "./tools/oxlint/anti-slop/effect/index.ts",
+    },
   ],
   overrides: [
+    {
+      files: ["**/*.{ts,tsx,mts,cts}"],
+      rules: {
+        "no-redeclare": "off",
+      },
+    },
     {
       files: portableEffectSourceFiles,
       rules: {
@@ -425,6 +453,7 @@ export default defineConfig({
       ],
       rules: {
         "effect/no-effect-test-global-mix": "error",
+        "effect/no-module-level-mutable-test-state": "error",
       },
     },
     {
@@ -495,6 +524,22 @@ export default defineConfig({
     },
   ],
   rules: {
+    "anti-slop-effect/no-service-constructor-imports": "error",
+    "anti-slop/no-chained-type-assertions": "error",
+    "anti-slop/no-conditional-empty-object-spread": "error",
+    "anti-slop/no-known-value-widening": "error",
+    "anti-slop/no-module-mocking": "error",
+    "anti-slop/no-object-parameters": "error",
+    "anti-slop/no-reflect-apply": "error",
+    "anti-slop/no-reflect-get": "error",
+    "anti-slop/no-runtime-typeof": "error",
+    "anti-slop/no-shape-in-symbol-names": "error",
+    "anti-slop/no-unknown-parameters": "error",
+    "anti-slop/no-unknown-returns": "error",
+    "anti-slop/no-unknown-type-aliases": "error",
+    "anti-slop/no-unsafe-dictionary-type": "error",
+    "anti-slop/no-widen-then-assert": "error",
+    "anti-slop/require-safety-comment-for-type-assertion": "error",
     "bun/no-host-api-outside-adapters": "error",
     "bun/no-runtime-outside-entrypoints": "error",
     "effect/no-console-outside-runtime": "error",

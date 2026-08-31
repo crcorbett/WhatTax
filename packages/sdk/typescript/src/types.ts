@@ -8,6 +8,8 @@ import type {
 import { Schema } from "effect";
 import type { Effect } from "effect";
 
+type UntrustedCalculatorOutput = typeof Schema.Unknown.Type;
+
 export interface SdkCalculation<
   Id extends CalculatorId,
   Jurisdiction extends CalculatorJurisdiction,
@@ -17,7 +19,7 @@ export interface SdkCalculation<
 > {
   readonly calculatorId: Id;
   readonly decodeOutput: (
-    output: unknown
+    output: UntrustedCalculatorOutput
   ) => Effect.Effect<OutputSchema["Type"], Schema.SchemaError>;
   readonly inputSchema: InputSchema;
   readonly jurisdiction: Jurisdiction;

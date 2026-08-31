@@ -77,8 +77,8 @@ export type SourceChecksum = typeof SourceChecksum.Type;
 export class SourceExtract extends Schema.TaggedClass<SourceExtract>()(
   "SourceExtract",
   {
+    rowContract: Schema.String,
     rowCount: Schema.Int,
-    shape: Schema.String,
   }
 ) {}
 
@@ -115,9 +115,9 @@ export interface TraceNode {
   readonly _tag: "TraceNode";
   readonly ruleId: RuleId;
   readonly title: string;
-  readonly inputs: Readonly<Record<string, unknown>>;
+  readonly inputs: Readonly<Record<string, Schema.Json>>;
   readonly formula?: string | undefined;
-  readonly result: unknown;
+  readonly result: Schema.Json;
   readonly rounding?: RoundingMode | undefined;
   readonly sources: readonly SourceRef[];
   readonly children: readonly TraceNode[];
@@ -132,9 +132,9 @@ export interface TraceNodeEncoded {
   readonly _tag: "TraceNode";
   readonly ruleId: string;
   readonly title: string;
-  readonly inputs: Readonly<Record<string, unknown>>;
+  readonly inputs: Readonly<Record<string, Schema.Json>>;
   readonly formula?: string | undefined;
-  readonly result: unknown;
+  readonly result: Schema.Json;
   readonly rounding?: typeof RoundingMode.Encoded | undefined;
   readonly sources: readonly (typeof SourceRef.Encoded)[];
   readonly children: readonly TraceNodeEncoded[];
@@ -151,8 +151,8 @@ export const TraceNode: Schema.Codec<TraceNode, TraceNodeEncoded> =
       Schema.suspend((): Schema.Codec<TraceNode, TraceNodeEncoded> => TraceNode)
     ),
     formula: Schema.optional(Schema.String),
-    inputs: Schema.Record(Schema.String, Schema.Unknown),
-    result: Schema.Unknown,
+    inputs: Schema.Record(Schema.String, Schema.Json),
+    result: Schema.Json,
     rounding: Schema.optional(RoundingMode),
     ruleId: RuleId,
     sources: Schema.Array(SourceRef),

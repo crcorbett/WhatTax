@@ -62,7 +62,7 @@ const findRow = (
 /**
  * Current STSL component using ATO Schedule 8 marginal component rows.
  *
- * @throws CalculationError when no Schedule 8 row covers the weekly-equivalent amount.
+ * @throws {CalculationError} When no Schedule 8 row covers the weekly-equivalent amount.
  * @since 0.1.0
  */
 export const StslComponentLive = Layer.effect(StslComponentFact)(

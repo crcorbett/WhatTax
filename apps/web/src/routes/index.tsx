@@ -5,7 +5,7 @@ import { Effect } from "effect";
 import { getRouteRuntime } from "#/lib/route-runtime";
 
 export const Route = createFileRoute("/")({
-  component() {
+  component: function HomeRoute() {
     const health = Route.useLoaderData();
 
     return (

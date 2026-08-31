@@ -5,6 +5,8 @@ import {
   AnnualTaxScenarioLiveFromInput,
 } from "./annual-tax.js";
 
+type UntrustedAnnualTaxScenario = typeof Schema.Unknown.Type;
+
 /**
  * Builds the public unknown-input scenario boundary for annual taxable income.
  *
@@ -12,7 +14,7 @@ import {
  * @returns A layer providing `AnnualTaxableIncomeFact`.
  * @since 0.1.0
  */
-export const AnnualTaxScenarioLive = (input: unknown) =>
+export const AnnualTaxScenarioLive = (input: UntrustedAnnualTaxScenario) =>
   Layer.unwrap(
     Schema.decodeUnknownEffect(AnnualTaxScenarioInputSchema)(input).pipe(
       Effect.map(AnnualTaxScenarioLiveFromInput)

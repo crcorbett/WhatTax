@@ -54,12 +54,16 @@ describe("docs route boundary", () => {
   });
 
   test("round-trips every expected docs failure", async () => {
-    for (const error of expectedErrors) {
-      const encoded = await Effect.runPromise(
-        docsHomeRouteBoundary.encodeExit(Effect.fail(error))
-      );
-      const result = docsHomeRouteBoundary.restore(encoded);
+    const cases = await Promise.all(
+      expectedErrors.map(async (error) => {
+        const encoded = await Effect.runPromise(
+          docsHomeRouteBoundary.encodeExit(Effect.fail(error))
+        );
+        return { error, result: docsHomeRouteBoundary.restore(encoded) };
+      })
+    );
 
+    for (const { error, result } of cases) {
       expect(Result.isFailure(result)).toBe(true);
       if (Result.isFailure(result)) {
         expect(result.failure._tag).toBe(error._tag);
@@ -86,11 +90,16 @@ describe("docs route boundary", () => {
       Cause.combine(Cause.fail(expectedFailure), Cause.interrupt(102)),
     ];
 
-    for (const cause of causes) {
-      const exit = await Effect.runPromiseExit(
-        docsHomeRouteBoundary.encodeExit(Effect.failCause(cause))
-      );
+    const exits = await Promise.all(
+      causes.map(async (cause) => ({
+        cause,
+        exit: await Effect.runPromiseExit(
+          docsHomeRouteBoundary.encodeExit(Effect.failCause(cause))
+        ),
+      }))
+    );
 
+    for (const { cause, exit } of exits) {
       expect(Exit.isFailure(exit)).toBe(true);
       if (Exit.isFailure(exit)) {
         expect(Equal.equals(exit.cause, cause)).toBe(true);
@@ -123,11 +132,16 @@ describe("docs route boundary", () => {
       },
     ];
 
-    for (const { cause, message } of invalidCauses) {
-      const exit = await Effect.runPromiseExit(
-        docsHomeRouteBoundary.encodeExit(Effect.failCause(cause))
-      );
+    const exits = await Promise.all(
+      invalidCauses.map(async ({ cause, message }) => ({
+        exit: await Effect.runPromiseExit(
+          docsHomeRouteBoundary.encodeExit(Effect.failCause(cause))
+        ),
+        message,
+      }))
+    );
 
+    for (const { exit, message } of exits) {
       expect(Exit.isFailure(exit)).toBe(true);
       if (Exit.isFailure(exit)) {
         expect(Cause.hasDies(exit.cause)).toBe(true);

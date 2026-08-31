@@ -40,7 +40,7 @@ const overlayBySkill = new Map([
   ["package-structure", "references/repository-profile.md"],
 ]);
 const referenceSkillIds = [...canonicalSkillIds, "docs-writer"];
-const markdownLink = /\[[^\]]*\]\(([^)]+)\)/gu;
+const markdownLink = /\[[^\]]*\]\((?<target>[^)]+)\)/gu;
 const absoluteUserPath = /(?:file:\/\/)?\/(?:Users|home)\/[^/\s)]+\//gu;
 
 const sha256 = (source: string | Uint8Array) =>
@@ -165,7 +165,7 @@ const inspectLink = (repositoryRoot: string, name: string) =>
 
 const markdownTargets = (source: string) =>
   Array.fromIterable(source.matchAll(markdownLink))
-    .map((match) => match[1] ?? "")
+    .map((match) => match.groups?.["target"] ?? "")
     .map((target) => target.replaceAll(/^<|>$/gu, "").split(/\s+/u)[0] ?? "")
     .map((target) => target.split("#")[0] ?? "")
     .filter(

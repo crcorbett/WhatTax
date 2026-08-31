@@ -82,8 +82,8 @@ export const IncomeTaxArtifact2025_26 = new SourceArtifact({
   ),
   documentVersion: "2025-26",
   extract: new SourceExtract({
+    rowContract: "IncomeTaxBracket[]",
     rowCount: 5,
-    shape: "IncomeTaxBracket[]",
   }),
   retrievedOn: isoDate("2026-05-12"),
   source: IncomeTaxSource2025_26,

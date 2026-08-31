@@ -398,7 +398,7 @@ const getRouteJson = <RouteSchema extends Schema.Top>(
 
 const postRouteJson = <RouteSchema extends Schema.Top>(
   path: string,
-  body: unknown,
+  body: Schema.Json,
   schema: RouteSchema
 ) => {
   const route = `POST ${path}`;
@@ -443,6 +443,7 @@ const calculateRequestBody = Schema.decodeUnknownEffect(CalculatorRunRequest)({
   taxYear: "2025-26",
 }).pipe(
   Effect.flatMap(Schema.encodeUnknownEffect(CalculatorRunRequest)),
+  Effect.flatMap(Schema.decodeUnknownEffect(Schema.Json)),
   Effect.mapError(
     (cause) =>
       new SmokeRouteError({

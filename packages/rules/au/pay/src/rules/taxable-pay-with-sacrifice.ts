@@ -22,7 +22,7 @@ export const TaxablePayWithSacrificeRuleId = RuleId.make(
  * one or the other. Period mismatch between gross and sacrifice fails the
  * effect — pre-rate-table conversion is not a concern of this implementation.
  *
- * @throws CalculationError when gross pay and salary sacrifice periods differ.
+ * @throws {CalculationError} When gross pay and salary sacrifice periods differ.
  * @since 0.1.0
  */
 export const TaxablePayWithSacrificeLive = Layer.effect(TaxablePayFact)(

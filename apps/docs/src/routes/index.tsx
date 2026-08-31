@@ -61,7 +61,7 @@ const DocsHomeContent = ({
 );
 
 export const Route = createFileRoute("/")({
-  component() {
+  component: function DocsHomeRoute() {
     const loaderData = Route.useLoaderData();
     const router = useRouter();
     const routeResult = docsHomeRouteBoundary.restore(loaderData);

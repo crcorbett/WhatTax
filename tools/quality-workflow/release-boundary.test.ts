@@ -11,12 +11,13 @@ import {
   writeFile,
 } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { dirname, join } from "node:path";
+import nodePath from "node:path";
 
 import { Effect, Schema } from "effect";
 
 import { ReleaseBoundaryFixtureCorpus } from "./schemas.js";
 
+const { dirname, join } = nodePath;
 const repositoryRoot = new URL("../..", import.meta.url).pathname;
 const fixtures = Effect.runSync(
   Schema.decodeUnknownEffect(
@@ -72,18 +73,21 @@ const prepareWorkspace = async () => {
     "--exclude-standard",
   ]);
   expect(inventory.exitCode).toBe(0);
-  for (const relativePath of inventory.stdout.trim().split("\n")) {
-    if (relativePath.length === 0) {
-      continue;
-    }
-    const destination = join(workspace, relativePath);
-    await mkdir(dirname(destination), { recursive: true });
-    const source = join(repositoryRoot, relativePath);
-    const sourceStat = await lstat(source);
-    await (sourceStat.isSymbolicLink()
-      ? readlink(source).then((link) => symlink(link, destination))
-      : copyFile(source, destination));
-  }
+  await Promise.all(
+    inventory.stdout
+      .trim()
+      .split("\n")
+      .filter((relativePath) => relativePath.length > 0)
+      .map(async (relativePath) => {
+        const destination = join(workspace, relativePath);
+        await mkdir(dirname(destination), { recursive: true });
+        const source = join(repositoryRoot, relativePath);
+        const sourceStat = await lstat(source);
+        await (sourceStat.isSymbolicLink()
+          ? readlink(source).then((link) => symlink(link, destination))
+          : copyFile(source, destination));
+      })
+  );
   const install = await run(workspace, "bun", [
     "install",
     "--offline",
@@ -105,18 +109,22 @@ const prepareWorkspace = async () => {
   ] as const;
   const scope = join(workspace, "node_modules", "@taxkit");
   await mkdir(scope, { recursive: true });
-  for (const [name, packageRoot] of workspacePackages) {
-    const alias = join(scope, name);
-    await rm(alias, { force: true, recursive: true });
-    await symlink(join("..", "..", packageRoot), alias, "dir");
-  }
+  await Promise.all(
+    workspacePackages.map(async ([name, packageRoot]) => {
+      const alias = join(scope, name);
+      await rm(alias, { force: true, recursive: true });
+      await symlink(join("..", "..", packageRoot), alias, "dir");
+    })
+  );
   const apiScope = join(workspace, "apps", "api", "node_modules", "@taxkit");
   await mkdir(apiScope, { recursive: true });
-  for (const [name, packageRoot] of workspacePackages) {
-    const alias = join(apiScope, name);
-    await rm(alias, { force: true, recursive: true });
-    await symlink(join("..", "..", "..", "..", packageRoot), alias, "dir");
-  }
+  await Promise.all(
+    workspacePackages.map(async ([name, packageRoot]) => {
+      const alias = join(apiScope, name);
+      await rm(alias, { force: true, recursive: true });
+      await symlink(join("..", "..", "..", "..", packageRoot), alias, "dir");
+    })
+  );
   return workspace;
 };
 
@@ -168,7 +176,7 @@ const expected = {
 
 describe("HGI-205 isolated release-boundary mutations", () => {
   test("executes every real owning command and retains exact failure identity", async () => {
-    for (const fixture of fixtures) {
+    const runFixture = async (fixture: (typeof fixtures)[number]) => {
       const workspace = await prepareWorkspace();
       try {
         const contract = expected[fixture.id];
@@ -222,6 +230,18 @@ describe("HGI-205 isolated release-boundary mutations", () => {
       } finally {
         await rm(workspace, { force: true, recursive: true });
       }
-    }
+    };
+    const runFixtures = async (
+      remaining: readonly (typeof fixtures)[number][]
+    ): Promise<void> => {
+      const [fixture, ...rest] = remaining;
+      if (fixture === undefined) {
+        return;
+      }
+      await runFixture(fixture);
+      await runFixtures(rest);
+    };
+
+    await runFixtures(fixtures);
   }, 300_000);
 });

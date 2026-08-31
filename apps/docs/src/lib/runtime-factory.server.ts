@@ -8,16 +8,16 @@ export const DocsRuntimeProbeSnapshot = Schema.Struct({
 });
 export type DocsRuntimeProbeSnapshot = typeof DocsRuntimeProbeSnapshot.Type;
 
-export interface DocsRuntimeProbeShape {
+export interface DocsRuntimeProbeContract {
   readonly read: Effect.Effect<DocsRuntimeProbeSnapshot>;
 }
 
 export class DocsRuntimeProbe extends Context.Service<
   DocsRuntimeProbe,
-  DocsRuntimeProbeShape
+  DocsRuntimeProbeContract
 >()("taxkit/DocsRuntimeProbe") {}
 
-export const makeDocsRuntimeProbeLayer = (
+export const createDocsRuntimeProbeLayer = (
   makeIsolateId: Effect.Effect<string>
 ) =>
   Layer.effect(
@@ -34,7 +34,7 @@ export const makeDocsRuntimeProbeLayer = (
     })
   );
 
-export const makeDocsRuntime = <E, E2>(
+export const createDocsRuntime = <E, E2>(
   contentLayer: Layer.Layer<DocsContentService, E, never>,
   probeLayer: Layer.Layer<DocsRuntimeProbe, E2, never>
 ) => ManagedRuntime.make(Layer.merge(contentLayer, probeLayer));

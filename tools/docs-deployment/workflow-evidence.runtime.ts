@@ -1,6 +1,6 @@
 import * as BunRuntime from "@effect/platform-bun/BunRuntime";
 import * as BunServices from "@effect/platform-bun/BunServices";
-import { Config, Console, Effect, Match } from "effect";
+import { Config, Console, Effect, Match, Schema } from "effect";
 
 import {
   writeBootstrapWorkflowEvidence,
@@ -70,7 +70,7 @@ export const runWorkflowEvidence = Effect.gen(function* workflowEvidence() {
 
 const program = runWorkflowEvidence.pipe(
   Effect.tap((value) =>
-    typeof value === "string" ? Console.log(value) : Effect.void
+    Schema.is(Schema.String)(value) ? Console.log(value) : Effect.void
   ),
   Effect.tapErrorTag("WorkflowEvidenceConfigError", (error) =>
     Console.error(
