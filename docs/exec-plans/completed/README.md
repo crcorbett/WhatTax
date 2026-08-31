@@ -16,6 +16,7 @@ evidence remains useful.
 
 Completed plans:
 
+- [Doppler configuration governance](./doppler-configuration-governance.md)
 - [Alchemy deployment structure corrections](./alchemy-deployment-structure-corrections.md)
 - [Automatic Preview Teardown Admission](./automatic-preview-teardown-admission.md)
 - [Shared Dependency Cache and Checkout Upgrade](./shared-dependency-cache-and-checkout.md)

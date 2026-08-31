@@ -60,7 +60,7 @@ exists. The earlier failed capability and re-auth receipts remain unchanged.
 
 ## 2026-08-31 Doppler bootstrap precondition
 
-The sanitized
+The sanitised
 `2026-08-31-doppler-bootstrap-precondition/receipt.json` records the exact PR
 head, missing TaxKit Doppler project and GitHub bridges, retained direct secret
 names, measured account-owned Cloudflare permission groups and the failed
@@ -109,6 +109,21 @@ prove a served Preview, hosted fork behaviour, Production, rollback, DNS,
 publication or legacy-credential removal. The Alchemy bootstrap step was
 mutation-capable under the approved envelope, although no stage Worker or state
 resource needed deletion.
+
+## 2026-08-31 Doppler hard cutover
+
+The sanitized
+[`2026-08-31-doppler-hard-cutover/receipt.json`](./2026-08-31-doppler-hard-cutover/receipt.json)
+records Cooper's hard-cutover approval, deletion of the six direct GitHub
+entries and revocation of the eight old TaxKit CI inventory/mutation
+Cloudflare tokens. Names-only readback found only the three Doppler bridges,
+the four locked TaxKit configs and the three intended current Cloudflare
+tokens. No secret value, hash, preview, raw provider output, cache or local path
+is retained.
+
+This proves metadata deletion and absence for the named targets only. It does
+not prove a served Preview, hosted fork, Production, rollback, DNS,
+publication or package release.
 
 ## Local workerd
 

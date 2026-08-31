@@ -135,11 +135,11 @@ config through the pinned Doppler action after every cache save, check the safe
 project/config identity, and pass only the named Turbo outputs to the canonical
 release step. Same-repository pull requests and `main` may read and write
 Vercel Remote Cache. Fork pull requests do not fetch Doppler and run the same
-full command graph with local cache only. Local remote-cache use remains an
-explicit developer choice through `TURBO_TOKEN` and `TURBO_TEAM`. Never commit
-either credential or treat a cache hit as test, release, deployment or public
-availability proof. The hosted trusted path remains unproved until the
-repository `DOPPLER_CI_TOKEN` bridge is separately created and read back.
+full command graph with local cache only. Local repository commands use local
+cache and do not have a supported direct Turbo credential path. Never put a
+cache credential in the shell, source or an env file, and never treat a cache
+hit as test, release, deployment or public-availability proof. The repository
+`DOPPLER_CI_TOKEN` bridge is the sole hosted Turbo source.
 
 Quality also keeps separate GitHub caches for Bun package downloads and the
 Playwright Chromium binary. It does not cache `node_modules`: current warm
@@ -160,8 +160,9 @@ only to exact provider steps. Production uses its separate protected
 `taxkit/prd` bridge and keeps its fixed `prod` plan/deploy/rollback controls.
 All deployment and receipt uploads use separate allowlisted directories so raw
 runner output is not retained. The TaxKit Doppler configs and GitHub bridges
-are still pending separately approved bootstrap, so this is repository
-behaviour rather than hosted proof.
+are established. Merged-main Quality and exact absent-stage teardown proof are
+recorded in the deployment evidence index; that evidence does not claim a
+served Preview or Production deployment under this credential epoch.
 
 Package-facing changes must include a Changeset. Use `bun run changeset` during
 implementation to record the user-facing package impact, and use

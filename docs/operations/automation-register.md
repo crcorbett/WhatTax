@@ -42,10 +42,10 @@ external-state authority. A green local or hosted result does not establish
 that GitHub ran, nor any tag, registry, deployment, provider or public
 availability consequence.
 
-The register describes repository desired state. The TaxKit Doppler config and
-GitHub bridge are not yet established, so no hosted trusted-run claim is made.
-Creating that bridge, proving it and later removing retained direct Turbo
-values are separate operations under the authority model.
+The TaxKit Doppler configs and GitHub bridges are established. Merged-main
+Quality proved the trusted `taxkit/ci` path at an exact revision. The retained
+direct Turbo secret and variable were then removed under the dated hard-cutover
+receipt. Hosted fork behaviour remains unproved.
 
 The distinct docs deployment owner is
 [`tools/docs-deployment/automation-register.json`](../../tools/docs-deployment/automation-register.json).

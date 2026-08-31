@@ -14,16 +14,12 @@ tombstone: false
 Live implementation plans belong here while work is in progress. Maintainer
 lifecycle is owned by [`../../README.md`](../../README.md).
 
-The active
-[Doppler configuration governance](./doppler-configuration-governance.md)
-plan owns the current research, required PRD review, ordered repository slices
-and closeout. Repository implementation through DCG-004 is accepted and the
-separately approved TaxKit-only Doppler, Cloudflare-token and GitHub-bridge
-bootstrap is complete. PR 73 is merged, merged-main Quality passed, and the
-separately approved automatic `pr-73` absent-stage teardown passed with
-independent receipt and provider readback. Hosted fork proof, Preview
-deployment, Production/rollback and legacy-credential cleanup remain bounded
-by their own proof or authority requirements.
+The implemented
+[Doppler configuration governance](../../product-specs/doppler-configuration-governance.md)
+SPEC and its [completed plan](../completed/doppler-configuration-governance.md)
+record the reviewed repository slices, bootstrap, merged-main proof and hard
+cutover. Hosted fork, served Preview and Production/rollback remain bounded
+non-claims rather than active repository work.
 
 The implemented
 [Alchemy deployment structure corrections](../../product-specs/alchemy-deployment-structure-corrections.md)

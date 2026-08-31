@@ -3,7 +3,7 @@ document_type: authority-model
 lifecycle: current
 authority: canonical
 owner: taxkit-authority-model-owner
-last_reviewed: 2026-08-28
+last_reviewed: 2026-08-31
 review_trigger: identity, release, Git, registry, deployment, provider, credential, or recovery change
 ---
 
@@ -48,22 +48,34 @@ coherent commits and pull-request/merge work after required checks. It does not
 authorise creating, changing, rotating, revoking or deleting a Doppler project,
 config, service token or secret, or a GitHub or Cloudflare credential.
 
-The pending provider operation must name Cooper or another approved TaxKit
-operator as principal; Doppler project `taxkit` and only configs `dev`, `ci`,
-`stg_preview` and `prd`; repository `DOPPLER_CI_TOKEN`; the separate Preview
-and Production environment `DOPPLER_PROVIDER_TOKEN` bridges; read-only,
-expiring, single-config access; masked named values; the exact environment and
-duration; bridge disablement and repository revert; and names-only config,
-scope, expiry, GitHub metadata, workflow and provider readback. Preview and
-Production are separate operations when their authority differs.
+The later dated receipts record the separately approved bootstrap and hard
+cutover. They do not create standing credential authority. Any future token,
+bridge, config or provider mutation must still name Cooper or another approved
+TaxKit operator, the exact config and environment, least privilege, expiry,
+rollback, revocation owner and names-only readback. Preview and Production are
+separate operations when their authority differs.
 
-Stop before that mutation while any principal, scope, expiry, Cloudflare
-permission measurement, rollback, revocation owner or readback is missing. Do
-not retrieve or record a value. Retained direct GitHub values may stay unused
-during migration recovery, but their removal needs separate approval after
-merged-main replacement proof. A locally green workflow proves repository
+Do not retrieve or record a value. A locally green workflow proves repository
 shape only; it does not prove a Doppler config, bridge, hosted run or provider
 result.
+
+## 2026-08-31 — Doppler hard cutover
+
+Cooper approved removal of the old direct credential paths as a hard cutover.
+The operation deleted repository `TURBO_TOKEN` and `TURBO_TEAM`, deleted the
+direct Cloudflare pair from the Preview and Production GitHub environments,
+and revoked the eight old TaxKit CI inventory/mutation Cloudflare tokens dated
+4 or 9 August 2026. Names-only readback found only the repository
+`DOPPLER_CI_TOKEN`, the two environment `DOPPLER_PROVIDER_TOKEN` bridges and
+the three active TaxKit Cloudflare tokens dated 31 August 2026.
+
+Recovery must stay Doppler-only. Replace and prove the narrow token for the
+same config, update only its matching bridge, read back metadata and then
+revoke the failed token. Do not recreate a direct Turbo or Cloudflare GitHub
+value. The sanitised receipt is
+[`../evidence/deployments/2026-08-31-doppler-hard-cutover/receipt.json`](../evidence/deployments/2026-08-31-doppler-hard-cutover/receipt.json).
+It grants no deployment, DNS, publication, package release or unrelated
+provider authority.
 
 ## 2026-08-20 — Vercel Remote Cache qualification
 

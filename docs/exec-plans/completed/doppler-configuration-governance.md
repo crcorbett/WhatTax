@@ -1,6 +1,6 @@
 ---
 document_type: execution-plan
-lifecycle: current
+lifecycle: historical
 authority: canonical
 owner: taxkit-platform-owner
 last_reviewed: 2026-08-31
@@ -48,13 +48,20 @@ Separately approved and completed on 31 August 2026:
 - one repository-scoped personal Doppler login plus value-free metadata and
   non-deploying credential checks.
 
+The final hard-cutover operation was separately approved and completed on 31
+August 2026:
+
+- repository `TURBO_TOKEN` and `TURBO_TEAM` removed;
+- direct Cloudflare values removed from Preview and Production;
+- eight old TaxKit CI inventory/mutation Cloudflare tokens revoked; and
+- names-only GitHub, Cloudflare and Doppler readback completed.
+
 Still not approved without a separate exact operation:
 
-- creating, changing, rotating, revoking or deleting a GitHub or Cloudflare
-  credential beyond the completed bootstrap envelope;
+- creating, changing, rotating, revoking or deleting any remaining GitHub,
+  Doppler or Cloudflare credential;
 - provider deployment or mutation beyond the separately authorised existing
   deployment runbook operation;
-- legacy credential removal; or
 - DNS, domain, publication or unrelated deployment changes.
 
 ## Starting identity
@@ -78,7 +85,7 @@ Still not approved without a separate exact operation:
 | DCG-002 | Accepted | Trusted Quality and successful receipt validation use pinned `taxkit/ci` named outputs after cache saves; forks and failed/cancelled receipt paths fetch no credential. |
 | DCG-003 | Accepted | Preview and teardown use only `taxkit/stg_preview`; Preview fetches `taxkit/ci` separately, teardown stays local-only, and all three upload classes use the secret-negative allowlist boundary. |
 | DCG-004 | Accepted | Protected Production and rollback use only `taxkit/prd`, fetch `taxkit/ci` separately after cache saves, and upload only prepared secret-negative plan/provider evidence. |
-| DCG-005 | In progress; further authority pending | PR #73 merged as `aec5e220…`. Exact merged-main Quality run `33365915627` passed. The separately approved automatic `pr-73` teardown run `33365915649` fetched only `taxkit/stg_preview`, accepted equal no-op plans and read back the exact stage and matching Worker absent; receipt reconciliation run `33366004914` passed. Hosted fork, Preview deployment, Production/rollback and legacy removal remain separately bounded. |
+| DCG-005 | Complete | PR #73 merged as `aec5e220…`; merged-main Quality, automatic `pr-73` absent-stage teardown and reconciliation passed. The later hard cutover removed all direct GitHub entries and eight old Cloudflare tokens with names-only readback. Hosted fork, served Preview and Production/rollback remain explicit non-claims, not unfinished repository work. |
 
 ## Research record
 
@@ -532,6 +539,51 @@ same-repository pull request, so hosted fork behaviour is not claimed. Preview,
 Production, rollback, merged-main and legacy-removal proof remain separate
 boundaries.
 
+### DCG-005 — hard cutover on 31 August 2026
+
+Cooper approved removal of the old direct paths as a hard cutover. The
+operation deleted repository `TURBO_TOKEN` and `TURBO_TEAM`, deleted the direct
+Cloudflare pair from each deployment environment, and revoked the eight old
+TaxKit CI inventory/mutation Cloudflare tokens dated 4 or 9 August. Readback
+found only `DOPPLER_CI_TOKEN`, the two environment
+`DOPPLER_PROVIDER_TOKEN` bridges, the four locked TaxKit configs and the three
+intended current Cloudflare tokens.
+
+The sanitised
+[hard-cutover receipt](../../evidence/deployments/2026-08-31-doppler-hard-cutover/receipt.json)
+contains names and non-secret identities only. It does not claim served
+Preview, hosted fork, Production, rollback, DNS, publication or package
+release proof.
+
+Documentation impact is **Change required** for the canonical configuration,
+testing, authority, automation, deployment/recovery runbooks, SPEC/task ledger,
+indexes, evidence route and root README. Historical receipts and negative test
+fixtures are **Preserve**. Alchemy source, application/public package behaviour,
+exports, generated owners, public routes, skills and Changesets are **N/A**.
+
+### Final PRD review outcome
+
+Outcome: **ready after changes**. The review reconciled the SPEC, task ledger
+and hard-cutover receipt against 487 readable docs/JSON owners and 30 repository
+READMEs, with deep reads limited to the current configuration, deployment,
+testing, authority, runbook, index and workflow owners. Historical receipts and
+completed plans were routed as evidence; generated output, dependencies and
+binary assets were excluded. No new upstream research was needed because no
+dependency, SDK, Alchemy graph or provider API contract changed.
+
+| Review surface | Outcome |
+| --- | --- |
+| Effect boundaries and linear composition | Pass; existing typed/redacted consumers are preserved |
+| Helper sprawl and React composition | N/A; no runtime or UI source changed |
+| Testing and operations | Strengthened; hard-cutover absence, recovery and proof limits are exact |
+| Canonical docs, runbooks and root README | Strengthened; direct-source guidance is removed |
+| Lint rules and repository skills | Pass/N/A; existing workflow policies already reject direct bindings and no skill contract changed |
+| Adjacent evidence and lifecycle | Strengthened; sanitised receipt added and SPEC/plan/task lifecycle closed |
+
+There is no unresolved repository decision. Hosted fork, served Preview and
+Production/rollback proof remain bounded non-claims requiring their own
+operation authority; they do not block the completed hard cutover.
+
 ## Versioning
 
 This work changes repository workflows, internal tools and maintainer docs. It
@@ -545,15 +597,12 @@ a normal reviewed revert. The completed credential bootstrap is recovered by
 the exact bridge and token procedures below rather than by deleting provider
 state blindly.
 
-During approved migration overlap, legacy GitHub values are retained but not
-referenced by new source. If the new bridge fails, the operator disables it and
-reverts to the last reviewed direct-source workflow commit, then reads back the
-exact GitHub environment and workflow identity. Mixing both sources in one
-workflow is forbidden.
-
-After replacement proof, legacy removal needs separate approval and metadata
-readback. Alchemy state recovery remains owned by the existing deployment and
-recovery runbooks.
+The migration overlap is closed. If a bridge fails, the operator creates and
+proves a read-only, expiring replacement for the same config, updates only the
+matching GitHub bridge, reads back metadata and then revokes the failed token.
+A reviewed source revert must remain Doppler-only. Direct Turbo or Cloudflare
+GitHub values must not be recreated. Alchemy state recovery remains owned by
+the existing deployment and recovery runbooks.
 
 ## Closeout requirements
 
