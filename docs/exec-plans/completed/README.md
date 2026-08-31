@@ -16,6 +16,7 @@ evidence remains useful.
 
 Completed plans:
 
+- [Oxlint Policy Refresh](./oxlint-policy-refresh.md)
 - [Doppler configuration governance](./doppler-configuration-governance.md)
 - [Alchemy deployment structure corrections](./alchemy-deployment-structure-corrections.md)
 - [Automatic Preview Teardown Admission](./automatic-preview-teardown-admission.md)

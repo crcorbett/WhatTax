@@ -2,7 +2,7 @@
   "$schema": "https://taxkit.local/schemas/product-spec-task-plan.v1.json",
   "spec": "docs/product-specs/oxlint-policy-refresh.md",
   "title": "Oxlint Policy Refresh Implementation Tasks",
-  "status": "active",
+  "status": "implemented",
   "last_reviewed": "2026-08-31",
   "principles": [
     "Keep generic, Effect-specific and TaxKit-specific lint policy under separate owners.",
@@ -78,7 +78,7 @@
   "tasks": [
     {
       "id": "OLP-001",
-      "status": "active",
+      "status": "completed",
       "title": "Refresh and verify TaxKit Oxlint policy",
       "type": "tooling-policy",
       "dependsOn": [],

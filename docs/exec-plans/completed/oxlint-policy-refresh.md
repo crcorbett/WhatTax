@@ -1,11 +1,11 @@
 ---
 document_type: execution-plan
-lifecycle: current
+lifecycle: historical
 authority: supporting
 owner: taxkit-tooling-owner
 last_reviewed: 2026-08-31
 review_trigger: OLP task transition, lint finding, dependency decision, verification result, or closeout
-successor: ../../product-specs/oxlint-policy-refresh.md
+successor: null
 tombstone: false
 ---
 
@@ -39,6 +39,23 @@ Task list:
    ownership and quality documents.
 4. Run the full local proof graph, review the diff, commit, open a pull request,
    wait for hosted Quality, merge and confirm the default-branch identity.
+
+## Closeout
+
+The implementation candidate
+`48384d5da44c25894612c7253003adc677f601dd` passed a frozen install, the full
+test suite, the root verification graph, Changeset status and
+`git diff --check`. Hosted pull-request Quality run `33375644482` then passed
+on that exact candidate.
+
+[Pull request #76](https://github.com/crcorbett/taxkit/pull/76) merged the
+candidate as `1a0b180326bb93eecee373c57503880b44754506` on 2026-08-31. A fresh
+fetch confirmed that exact merge as `origin/main`, and main Quality run
+`33376169245` passed on that merge. The change installed the applicable generic
+and Effect anti-slop rules, kept TaxKit's stricter local rules, fixed owned
+findings structurally, and added a Changeset for the public contract
+corrections. It did not publish a package, deploy an application, change
+provider state or use credentials.
 
 ## Limits and recovery
 
