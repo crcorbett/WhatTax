@@ -91,6 +91,25 @@ not exercise the fork-only step. It does not prove Preview, teardown,
 Production, rollback, deployment, DNS, publication or legacy-credential
 removal.
 
+## 2026-08-31 Doppler merged-main and PR 73 teardown
+
+The sanitized
+[`2026-08-31-doppler-merged-main/receipt.json`](./2026-08-31-doppler-merged-main/receipt.json)
+records the separately approved merge of PR 73, the successful exact merged-main
+Quality run `33365915627`, and the automatic exact-stage teardown run
+`33365915649`. The teardown fetched only `taxkit/stg_preview`, accepted two
+equal no-op plans for `DocsWebsite`, and read back both the `pr-73` Alchemy
+stage and matching Cloudflare Worker as absent. Receipt-reconciliation run
+`33366004914` independently bound the workflow artifact to merged commit
+`aec5e220…`; a later read-only Cloudflare query also found no Worker carrying
+both the TaxKit docs stack tag and `pr-73` stage tag.
+
+This is merged-main Quality and absent-stage teardown proof only. It does not
+prove a served Preview, hosted fork behaviour, Production, rollback, DNS,
+publication or legacy-credential removal. The Alchemy bootstrap step was
+mutation-capable under the approved envelope, although no stage Worker or state
+resource needed deletion.
+
 ## Local workerd
 
 The DCD-001 command-owned ignored receipt is local-only and is bound to its

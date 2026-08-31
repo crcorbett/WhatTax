@@ -49,8 +49,18 @@ repository-scoped personal login. The retained direct GitHub values remain for
 rollback and are not read by the new workflow source. The dated
 [bootstrap receipt](../evidence/deployments/2026-08-31-doppler-bootstrap/receipt.json)
 owns the exact identities and secret-negative readback. Provider deployment,
-merged-main proof and legacy cleanup remain separate proof or authority
+hosted deployment proof and legacy cleanup remain separate proof or authority
 boundaries.
+
+PR 73 then merged as `aec5e220…`. Exact merged-main Quality run `33365915627`
+passed the trusted `taxkit/ci` fetch, identity check and remote-cache Quality
+graph. The separately approved automatic `pr-73` teardown used only
+`taxkit/stg_preview`, accepted equal no-op plans, and finished with both the
+Alchemy stage and matching Cloudflare Worker absent. The dated
+[merged-main receipt](../evidence/deployments/2026-08-31-doppler-merged-main/receipt.json)
+binds the merge parents, workflow runs, sanitized artifacts and independent
+provider readback. It does not promote that no-op into Preview deployment,
+hosted fork, Production, rollback or legacy-removal proof.
 
 ## Problem
 
