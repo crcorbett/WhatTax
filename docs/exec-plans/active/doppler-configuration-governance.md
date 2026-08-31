@@ -3,7 +3,7 @@ document_type: execution-plan
 lifecycle: current
 authority: canonical
 owner: taxkit-platform-owner
-last_reviewed: 2026-08-28
+last_reviewed: 2026-08-31
 review_trigger: task acceptance, implementation discovery, authority change, hosted proof, rollback, or closeout
 successor: null
 tombstone: false
@@ -383,12 +383,32 @@ hosted failure proof of the missing repository bridge, not proof of a Doppler
 config, secret value, cache result, deployment or provider state. No action log
 or credential value was read into the record.
 
-The current exact head `4acf98f00ad4ad33b80582b61772ce460cf97244`
+The current exact head `46a51adbf150f62fbe2abf289194fd62abeb60a9`
 produced the same bounded failure in hosted Quality run
-[`33090875255`](https://github.com/crcorbett/taxkit/actions/runs/33090875255):
+[`33091612475`](https://github.com/crcorbett/taxkit/actions/runs/33091612475):
 steps through the repository-owned Quality policy passed, and the first Doppler
-fetch failed before any metadata check or release command. The pull request
-therefore remains open and unmerged.
+fetch failed before any metadata check or release command. Read-only
+reconciliation on 31 August 2026 found no TaxKit Doppler project, repository
+`DOPPLER_CI_TOKEN` or Preview/Production `DOPPLER_PROVIDER_TOKEN` bridge. The
+retained direct GitHub values remain present by name. The retained account-owned
+Cloudflare mutation token remains active until 3 September 2026 with the exact
+three permission groups recorded in the earlier capability receipt, but its
+bearer value has no approved recoverable source. The approved bootstrap stopped
+before mutation because its precondition requires all values to have a secure
+source. Separate authority for three TaxKit-only account-owned replacement
+tokens is the smallest resume action. The sanitized dated receipt is
+[`DCG-005-bootstrap-precondition-2026-08-31`](../../evidence/deployments/2026-08-31-doppler-bootstrap-precondition/receipt.json).
+The pull request remains open and unmerged.
+
+Documentation impact for this read-only reconciliation is **Change required**
+for the dated evidence receipt/index and this active plan. The reviewed SPEC,
+task ledger, architecture, authority model, deployment/recovery runbooks,
+workflow source and implementation remain **Preserve** because the required
+design and stop rule did not change. Package/app READMEs, public documentation,
+generated references, skills and a Changeset are **N/A** because this slice
+changes no command, package, export, runtime or public behaviour. Pinned Bun
+`1.3.14` full verification and a forced 93-test deployment run passed; these
+checks prove the repository state only and do not prove external bootstrap.
 
 ## Versioning
 
